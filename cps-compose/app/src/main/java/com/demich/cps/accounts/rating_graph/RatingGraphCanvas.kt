@@ -18,7 +18,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Composable
 internal fun RatingGraphCanvas(

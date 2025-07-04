@@ -28,12 +28,13 @@ import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 
 internal enum class RatingFilterType {
@@ -91,7 +92,7 @@ private fun RatingGraphWithHeader(
     //TODO: saveables not reset after ratings changes
     val translator = rememberCoordinateTranslator()
 
-    val currentTime = remember { getCurrentXTime() }
+    val currentTime = remember { getCurrentTime() }
     var filterType by rememberSaveable {
         translator.setWindow(
             createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
@@ -201,8 +202,8 @@ private fun RatingGraphHeader(
 private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Instant) =
     buildList {
         if (ratingChanges.size > 10) add(RatingFilterType.LAST_10)
-        val firstInMonth = ratingChanges.partitionIndex { it.date < currentTime - 30.days }
-        val firstInYear = ratingChanges.partitionIndex { it.date < currentTime - 365.days }
+        val firstInMonth = ratingChanges.partitionIndex { it.date.toStdlibInstant() < currentTime - 30.days }
+        val firstInYear = ratingChanges.partitionIndex { it.date.toStdlibInstant() < currentTime - 365.days }
         if (firstInMonth < ratingChanges.size && firstInMonth > 0) {
             add(RatingFilterType.LAST_MONTH)
         }

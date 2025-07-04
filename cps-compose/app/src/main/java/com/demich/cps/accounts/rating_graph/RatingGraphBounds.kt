@@ -1,8 +1,9 @@
 package com.demich.cps.accounts.rating_graph
 
 import com.demich.cps.accounts.managers.RatingChange
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 internal data class RatingGraphBounds(
     val minRating: Int,
@@ -18,8 +19,8 @@ internal data class RatingGraphBounds(
 
 private fun createBounds(
     ratingChanges: List<RatingChange>,
-    startTime: Instant = ratingChanges.first().date,
-    endTime: Instant = ratingChanges.last().date
+    startTime: Instant = ratingChanges.first().date.toStdlibInstant(),
+    endTime: Instant = ratingChanges.last().date.toStdlibInstant()
 ) = RatingGraphBounds(
     minRating = ratingChanges.minOf { it.rating },
     maxRating = ratingChanges.maxOf { it.rating },
@@ -37,7 +38,7 @@ internal fun createBounds(
     RatingFilterType.LAST_MONTH, RatingFilterType.LAST_YEAR -> {
         val startTime = now - (if (filterType == RatingFilterType.LAST_MONTH) 30.days else 365.days)
         createBounds(
-            ratingChanges = ratingChanges.filter { it.date >= startTime },
+            ratingChanges = ratingChanges.filter { it.date.toStdlibInstant() >= startTime },
             startTime = startTime,
             endTime = now
         )
