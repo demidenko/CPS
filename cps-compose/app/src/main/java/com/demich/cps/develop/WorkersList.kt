@@ -74,10 +74,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Instant
 import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
@@ -247,7 +248,7 @@ private fun WorkerItem(
         name = work.name,
         workState = workInfo.stateOrCancelled,
         progressInfo = { workInfo?.takeIf { it.isRunning }?.getProgressInfo() },
-        lastExecTime = lastExecutionEvent?.start,
+        lastExecTime = lastExecutionEvent?.start?.toStdlibInstant(),
         lastResult = lastExecutionEvent?.resultType,
         lastDuration = lastExecutionEvent?.duration,
         modifier = modifier
@@ -299,7 +300,7 @@ private fun WorkerItem(
 
             Text(
                 text = lastExecTime?.let {
-                    (localCurrentTime - it).toDropSecondsString() + " ago"
+                    (localCurrentTime.toStdlibInstant() - it).toDropSecondsString() + " ago"
                 } ?: "never"
             )
 
