@@ -44,8 +44,8 @@ class CodeforcesCommunityLostRecentWorker(
         }
     }
 
-    private fun isNew(blogCreationTime: Instant) = workerStartTime.toStdlibInstant() - blogCreationTime < 24.hours
-    private fun isOldLost(blogCreationTime: Instant) = workerStartTime.toStdlibInstant() - blogCreationTime > 7.days
+    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
+    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
 
     private suspend fun CodeforcesLostDao.getSuspectsRemoveOld(minRatingColorTag: CodeforcesColorTag) =
         getSuspects().partition {
@@ -112,7 +112,7 @@ class CodeforcesCommunityLostRecentWorker(
             if (blogEntry.id !in recentIds) {
                 dao.insert(blogEntry.copy(
                     isSuspect = false,
-                    timeStamp = workerStartTime
+                    timeStamp = workerStartTime.toDeprecatedInstant()
                 ))
             }
         }

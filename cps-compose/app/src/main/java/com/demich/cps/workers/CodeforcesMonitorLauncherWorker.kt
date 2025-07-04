@@ -10,6 +10,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
 import com.demich.kotlin_stdlib_boost.minOfNotNull
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -34,7 +35,7 @@ class CodeforcesMonitorLauncherWorker(
         }
     }
 
-    private fun isActual(time: Instant) = workerStartTime.toStdlibInstant() - time < 24.hours
+    private fun isActual(time: Instant) = workerStartTime - time < 24.hours
 
     override suspend fun runWork(): Result {
         //TODO: restart failed monitor
@@ -100,11 +101,12 @@ class CodeforcesMonitorLauncherWorker(
     }
 
     private suspend fun enqueueToCodeforcesContest() {
+        val currentTime = workerStartTime.toDeprecatedInstant()
         context.contestsListDao.getContestsNotFinished(
             platform = Contest.Platform.codeforces,
-            currentTime = workerStartTime
+            currentTime = currentTime
         ).minOfNotNull {
-            when (it.getPhase(workerStartTime)) {
+            when (it.getPhase(currentTime)) {
                 Contest.Phase.RUNNING -> {
                     work.enqueueAsap()
                     return

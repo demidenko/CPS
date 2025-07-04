@@ -10,7 +10,6 @@ import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.kotlin_stdlib_boost.minOfNotNull
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -63,7 +62,7 @@ class ProjectEulerRecentProblemsWorker(
         val rssPage = ProjectEulerClient.getRSSPage()
 
         val nextDate = ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
-            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime.toStdlibInstant() } }
+            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }
             ?: return
 
         work.enqueueAtIfEarlier(nextDate + 1.minutes)

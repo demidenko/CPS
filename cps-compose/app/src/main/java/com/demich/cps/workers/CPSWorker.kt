@@ -9,6 +9,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.getCurrentXTime
 import com.demich.cps.utils.joinAllWithCounter
 import com.demich.cps.utils.jsonCPS
@@ -19,11 +20,13 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 abstract class CPSWorker(
     protected val work: CPSPeriodicWork,
@@ -44,7 +47,7 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = coroutineScope {
-            val event = ExecutionEvent(start = workerStartTime)
+            val event = ExecutionEvent(start = workerStartTime.toDeprecatedInstant())
             workersInfo.append(event)
             smartRunWork().also { result ->
                 workersInfo.append(event.copy(end = getCurrentXTime(), resultType = result.toType()))
@@ -168,9 +171,9 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
 
 
 private class TimeHolder {
-    private var time = getCurrentXTime()
+    private var time: Instant = getCurrentTime()
     fun reset() {
-        time = getCurrentXTime()
+        time = getCurrentTime()
     }
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = time
 }
