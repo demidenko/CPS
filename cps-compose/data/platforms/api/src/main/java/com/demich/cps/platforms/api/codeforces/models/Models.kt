@@ -2,9 +2,11 @@ package com.demich.cps.platforms.api.codeforces.models
 
 import com.demich.cps.platforms.api.DeprecatedInstantAsSecondsSerializer
 import com.demich.cps.platforms.api.DurationAsSecondsSerializer
+import com.demich.cps.platforms.api.InstantAsSecondsSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 enum class CodeforcesLocale {
     EN, RU;
@@ -137,8 +139,8 @@ data class CodeforcesSubmission(
 
     // Time, when submission was created, in unix-format
     @SerialName("creationTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: kotlinx.datetime.Instant,
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
 
     // Testset used for judging the submission
     val testset: CodeforcesTestset
