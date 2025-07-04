@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.utils
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.UtcOffset
@@ -9,9 +8,10 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
-import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.parse
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
+import kotlin.time.Instant
 
 object ProjectEulerUtils {
     private val peUtcOffset get() = UtcOffset(hours = +1)
@@ -52,7 +52,7 @@ object ProjectEulerUtils {
                     RecentProblem(
                         name = nameCell.text(),
                         id = idCell.text(),
-                        date = format.parse(dateStr).toInstant(peUtcOffset).toDeprecatedInstant()
+                        date = format.parse(dateStr).toInstant(peUtcOffset)
                     )
                 }
             }

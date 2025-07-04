@@ -52,7 +52,7 @@ class ProjectEulerRecentProblemsWorker(
                 bigContent = post.name
                 smallIcon = R.drawable.ic_logo_projecteuler
                 colorResId = R.color.project_euler_main
-                time = post.date.toStdlibInstant()
+                time = post.date
                 autoCancel = true
                 url = ProjectEulerUrls.problem(problemId)
             }
@@ -63,8 +63,7 @@ class ProjectEulerRecentProblemsWorker(
         val rssPage = ProjectEulerClient.getRSSPage()
 
         val nextDate = ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
-            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }
-            ?.toStdlibInstant()
+            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime.toStdlibInstant() } }
             ?: return
 
         work.enqueueAtIfEarlier(nextDate + 1.minutes)
