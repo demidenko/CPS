@@ -3,16 +3,18 @@ package com.demich.cps.platforms.utils.atcoder
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.atcoder.AtCoderApi
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.char
+import kotlinx.datetime.parse
+import kotlinx.datetime.toDeprecatedInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 suspend fun AtCoderApi.getContests(): List<Contest> {
     val source = getContestsPage()
@@ -57,7 +59,7 @@ private fun extractContestOrNull(
             title = title.text().trim(),
             id = id,
             link = AtCoderUrls.contest(id),
-            startTime = startTime,
+            startTime = startTime.toDeprecatedInstant(),
             duration = duration
         )
     }.getOrNull()

@@ -29,8 +29,9 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.toSignedString
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toStdlibInstant
+import kotlin.time.Instant
 
 @Composable
 internal fun ContestResult(
@@ -128,7 +129,7 @@ private fun ContestResultTest(
     ContestResult(
         ratingChange = RatingChange(
             title = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
-            date = Instant.fromEpochSeconds(1e9.toLong()),
+            date = Instant.fromEpochSeconds(1e9.toLong()).toDeprecatedInstant(),
             rating = rating,
             rank = 345,
             oldRating = if (change != null) rating - change else null
