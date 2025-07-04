@@ -15,7 +15,6 @@ import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
 import com.demich.cps.utils.asHtmlToSpanned
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.hours
 
 class NewsWorker(
@@ -63,7 +62,7 @@ class NewsWorker(
                 subText = "atcoder news"
                 bigContent = post.title.trim() //TODO: title + content html
                 smallIcon = R.drawable.ic_community
-                post.time?.let { time = it.toStdlibInstant() }
+                post.time?.let { time = it }
                 url = AtCoderUrls.post(post.id.toInt())
                 //setColor
                 autoCancel = true

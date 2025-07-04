@@ -3,8 +3,8 @@ package com.demich.cps.platforms.utils.atcoder
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.utils.NewsPostEntry
-import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
+import kotlin.time.Instant
 
 object AtCoderUtils {
     fun extractUserInfo(source: String): AtCoderUserInfo =
