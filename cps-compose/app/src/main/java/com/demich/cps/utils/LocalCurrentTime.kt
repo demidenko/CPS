@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -61,5 +62,5 @@ fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
 
 @Composable
 @ReadOnlyComposable
-fun kotlinx.datetime.Instant.toTimeAgoString(): String =
-    (localCurrentTime - this).toRoundedTimeString() + " ago"
+fun kotlin.time.Instant.toTimeAgoString(): String =
+    (localCurrentTime.toStdlibInstant() - this).toRoundedTimeString() + " ago"

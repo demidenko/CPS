@@ -25,8 +25,9 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toTimeAgoString
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 @Composable
 fun CommunityFollowListItem(
@@ -98,7 +99,7 @@ private fun CommunityFollowListItemInfo(
 ) {
     Box(modifier = modifier) {
         UserOnlineInfo(
-            time = userInfo.lastOnlineTime,
+            time = userInfo.lastOnlineTime.toStdlibInstant(),
             fontSize = fontSize,
             modifier = Modifier.align(Alignment.CenterStart)
         )
@@ -127,7 +128,7 @@ private fun UserOnlineInfo(
         modifier = modifier,
         fontSize = fontSize,
         text = "online: " + time.toTimeAgoString(),
-        showWarning = localCurrentTime - time > 365.days
+        showWarning = localCurrentTime.toStdlibInstant() - time > 365.days
     )
 }
 

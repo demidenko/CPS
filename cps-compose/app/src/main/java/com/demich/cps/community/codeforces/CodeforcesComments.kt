@@ -45,6 +45,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.htmlToAnnotatedString
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.toTimeAgoString
+import kotlinx.datetime.toStdlibInstant
 import kotlin.math.roundToInt
 
 @Composable
@@ -92,7 +93,7 @@ private fun Comment(
         authorHandle = comment.commentator.toHandleSpan(),
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
-        timeAgo = comment.creationTime.toTimeAgoString(),
+        timeAgo = comment.creationTime.toStdlibInstant().toTimeAgoString(),
         commentHtml = comment.html
     )
 }

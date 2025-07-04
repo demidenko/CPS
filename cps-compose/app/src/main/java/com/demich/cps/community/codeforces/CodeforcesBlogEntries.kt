@@ -32,6 +32,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.utils.plusIf
 import com.demich.cps.utils.toTimeAgoString
+import kotlinx.datetime.toStdlibInstant
 
 
 @Composable
@@ -95,7 +96,7 @@ private fun BlogEntryInfo(
         authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount ?: 0,
-        timeAgo = blogEntry.creationTime.toTimeAgoString(),
+        timeAgo = blogEntry.creationTime.toStdlibInstant().toTimeAgoString(),
         markNew = markNew,
         label = label,
         modifier = modifier
