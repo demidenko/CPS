@@ -29,6 +29,5 @@ dependencies {
     implementation(project(":data:platforms:utils"))
     implementation(project(":kotlin-stdlib-boost"))
 
-    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.android)
 }
