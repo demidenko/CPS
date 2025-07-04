@@ -10,7 +10,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
-import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -89,7 +88,7 @@ object CodeforcesUtils {
                 title = title,
                 authorHandle = author.handle,
                 authorColorTag = author.colorTag,
-                creationTime = creationTime.toDeprecatedInstant(),
+                creationTime = creationTime,
                 rating = rating,
                 commentsCount = commentsCount
             )
@@ -144,7 +143,7 @@ object CodeforcesUtils {
                     title = blogEntryTitle,
                     authorHandle = blogEntryAuthor.handle,
                     authorColorTag = blogEntryAuthor.colorTag,
-                    creationTime = Instant.DISTANT_PAST.toDeprecatedInstant(),
+                    creationTime = Instant.DISTANT_PAST,
                     rating = 0
                 )
             )

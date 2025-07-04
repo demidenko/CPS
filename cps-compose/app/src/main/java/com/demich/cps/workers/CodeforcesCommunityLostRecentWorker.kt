@@ -18,11 +18,13 @@ import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 
 class CodeforcesCommunityLostRecentWorker(
@@ -42,8 +44,8 @@ class CodeforcesCommunityLostRecentWorker(
         }
     }
 
-    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
-    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
+    private fun isNew(blogCreationTime: Instant) = workerStartTime.toStdlibInstant() - blogCreationTime < 24.hours
+    private fun isOldLost(blogCreationTime: Instant) = workerStartTime.toStdlibInstant() - blogCreationTime > 7.days
 
     private suspend fun CodeforcesLostDao.getSuspectsRemoveOld(minRatingColorTag: CodeforcesColorTag) =
         getSuspects().partition {
@@ -91,7 +93,7 @@ class CodeforcesCommunityLostRecentWorker(
                 CodeforcesLostBlogEntry(
                     blogEntry = it,
                     isSuspect = true,
-                    timeStamp = Instant.DISTANT_PAST
+                    timeStamp = Instant.DISTANT_PAST.toDeprecatedInstant()
                 )
             )
         }
@@ -122,7 +124,7 @@ class CodeforcesCommunityLostRecentWorker(
 @Serializable
 data class CodeforcesLostHint(
     val blogEntryId: Int,
-    val creationTime: Instant
+    val creationTime: kotlinx.datetime.Instant
 )
 
 private class CachedBlogEntriesCodeforcesApi(
@@ -177,8 +179,8 @@ private suspend inline fun findSuspects(
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
     val cachedApi = CachedBlogEntriesCodeforcesApi(api) { blogEntry ->
-        val time = blogEntry.creationTime
-        if (!isNew(time)) {
+        val time = blogEntry.creationTime.toDeprecatedInstant()
+        if (!isNew(time.toStdlibInstant())) {
             //save hint
             lastNotNewIdItem.update {
                 if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntry.id, time)
@@ -191,7 +193,7 @@ private suspend inline fun findSuspects(
         // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
         val hint = item.invoke()
         //ensure hint in case isNew logic changes
-        if (hint != null && isNew(hint.creationTime)) {
+        if (hint != null && isNew(hint.creationTime.toStdlibInstant())) {
             item.setValue(null)
             null
         } else {

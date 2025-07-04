@@ -9,7 +9,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import kotlinx.datetime.toStdlibInstant
 
 val Context.followRepository: CodeforcesFollowRepository
     get() = CodeforcesFollowRepositoryImpl(context = this)
@@ -26,7 +25,7 @@ private class CodeforcesFollowRepositoryImpl(val context: Context):
             bigContent = CodeforcesUtils.extractTitle(blogEntry)
             smallIcon = R.drawable.ic_new_post
             autoCancel = true
-            time = blogEntry.creationTime.toStdlibInstant()
+            time = blogEntry.creationTime
             url = CodeforcesUrls.blogEntry(blogEntry.id)
         }
 }

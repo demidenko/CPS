@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.api.codeforces.models
 
-import com.demich.cps.platforms.api.DeprecatedInstantAsSecondsSerializer
 import com.demich.cps.platforms.api.DurationAsSecondsSerializer
 import com.demich.cps.platforms.api.InstantAsSecondsSerializer
 import kotlinx.serialization.SerialName
@@ -158,8 +157,8 @@ data class CodeforcesBlogEntry(
 
     // Time, when blog entry was created, in unix format
     @SerialName("creationTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: kotlinx.datetime.Instant,
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
 
     val rating: Int,
 
