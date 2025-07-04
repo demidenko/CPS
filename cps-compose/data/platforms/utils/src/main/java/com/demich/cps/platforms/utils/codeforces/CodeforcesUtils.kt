@@ -137,7 +137,7 @@ object CodeforcesUtils {
                     commentatorHandleColorTag = commentator.colorTag,
                     html = commentHtml,
                     rating = commentRating,
-                    creationTime = commentCreationTime.toDeprecatedInstant()
+                    creationTime = commentCreationTime
                 ),
                 blogEntry = CodeforcesBlogEntry(
                     id = blogEntryId,

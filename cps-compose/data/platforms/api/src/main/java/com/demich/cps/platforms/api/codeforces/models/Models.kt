@@ -199,8 +199,8 @@ data class CodeforcesComment(
 
     // Time, when comment was created, in unix format
     @SerialName("creationTimeSeconds")
-    @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: kotlinx.datetime.Instant,
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
 
     val commentatorHandle: String,
 
