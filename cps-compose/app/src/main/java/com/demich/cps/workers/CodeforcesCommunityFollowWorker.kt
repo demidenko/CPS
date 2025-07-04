@@ -5,8 +5,6 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import kotlinx.datetime.toDeprecatedInstant
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -51,7 +49,7 @@ class CodeforcesCommunityFollowWorker(
 
         blogs
             .let {
-                val lastSuccess = lastSuccessItem()?.toStdlibInstant()
+                val lastSuccess = lastSuccessItem()
                 if (lastSuccess == null || workerStartTime - lastSuccess > 1.days) it
                 else it.filter { blog -> blog.blogEntries == null || !blog.isUserInactive() }
             }
@@ -68,7 +66,7 @@ class CodeforcesCommunityFollowWorker(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
 
-        lastSuccessItem.setValue(workerStartTime.toDeprecatedInstant())
+        lastSuccessItem.setValue(workerStartTime)
 
         return Result.success()
     }

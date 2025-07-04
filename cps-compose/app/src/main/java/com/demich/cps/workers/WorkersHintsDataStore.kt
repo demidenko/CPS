@@ -8,7 +8,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 
 class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataStore) {
