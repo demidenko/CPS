@@ -16,7 +16,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.utils.getCurrentXTime
+import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
@@ -30,11 +30,12 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 suspend fun CodeforcesMonitorDataStore.launchIn(
     scope: CoroutineScope,
@@ -190,7 +191,7 @@ private suspend fun getDelay(
         CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
         CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
         CodeforcesContestPhase.FINISHED -> {
-            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
+            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime.toStdlibInstant() + contest.duration)
         }
         else -> 5.seconds
     }
@@ -205,7 +206,7 @@ private class RatingChangeWaiter(
 ) {
     suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
         if (isRatingChangeDone()) return Duration.INFINITE
-        val waitingTime = getCurrentXTime() - contestEnd
+        val waitingTime = getCurrentTime() - contestEnd
         return when {
             waitingTime < 30.minutes -> 10.seconds
             waitingTime < 1.hours -> 30.seconds
