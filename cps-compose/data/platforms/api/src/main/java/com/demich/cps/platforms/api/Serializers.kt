@@ -8,7 +8,16 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
+
+object InstantAsSecondsSerializer: KSerializer<Instant> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
+    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeLong(value.epochSeconds)
+    override fun deserialize(decoder: Decoder): Instant =
+        Instant.fromEpochSeconds(decoder.decodeLong())
+}
 
 object DeprecatedInstantAsSecondsSerializer: KSerializer<kotlinx.datetime.Instant> {
     override val descriptor: SerialDescriptor =

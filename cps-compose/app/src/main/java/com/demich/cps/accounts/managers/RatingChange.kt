@@ -41,7 +41,7 @@ internal fun AtCoderRatingChange.toRatingChange(handle: String) =
         rating = NewRating,
         oldRating = OldRating,
         rank = Place,
-        date = EndTime,
+        date = EndTime.toDeprecatedInstant(),
         title = ContestName,
         url = AtCoderUrls.userContestResult(handle, getContestId())
     )
