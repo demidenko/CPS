@@ -2,7 +2,6 @@ package com.demich.cps.platforms.api.codeforces.models
 
 import com.demich.cps.platforms.api.DeprecatedInstantAsSecondsSerializer
 import com.demich.cps.platforms.api.DurationAsSecondsSerializer
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -43,7 +42,7 @@ data class CodeforcesUser(
     // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val lastOnlineTime: Instant
+    val lastOnlineTime: kotlinx.datetime.Instant
 )
 
 @Serializable
@@ -66,7 +65,7 @@ data class CodeforcesContest(
     // Contest start time in unix format. Can be absent.
     @SerialName("startTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val startTime: Instant
+    val startTime: kotlinx.datetime.Instant
 )
 
 @Serializable
@@ -139,7 +138,7 @@ data class CodeforcesSubmission(
     // Time, when submission was created, in unix-format
     @SerialName("creationTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: Instant,
+    val creationTime: kotlinx.datetime.Instant,
 
     // Testset used for judging the submission
     val testset: CodeforcesTestset
@@ -158,7 +157,7 @@ data class CodeforcesBlogEntry(
     // Time, when blog entry was created, in unix format
     @SerialName("creationTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: Instant,
+    val creationTime: kotlinx.datetime.Instant,
 
     val rating: Int,
 
@@ -189,7 +188,7 @@ data class CodeforcesRatingChange(
     // Time, when rating for the contest was update, in unix-format
     @SerialName("ratingUpdateTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val ratingUpdateTime: Instant
+    val ratingUpdateTime: kotlinx.datetime.Instant
 )
 
 @Serializable
@@ -199,7 +198,7 @@ data class CodeforcesComment(
     // Time, when comment was created, in unix format
     @SerialName("creationTimeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val creationTime: Instant,
+    val creationTime: kotlinx.datetime.Instant,
 
     val commentatorHandle: String,
 
@@ -216,7 +215,7 @@ data class CodeforcesRecentAction(
     // Action time, in unix format
     @SerialName("timeSeconds")
     @Serializable(with = DeprecatedInstantAsSecondsSerializer::class)
-    val time: Instant,
+    val time: kotlinx.datetime.Instant,
 
     // In short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,
