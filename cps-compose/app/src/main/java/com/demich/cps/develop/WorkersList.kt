@@ -74,7 +74,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -247,7 +246,7 @@ private fun WorkerItem(
         name = work.name,
         workState = workInfo.stateOrCancelled,
         progressInfo = { workInfo?.takeIf { it.isRunning }?.getProgressInfo() },
-        lastExecTime = lastExecutionEvent?.start?.toStdlibInstant(),
+        lastExecTime = lastExecutionEvent?.start,
         lastResult = lastExecutionEvent?.resultType,
         lastDuration = lastExecutionEvent?.duration,
         modifier = modifier

@@ -19,7 +19,6 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.datetime.toDeprecatedInstant
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 import kotlin.time.Duration
@@ -46,10 +45,10 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
 
         val result = coroutineScope {
-            val event = ExecutionEvent(start = workerStartTime.toDeprecatedInstant())
+            val event = ExecutionEvent(start = workerStartTime)
             workersInfo.append(event)
             smartRunWork().also { result ->
-                workersInfo.append(event.copy(end = getCurrentTime().toDeprecatedInstant(), resultType = result.toType()))
+                workersInfo.append(event.copy(end = getCurrentTime(), resultType = result.toType()))
                 if (result.toType() != ResultType.SUCCESS) {
                     work.enqueueAsap()
                 }
@@ -124,8 +123,8 @@ abstract class CPSWorker(
 
     @Serializable
     data class ExecutionEvent(
-        val start: kotlinx.datetime.Instant,
-        val end: kotlinx.datetime.Instant? = null,
+        val start: Instant,
+        val end: Instant? = null,
         val resultType: ResultType? = null
     ) {
         val duration: Duration? get() = end?.minus(start)
