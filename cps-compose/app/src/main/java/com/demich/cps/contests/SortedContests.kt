@@ -26,9 +26,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Instant
 import kotlinx.datetime.toDeprecatedInstant
+import kotlinx.datetime.toStdlibInstant
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
     combine(
@@ -66,14 +67,14 @@ private interface ContestsSorter {
 }
 
 private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionIndex { it.getPhase(currentTime) != Contest.Phase.FINISHED }
+    partitionIndex { it.getPhase(currentTime.toDeprecatedInstant()) != Contest.Phase.FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)
         private set
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime))
+        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime.toDeprecatedInstant()))
         this.contests = SortedContests(
             contests = sorted,
             firstFinished = sorted.firstFinished(currentTime)
@@ -86,7 +87,7 @@ private class ContestsSmartSorter: ContestsSorter {
     private class SortedData(contests: List<Contest>, time: Instant) {
         val sorted: List<Contest> =
             contests.let {
-                val comparator = Contest.comparatorAt(time)
+                val comparator = Contest.comparatorAt(time.toDeprecatedInstant())
                 if (it.isSortedWith(comparator)) it
                 else it.sortedWith(comparator)
             }
@@ -96,8 +97,8 @@ private class ContestsSmartSorter: ContestsSorter {
         val nextReorderTime: Instant =
             sorted.minOfNotNull {
                 when {
-                    sortedAt < it.startTime -> it.startTime
-                    sortedAt < it.endTime -> it.endTime
+                    sortedAt < it.startTime.toStdlibInstant() -> it.startTime.toStdlibInstant()
+                    sortedAt < it.endTime.toStdlibInstant() -> it.endTime.toStdlibInstant()
                     else -> null
                 }
             } ?: Instant.DISTANT_FUTURE
@@ -134,16 +135,16 @@ private class ContestsSmartSorter: ContestsSorter {
 @Composable
 internal fun produceSortedContestsWithTime(
 
-): Pair<State<SortedContests>, State<Instant>> {
+): Pair<State<SortedContests>, State<kotlinx.datetime.Instant>> {
     val context = context
 
     val init = remember {
         val initContests = runBlocking { flowOfContests(context).first() }
-        val currentTime = getCurrentTime().truncateBy(1.seconds).toDeprecatedInstant()
+        val currentTime = getCurrentTime().truncateBy(1.seconds)
         val sorter = ContestsSmartSorter()
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)
-        val currentTimeState = mutableStateOf(currentTime)
+        val currentTimeState = mutableStateOf(currentTime.toDeprecatedInstant())
         Pair(Pair(contestsState, currentTimeState), sorter)
     }
 
@@ -154,7 +155,7 @@ internal fun produceSortedContestsWithTime(
             val (states, sorter: ContestsSorter) = init
             val (contestsState, currentTimeState) = states
             flowOfContests(context).combine(flowOfCurrentTimeEachSecond()) { contests, currentTime ->
-                if (sorter.apply(contests, currentTime)) {
+                if (sorter.apply(contests, currentTime.toStdlibInstant())) {
                     contestsState.value = sorter.contests
                 }
                 currentTimeState.value = currentTime
