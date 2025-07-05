@@ -42,9 +42,9 @@ class CodeforcesMonitorNotifier(
 
     fun apply(contestData: CodeforcesMonitorData) {
         changed = false
-        if (setContestName(contestData.contestInfo.name)) changed = true
+        contestantRank = contestData.contestantRank
+        contestName = contestData.contestInfo.name
         if (setContestPhase(contestData.contestPhase)) changed = true
-        if (setContestantRank(contestData.contestantRank)) changed = true
         if (setProblemNames(contestData.problems.map { it.name })) changed = true
         contestData.problems.forEach { //don't confuse with .any{} !!
             if (setProblemResult(
@@ -56,24 +56,18 @@ class CodeforcesMonitorNotifier(
         if (changed) submitNotification()
     }
 
-    private var _contestantRank = CodeforcesMonitorData.ContestRank(rank = null, participationType = CodeforcesParticipationType.NOT_PARTICIPATED)
-    private fun setContestantRank(contestantRank: CodeforcesMonitorData.ContestRank): Boolean {
-        if (_contestantRank == contestantRank) return false
-        _contestantRank = contestantRank
+    private var contestantRank by delegate(
+        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = CodeforcesParticipationType.NOT_PARTICIPATED)
+    ) {
         val rank = buildString {
-            if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
-            append(contestantRank.rank)
+            if (it.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
+            append(it.rank)
         }
         viewBig.setTextViewText(R.id.cf_monitor_rank, rank)
-        return true
     }
 
-    private var _contestName = ""
-    private fun setContestName(contestName: String): Boolean {
-        if (_contestName == contestName) return false
-        _contestName = contestName
-        notificationBuilder.edit { subText = "$contestName • $handle" }
-        return true
+    private var contestName by delegate(initialValue = "") {
+        notificationBuilder.edit { subText = "$it • $handle" }
     }
 
     private var _phase: CodeforcesMonitorData.ContestPhase = CodeforcesMonitorData.ContestPhase.Other(
@@ -161,13 +155,13 @@ class CodeforcesMonitorNotifier(
 
     private fun submitNotification() {
         notificationBuilder.edit {
-            val notParticipated = _contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
+            val notParticipated = contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
 
             setCustomContentView(viewSmall.apply {
                 setTextViewText(
                     R.id.cf_monitor_rank,
                     if (notParticipated) "not participated"
-                    else "rank: ${_contestantRank.rank}"
+                    else "rank: ${contestantRank.rank}"
                 )
             })
 
