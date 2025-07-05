@@ -48,7 +48,7 @@ class CodeforcesMonitorNotifier(
         contestantRank = contestData.contestantRank
         contestName = contestData.contestInfo.name
         phase = contestData.contestPhase
-        if (setProblemNames(contestData.problems.map { it.name })) changed = true
+        problemNames = contestData.problems.map { it.name }
         contestData.problems.forEach { //don't confuse with .any{} !!
             if (setProblemResult(
                 problemName = it.name,
@@ -92,20 +92,16 @@ class CodeforcesMonitorNotifier(
         }
     }
 
-    private var _problemNames: List<String>? = null
-    private fun setProblemNames(problemNames: List<String>): Boolean {
-        if (_problemNames == problemNames) return false
-        _problemNames = problemNames
+    private var problemNames: List<String> by delegate(initialValue = emptyList()) {
         viewBig.removeAllViews(R.id.cf_monitor_problems_table)
         problemColumns.clear()
-        problemNames.forEach { problemName ->
+        it.forEach { problemName ->
             val view = RemoteViews(context.packageName, R.layout.cf_monitor_table_column)
             view.setTextViewText(R.id.cf_monitor_table_column_header, problemName)
             view.setTextViewText(R.id.cf_monitor_table_column_cell, "")
             viewBig.addView(R.id.cf_monitor_problems_table, view)
             problemColumns[problemName] = view
         }
-        return true
     }
 
     private val _problemResults = mutableMapOf<String, CodeforcesMonitorData.ProblemResult>()
