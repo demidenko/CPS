@@ -20,6 +20,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -88,6 +89,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 .takeWhile { it?.contestId == contestId }
                 .filterNotNull()
                 .distinctUntilChanged()
+                .conflate()
                 .collect {
                     notifier.apply(it)
                 }
