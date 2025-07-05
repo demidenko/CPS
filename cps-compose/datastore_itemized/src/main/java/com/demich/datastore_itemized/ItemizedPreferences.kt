@@ -15,6 +15,9 @@ open class ItemizedPreferences internal constructor(
 ) {
     operator fun <T> get(item: DataStoreValue<T>): T =
         item.reader.restore(preferences)
+
+    val <T> DataStoreValue<T>.value: T
+        get() = get(item = this)
 }
 
 class ItemizedMutablePreferences internal constructor(
@@ -22,6 +25,10 @@ class ItemizedMutablePreferences internal constructor(
 ): ItemizedPreferences(preferences) {
     operator fun <T> set(item: DataStoreItem<T>, value: T) =
         item.saver.save(preferences, value)
+
+    var <T> DataStoreItem<T>.value: T
+        get() = get(item = this)
+        set(value) = set(item = this, value = value)
 
     fun clear() {
         preferences.clear()
