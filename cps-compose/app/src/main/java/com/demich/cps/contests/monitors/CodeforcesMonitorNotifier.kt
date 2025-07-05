@@ -23,7 +23,7 @@ class CodeforcesMonitorNotifier(
 ) {
     private var changed: Boolean = false
 
-    private inline fun <T> delegate(initialValue: T, crossinline block: (T) -> Unit) =
+    private inline fun <T> delegateWithOld(initialValue: T, crossinline block: (T, T) -> Unit) =
         object : ObservableProperty<T>(initialValue = initialValue) {
             override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean {
                 return newValue != oldValue
@@ -31,9 +31,12 @@ class CodeforcesMonitorNotifier(
 
             override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
                 changed = true
-                block(newValue)
+                block(oldValue, newValue)
             }
         }
+
+    private inline fun <T> delegate(initialValue: T, crossinline block: (T) -> Unit) =
+        delegateWithOld(initialValue = initialValue) { oldValue, newValue -> block(newValue) }
 
     private val viewSmall = RemoteViews(context.packageName, R.layout.cf_monitor_view_small)
     private val viewBig = RemoteViews(context.packageName, R.layout.cf_monitor_view_big)
