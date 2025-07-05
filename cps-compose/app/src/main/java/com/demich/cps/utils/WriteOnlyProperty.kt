@@ -3,13 +3,9 @@ package com.demich.cps.utils
 import kotlin.reflect.KProperty
 
 inline fun <T> writeOnlyProperty(crossinline set: (T) -> Unit): WriteOnlyProperty<T> =
-    object : WriteOnlyProperty<T> {
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-            set(value)
-        }
-    }
+    WriteOnlyProperty { _, _, value -> set(value) }
 
-interface WriteOnlyProperty<T> {
+fun interface WriteOnlyProperty<T> {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T)
 }
 
