@@ -6,69 +6,58 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.demich.cps.utils.makePendingIntentOpenUrl
+import com.demich.cps.utils.writeOnlyProperty
 import kotlin.time.Instant
 
-//default values and getters don't matters, setter just send value to builder
 class NotificationBuildScope(
     private val builder: NotificationCompat.Builder,
     private val context: Context
 ) {
 
-    var contentTitle: String = ""
-        set(value) {
-            builder.setContentTitle(value)
-        }
+    var contentTitle: String by writeOnlyProperty {
+        builder.setContentTitle(it)
+    }
 
-    var contentText: String = ""
-        set(value) {
-            builder.setContentText(value)
-        }
+    var contentText: String by writeOnlyProperty {
+        builder.setContentText(it)
+    }
 
-    var subText: String = ""
-        set(value) {
-            builder.setSubText(value)
-        }
+    var subText: String by writeOnlyProperty {
+        builder.setSubText(it)
+    }
 
-    var smallIcon: Int = 0
-        set(value) {
-            builder.setSmallIcon(value)
-        }
+    var smallIcon: Int by writeOnlyProperty {
+        builder.setSmallIcon(it)
+    }
 
-    var color: Color = Color.Black
-        set(value) {
-            builder.setColor(value.toArgb())
-        }
+    var color: Color by writeOnlyProperty {
+        builder.setColor(it.toArgb())
+    }
 
-    var colorResId: Int = 0
-        set(value) {
-            builder.setColor(context.getColor(value))
-        }
+    var colorResId: Int by writeOnlyProperty {
+        builder.setColor(context.getColor(it))
+    }
 
-    var time: Instant? = null
-        set(value) {
-            builder.setShowWhen(value != null)
-            if (value != null) builder.setWhen(value.toEpochMilliseconds())
-        }
+    var time: Instant? by writeOnlyProperty {
+        builder.setShowWhen(it != null)
+        if (it != null) builder.setWhen(it.toEpochMilliseconds())
+    }
 
-    var bigContent: CharSequence = ""
-        set(value) {
-            builder.setContentText(value).setStyle(NotificationCompat.BigTextStyle().bigText(value))
-        }
+    var bigContent: CharSequence by writeOnlyProperty {
+        builder.setContentText(it).setStyle(NotificationCompat.BigTextStyle().bigText(it))
+    }
 
-    var url: String = ""
-        set(value) {
-            builder.setContentIntent(makePendingIntentOpenUrl(url = value, context = context))
-        }
+    var url: String by writeOnlyProperty {
+        builder.setContentIntent(makePendingIntentOpenUrl(url = it, context = context))
+    }
 
-    var autoCancel: Boolean = false
-        set(value) {
-            builder.setAutoCancel(value)
-        }
+    var autoCancel: Boolean by writeOnlyProperty {
+        builder.setAutoCancel(it)
+    }
 
-    var silent: Boolean = false
-        set(value) {
-            builder.setSilent(value)
-        }
+    var silent: Boolean by writeOnlyProperty {
+        builder.setSilent(it)
+    }
 
     fun setStyle(style: NotificationCompat.Style?) {
         builder.setStyle(style)
