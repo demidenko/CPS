@@ -271,11 +271,11 @@ private fun needCheckSubmissions(
 
 private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
-) = fromSnapshot { prefs ->
-    val contestInfo = prefs[contestInfo] ?: return@fromSnapshot
-    if (needCheckSubmissions(contestInfo = contestInfo, participationType = prefs[participationType])) {
-        val problemResults = prefs[problemResults]
-        val info = prefs[submissionsInfo]
+) = fromSnapshot {
+    val contestInfo = contestInfo.value ?: return@fromSnapshot
+    if (needCheckSubmissions(contestInfo = contestInfo, participationType = participationType.value)) {
+        val problemResults = problemResults.value
+        val info = submissionsInfo.value
         if (problemResults.any { needCheckSubmissions(it, info) }) block(problemResults)
     }
 }

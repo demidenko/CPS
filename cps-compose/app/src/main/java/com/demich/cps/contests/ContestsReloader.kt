@@ -77,10 +77,10 @@ private suspend fun contestsLoadingFlows(
     val contestsDateConstraints: ContestDateRelativeConstraints
     val contestsLoadersPriorityLists: Map<Contest.Platform, List<ContestsLoaderType>>
     settings.fromSnapshot {
-        clistApiAccess = it[this.clistApiAccess]
-        clistAdditionalResources = it[this.clistAdditionalResources]
-        contestsDateConstraints = it[this.contestsDateConstraints]
-        contestsLoadersPriorityLists = it[this.contestsLoadersPriorityLists]
+        clistApiAccess = settings.clistApiAccess.value
+        clistAdditionalResources = settings.clistAdditionalResources.value
+        contestsDateConstraints = settings.contestsDateConstraints.value
+        contestsLoadersPriorityLists = settings.contestsLoadersPriorityLists.value
     }
 
     return contestsLoadingFlows(

@@ -50,9 +50,9 @@ suspend fun <D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) 
 }
 
 @OptIn(ExperimentalContracts::class)
-suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(block: D.(ItemizedPreferences) -> R): R {
+suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(block: ItemizedPreferences.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return block(snapshot())
+    return snapshot().block()
 }
