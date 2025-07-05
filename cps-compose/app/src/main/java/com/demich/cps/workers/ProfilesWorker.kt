@@ -76,7 +76,7 @@ class ProfilesWorker(
 
         if (newContribution == userInfo.contribution) return
 
-        dataStore.setProfile(ProfileResult.Success(userInfo.copy(contribution = newContribution)))
+        dataStore.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)))
 
         val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
 

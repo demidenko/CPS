@@ -16,7 +16,7 @@ object TimusUtils {
                 else select("td.author_stats_value").map { row ->
                     row.text().let { it.substring(0, it.indexOf(" out of ")) }
                 }
-            return ProfileResult.Success(
+            return ProfileResult(
                 userInfo = TimusUserInfo(
                     id = handle,
                     userName = userName,

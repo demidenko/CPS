@@ -36,12 +36,7 @@ class DmojAccountManager :
     override suspend fun fetchProfile(data: String): ProfileResult<DmojUserInfo> =
         DmojClient.runCatching {
             val res = getUser(handle = data)
-            ProfileResult.Success(
-                userInfo = DmojUserInfo(
-                    handle = res.username,
-                    rating = res.rating
-                )
-            )
+            ProfileResult(DmojUserInfo(handle = res.username, rating = res.rating))
         }.getOrElse {
             if (it.isPageNotFound) ProfileResult.NotFound(data)
             else ProfileResult.Failed(data)

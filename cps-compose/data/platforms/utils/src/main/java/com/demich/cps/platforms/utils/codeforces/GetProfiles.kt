@@ -29,7 +29,7 @@ suspend fun CodeforcesApi.getProfiles(
                 val iter = users.iterator()
                 for (handle in handles) {
                     val user = iter.next()
-                    put(key = handle, value = ProfileResult.Success(user.toUserInfo()))
+                    put(key = handle, value = ProfileResult(user.toUserInfo()))
                 }
                 break
             }
@@ -42,7 +42,7 @@ suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): Pr
     // shortcut for getProfiles(setOf(handle), recoverHandle).getValue(handle)
     return runCatching {
         val user = getUser(handle = handle, checkHistoricHandles = recoverHandle)
-        ProfileResult.Success(user.toUserInfo())
+        ProfileResult(user.toUserInfo())
     }.getOrElse { e ->
         if (e is CodeforcesApiHandleNotFoundException && e.handle == handle) {
             ProfileResult.NotFound(handle)

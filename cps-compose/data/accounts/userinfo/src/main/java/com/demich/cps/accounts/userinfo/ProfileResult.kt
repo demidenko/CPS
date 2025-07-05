@@ -23,6 +23,8 @@ sealed interface ProfileResult<out U: UserInfo> {
     }
 }
 
+fun <U: UserInfo> ProfileResult(userInfo: U) = ProfileResult.Success(userInfo)
+
 private val userInfoSerializersModule = SerializersModule {
     polymorphic(UserInfo::class) {
         subclass(ACMPUserInfo::class)

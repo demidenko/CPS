@@ -27,7 +27,7 @@ class ACMPAccountManager :
 
     override suspend fun fetchProfile(data: String): ProfileResult<ACMPUserInfo> {
         return ACMPUtils.runCatching {
-            ProfileResult.Success(
+            ProfileResult(
                 userInfo = extractUserInfo(
                     source = ACMPClient.getUserPage(id = data.toInt()),
                     id = data

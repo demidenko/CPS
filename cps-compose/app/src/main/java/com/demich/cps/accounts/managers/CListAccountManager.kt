@@ -22,7 +22,7 @@ class CListAccountManager :
 
     override suspend fun fetchProfile(data: String): ProfileResult<ClistUserInfo> =
         ClistUtils.runCatching {
-            ProfileResult.Success(
+            ProfileResult(
                 userInfo = extractUserInfo(
                     source = ClistClient.getUserPage(login = data),
                     login = data

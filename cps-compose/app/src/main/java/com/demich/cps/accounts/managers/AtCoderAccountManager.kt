@@ -38,9 +38,7 @@ class AtCoderAccountManager :
 
     override suspend fun fetchProfile(data: String): ProfileResult<AtCoderUserInfo> {
         return AtCoderUtils.runCatching {
-            ProfileResult.Success(
-                userInfo = extractUserInfo(source = AtCoderClient.getUserPage(handle = data))
-            )
+            ProfileResult(extractUserInfo(AtCoderClient.getUserPage(handle = data)))
         }.getOrElse { e ->
             if (e.isPageNotFound) ProfileResult.NotFound(data)
             else ProfileResult.Failed(data)

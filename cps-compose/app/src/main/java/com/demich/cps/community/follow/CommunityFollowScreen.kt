@@ -149,7 +149,7 @@ private fun CodeforcesFollowList(
             title = buildAnnotatedString {
                 val result = userBlog.userInfo.let {
                     if (it == null) ProfileResult.Failed(userId = userBlog.handle)
-                    else ProfileResult.Success(userInfo = it)
+                    else ProfileResult(userInfo = it)
                 }
                 append("Delete ")
                 append(LocalCodeforcesAccountManager.current.makeHandleSpan(profileResult = result))

@@ -60,7 +60,7 @@ class CodeChefAccountManager :
 
     override suspend fun fetchProfile(data: String): ProfileResult<CodeChefUserInfo> =
         CodeChefUtils.runCatching {
-            ProfileResult.Success(
+            ProfileResult(
                 userInfo = extractUserInfo(
                     source = CodeChefClient.getUserPage(handle = data),
                     handle = data
