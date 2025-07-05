@@ -43,6 +43,7 @@ fun Project.configureKotlin() {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
             optIn.add("kotlin.time.ExperimentalTime")
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
     }
 }

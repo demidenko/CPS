@@ -15,9 +15,6 @@ open class ItemizedPreferences internal constructor(
 ) {
     operator fun <T> get(item: DataStoreValue<T>): T =
         item.reader.restore(preferences)
-
-    val <T> DataStoreValue<T>.value: T
-        get() = get(item = this)
 }
 
 class ItemizedMutablePreferences internal constructor(
@@ -25,10 +22,6 @@ class ItemizedMutablePreferences internal constructor(
 ): ItemizedPreferences(preferences) {
     operator fun <T> set(item: DataStoreItem<T>, value: T) =
         item.saver.save(preferences, value)
-
-    var <T> DataStoreItem<T>.value: T
-        get() = get(item = this)
-        set(value) = set(item = this, value = value)
 
     fun clear() {
         preferences.clear()
@@ -38,6 +31,17 @@ class ItemizedMutablePreferences internal constructor(
         item.saver.removeFrom(preferences)
     }
 }
+
+// fun in prefs does not compile
+context(prefs: ItemizedPreferences)
+val <T> DataStoreValue<T>.value: T
+    get() = prefs.get(item = this)
+
+context(prefs: ItemizedMutablePreferences)
+var <T> DataStoreItem<T>.value: T
+    get() = prefs.get(item = this)
+    set(value) = prefs.set(item = this, value = value)
+
 
 fun <D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
     dataStore.data.map { transform(ItemizedPreferences(it)) }.distinctUntilChanged()
@@ -50,9 +54,9 @@ suspend fun <D: ItemizedDataStore> D.edit(block: D.(ItemizedMutablePreferences) 
 }
 
 @OptIn(ExperimentalContracts::class)
-suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(block: ItemizedPreferences.() -> R): R {
+suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(block: context(ItemizedPreferences) D.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return snapshot().block()
+    return block(snapshot(), this)
 }
