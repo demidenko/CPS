@@ -2,6 +2,7 @@ package com.demich.cps.contests.settings
 
 import com.demich.cps.contests.database.Contest
 import com.demich.datastore_itemized.fromSnapshot
+import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.serialization.Serializable
 

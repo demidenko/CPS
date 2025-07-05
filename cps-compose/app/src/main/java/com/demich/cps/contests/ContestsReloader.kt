@@ -19,6 +19,7 @@ import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.last
@@ -77,10 +78,10 @@ private suspend fun contestsLoadingFlows(
     val contestsDateConstraints: ContestDateRelativeConstraints
     val contestsLoadersPriorityLists: Map<Contest.Platform, List<ContestsLoaderType>>
     settings.fromSnapshot {
-        clistApiAccess = settings.clistApiAccess.value
-        clistAdditionalResources = settings.clistAdditionalResources.value
-        contestsDateConstraints = settings.contestsDateConstraints.value
-        contestsLoadersPriorityLists = settings.contestsLoadersPriorityLists.value
+        clistApiAccess = this.clistApiAccess.value
+        clistAdditionalResources = this.clistAdditionalResources.value
+        contestsDateConstraints = this.contestsDateConstraints.value
+        contestsLoadersPriorityLists = this.contestsLoadersPriorityLists.value
     }
 
     return contestsLoadingFlows(
