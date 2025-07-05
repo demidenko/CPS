@@ -19,13 +19,15 @@ class CodeforcesMonitorNotifier(
     val notificationBuilder: NotificationBuilder,
     val handle: String
 ) {
+    private var changed: Boolean = false
+
     private val viewSmall = RemoteViews(context.packageName, R.layout.cf_monitor_view_small)
     private val viewBig = RemoteViews(context.packageName, R.layout.cf_monitor_view_big)
     private val views = arrayOf(viewSmall, viewBig)
     private val problemColumns = mutableMapOf<String, RemoteViews>()
 
     fun apply(contestData: CodeforcesMonitorData) {
-        var changed = false
+        changed = false
         if (setContestName(contestData.contestInfo.name)) changed = true
         if (setContestPhase(contestData.contestPhase)) changed = true
         if (setContestantRank(contestData.contestantRank)) changed = true
