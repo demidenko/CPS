@@ -12,6 +12,8 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.utils.getCurrentTime
+import kotlin.properties.ObservableProperty
+import kotlin.reflect.KProperty
 import kotlin.time.Duration.Companion.milliseconds
 
 class CodeforcesMonitorNotifier(
@@ -20,6 +22,18 @@ class CodeforcesMonitorNotifier(
     val handle: String
 ) {
     private var changed: Boolean = false
+
+    private inline fun <T> delegate(initialValue: T, crossinline block: (T) -> Unit) =
+        object : ObservableProperty<T>(initialValue = initialValue) {
+            override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean {
+                return newValue != oldValue
+            }
+
+            override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
+                changed = true
+                block(newValue)
+            }
+        }
 
     private val viewSmall = RemoteViews(context.packageName, R.layout.cf_monitor_view_small)
     private val viewBig = RemoteViews(context.packageName, R.layout.cf_monitor_view_big)
