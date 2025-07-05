@@ -47,7 +47,7 @@ class CodeforcesMonitorNotifier(
         changed = false
         contestantRank = contestData.contestantRank
         contestName = contestData.contestInfo.name
-        if (setContestPhase(contestData.contestPhase)) changed = true
+        phase = contestData.contestPhase
         if (setProblemNames(contestData.problems.map { it.name })) changed = true
         contestData.problems.forEach { //don't confuse with .any{} !!
             if (setProblemResult(
@@ -73,19 +73,16 @@ class CodeforcesMonitorNotifier(
         notificationBuilder.edit { subText = "$it • $handle" }
     }
 
-    private var _phase: CodeforcesMonitorData.ContestPhase = CodeforcesMonitorData.ContestPhase.Other(
-        CodeforcesContestPhase.UNDEFINED)
-    private fun setContestPhase(phase: CodeforcesMonitorData.ContestPhase): Boolean {
-        if (_phase == phase) return false
-        val phaseChanged = _phase.phase != phase.phase
-        _phase = phase
+    private var phase: CodeforcesMonitorData.ContestPhase by delegateWithOld(
+        initialValue = CodeforcesMonitorData.ContestPhase.Other(CodeforcesContestPhase.UNDEFINED)
+    ) { oldPhase, phase ->
         views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
             val remaining = phase.endTime - getCurrentTime()
             val elapsed = SystemClock.elapsedRealtime().milliseconds
             views.forEach { it.setChronometer(R.id.cf_monitor_progress, (elapsed + remaining).inWholeMilliseconds, null, true) }
         } else {
-            if (phaseChanged) {
+            if (phase.phase != oldPhase.phase) {
                 views.forEach { it.setChronometer(R.id.cf_monitor_progress, 0, null, false) }
                 views.forEach { it.setTextViewText(R.id.cf_monitor_progress, "") }
             }
@@ -93,7 +90,6 @@ class CodeforcesMonitorNotifier(
         if (phase is CodeforcesMonitorData.ContestPhase.SystemTesting) {
             views.forEach { it.setTextViewText(R.id.cf_monitor_progress, "${phase.percentage}%") }
         }
-        return true
     }
 
     private var _problemNames: List<String>? = null
