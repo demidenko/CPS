@@ -34,6 +34,7 @@ import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFrom
+import com.demich.cps.utils.writeOnlyProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -108,13 +109,13 @@ class CPSNavigator(
     inner class DuringCompositionHolder<T: Screen>(
         val screen: T
     ) {
-        var menu: CPSMenuBuilder?
-            get() = error("read not allowed, use state instead")
-            set(value) { if (screen == currentScreen) menuBuilderState.value = value }
+        var menu: CPSMenuBuilder? by writeOnlyProperty {
+            if (screen == currentScreen) menuBuilderState.value = it
+        }
 
-        var bottomBar: AdditionalBottomBarBuilder?
-            get() = error("read not allowed, use state instead")
-            set(value) { if (screen == currentScreen) bottomBarBuilderState.value = value }
+        var bottomBar: AdditionalBottomBarBuilder? by writeOnlyProperty {
+            if (screen == currentScreen) bottomBarBuilderState.value = it
+        }
 
         val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
 
