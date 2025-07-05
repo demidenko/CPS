@@ -5,6 +5,7 @@ import android.widget.RemoteViews
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
+import com.demich.cps.utils.getValue
 import com.demich.cps.utils.makePendingIntentOpenUrl
 import com.demich.cps.utils.writeOnlyProperty
 import kotlin.time.Instant

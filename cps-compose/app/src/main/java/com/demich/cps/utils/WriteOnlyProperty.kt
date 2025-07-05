@@ -1,15 +1,24 @@
 package com.demich.cps.utils
 
-import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-inline fun <T> writeOnlyProperty(crossinline set: (T) -> Unit): ReadWriteProperty<Any?, T> =
-    object : ReadWriteProperty<Any?, T> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-            error("get in write-only delegate")
-        }
-
+inline fun <T> writeOnlyProperty(crossinline set: (T) -> Unit): WriteOnlyProperty<T> =
+    object : WriteOnlyProperty<T> {
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
             set(value)
         }
     }
+
+interface WriteOnlyProperty<T> {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T)
+}
+
+// @Deprecated(level = DeprecationLevel.ERROR, message = "get is not allowed")
+operator fun <T> WriteOnlyProperty<T>.getValue(thisRef: Any?, property: KProperty<*>): T {
+    error("get in write-only property")
+}
+
+/*
+operator fun WriteOnlyProperty<*>.getValue(thisRef: Any?, property: KProperty<*>): Nothing {
+    error("get in write-only property")
+}*/
