@@ -61,15 +61,15 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
     override suspend fun doWork(): Result {
         val monitor = CodeforcesMonitorDataStore(context)
 
-        val (contestId, handle) = monitor.args() ?: return Result.failure()
+        val args = monitor.args() ?: return Result.failure()
 
-        val notificationBuilder = createNotificationBuilder(handle)
+        val notificationBuilder = createNotificationBuilder(args.handle)
             .also { setForeground(it) }
 
         val notifier = CodeforcesMonitorNotifier(
             context = context,
             notificationBuilder = notificationBuilder,
-            handle = handle
+            handle = args.handle
         )
 
         coroutineScope {
