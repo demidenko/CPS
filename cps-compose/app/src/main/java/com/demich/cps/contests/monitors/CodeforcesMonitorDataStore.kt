@@ -12,6 +12,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
@@ -78,9 +79,9 @@ internal data class CodeforcesMonitorSubmissionInfo(
 }
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
-    flowOf { prefs ->
-        val contest = prefs[contestInfo] ?: return@flowOf null
-        prefs[args].let { if (it?.contestId != contest.id) return@flowOf null }
+    flowOf {
+        val contest = contestInfo.value ?: return@flowOf null
+        args.value.let { if (it?.contestId != contest.id) return@flowOf null }
         if (contest.phase == CodeforcesContestPhase.UNDEFINED) return@flowOf null
 
         val phase = when (contest.phase) {
@@ -88,7 +89,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
                 CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
             }
             CodeforcesContestPhase.SYSTEM_TEST -> {
-                CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = prefs[sysTestPercentage])
+                CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
             }
             else -> {
                 CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
@@ -96,11 +97,11 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
         }
 
         val contestantRank = CodeforcesMonitorData.ContestRank(
-            rank = prefs[contestantRank],
-            participationType = prefs[participationType]
+            rank = contestantRank.value,
+            participationType = participationType.value
         )
 
-        val problems = prefs[problemResults].map { problem ->
+        val problems = problemResults.value.map { problem ->
             val index = problem.problemIndex
             CodeforcesMonitorData.ProblemInfo(
                 name = index,
@@ -112,7 +113,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
                             points = problem.points,
                             isFinal = problem.type == CodeforcesProblemStatus.FINAL
                         )
-                    prefs[submissionsInfo][index]?.any { it.isFailedSystemTest() } == true
+                    submissionsInfo.value[index]?.any { it.isFailedSystemTest() } == true
                         -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
                     else
                         -> CodeforcesMonitorData.ProblemResult.Empty
@@ -130,9 +131,9 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
 
 // shortcut for flowOfContestData().map { it?.contestId }
 fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
-    flowOf { prefs ->
-        val contestInfo = prefs[contestInfo]
-        val contestId = prefs[args]?.contestId
+    flowOf {
+        val contestInfo = contestInfo.value
+        val contestId = args.value?.contestId
         when {
             contestInfo == null -> null
             contestInfo.id != contestId -> null

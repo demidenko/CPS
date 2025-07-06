@@ -52,6 +52,7 @@ import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -99,8 +100,8 @@ fun CommunitySettingsScreen() {
 }
 
 private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =
-    context.settingsCommunity.flowOf { prefs ->
-        prefs[codeforcesFollowEnabled] || prefs[enabledNewsFeeds].isNotEmpty()
+    context.settingsCommunity.flowOf {
+        codeforcesFollowEnabled.value || enabledNewsFeeds.value.isNotEmpty()
     }
 
 @Composable

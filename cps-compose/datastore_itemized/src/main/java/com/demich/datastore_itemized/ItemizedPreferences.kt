@@ -43,8 +43,12 @@ var <T> DataStoreItem<T>.value: T
     set(value) = prefs.set(item = this, value = value)
 
 
-fun <D: ItemizedDataStore, R> D.flowOf(transform: D.(ItemizedPreferences) -> R): Flow<R> =
-    dataStore.data.map { transform(ItemizedPreferences(it)) }.distinctUntilChanged()
+fun <D: ItemizedDataStore, R> D.flowOf(
+    transform: context(ItemizedPreferences) D.() -> R
+): Flow<R> =
+    dataStore.data
+        .map { transform(ItemizedPreferences(it), this) }
+        .distinctUntilChanged()
 
 @OptIn(ExperimentalContracts::class)
 suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
