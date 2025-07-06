@@ -21,10 +21,10 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
@@ -66,7 +66,19 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         val notificationBuilder = createNotificationBuilder(handle)
             .also { setForeground(it) }
 
+        val notifier = CodeforcesMonitorNotifier(
+            context = context,
+            notificationBuilder = notificationBuilder,
+            handle = handle
+        )
+
         coroutineScope {
+            val job = monitor.flowOfContestData()
+                .filterNotNull()
+                .conflate()
+                .onEach { notifier.apply(it) }
+                .launchIn(this)
+
             monitor.launchIn(
                 scope = this,
                 api = CodeforcesClient,
@@ -76,23 +88,11 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 },
                 onSubmissionFinalResult = { submission ->
                     launch { notify(submission) }
+                },
+                onCompletion = {
+                    job.cancel()
                 }
             )
-
-            val notifier = CodeforcesMonitorNotifier(
-                context = context,
-                notificationBuilder = notificationBuilder,
-                handle = handle
-            )
-
-            monitor.flowOfContestData()
-                .takeWhile { it?.contestId == contestId } //TODO: must be args.contestId == contestId
-                .filterNotNull()
-                .distinctUntilChanged()
-                .conflate()
-                .collect {
-                    notifier.apply(it)
-                }
         }
 
         return Result.success()

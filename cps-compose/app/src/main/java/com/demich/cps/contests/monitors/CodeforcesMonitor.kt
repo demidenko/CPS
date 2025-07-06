@@ -42,7 +42,8 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     api: CodeforcesApi,
     pageContentProvider: CodeforcesPageContentProvider,
     onRatingChange: (CodeforcesRatingChange) -> Unit,
-    onSubmissionFinalResult: (CodeforcesSubmission) -> Unit
+    onSubmissionFinalResult: (CodeforcesSubmission) -> Unit,
+    onCompletion: () -> Unit = {}
 ) {
     val (contestId: Int, handle: String) = args() ?: return
 
@@ -107,6 +108,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         .onCompletion {
             systestPercentageJob.cancel()
             mainJob.cancel()
+            onCompletion()
         }
         .launchIn(scope)
 }
