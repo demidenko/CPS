@@ -41,7 +41,6 @@ abstract class CPSWork(
 
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
         workManager.getWorkInfosForUniqueWorkFlow(name)
-//            .onStart { emit(emptyList()) }
             .map { it.firstOrNull() }
 }
 
@@ -86,18 +85,12 @@ abstract class CPSPeriodicWork(
         )
     }
 
-    private suspend fun start(restart: Boolean) =
-        enqueueWork(
-            policy = if (restart) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
-                    else ExistingPeriodicWorkPolicy.UPDATE
-        )
-
-    suspend fun startImmediate() = start(restart = true)
-
-    private suspend fun enqueue() = start(restart = false)
+    suspend fun startImmediate() {
+        enqueueWork(policy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE)
+    }
 
     suspend fun enqueueIfEnabled() {
-        if (isEnabled()) enqueue()
+        if (isEnabled()) enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) //TODO: KEEP sometimes?
     }
 
     private suspend fun getWorkInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
