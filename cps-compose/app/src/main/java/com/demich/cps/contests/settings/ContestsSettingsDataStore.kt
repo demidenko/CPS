@@ -32,8 +32,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
             if (enabled) add(platform) else remove(platform)
         }
     }
-
-    val clistApiAccess = jsonCPS.item(name = "clist_api_access", defaultValue = ClistApi.ApiAccess("", ""))
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
     val enabledPlatforms = combine(
@@ -44,6 +42,12 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
             addAll(platforms)
             if (clistAdditional.isNotEmpty()) add(Contest.Platform.unknown)
         }
+    }
+
+    val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
+    val clistApiKey = itemString(name = "clist_api_key", defaultValue = "")
+    val clistApiAccess = combine(clistApiLogin, clistApiKey) { login, key ->
+        ClistApi.ApiAccess(login = login, key = key)
     }
 
     val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints") {

@@ -31,9 +31,8 @@ import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.saver
+import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -73,9 +72,9 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    var apiAccess by rememberSaveable(stateSaver = jsonCPS.saver()) {
-        mutableStateOf(runBlocking { context.settingsContests.clistApiAccess() })
-    }
+    val initApiAcces = remember { runBlocking { context.settingsContests.clistApiAccess() } }
+    var login by rememberSaveable { mutableStateOf(initApiAcces.login) }
+    var key by rememberSaveable { mutableStateOf(initApiAcces.key) }
 
     CPSDialog(onDismissRequest = onDismissRequest) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -92,8 +91,8 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
         }
 
         ClistApiTextField(
-            input = apiAccess.login,
-            onChangeInput = { apiAccess = apiAccess.copy(login = it) },
+            input = login,
+            onChangeInput = { login = it },
             title = "login",
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,8 +100,8 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
         )
 
         ClistApiTextField(
-            input = apiAccess.key,
-            onChangeInput = { apiAccess = apiAccess.copy(key = it) },
+            input = key,
+            onChangeInput = { key = it },
             title = "api-key",
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,7 +114,10 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
             modifier = Modifier.padding(top = 8.dp)
         ) {
             scope.launch {
-                context.settingsContests.clistApiAccess.setValue(apiAccess)
+                context.settingsContests.edit {
+                    it[clistApiLogin] = login
+                    it[clistApiKey] = key
+                }
                 onDismissRequest()
             }
         }
