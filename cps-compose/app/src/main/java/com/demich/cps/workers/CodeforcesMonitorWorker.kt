@@ -86,7 +86,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             )
 
             monitor.flowOfContestData()
-                .takeWhile { it?.contestId == contestId }
+                .takeWhile { it?.contestId == contestId } //TODO: must be args.contestId == contestId
                 .filterNotNull()
                 .distinctUntilChanged()
                 .conflate()
