@@ -37,10 +37,9 @@ context(prefs: ItemizedPreferences)
 val <T> DataStoreValue<T>.value: T
     get() = prefs.get(item = this)
 
-context(prefs: ItemizedMutablePreferences)
-var <T> DataStoreItem<T>.value: T
-    get() = prefs.get(item = this)
-    set(value) = prefs.set(item = this, value = value)
+context(prefs: ItemizedPreferences)
+operator fun <K, V> DataStoreValue<Map<K, V>>.get(key: K): V? =
+    prefs.get(item = this).get(key = key)
 
 
 fun <D: ItemizedDataStore, R> D.flowOf(

@@ -12,6 +12,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.get
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -113,7 +114,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
                             points = problem.points,
                             isFinal = problem.type == CodeforcesProblemStatus.FINAL
                         )
-                    submissionsInfo.value[index]?.any { it.isFailedSystemTest() } == true
+                    submissionsInfo[index]?.any { it.isFailedSystemTest() } == true
                         -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
                     else
                         -> CodeforcesMonitorData.ProblemResult.Empty
