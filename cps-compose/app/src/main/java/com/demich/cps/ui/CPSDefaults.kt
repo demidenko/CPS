@@ -16,11 +16,6 @@ object CPSDefaults {
 
     val scrollBarWidth get() = 5.dp
 
-    val settingsTitle get() = 18.sp
-    val settingsSubtitle get() = 15.sp
-    val settingsDescription get() = 14.sp
-    val settingsSectionTitle get() = 14.sp
-
     val MonospaceTextStyle
         get() = TextStyle(
             fontFamily = FontFamily.Monospace,
@@ -30,5 +25,11 @@ object CPSDefaults {
     @Stable
     fun <T> toggleAnimationSpec(): AnimationSpec<T> =
         tween(durationMillis = 800)
+}
 
+object CPSFontSize {
+    val settingsTitle get() = 18.sp
+    val settingsSubtitle get() = 15.sp
+    val settingsDescription get() = 14.sp
+    val settingsSectionTitle get() = 14.sp
 }

@@ -105,7 +105,7 @@ inline fun ColumnScope.SettingsSectionHeader(
             )
             Text(
                 text = title,
-                fontSize = CPSDefaults.settingsSectionTitle,
+                fontSize = CPSFontSize.settingsSectionTitle,
                 fontWeight = FontWeight.SemiBold,
             )
         }
@@ -144,14 +144,14 @@ inline fun SettingsItemContent(
         ) {
             Text(
                 text = title,
-                fontSize = CPSDefaults.settingsTitle,
+                fontSize = CPSFontSize.settingsTitle,
                 fontWeight = FontWeight.SemiBold
             )
             if (description.isNotBlank()) {
                 Text(
                     text = description,
                     color = cpsColors.contentAdditional,
-                    fontSize = CPSDefaults.settingsDescription
+                    fontSize = CPSFontSize.settingsDescription
                 )
             }
         }
@@ -294,7 +294,7 @@ fun<T: Enum<T>> SettingsEnumItemContent(
         TextButton(onClick = { showChangeDialog = true }) {
             Text(
                 text = optionToString(selectedOption),
-                fontSize = CPSDefaults.settingsTitle,
+                fontSize = CPSFontSize.settingsTitle,
                 color = cpsColors.accent
             )
         }
@@ -346,11 +346,11 @@ fun<T> SettingsItemWithInfo(
         Column {
             Text(
                 text = title,
-                fontSize = CPSDefaults.settingsTitle,
+                fontSize = CPSFontSize.settingsTitle,
                 fontWeight = FontWeight.SemiBold
             )
             ProvideTextStyle(TextStyle(
-                fontSize = CPSDefaults.settingsSubtitle,
+                fontSize = CPSFontSize.settingsSubtitle,
                 color = cpsColors.contentAdditional
             )) {
                 infoContent(value)
@@ -365,7 +365,7 @@ fun SettingsSubtitle(
 ) {
     Text(
         text = text,
-        fontSize = CPSDefaults.settingsSubtitle,
+        fontSize = CPSFontSize.settingsSubtitle,
         color = cpsColors.contentAdditional,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -424,7 +424,7 @@ fun ExpandableSettingsItem(
             Column {
                 Text(
                     text = title,
-                    fontSize = CPSDefaults.settingsTitle,
+                    fontSize = CPSFontSize.settingsTitle,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .fillMaxWidth()
