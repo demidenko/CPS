@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.accounts.DialogAccountChooser
+import com.demich.cps.accounts.DialogProfileSelector
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
@@ -172,7 +172,7 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     }
 
     if (showChooseDialog) {
-        DialogAccountChooser(
+        DialogProfileSelector(
             manager = LocalCodeforcesAccountManager.current,
             initial = null,
             onDismissRequest = { showChooseDialog = false },

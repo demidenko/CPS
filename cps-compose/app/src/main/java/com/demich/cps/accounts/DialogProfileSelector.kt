@@ -78,14 +78,14 @@ private const val suggestionsMinLength = 3
 private const val requestDebounceDelay: Long = 300
 
 @Composable
-fun <U: UserInfo> DialogAccountChooser(
+fun <U: UserInfo> DialogProfileSelector(
     manager: AccountManager<U>,
     initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
     onResult: (ProfileResult<U>) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
-        AccountChooserHeader(
+        ProfileHeader(
             text = "getUser(${manager.type.name}):",
             color = cpsColors.contentAdditional
         ) {
@@ -324,7 +324,7 @@ private fun SuggestionsList(
     val suggestions = suggestionsResult.getOrDefault(emptyList())
     if (suggestions.isNotEmpty() || isLoading || isError) {
         Column(modifier = modifier) {
-            AccountChooserHeader(
+            ProfileHeader(
                 text = if (isError) "suggestions load failed" else "suggestions:",
                 color = if (isError) cpsColors.error else cpsColors.contentAdditional
             ) {
@@ -376,7 +376,7 @@ private fun SuggestionItem(
 }
 
 @Composable
-private fun AccountChooserHeader(
+private fun ProfileHeader(
     text: String,
     color: Color,
     icon: @Composable () -> Unit

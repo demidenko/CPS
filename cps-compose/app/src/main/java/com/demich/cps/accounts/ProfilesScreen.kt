@@ -247,7 +247,7 @@ internal fun <U: UserInfo> ChangeSavedProfileDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = context
-    DialogAccountChooser(
+    DialogProfileSelector(
         manager = manager,
         initial = initial,
         onDismissRequest = onDismissRequest,
@@ -263,7 +263,7 @@ private fun CListImportDialog(
     val profilesViewModel = profilesViewModel()
     val progressBarsViewModel = progressBarsViewModel()
     val cListAccountManager = remember { CListAccountManager() }
-    DialogAccountChooser(
+    DialogProfileSelector(
         manager = cListAccountManager,
         initial = null,
         onDismissRequest = onDismissRequest,
