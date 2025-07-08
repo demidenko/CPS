@@ -27,13 +27,13 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.clickableNoRipple
 
 @Composable
-fun ExpandableSettingsItem(
+fun SettingsContainerScope.Expandable(
     title: String,
     collapsedContent: @Composable () -> Unit,
     expandedContent: @Composable () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    SettingsItem(
+    Item(
         modifier = Modifier.clickableNoRipple(enabled = !expanded) { expanded = true }
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {

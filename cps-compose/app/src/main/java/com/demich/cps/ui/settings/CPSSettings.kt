@@ -56,7 +56,7 @@ inline fun SettingsContainerScope.SettingsSectionHeader(
 }
 
 @Composable
-inline fun SettingsItem(
+private inline fun SettingsItem(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {

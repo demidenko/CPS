@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
-import com.demich.cps.ui.settings.ExpandableSettingsItem
+import com.demich.cps.ui.settings.Expandable
+import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsSubtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
@@ -36,7 +37,7 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-internal fun DateConstraintsSettingsItem() {
+internal fun SettingsContainerScope.DateConstraintsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -49,7 +50,7 @@ internal fun DateConstraintsSettingsItem() {
         }
     }
 
-    ExpandableSettingsItem(
+    Expandable(
         title = "Date constraints",
         collapsedContent = {
             SettingsSubtitle(text = dateConstraints.makeInfoString())

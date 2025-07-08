@@ -25,7 +25,8 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.WordsWithCounterOnOverflow
-import com.demich.cps.ui.settings.ExpandableSettingsItem
+import com.demich.cps.ui.settings.Expandable
+import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
@@ -33,14 +34,14 @@ import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun ContestPlatformsSettingsItem() {
+internal fun SettingsContainerScope.ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
     val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
     val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
-    ExpandableSettingsItem(
+    Expandable(
         title = "Platforms",
         collapsedContent = {
             ContestPlatformsSettingsItemContent(
