@@ -41,8 +41,9 @@ import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.settings.SettingsSwitchItemContent
+import com.demich.cps.ui.settings.Switch
+import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
-import com.demich.cps.ui.settings.SwitchItem
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
@@ -201,7 +202,7 @@ private fun SettingsContainerScope.RuEnabledSettingsItem() {
 
     val locale by collectItemAsState { context.settingsCommunity.codeforcesLocale }
 
-    SwitchItem(
+    Switch(
         title = "Russian content",
         checked = locale == CodeforcesLocale.RU,
         onCheckedChange = { checked ->
@@ -289,7 +290,7 @@ private fun NewsFeedsSettingsItem() {
 @Composable
 private fun SettingsContainerScope.RenderAllTabs() {
     val context = context
-    SwitchItem(
+    SwitchByItem(
         item = context.settingsCommunity.renderAllTabs,
         title = "Render all tabs"
     )

@@ -16,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsContainerScope.SwitchItem(
+fun SettingsContainerScope.Switch(
     checked: Boolean,
     title: String,
     description: String = "",
@@ -35,7 +35,7 @@ fun SettingsContainerScope.SwitchItem(
 }
 
 @Composable
-private inline fun SettingsContainerScope.SwitchItem(
+private inline fun SettingsContainerScope.SwitchByItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
@@ -43,7 +43,7 @@ private inline fun SettingsContainerScope.SwitchItem(
 ) {
     val scope = rememberCoroutineScope()
     val checked by collectItemAsState { item }
-    SwitchItem(
+    Switch(
         checked = checked,
         title = title,
         description = description
@@ -56,12 +56,12 @@ private inline fun SettingsContainerScope.SwitchItem(
 }
 
 @Composable
-fun SettingsContainerScope.SwitchItem(
+fun SettingsContainerScope.SwitchByItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = ""
 ) {
-    SwitchItem(
+    SwitchByItem(
         item = item,
         title = title,
         description = description,
@@ -78,7 +78,7 @@ fun SettingsContainerScope.SwitchByWork(
     stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context
-    SwitchItem(
+    SwitchByItem(
         item = item,
         title = title,
         description = description
