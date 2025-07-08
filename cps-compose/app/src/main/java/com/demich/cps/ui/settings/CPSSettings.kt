@@ -1,17 +1,12 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -29,13 +24,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.NotificationsPermissionPanel
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
@@ -49,43 +42,13 @@ import com.demich.datastore_itemized.DataStoreValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Composable
-inline fun SettingsColumn(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val border: Dp = 10.dp
-    //spaceBy adds space only between items but start + end required too
-    Column(
-        verticalArrangement = Arrangement.spacedBy(border),
-        modifier = modifier
-            .padding(horizontal = border)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(modifier = Modifier.fillMaxWidth())
-        content()
-        Spacer(modifier = Modifier.fillMaxWidth())
-    }
-}
 
 @Composable
-inline fun SettingsColumn(
-    requiredNotificationsPermission: Boolean,
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column(modifier = modifier) {
-        SettingsColumn(content = content, modifier = Modifier.weight(1f))
-        NotificationsPermissionPanel(permissionRequired = requiredNotificationsPermission)
-    }
-}
-
-@Composable
-inline fun ColumnScope.SettingsSectionHeader(
+inline fun SettingsContainerScope.SettingsSectionHeader(
     title: String,
     painter: Painter,
     modifier: Modifier = Modifier,
-    content: ColumnScope.() -> Unit
+    content: SettingsContainerScope.() -> Unit
 ) {
     Row(
         modifier = modifier,
