@@ -38,7 +38,7 @@ import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsSectionHeader
-import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
+import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.ui.settings.Switch
 import com.demich.cps.ui.settings.SwitchByItem
@@ -241,8 +241,8 @@ private fun SettingsContainerScope.NewsFeedsSettingsItem() {
         title = title,
         modifier = Modifier.clickable { showDialog = true }
     ) { newsFeeds ->
-        SettingsSubtitleOfEnabled(
-            enabled = newsFeeds,
+        Subtitle(
+            selected = newsFeeds,
             name = { it.shortName }
         )
     }

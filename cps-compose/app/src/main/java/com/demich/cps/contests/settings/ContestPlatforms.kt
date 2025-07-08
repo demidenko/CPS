@@ -27,7 +27,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
-import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
+import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -44,7 +44,7 @@ internal fun SettingsContainerScope.ContestPlatformsSettingsItem() {
     Expandable(
         title = "Platforms",
         collapsedContent = {
-            ContestPlatformsSettingsItemContent(
+            EnabledPlatformsSubtitle(
                 enabledPlatforms = enabledPlatforms,
                 clistResources = clistResources
             )
@@ -68,22 +68,20 @@ internal fun SettingsContainerScope.ContestPlatformsSettingsItem() {
 }
 
 @Composable
-private fun ContestPlatformsSettingsItemContent(
+private fun SettingsContainerScope.EnabledPlatformsSubtitle(
     enabledPlatforms: Set<Contest.Platform>,
     clistResources: List<ClistResource>
 ) {
-    ProvideTextStyle(TextStyle(fontSize = 15.sp, color = cpsColors.contentAdditional)) {
-        SettingsSubtitleOfEnabled(
-            enabled = remember(key1 = enabledPlatforms, key2 = clistResources) {
-                buildList {
-                    enabledPlatforms.sortedBy { it.ordinal }.forEach {
-                        if (it != Contest.Platform.unknown) add(it.name)
-                    }
-                    clistResources.forEach { add(it.name) }
+    Subtitle(
+        selected = remember(key1 = enabledPlatforms, key2 = clistResources) {
+            buildList {
+                enabledPlatforms.sortedBy { it.ordinal }.forEach {
+                    if (it != Contest.Platform.unknown) add(it.name)
                 }
+                clistResources.forEach { add(it.name) }
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable

@@ -29,8 +29,8 @@ import com.demich.cps.utils.clickableNoRipple
 @Composable
 fun SettingsContainerScope.Expandable(
     title: String,
-    collapsedContent: @Composable () -> Unit,
-    expandedContent: @Composable () -> Unit,
+    collapsedContent: @Composable SettingsContainerScope.() -> Unit,
+    expandedContent: @Composable SettingsContainerScope.() -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Item(

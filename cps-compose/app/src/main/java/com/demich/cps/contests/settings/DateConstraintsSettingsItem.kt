@@ -27,7 +27,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
-import com.demich.cps.ui.settings.SettingsSubtitle
+import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -53,7 +53,7 @@ internal fun SettingsContainerScope.DateConstraintsSettingsItem() {
     Expandable(
         title = "Date constraints",
         collapsedContent = {
-            SettingsSubtitle(text = dateConstraints.makeInfoString())
+            Subtitle(text = dateConstraints.makeInfoString())
         },
         expandedContent = {
             Column {
