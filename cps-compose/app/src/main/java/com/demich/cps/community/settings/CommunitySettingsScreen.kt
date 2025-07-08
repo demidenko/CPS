@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesTitle
@@ -30,6 +29,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
@@ -256,7 +256,7 @@ private fun SettingsContainerScope.NewsFeedsSettingsItem() {
             optionTitle = {
                 Column {
                     Text(it.title)
-                    Text(it.link, color = cpsColors.contentAdditional, fontSize = 15.sp)
+                    Text(it.link, color = cpsColors.contentAdditional, fontSize = CPSFontSize.settingsSubtitle)
                 }
             },
             onDismissRequest = { showDialog = false },
