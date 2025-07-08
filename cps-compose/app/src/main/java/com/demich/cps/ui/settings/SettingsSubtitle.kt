@@ -26,10 +26,7 @@ fun <T> SettingsContainerScope.SubtitledByValue(
         val value by collectItemAsState { item }
         Column {
             Title(title = title)
-            ProvideTextStyle(TextStyle(
-                fontSize = CPSFontSize.settingsSubtitle,
-                color = cpsColors.contentAdditional
-            )) {
+            ProvideTextStyle(subtitleTextStyle()) {
                 subtitle(value)
             }
         }
