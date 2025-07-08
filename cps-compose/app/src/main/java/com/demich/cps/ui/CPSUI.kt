@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Badge
 import androidx.compose.material.ButtonDefaults
@@ -179,9 +178,9 @@ fun CPSSwitch(
     onCheckedChange: (Boolean) -> Unit
 ) {
     Switch(
+        modifier = modifier,
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = modifier.padding(start = 5.dp),
         colors = SwitchDefaults.colors(
             checkedThumbColor = cpsColors.accent
         )
