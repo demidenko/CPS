@@ -40,7 +40,6 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
-import com.demich.cps.ui.settings.SettingsSwitchItemContent
 import com.demich.cps.ui.settings.Switch
 import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
@@ -134,25 +133,16 @@ private fun SettingsContainerScope.FollowSettingsItem() {
 @Composable
 private fun SettingsContainerScope.LostSettingsItem() {
     val context = context
-    val scope = rememberCoroutineScope()
     val settings = remember { context.settingsCommunity }
-    val enabled by collectItemAsState { settings.codeforcesLostEnabled }
+    val item = remember { settings.codeforcesLostEnabled }
+    val enabled by collectItemAsState { item }
     Item {
-        Item {
-            SettingsSwitchItemContent(
-                checked = enabled,
-                title = "Lost recent blog entries",
-                description = stringResource(id = R.string.community_settings_cf_lost_description),
-                onCheckedChange = { checked ->
-                    scope.launch {
-                        settings.codeforcesLostEnabled.setValue(checked)
-                        with(CodeforcesCommunityLostRecentWorker.getWork(context)) {
-                            if (checked) startImmediate() else stop()
-                        }
-                    }
-                }
-            )
-        }
+        SwitchByWork(
+            item = item,
+            title = "Lost recent blog entries",
+            description = stringResource(id = R.string.community_settings_cf_lost_description),
+            workProvider = CodeforcesCommunityLostRecentWorker
+        )
         AnimatedVisibility(
             visible = enabled,
             // TODO: copy pasted from ColumnScope.AnimatedVisibility
