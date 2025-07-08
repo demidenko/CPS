@@ -91,7 +91,7 @@ private fun CPSContent() {
             )
         }
 
-        navEntry<Screen.ProfileSettings> { holder ->
+        navEntry<Screen.ProfileSettings>(false) { holder ->
             val type = holder.screen.managerType
             ProfileSettingsScreen(type)
             holder.setSubtitle("profiles", type.name, "settings")
@@ -111,7 +111,7 @@ private fun CPSContent() {
             holder.setSubtitle("community", "codeforces", controller.currentTab.name)
         }
 
-        navEntry<Screen.CommunitySettings> { holder ->
+        navEntry<Screen.CommunitySettings>(false) { holder ->
             CommunitySettingsScreen()
             holder.setSubtitle("community", "settings")
         }
@@ -135,7 +135,7 @@ private fun CPSContent() {
             )
         }
 
-        navEntry<Screen.ContestsSettings> { holder ->
+        navEntry<Screen.ContestsSettings>(false) { holder ->
             ContestsSettingsScreen()
             holder.setSubtitle("contests", "settings")
         }
