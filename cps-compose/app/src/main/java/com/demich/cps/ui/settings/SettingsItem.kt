@@ -1,0 +1,60 @@
+package com.demich.cps.ui.settings
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Text
+import androidx.compose.material.minimumInteractiveComponentSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.ui.CPSFontSize
+import com.demich.cps.ui.theme.cpsColors
+
+@Composable
+fun SettingsContainerScope.Item(
+    content: @Composable SettingsContainerScope.() -> Unit
+) {
+    append {
+        SettingsItemScopeInstance.content()
+    }
+}
+
+@Composable
+fun SettingsContainerScope.ItemWithTrailer(
+    title: String,
+    description: String = "",
+    trailer: @Composable () -> Unit
+) {
+    Item {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.minimumInteractiveComponentSize()
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = CPSFontSize.settingsTitle,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (description.isNotBlank()) {
+                    Text(
+                        text = description,
+                        color = cpsColors.contentAdditional,
+                        fontSize = CPSFontSize.settingsDescription
+                    )
+                }
+            }
+            trailer()
+        }
+    }
+}
+
+object SettingsItemScopeInstance: SettingsContainerScope {
+    @Composable
+    override fun append(content: @Composable () -> Unit) {
+        content()
+    }
+}

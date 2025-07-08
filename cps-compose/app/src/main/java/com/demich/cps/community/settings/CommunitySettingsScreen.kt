@@ -32,8 +32,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
-import com.demich.cps.ui.settings.SettingsEnumItem
+import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsEnumItemContent
 import com.demich.cps.ui.settings.SettingsItem
 import com.demich.cps.ui.settings.SettingsItemWithInfo
@@ -75,7 +76,7 @@ fun CommunitySettingsScreen() {
             title = "codeforces",
             painter = platformIconPainter(platform = Contest.Platform.codeforces)
         ) {
-            CodeforcesDefaultTabSettingsItem()
+            DefaultTabSettingsItem()
             CodeforcesFollowSettingsItem()
             CodeforcesLostSettingsItem()
             CodeforcesRuEnabledSettingsItem()
@@ -105,9 +106,9 @@ private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolea
     }
 
 @Composable
-private fun CodeforcesDefaultTabSettingsItem() {
+private fun SettingsContainerScope.DefaultTabSettingsItem() {
     val context = context
-    SettingsEnumItem(
+    SelectEnum(
         item = context.settingsCommunity.codeforcesDefaultTab,
         title = "Default tab",
         options = listOf(

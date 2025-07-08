@@ -280,26 +280,6 @@ fun<T: Enum<T>> SettingsEnumItemContent(
 }
 
 @Composable
-fun<T: Enum<T>> SettingsEnumItem(
-    item: DataStoreItem<T>,
-    title: String,
-    description: String = "",
-    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
-    options: List<T>
-) {
-    SettingsItem {
-        SettingsEnumItemContent(
-            item = item,
-            title = title,
-            description = description,
-            optionToString = optionToString,
-            options = options
-        )
-    }
-}
-
-
-@Composable
 fun<T> SettingsItemWithInfo(
     modifier: Modifier = Modifier,
     item: DataStoreValue<T>,
