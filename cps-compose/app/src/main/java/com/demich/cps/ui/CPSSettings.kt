@@ -52,6 +52,7 @@ import com.demich.cps.workers.CPSPeriodicWorkProvider
 import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -218,7 +219,7 @@ fun SettingsSwitchItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
-    onCheckedChange: (Boolean) -> Unit = {}
+    onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val checked by collectItemAsState { item }
@@ -243,17 +244,14 @@ fun SettingsSwitchItemWithWork(
     stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
     SettingsSwitchItem(
         item = item,
         title = title,
         description = description
     ) { checked ->
-        scope.launch {
-            with(workProvider.getWork(context)) {
-                if (checked) startImmediate()
-                else if (stopWorkOnUnchecked) stop()
-            }
+        with(workProvider.getWork(context)) {
+            if (checked) startImmediate()
+            else if (stopWorkOnUnchecked) stop()
         }
     }
 }

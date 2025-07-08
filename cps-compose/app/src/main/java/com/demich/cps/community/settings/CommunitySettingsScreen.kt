@@ -285,14 +285,11 @@ private fun NewsFeedsSettingsItem() {
 @Composable
 private fun RenderAllTabs() {
     val context = context
-    val scope = rememberCoroutineScope()
     val settings = context.settingsCommunity
     SettingsSwitchItem(
         item = settings.renderAllTabs,
         title = "Render all tabs"
     ) {
-        scope.launch {
-            settings.renderAllTabs.setValue(it)
-        }
+        settings.renderAllTabs.setValue(it)
     }
 }
