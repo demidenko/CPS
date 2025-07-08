@@ -51,9 +51,12 @@ inline fun SettingsColumn(
 
 object SettingsColumnScopeInstance: SettingsContainerScope {
     @Composable
-    override fun append(content: @Composable () -> Unit) {
+    override fun append(
+        modifier: Modifier,
+        content: @Composable () -> Unit
+    ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .background(cpsColors.backgroundAdditional, RoundedCornerShape(4.dp))
                 .fillMaxWidth()
                 .padding(all = 10.dp),

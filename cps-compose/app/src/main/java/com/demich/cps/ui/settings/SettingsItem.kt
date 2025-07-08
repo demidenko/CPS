@@ -1,6 +1,7 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,10 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 fun SettingsContainerScope.Item(
+    modifier: Modifier = Modifier,
     content: @Composable SettingsContainerScope.() -> Unit
 ) {
-    append {
+    append(modifier = modifier) {
         Column(
             // TODO: bad glitch with animated content
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -63,7 +65,12 @@ fun SettingsContainerScope.ItemWithTrailer(
 
 object SettingsItemScopeInstance: SettingsContainerScope {
     @Composable
-    override fun append(content: @Composable () -> Unit) {
-        content()
+    override fun append(
+        modifier: Modifier,
+        content: @Composable () -> Unit
+    ) {
+        Box(modifier = modifier.fillMaxWidth()) {
+            content()
+        }
     }
 }
