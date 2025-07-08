@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -69,52 +68,6 @@ inline fun SettingsItem(
         contentAlignment = Alignment.CenterStart
     ) {
         content()
-    }
-}
-
-@Composable
-inline fun SettingsItemContent(
-    title: String,
-    description: String = "",
-    trailerContent: @Composable () -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.minimumInteractiveComponentSize()
-    ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = title,
-                fontSize = CPSFontSize.settingsTitle,
-                fontWeight = FontWeight.SemiBold
-            )
-            if (description.isNotBlank()) {
-                Text(
-                    text = description,
-                    color = cpsColors.contentAdditional,
-                    fontSize = CPSFontSize.settingsDescription
-                )
-            }
-        }
-        trailerContent()
-    }
-}
-
-@Composable
-inline fun SettingsItem(
-    modifier: Modifier = Modifier,
-    title: String,
-    description: String = "",
-    trailerContent: @Composable () -> Unit
-) {
-    SettingsItem(modifier = modifier) {
-        SettingsItemContent(
-            title = title,
-            description = description,
-            trailerContent = trailerContent
-        )
     }
 }
 
