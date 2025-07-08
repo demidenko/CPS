@@ -184,20 +184,6 @@ private inline fun SettingsSwitchItem(
 }
 
 @Composable
-fun SettingsSwitchItem(
-    item: DataStoreItem<Boolean>,
-    title: String,
-    description: String = ""
-) {
-    SettingsSwitchItem(
-        item = item,
-        title = title,
-        description = description,
-        onCheckedChange = { }
-    )
-}
-
-@Composable
 fun SettingsSwitchItemWithWork(
     item: DataStoreItem<Boolean>,
     title: String,

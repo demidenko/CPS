@@ -40,9 +40,9 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
-import com.demich.cps.ui.settings.SettingsSwitchItem
 import com.demich.cps.ui.settings.SettingsSwitchItemContent
 import com.demich.cps.ui.settings.SettingsSwitchItemWithWork
+import com.demich.cps.ui.settings.SwitchItem
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
@@ -79,7 +79,7 @@ fun CommunitySettingsScreen() {
             DefaultTabSettingsItem()
             CodeforcesFollowSettingsItem()
             LostSettingsItem()
-            CodeforcesRuEnabledSettingsItem()
+            RuEnabledSettingsItem()
         }
 
         SettingsSectionHeader(
@@ -195,13 +195,13 @@ private fun SettingsContainerScope.LostAuthorSettingsItem(
 }
 
 @Composable
-private fun CodeforcesRuEnabledSettingsItem() {
+private fun SettingsContainerScope.RuEnabledSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
     val locale by collectItemAsState { context.settingsCommunity.codeforcesLocale }
 
-    SettingsSwitchItem(
+    SwitchItem(
         title = "Russian content",
         checked = locale == CodeforcesLocale.RU,
         onCheckedChange = { checked ->
@@ -287,9 +287,9 @@ private fun NewsFeedsSettingsItem() {
 }
 
 @Composable
-private fun RenderAllTabs() {
+private fun SettingsContainerScope.RenderAllTabs() {
     val context = context
-    SettingsSwitchItem(
+    SwitchItem(
         item = context.settingsCommunity.renderAllTabs,
         title = "Render all tabs"
     )
