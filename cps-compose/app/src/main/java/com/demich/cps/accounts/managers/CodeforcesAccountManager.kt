@@ -30,8 +30,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.ui.settings.SettingsSwitchItemWithProfilesWork
-import com.demich.cps.ui.settings.SettingsSwitchItemWithWork
+import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.cps.ui.settings.SwitchByProfilesWork
+import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
@@ -166,24 +167,25 @@ class CodeforcesAccountManager :
     override fun getSettings(context: Context) = CodeforcesProfileSettingsDataStore(context)
 
     @Composable
+    context(scope: SettingsContainerScope)
     override fun SettingsItems() {
         val settings = getSettings(context)
-        SettingsSwitchItemWithProfilesWork(
+        scope.SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
         )
-        SettingsSwitchItemWithWork(
+        scope.SwitchByWork(
             item = settings.monitorEnabled,
             title = "Contest monitor",
             description = stringResource(id = R.string.cf_contest_watcher_description),
             workProvider = CodeforcesMonitorLauncherWorker
         )
-        SettingsSwitchItemWithWork(
+        scope.SwitchByWork(
             item = settings.upsolvingSuggestionsEnabled,
             title = "Upsolving suggestions",
             workProvider = CodeforcesUpsolvingSuggestionsWorker
         )
-        SettingsSwitchItemWithProfilesWork(
+        scope.SwitchByProfilesWork(
             item = settings.observeContribution,
             title = "Contribution changes observer"
         )

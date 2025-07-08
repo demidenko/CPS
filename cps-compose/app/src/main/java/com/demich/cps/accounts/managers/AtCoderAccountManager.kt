@@ -17,7 +17,8 @@ import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.ui.settings.SettingsSwitchItemWithProfilesWork
+import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.cps.ui.settings.SwitchByProfilesWork
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
@@ -97,9 +98,10 @@ class AtCoderAccountManager :
     override fun getSettings(context: Context) = AtCoderProfileSettingsDataStore(context)
 
     @Composable
+    context(scope: SettingsContainerScope)
     override fun SettingsItems() {
         val settings = getSettings(context)
-        SettingsSwitchItemWithProfilesWork(
+        scope.SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
         )

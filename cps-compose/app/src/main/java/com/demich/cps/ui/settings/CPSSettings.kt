@@ -12,7 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -22,19 +21,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSFontSize
-import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.context
-import com.demich.cps.workers.CPSPeriodicWorkProvider
-import com.demich.cps.workers.ProfilesWorker
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -124,99 +116,6 @@ inline fun SettingsItem(
             trailerContent = trailerContent
         )
     }
-}
-
-@Composable
-fun SettingsSwitchItemContent(
-    checked: Boolean,
-    title: String,
-    description: String = "",
-    onCheckedChange: (Boolean) -> Unit
-) {
-    SettingsItemContent(
-        title = title,
-        description = description
-    ) {
-        CPSSwitch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.padding(start = 5.dp)
-        )
-    }
-}
-
-@Composable
-fun SettingsSwitchItem(
-    checked: Boolean,
-    title: String,
-    description: String = "",
-    onCheckedChange: (Boolean) -> Unit
-) {
-    SettingsItem {
-        SettingsSwitchItemContent(
-            checked = checked,
-            title = title,
-            description = description,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-@Composable
-private inline fun SettingsSwitchItem(
-    item: DataStoreItem<Boolean>,
-    title: String,
-    description: String = "",
-    crossinline onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val checked by collectItemAsState { item }
-    SettingsSwitchItem(
-        checked = checked,
-        title = title,
-        description = description
-    ) {
-        scope.launch {
-            item.setValue(it)
-            onCheckedChange(it)
-        }
-    }
-}
-
-@Composable
-fun SettingsSwitchItemWithWork(
-    item: DataStoreItem<Boolean>,
-    title: String,
-    description: String = "",
-    workProvider: CPSPeriodicWorkProvider,
-    stopWorkOnUnchecked: Boolean = true
-) {
-    val context = context
-    SettingsSwitchItem(
-        item = item,
-        title = title,
-        description = description
-    ) { checked ->
-        with(workProvider.getWork(context)) {
-            if (checked) startImmediate()
-            else if (stopWorkOnUnchecked) stop()
-        }
-    }
-}
-
-@Composable
-fun SettingsSwitchItemWithProfilesWork(
-    item: DataStoreItem<Boolean>,
-    title: String,
-    description: String = ""
-) {
-    SettingsSwitchItemWithWork(
-        item = item,
-        title = title,
-        description = description,
-        workProvider = ProfilesWorker,
-        stopWorkOnUnchecked = false
-    )
 }
 
 @Composable

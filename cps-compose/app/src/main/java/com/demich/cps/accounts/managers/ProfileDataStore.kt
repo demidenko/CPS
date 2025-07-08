@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.jsonProfile
+import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -66,7 +67,8 @@ interface ProfileSettingsProvider {
     fun getSettings(context: Context): ItemizedDataStore
 
     @Composable
-    fun SettingsItems() {}
+    context(scope: SettingsContainerScope)
+    fun SettingsItems() { }
 
     fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
