@@ -21,8 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.minimumInteractiveComponentSize
@@ -186,13 +184,10 @@ fun SettingsSwitchItemContent(
         title = title,
         description = description
     ) {
-        Switch(
+        CPSSwitch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            modifier = Modifier.padding(start = 5.dp),
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = cpsColors.accent
-            )
+            modifier = Modifier.padding(start = 5.dp)
         )
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Badge
 import androidx.compose.material.ButtonDefaults
@@ -18,6 +19,8 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -167,6 +170,22 @@ fun CPSReloadingButton(
             )
         }
     }
+}
+
+@Composable
+fun CPSSwitch(
+    modifier: Modifier = Modifier,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Switch(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        modifier = modifier.padding(start = 5.dp),
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = cpsColors.accent
+        )
+    )
 }
 
 @Composable
