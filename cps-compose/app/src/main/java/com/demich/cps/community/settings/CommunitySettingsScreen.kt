@@ -151,8 +151,9 @@ private fun SettingsContainerScope.LostSettingsItem() {
 private fun SettingsContainerScope.LostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
-    val options = remember {
-        listOf(
+    CodeforcesColorTag.entries
+    val names = remember {
+        mapOf(
             CodeforcesColorTag.BLACK to "Exists",
             CodeforcesColorTag.GRAY to "Newbie",
             CodeforcesColorTag.GREEN to "Pupil",
@@ -168,12 +169,9 @@ private fun SettingsContainerScope.LostAuthorSettingsItem(
     SelectEnum(
         item = item,
         title = "Author at least",
-        options = options.map { it.first },
-        optionToString = { tag ->
-            CodeforcesHandle(
-                handle = options.first { it.first == tag }.second,
-                colorTag = tag
-            ).toHandleSpan()
+        options = names.keys,
+        optionTitle = { tag ->
+            Text(text = CodeforcesHandle(handle = names.getValue(tag), colorTag = tag).toHandleSpan())
         }
     )
 }
@@ -199,22 +197,22 @@ private fun SettingsContainerScope.RuEnabledSettingsItem() {
 }
 
 
-private val NewsFeed.title: String get() =
-    when (this) {
+private val NewsFeed.title: String
+    get() = when (this) {
         NewsFeed.atcoder_news -> "AtCoder news"
         NewsFeed.project_euler_news -> "Project Euler news"
         NewsFeed.project_euler_problems -> "Project Euler recent problems"
     }
 
-private val NewsFeed.shortName: String get() =
-    when (this) {
+private val NewsFeed.shortName: String
+    get() = when (this) {
         NewsFeed.atcoder_news -> "atcoder"
         NewsFeed.project_euler_news -> "pe_news"
         NewsFeed.project_euler_problems -> "pe_problems"
     }
 
-private val NewsFeed.link: String get() =
-    when (this) {
+private val NewsFeed.link: String
+    get() = when (this) {
         NewsFeed.atcoder_news -> "atcoder.jp"
         NewsFeed.project_euler_news -> "projecteuler.net/news"
         NewsFeed.project_euler_problems -> "projecteuler.net/recent"

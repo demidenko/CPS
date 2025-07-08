@@ -1,6 +1,7 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -10,7 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.dialogs.CPSDialogSelect
@@ -25,7 +26,7 @@ fun <T> SettingsContainerScope.Select(
     description: String = "",
     item: DataStoreItem<T>,
     options: Iterable<T>,
-    optionToString: @Composable (T) -> AnnotatedString
+    optionTitle: @Composable (T) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val selectedOption by collectItemAsState { item }
@@ -37,11 +38,9 @@ fun <T> SettingsContainerScope.Select(
         description = description
     ) {
         TextButton(onClick = { showChangeDialog = true }) {
-            Text(
-                text = optionToString(selectedOption),
-                fontSize = CPSFontSize.settingsTitle,
-                color = cpsColors.accent
-            )
+            ProvideTextStyle(TextStyle(fontSize = CPSFontSize.settingsTitle, color = cpsColors.accent)) {
+                optionTitle(selectedOption)
+            }
         }
     }
 
@@ -50,7 +49,7 @@ fun <T> SettingsContainerScope.Select(
             title = title,
             options = options,
             selectedOption = selectedOption,
-            optionTitle = { Text(text = optionToString(it)) },
+            optionTitle = optionTitle,
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
                 scope.launch { item.setValue(it) }
@@ -65,14 +64,14 @@ fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
     description: String = "",
     item: DataStoreItem<T>,
     options: Iterable<T>,
-    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) }
+    optionTitle: @Composable (T) -> Unit = { Text(text = it.name) }
 ) {
     Select(
         title = title,
         description = description,
         item = item,
         options = options,
-        optionToString = optionToString
+        optionTitle = optionTitle
     )
 }
 
