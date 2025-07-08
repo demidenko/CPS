@@ -20,12 +20,12 @@ import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.launch
 
 @Composable
-fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
+fun <T> SettingsContainerScope.Select(
     title: String,
     description: String = "",
     item: DataStoreItem<T>,
-    options: List<T>,
-    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) }
+    options: Iterable<T>,
+    optionToString: @Composable (T) -> AnnotatedString
 ) {
     val scope = rememberCoroutineScope()
     val selectedOption by collectItemAsState { item }
@@ -60,10 +60,27 @@ fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
 }
 
 @Composable
+fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
+    title: String,
+    description: String = "",
+    item: DataStoreItem<T>,
+    options: Iterable<T>,
+    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) }
+) {
+    Select(
+        title = title,
+        description = description,
+        item = item,
+        options = options,
+        optionToString = optionToString
+    )
+}
+
+@Composable
 fun <T: Enum<T>> SettingsContainerScope.MultiSelectEnum(
     title: String,
     item: DataStoreItem<Set<T>>,
-    options: List<T>,
+    options: Iterable<T>,
     optionName: (T) -> String = { it.name },
     onNewSelected: suspend (Set<T>) -> Unit,
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }

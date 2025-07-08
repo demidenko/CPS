@@ -231,7 +231,7 @@ fun <T> CPSDialogSelect(
 @Composable
 fun<T: Enum<T>> CPSDialogMultiSelectEnum(
     title: String,
-    options: Collection<T>,
+    options: Iterable<T>,
     selectedOptions: Collection<T>,
     optionContent: @Composable (T) -> Unit,
     onDismissRequest: () -> Unit,
