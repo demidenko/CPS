@@ -11,7 +11,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 
@@ -45,11 +44,9 @@ fun communityMenuBuilder(
 ): CPSMenuBuilder = {
     val context = context
 
-    val loadingStatus by controller.loadingStatusState()
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
-        enabled = loadingStatus != LoadingStatus.LOADING,
         onClick = onOpenSettings
     )
 
