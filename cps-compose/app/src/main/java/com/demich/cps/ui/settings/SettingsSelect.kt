@@ -59,6 +59,43 @@ fun <T> SettingsContainerScope.Select(
 }
 
 @Composable
+fun <T> SettingsContainerScope.SelectSubtitled(
+    title: String,
+    item: DataStoreItem<T>,
+    options: Iterable<T>,
+    onOptionSaved: suspend (T) -> Unit,
+    optionTitle: @Composable (T) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val selectedOption by collectItemAsState { item }
+
+    var showChangeDialog by rememberSaveable { mutableStateOf(false) }
+
+    SubtitledByValue(
+        modifier = Modifier.clickable { showChangeDialog = true },
+        item = item,
+        title = title,
+        subtitle = { optionTitle(it) }
+    )
+
+    if (showChangeDialog) {
+        CPSDialogSelect(
+            title = title,
+            options = options,
+            selectedOption = selectedOption,
+            optionTitle = optionTitle,
+            onDismissRequest = { showChangeDialog = false },
+            onSelectOption = {
+                scope.launch {
+                    item.setValue(it)
+                    onOptionSaved(it)
+                }
+            }
+        )
+    }
+}
+
+@Composable
 fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
     title: String,
     description: String = "",
