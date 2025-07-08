@@ -55,10 +55,9 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     )
 
     val mainJob = scope.launchWhileActive {
-        api.getStandingsData(
+        api.updateStandingsData(
             contestId = contestId,
             handle = handle,
-            monitor = this@launchIn,
             onOfficialChanged = {
                 return@launchWhileActive Duration.ZERO
             }
@@ -103,7 +102,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             }
     }
 
-    this.args.asFlow()
+    args.asFlow()
         .takeWhile { it?.contestId == contestId }
         .onCompletion {
             systestPercentageJob.cancel()
@@ -113,10 +112,10 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         .launchIn(scope)
 }
 
-private suspend inline fun CodeforcesApi.getStandingsData(
+context(monitor: CodeforcesMonitorDataStore)
+private suspend inline fun CodeforcesApi.updateStandingsData(
     contestId: Int,
     handle: String,
-    monitor: CodeforcesMonitorDataStore,
     onOfficialChanged: () -> Unit
 ) {
     runCatching {
