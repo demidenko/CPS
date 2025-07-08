@@ -29,9 +29,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.getProfile
-import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
-import com.demich.cps.ui.SettingsSwitchItemWithWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.settings.SettingsSwitchItemWithProfilesWork
+import com.demich.cps.ui.settings.SettingsSwitchItemWithWork
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append

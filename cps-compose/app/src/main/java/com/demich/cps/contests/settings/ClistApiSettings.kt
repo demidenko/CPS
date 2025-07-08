@@ -25,9 +25,9 @@ import com.demich.cps.platforms.api.clist.ClistUrls
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
+import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context

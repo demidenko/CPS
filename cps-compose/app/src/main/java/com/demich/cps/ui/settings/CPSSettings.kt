@@ -1,4 +1,4 @@
-package com.demich.cps.ui
+package com.demich.cps.ui.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -40,6 +40,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSFontSize
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CPSSwitch
+import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.NotificationsPermissionPanel
+import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor

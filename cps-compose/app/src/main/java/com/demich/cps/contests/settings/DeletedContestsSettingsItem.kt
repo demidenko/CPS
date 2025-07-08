@@ -10,8 +10,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.demich.cps.contests.ContestsInfoDataStore
-import com.demich.cps.ui.SettingsItemWithInfo
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
+import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context

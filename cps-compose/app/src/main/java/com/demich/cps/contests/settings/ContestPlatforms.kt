@@ -24,9 +24,9 @@ import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.ExpandableSettingsItem
-import com.demich.cps.ui.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.WordsWithCounterOnOverflow
+import com.demich.cps.ui.settings.ExpandableSettingsItem
+import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context

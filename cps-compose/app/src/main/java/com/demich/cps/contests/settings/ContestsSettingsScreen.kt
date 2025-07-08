@@ -2,7 +2,7 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.runtime.Composable
 import com.demich.cps.contests.ContestsInfoDataStore
-import com.demich.cps.ui.SettingsColumn
+import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.utils.LaunchedEffectOneTime
 import com.demich.cps.utils.context
 

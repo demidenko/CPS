@@ -16,8 +16,8 @@ import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
-import com.demich.cps.ui.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.settings.SettingsSwitchItemWithProfilesWork
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow

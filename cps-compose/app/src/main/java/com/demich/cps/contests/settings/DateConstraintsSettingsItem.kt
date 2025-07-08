@@ -23,10 +23,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSRadioButtonTitled
-import com.demich.cps.ui.ExpandableSettingsItem
-import com.demich.cps.ui.SettingsSubtitle
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
+import com.demich.cps.ui.settings.ExpandableSettingsItem
+import com.demich.cps.ui.settings.SettingsSubtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context

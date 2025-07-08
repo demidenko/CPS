@@ -19,8 +19,8 @@ import com.demich.cps.accounts.managers.ProfileSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
-import com.demich.cps.ui.SettingsColumn
-import com.demich.cps.ui.SettingsItem
+import com.demich.cps.ui.settings.SettingsColumn
+import com.demich.cps.ui.settings.SettingsItem
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
