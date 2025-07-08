@@ -8,6 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.context
+import com.demich.cps.workers.CPSPeriodicWorkProvider
+import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -63,5 +66,41 @@ fun SettingsContainerScope.SwitchItem(
         title = title,
         description = description,
         onCheckedChange = { }
+    )
+}
+
+@Composable
+fun SettingsContainerScope.SwitchByWork(
+    item: DataStoreItem<Boolean>,
+    title: String,
+    description: String = "",
+    workProvider: CPSPeriodicWorkProvider,
+    stopWorkOnUnchecked: Boolean = true
+) {
+    val context = context
+    SwitchItem(
+        item = item,
+        title = title,
+        description = description
+    ) { checked ->
+        with(workProvider.getWork(context)) {
+            if (checked) startImmediate()
+            else if (stopWorkOnUnchecked) stop()
+        }
+    }
+}
+
+@Composable
+fun SettingsContainerScope.SwitchByProfilesWork(
+    item: DataStoreItem<Boolean>,
+    title: String,
+    description: String = ""
+) {
+    SwitchByWork(
+        item = item,
+        title = title,
+        description = description,
+        workProvider = ProfilesWorker,
+        stopWorkOnUnchecked = false
     )
 }

@@ -41,7 +41,7 @@ import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
 import com.demich.cps.ui.settings.SettingsSwitchItemContent
-import com.demich.cps.ui.settings.SettingsSwitchItemWithWork
+import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.settings.SwitchItem
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
@@ -77,7 +77,7 @@ fun CommunitySettingsScreen() {
             painter = platformIconPainter(platform = Contest.Platform.codeforces)
         ) {
             DefaultTabSettingsItem()
-            CodeforcesFollowSettingsItem()
+            FollowSettingsItem()
             LostSettingsItem()
             RuEnabledSettingsItem()
         }
@@ -120,9 +120,9 @@ private fun SettingsContainerScope.DefaultTabSettingsItem() {
 }
 
 @Composable
-private fun CodeforcesFollowSettingsItem() {
+private fun SettingsContainerScope.FollowSettingsItem() {
     val context = context
-    SettingsSwitchItemWithWork(
+    SwitchByWork(
         item = context.settingsCommunity.codeforcesFollowEnabled,
         title = "Follow",
         description = stringResource(id = R.string.community_settings_cf_follow_description),
