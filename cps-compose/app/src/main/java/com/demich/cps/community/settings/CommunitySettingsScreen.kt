@@ -231,7 +231,17 @@ private fun SettingsContainerScope.NewsFeedsSettingsItem() {
         item = enabledItem,
         options = NewsFeed.entries,
         optionName = { it.shortName },
-        newSelected = {
+        optionContent = {
+            Column {
+                Text(text = it.title)
+                Text(
+                    text = it.link,
+                    color = cpsColors.contentAdditional,
+                    fontSize = CPSFontSize.settingsSubtitle
+                )
+            }
+        },
+        onNewSelected = {
             val pe_recent = NewsFeed.project_euler_problems
             if ((it - pe_recent).isNotEmpty()) {
                 NewsWorker.getWork(context).startImmediate()
@@ -240,16 +250,7 @@ private fun SettingsContainerScope.NewsFeedsSettingsItem() {
                 ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
             }
         }
-    ) {
-        Column {
-            Text(text = it.title)
-            Text(
-                text = it.link,
-                color = cpsColors.contentAdditional,
-                fontSize = CPSFontSize.settingsSubtitle
-            )
-        }
-    }
+    )
 }
 
 @Composable

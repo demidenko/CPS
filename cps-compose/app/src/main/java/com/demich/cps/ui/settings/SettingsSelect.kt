@@ -65,7 +65,7 @@ fun <T: Enum<T>> SettingsContainerScope.MultiSelectEnum(
     item: DataStoreItem<Set<T>>,
     options: List<T>,
     optionName: (T) -> String = { it.name },
-    newSelected: suspend (Set<T>) -> Unit,
+    onNewSelected: suspend (Set<T>) -> Unit,
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }
 ) {
     val scope = rememberCoroutineScope()
@@ -94,7 +94,7 @@ fun <T: Enum<T>> SettingsContainerScope.MultiSelectEnum(
             onSaveSelected = {
                 scope.launch {
                     item.setValue(it)
-                    newSelected(it - selectedOptions)
+                    onNewSelected(it - selectedOptions)
                 }
             }
         )
