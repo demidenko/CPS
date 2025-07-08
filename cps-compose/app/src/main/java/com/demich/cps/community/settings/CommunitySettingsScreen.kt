@@ -2,11 +2,13 @@ package com.demich.cps.community.settings
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
@@ -32,11 +33,10 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
-import com.demich.cps.ui.settings.SettingsEnumItemContent
-import com.demich.cps.ui.settings.SettingsItem
 import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
@@ -78,7 +78,7 @@ fun CommunitySettingsScreen() {
         ) {
             DefaultTabSettingsItem()
             CodeforcesFollowSettingsItem()
-            CodeforcesLostSettingsItem()
+            LostSettingsItem()
             CodeforcesRuEnabledSettingsItem()
         }
 
@@ -131,13 +131,13 @@ private fun CodeforcesFollowSettingsItem() {
 }
 
 @Composable
-private fun CodeforcesLostSettingsItem() {
+private fun SettingsContainerScope.LostSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
     val settings = remember { context.settingsCommunity }
     val enabled by collectItemAsState { settings.codeforcesLostEnabled }
-    SettingsItem {
-        Column {
+    Item {
+        Item {
             SettingsSwitchItemContent(
                 checked = enabled,
                 title = "Lost recent blog entries",
@@ -151,15 +151,20 @@ private fun CodeforcesLostSettingsItem() {
                     }
                 }
             )
-            AnimatedVisibility(visible = enabled) {
-                CodeforcesLostAuthorSettingsItem(item = settings.codeforcesLostMinRatingTag)
-            }
+        }
+        AnimatedVisibility(
+            visible = enabled,
+            // TODO: copy pasted from ColumnScope.AnimatedVisibility
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
+            LostAuthorSettingsItem(item = settings.codeforcesLostMinRatingTag)
         }
     }
 }
 
 @Composable
-private fun CodeforcesLostAuthorSettingsItem(
+private fun SettingsContainerScope.LostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
     val options = remember {
@@ -176,19 +181,17 @@ private fun CodeforcesLostAuthorSettingsItem(
         )
     }
     //TODO: restart worker on change?
-    Box(modifier = Modifier.padding(top = 10.dp)) {
-        SettingsEnumItemContent(
-            item = item,
-            title = "Author at least",
-            options = options.map { it.first },
-            optionToString = { tag ->
-                CodeforcesHandle(
-                    handle = options.first { it.first == tag }.second,
-                    colorTag = tag
-                ).toHandleSpan()
-            }
-        )
-    }
+    SelectEnum(
+        item = item,
+        title = "Author at least",
+        options = options.map { it.first },
+        optionToString = { tag ->
+            CodeforcesHandle(
+                handle = options.first { it.first == tag }.second,
+                colorTag = tag
+            ).toHandleSpan()
+        }
+    )
 }
 
 @Composable

@@ -9,18 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,7 +25,6 @@ import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.WordsWithCounterOnOverflow
-import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.collectItemAsState
@@ -237,46 +231,6 @@ fun SettingsSwitchItemWithProfilesWork(
         workProvider = ProfilesWorker,
         stopWorkOnUnchecked = false
     )
-}
-
-@Composable
-fun<T: Enum<T>> SettingsEnumItemContent(
-    item: DataStoreItem<T>,
-    title: String,
-    description: String = "",
-    optionToString: @Composable (T) -> AnnotatedString = { AnnotatedString(it.name) },
-    options: List<T>
-) {
-    val scope = rememberCoroutineScope()
-    val selectedOption by collectItemAsState { item }
-
-    var showChangeDialog by rememberSaveable { mutableStateOf(false) }
-
-    SettingsItemContent(
-        title = title,
-        description = description
-    ) {
-        TextButton(onClick = { showChangeDialog = true }) {
-            Text(
-                text = optionToString(selectedOption),
-                fontSize = CPSFontSize.settingsTitle,
-                color = cpsColors.accent
-            )
-        }
-    }
-
-    if (showChangeDialog) {
-        CPSDialogSelect(
-            title = title,
-            options = options,
-            selectedOption = selectedOption,
-            optionTitle = { Text(text = optionToString(it)) },
-            onDismissRequest = { showChangeDialog = false },
-            onSelectOption = {
-                scope.launch { item.setValue(it) }
-            }
-        )
-    }
 }
 
 @Composable
