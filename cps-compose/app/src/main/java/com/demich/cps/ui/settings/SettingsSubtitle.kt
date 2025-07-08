@@ -76,7 +76,7 @@ fun SettingsContainerScope.Subtitle(
 
 @Composable
 fun <T: Enum<T>> SettingsContainerScope.Subtitle(
-    selected: Set<T>,
+    selected: Collection<T>,
     name: (T) -> String = { it.name }
 ) {
     Subtitle(selected = selected.sortedBy { it.ordinal }.map(name))

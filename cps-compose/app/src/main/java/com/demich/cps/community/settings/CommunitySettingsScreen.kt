@@ -6,18 +6,14 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
@@ -31,15 +27,13 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.settings.Item
+import com.demich.cps.ui.settings.MultiSelectEnum
 import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SettingsSectionHeader
-import com.demich.cps.ui.settings.Subtitle
-import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.ui.settings.Switch
 import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
@@ -56,7 +50,6 @@ import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -231,49 +224,31 @@ private val NewsFeed.link: String get() =
 @Composable
 private fun SettingsContainerScope.NewsFeedsSettingsItem() {
     val context = context
-    val enabledSettingsItem = remember { context.settingsCommunity.enabledNewsFeeds }
+    val enabledItem = remember { context.settingsCommunity.enabledNewsFeeds }
 
-    val title = "Subscriptions"
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-
-    SubtitledByValue(
-        item = enabledSettingsItem,
-        title = title,
-        modifier = Modifier.clickable { showDialog = true }
-    ) { newsFeeds ->
-        Subtitle(
-            selected = newsFeeds,
-            name = { it.shortName }
-        )
-    }
-
-    val scope = rememberCoroutineScope()
-    if (showDialog) {
-        CPSDialogMultiSelectEnum(
-            title = title,
-            options = NewsFeed.entries,
-            selectedOptions = remember { runBlocking { enabledSettingsItem() } },
-            optionTitle = {
-                Column {
-                    Text(it.title)
-                    Text(it.link, color = cpsColors.contentAdditional, fontSize = CPSFontSize.settingsSubtitle)
-                }
-            },
-            onDismissRequest = { showDialog = false },
-            onSaveSelected = { current ->
-                scope.launch {
-                    val newSelectedFeeds = current - enabledSettingsItem()
-                    enabledSettingsItem.setValue(current)
-                    val pe_recent = NewsFeed.project_euler_problems
-                    if ((newSelectedFeeds - pe_recent).isNotEmpty()) {
-                        NewsWorker.getWork(context).startImmediate()
-                    }
-                    if (pe_recent in newSelectedFeeds) {
-                        ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
-                    }
-                }
+    MultiSelectEnum(
+        title = "Subscriptions",
+        item = enabledItem,
+        options = NewsFeed.entries,
+        optionName = { it.shortName },
+        newSelected = {
+            val pe_recent = NewsFeed.project_euler_problems
+            if ((it - pe_recent).isNotEmpty()) {
+                NewsWorker.getWork(context).startImmediate()
             }
-        )
+            if (pe_recent in it) {
+                ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
+            }
+        }
+    ) {
+        Column {
+            Text(text = it.title)
+            Text(
+                text = it.link,
+                color = cpsColors.contentAdditional,
+                fontSize = CPSFontSize.settingsSubtitle
+            )
+        }
     }
 }
 

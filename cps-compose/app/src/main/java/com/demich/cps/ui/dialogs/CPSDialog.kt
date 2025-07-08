@@ -231,13 +231,13 @@ fun <T> CPSDialogSelect(
 @Composable
 fun<T: Enum<T>> CPSDialogMultiSelectEnum(
     title: String,
-    options: Iterable<T>,
-    selectedOptions: Set<T>,
-    optionTitle: @Composable (T) -> Unit,
+    options: Collection<T>,
+    selectedOptions: Collection<T>,
+    optionContent: @Composable (T) -> Unit,
     onDismissRequest: () -> Unit,
     onSaveSelected: (Set<T>) -> Unit
 ) {
-    var currentlySelected: Set<T> by remember { mutableStateOf(selectedOptions) }
+    var currentlySelected: Set<T> by remember { mutableStateOf(selectedOptions.toSet()) }
 
     CPSDialog(
         title = title,
@@ -252,7 +252,7 @@ fun<T: Enum<T>> CPSDialogMultiSelectEnum(
         ) {
             options.forEach { option ->
                 CPSCheckBoxTitled(
-                    title = { optionTitle(option) },
+                    title = { optionContent(option) },
                     checked = option in currentlySelected,
                     modifier = Modifier.fillMaxWidth()
                 ) { checked ->
