@@ -27,7 +27,7 @@ internal constructor(
     }
 }
 
-abstract class DataStoreValue<T>
+abstract class DataStoreValue<out T>
 internal constructor(
     protected val dataStore: DataStore<Preferences>,
     internal val reader: PreferencesReader<T>

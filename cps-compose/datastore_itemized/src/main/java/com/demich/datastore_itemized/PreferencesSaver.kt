@@ -9,7 +9,7 @@ internal interface PreferencesSaver<T>: PreferencesReader<T> {
     fun removeFrom(prefs: MutablePreferences)
 }
 
-internal interface PreferencesReader<T> {
+internal interface PreferencesReader<out T> {
     fun restore(prefs: Preferences): T
 
     fun prefsEquivalent(old: Preferences, new: Preferences): Boolean
