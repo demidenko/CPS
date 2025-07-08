@@ -11,7 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
-import com.demich.cps.ui.settings.SettingsItemWithInfo
+import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -19,7 +20,7 @@ import com.demich.cps.utils.emptyTimedCollection
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun DeletedContestsSettingsItem() {
+internal fun SettingsContainerScope.DeletedContestsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -28,7 +29,7 @@ internal fun DeletedContestsSettingsItem() {
 
     if (devModeEnabled) {
         var showDialog by remember { mutableStateOf(false) }
-        SettingsItemWithInfo(
+        SubtitledByValue(
             modifier = Modifier.clickable { showDialog = true },
             item = settings.ignoredContests,
             title = "Ignored contests"

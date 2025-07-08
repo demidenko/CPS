@@ -27,7 +27,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
-import com.demich.cps.ui.settings.SettingsItemWithInfo
+import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
@@ -37,12 +38,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @Composable
-internal fun ClistApiAccessSettingsItem() {
+internal fun SettingsContainerScope.ClistApiAccessSettingsItem() {
     val context = context
     val settings = remember { context.settingsContests }
 
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    SettingsItemWithInfo(
+    SubtitledByValue(
         modifier = Modifier.clickable { showDialog = true },
         item = settings.clistApiAccess,
         title = "Clist API access"

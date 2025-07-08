@@ -37,9 +37,9 @@ import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
-import com.demich.cps.ui.settings.SettingsItemWithInfo
 import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.SettingsSubtitleOfEnabled
+import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.ui.settings.Switch
 import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
@@ -229,14 +229,14 @@ private val NewsFeed.link: String get() =
 
 
 @Composable
-private fun NewsFeedsSettingsItem() {
+private fun SettingsContainerScope.NewsFeedsSettingsItem() {
     val context = context
     val enabledSettingsItem = remember { context.settingsCommunity.enabledNewsFeeds }
 
     val title = "Subscriptions"
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
-    SettingsItemWithInfo(
+    SubtitledByValue(
         item = enabledSettingsItem,
         title = title,
         modifier = Modifier.clickable { showDialog = true }

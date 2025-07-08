@@ -11,7 +11,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.dialogs.CPSDialogSelect
-import com.demich.cps.ui.settings.SettingsItemWithInfo
+import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.cps.ui.settings.SubtitledByValue
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.workers.ContestsWorker
@@ -21,12 +22,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-internal fun AutoUpdateSettingsItem() {
+internal fun SettingsContainerScope.AutoUpdateSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    SettingsItemWithInfo(
+    SubtitledByValue(
         item = context.settingsContests.autoUpdateInterval,
         title = "Background auto update",
         modifier = Modifier.clickable { showDialog = true }

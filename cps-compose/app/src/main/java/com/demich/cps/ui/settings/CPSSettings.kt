@@ -1,68 +1,12 @@
 package com.demich.cps.ui.settings
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectItemAsState
-import com.demich.datastore_itemized.DataStoreValue
 
-
-@Composable
-private inline fun SettingsItem(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .background(cpsColors.backgroundAdditional, RoundedCornerShape(4.dp))
-            .fillMaxWidth()
-            .padding(all = 10.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun<T> SettingsItemWithInfo(
-    modifier: Modifier = Modifier,
-    item: DataStoreValue<T>,
-    title: String,
-    infoContent: @Composable (T) -> Unit
-) {
-    SettingsItem(modifier = modifier) {
-        val value by collectItemAsState { item }
-        Column {
-            Text(
-                text = title,
-                fontSize = CPSFontSize.settingsTitle,
-                fontWeight = FontWeight.SemiBold
-            )
-            ProvideTextStyle(TextStyle(
-                fontSize = CPSFontSize.settingsSubtitle,
-                color = cpsColors.contentAdditional
-            )) {
-                infoContent(value)
-            }
-        }
-    }
-}
 
 @Composable
 fun SettingsSubtitle(
