@@ -210,11 +210,11 @@ fun SettingsSwitchItem(
 }
 
 @Composable
-fun SettingsSwitchItem(
+private inline fun SettingsSwitchItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
-    onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit = {}
+    crossinline onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val checked by collectItemAsState { item }
@@ -228,6 +228,20 @@ fun SettingsSwitchItem(
             onCheckedChange(it)
         }
     }
+}
+
+@Composable
+fun SettingsSwitchItem(
+    item: DataStoreItem<Boolean>,
+    title: String,
+    description: String = ""
+) {
+    SettingsSwitchItem(
+        item = item,
+        title = title,
+        description = description,
+        onCheckedChange = { }
+    )
 }
 
 @Composable

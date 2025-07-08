@@ -285,11 +285,8 @@ private fun NewsFeedsSettingsItem() {
 @Composable
 private fun RenderAllTabs() {
     val context = context
-    val settings = context.settingsCommunity
     SettingsSwitchItem(
-        item = settings.renderAllTabs,
+        item = context.settingsCommunity.renderAllTabs,
         title = "Render all tabs"
-    ) {
-        settings.renderAllTabs.setValue(it)
-    }
+    )
 }
