@@ -1,6 +1,5 @@
 package com.demich.cps.ui
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.snap
@@ -49,7 +48,7 @@ import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.workers.CPSPeriodicWork
+import com.demich.cps.workers.CPSPeriodicWorkProvider
 import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
@@ -240,7 +239,7 @@ fun SettingsSwitchItemWithWork(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
-    workGetter: (Context) -> CPSPeriodicWork,
+    workProvider: CPSPeriodicWorkProvider,
     stopWorkOnUnchecked: Boolean = true
 ) {
     val context = context
@@ -251,7 +250,7 @@ fun SettingsSwitchItemWithWork(
         description = description
     ) { checked ->
         scope.launch {
-            with(workGetter(context)) {
+            with(workProvider.getWork(context)) {
                 if (checked) startImmediate()
                 else if (stopWorkOnUnchecked) stop()
             }
@@ -269,7 +268,7 @@ fun SettingsSwitchItemWithProfilesWork(
         item = item,
         title = title,
         description = description,
-        workGetter = ProfilesWorker::getWork,
+        workProvider = ProfilesWorker,
         stopWorkOnUnchecked = false
     )
 }

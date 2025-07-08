@@ -125,7 +125,7 @@ private fun CodeforcesFollowSettingsItem() {
         item = context.settingsCommunity.codeforcesFollowEnabled,
         title = "Follow",
         description = stringResource(id = R.string.community_settings_cf_follow_description),
-        workGetter = CodeforcesCommunityFollowWorker::getWork
+        workProvider = CodeforcesCommunityFollowWorker
     )
 }
 

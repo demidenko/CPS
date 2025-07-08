@@ -176,12 +176,12 @@ class CodeforcesAccountManager :
             item = settings.monitorEnabled,
             title = "Contest monitor",
             description = stringResource(id = R.string.cf_contest_watcher_description),
-            workGetter = CodeforcesMonitorLauncherWorker::getWork
+            workProvider = CodeforcesMonitorLauncherWorker
         )
         SettingsSwitchItemWithWork(
             item = settings.upsolvingSuggestionsEnabled,
             title = "Upsolving suggestions",
-            workGetter = CodeforcesUpsolvingSuggestionsWorker::getWork
+            workProvider = CodeforcesUpsolvingSuggestionsWorker
         )
         SettingsSwitchItemWithProfilesWork(
             item = settings.observeContribution,
