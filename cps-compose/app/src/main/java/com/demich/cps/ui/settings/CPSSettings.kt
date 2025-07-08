@@ -1,11 +1,5 @@
 package com.demich.cps.ui.settings
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -41,7 +33,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSFontSize
-import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.NotificationsPermissionPanel
@@ -49,7 +40,6 @@ import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
-import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CPSPeriodicWorkProvider
@@ -406,60 +396,4 @@ fun<T: Enum<T>> SettingsSubtitleOfEnabled(
         enabled = enabled.sortedBy { it.ordinal }.map(name),
         allSize = allSize
     )
-}
-
-@Composable
-fun ExpandableSettingsItem(
-    title: String,
-    collapsedContent: @Composable () -> Unit,
-    expandedContent: @Composable () -> Unit,
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    SettingsItem(
-        modifier = Modifier.clickableNoRipple(enabled = !expanded) { expanded = true }
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn(animationSpec = snap()),
-                exit = fadeOut(),
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Icon(
-                    imageVector = CPSIcons.CollapseUp,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Column {
-                Text(
-                    text = title,
-                    fontSize = CPSFontSize.settingsTitle,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickableNoRipple { expanded = !expanded }
-                )
-                AnimatedContent(
-                    targetState = expanded,
-                    transitionSpec = { fadeIn() togetherWith fadeOut(snap()) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "settings item content"
-                ) { itemExpanded ->
-                    if (itemExpanded) {
-                        Box(
-                            content = { expandedContent() },
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .padding(top = 8.dp)
-                        )
-                    } else {
-                        collapsedContent()
-                    }
-                }
-            }
-        }
-    }
 }
