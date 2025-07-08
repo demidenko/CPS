@@ -19,8 +19,9 @@ import com.demich.cps.accounts.managers.ProfileSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SettingsColumn
-import com.demich.cps.ui.settings.SettingsItem
+import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -46,7 +47,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     val profileResult by collectAsState { manager.dataStore(context).flowOfProfile() }
 
     profileResult?.let {
-        UserInfoSettings(
+        ProfileSettingsItems(
             manager = manager,
             profileResult = it,
             onUserIdClick = { showChangeDialog = true }
@@ -64,7 +65,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
 }
 
 @Composable
-private fun <U: UserInfo> UserInfoSettings(
+private fun <U: UserInfo> ProfileSettingsItems(
     manager: AccountManager<U>,
     profileResult: ProfileResult<U>,
     onUserIdClick: () -> Unit
@@ -88,12 +89,12 @@ private fun <U: UserInfo> UserInfoSettings(
 }
 
 @Composable
-private fun UserIdSettingsItem(
+private fun SettingsContainerScope.UserIdSettingsItem(
     userId: String,
     userIdTitle: String,
     modifier: Modifier = Modifier
 ) {
-    SettingsItem(modifier = modifier) {
+    Item(modifier = modifier) {
         Column {
             Text(
                 text = "$userIdTitle:",
