@@ -8,7 +8,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.WordsWithCounterOnOverflow
@@ -26,11 +25,7 @@ fun <T> SettingsContainerScope.SubtitledByValue(
     Item(modifier = modifier) {
         val value by collectItemAsState { item }
         Column {
-            Text(
-                text = title,
-                fontSize = CPSFontSize.settingsTitle,
-                fontWeight = FontWeight.SemiBold
-            )
+            Title(title = title)
             ProvideTextStyle(TextStyle(
                 fontSize = CPSFontSize.settingsSubtitle,
                 color = cpsColors.contentAdditional

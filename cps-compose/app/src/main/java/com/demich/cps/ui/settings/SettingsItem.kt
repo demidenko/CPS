@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -32,6 +33,19 @@ fun SettingsContainerScope.Item(
 }
 
 @Composable
+fun SettingsContainerScope.Title(
+    modifier: Modifier = Modifier,
+    title: String
+) {
+    Text(
+        text = title,
+        fontSize = CPSFontSize.settingsTitle,
+        fontWeight = FontWeight.SemiBold,
+        modifier = modifier.padding(vertical = 2.dp)
+    )
+}
+
+@Composable
 fun SettingsContainerScope.ItemWithTrailer(
     title: String,
     description: String = "",
@@ -45,11 +59,7 @@ fun SettingsContainerScope.ItemWithTrailer(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = title,
-                    fontSize = CPSFontSize.settingsTitle,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Title(title = title)
                 if (description.isNotBlank()) {
                     Text(
                         text = description,
