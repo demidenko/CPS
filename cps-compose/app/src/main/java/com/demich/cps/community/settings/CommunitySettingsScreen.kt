@@ -47,9 +47,9 @@ import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.setValueIn
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -187,11 +187,10 @@ private fun SettingsContainerScope.RuEnabledSettingsItem() {
         title = "Russian content",
         checked = locale == CodeforcesLocale.RU,
         onCheckedChange = { checked ->
-            scope.launch {
-                context.settingsCommunity.codeforcesLocale.setValue(
-                    value = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
-                )
-            }
+            context.settingsCommunity.codeforcesLocale.setValueIn(
+                scope = scope,
+                value = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
+            )
         }
     )
 }

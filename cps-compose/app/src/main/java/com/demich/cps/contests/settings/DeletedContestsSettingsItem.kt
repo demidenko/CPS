@@ -17,7 +17,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.emptyTimedCollection
-import kotlinx.coroutines.launch
+import com.demich.datastore_itemized.setValueIn
 
 @Composable
 internal fun SettingsContainerScope.DeletedContestsSettingsItem() {
@@ -42,9 +42,7 @@ internal fun SettingsContainerScope.DeletedContestsSettingsItem() {
                 title = { Text("Reset ignored?") },
                 onDismissRequest = { showDialog = false },
                 onConfirmRequest = {
-                    scope.launch {
-                        settings.ignoredContests.setValue(emptyTimedCollection())
-                    }
+                    settings.ignoredContests.setValueIn(scope, emptyTimedCollection())
                 }
             )
         }

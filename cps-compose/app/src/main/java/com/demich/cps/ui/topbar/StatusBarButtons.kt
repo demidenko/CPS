@@ -32,6 +32,7 @@ import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -71,7 +72,7 @@ internal fun StatusBarButtons() {
             if (noneEnabled) {
                 showPopup = true
             } else {
-                scope.launch { settingsUI.coloredStatusBar.setValue(!coloredStatusBar) }
+                settingsUI.coloredStatusBar.setValueIn(scope, !coloredStatusBar)
             }
         }
         if (coloredStatusBar) Box {
@@ -83,7 +84,7 @@ internal fun StatusBarButtons() {
                 expanded = showPopup,
                 rankSelector = rankSelector,
                 onSetRankSelector = {
-                    scope.launch { settingsUI.statusBarRankSelector.setValue(it) }
+                    settingsUI.statusBarRankSelector.setValueIn(scope, it)
                 },
                 disabledManagers = disabledManagers,
                 onCheckedChange = { type, checked ->

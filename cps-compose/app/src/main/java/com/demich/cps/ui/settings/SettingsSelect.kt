@@ -18,6 +18,7 @@ import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.launch
 
 @Composable
@@ -52,7 +53,7 @@ fun <T> SettingsContainerScope.Select(
             optionTitle = optionTitle,
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
-                scope.launch { item.setValue(it) }
+                item.setValueIn(scope, it)
             }
         )
     }

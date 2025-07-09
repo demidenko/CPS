@@ -45,11 +45,11 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
+import com.demich.datastore_itemized.setValueIn
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -150,9 +150,10 @@ private fun PanelMovingButtons(
     val context = context
     val scope = rememberCoroutineScope()
     fun saveSwapped(i: Int, j: Int) {
-        scope.launch {
-            context.settingsUI.profilesOrder.setValue(visibleOrder.toMutableList().apply { swap(i, j) })
-        }
+        context.settingsUI.profilesOrder.setValueIn(
+            scope = scope,
+            value = visibleOrder.toMutableList().apply { swap(i, j) }
+        )
     }
     val index = visibleOrder.indexOf(type)
     PanelMovingButtons(

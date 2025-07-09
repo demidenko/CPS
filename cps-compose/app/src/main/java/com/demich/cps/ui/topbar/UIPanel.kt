@@ -16,7 +16,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFrom
-import kotlinx.coroutines.launch
+import com.demich.datastore_itemized.setValueIn
 
 
 @Composable
@@ -38,18 +38,14 @@ internal fun UIPanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CPSIconButton(icon = CPSIcons.Colors, onState = useOriginalColors) {
-                scope.launch {
-                    settingsUI.useOriginalColors.setValue(!useOriginalColors)
-                }
+                settingsUI.useOriginalColors.setValueIn(scope, !useOriginalColors)
             }
             StatusBarButtons()
             DarkLightModeButton(
                 mode = darkLightMode,
                 isSystemInDarkMode = isSystemInDarkTheme()
             ) { mode ->
-                scope.launch {
-                    settingsUI.darkLightMode.setValue(mode)
-                }
+                settingsUI.darkLightMode.setValueIn(scope, mode)
             }
         }
     }

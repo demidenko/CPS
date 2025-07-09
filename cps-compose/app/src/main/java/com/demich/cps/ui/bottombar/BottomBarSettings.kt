@@ -31,7 +31,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import kotlinx.coroutines.launch
+import com.demich.datastore_itemized.setValueIn
 
 @Composable
 internal fun BottomBarSettings(
@@ -80,9 +80,7 @@ private fun LayoutSelectRow() {
             values = NavigationLayoutType.entries,
             selectedValue = layoutType,
             onSelect = {
-                scope.launch {
-                    context.settingsUI.navigationLayoutType.setValue(it)
-                }
+                context.settingsUI.navigationLayoutType.setValueIn(scope, it)
             }
         ) {
             DemoRow(it, Modifier.widthIn(max = 56.dp))
