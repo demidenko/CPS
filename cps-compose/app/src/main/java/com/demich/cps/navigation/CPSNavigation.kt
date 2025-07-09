@@ -107,7 +107,7 @@ class CPSNavigator(
         navController.popBackStack()
     }
 
-    inner class DuringCompositionHolder<T: Screen>(
+    inner class ScreenScope<T: Screen>(
         val screen: T
     ) {
         var menu: CPSMenuBuilder? by writeOnlyProperty {
@@ -129,11 +129,11 @@ class CPSNavigator(
     context(builder: NavGraphBuilder)
     inline fun <reified T: Screen> navEntry(
         includeFontPadding: Boolean = true,
-        crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
+        crossinline content: @Composable ScreenScope<T>.() -> Unit
     ) {
         builder.composable<T> {
             val holder = remember {
-                DuringCompositionHolder(it.toRoute<T>()).apply {
+                ScreenScope(it.toRoute<T>()).apply {
                     menu = null
                     bottomBar = null
                 }

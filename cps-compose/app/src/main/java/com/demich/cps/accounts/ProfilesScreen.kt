@@ -84,7 +84,7 @@ private fun ProfilesScreen(
 
 @Composable
 fun NavContentProfilesScreen(
-    holder: CPSNavigator.DuringCompositionHolder<Screen.Profiles>,
+    holder: CPSNavigator.ScreenScope<Screen.Profiles>,
     onExpandProfile: (AccountManagerType) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }

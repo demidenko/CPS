@@ -67,20 +67,20 @@ private fun CPSContent() {
     val navigator = rememberCPSNavigator()
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        navigator.navEntry<Screen.Profiles> { holder ->
+        navigator.navEntry<Screen.Profiles> {
             NavContentProfilesScreen(
-                holder = holder,
+                holder = this,
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
 
-        navigator.navEntry<Screen.ProfileExpanded> { holder ->
+        navigator.navEntry<Screen.ProfileExpanded> {
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
-                holder = holder,
+                holder = this,
                 onOpenSettings = {
-                    val type = holder.screen.managerType
+                    val type = screen.managerType
                     navigator.navigateTo(Screen.ProfileSettings(type))
                 },
                 onDeleteRequest = { manager ->
@@ -90,59 +90,59 @@ private fun CPSContent() {
             )
         }
 
-        navigator.navEntry<Screen.ProfileSettings>(false) { holder ->
-            val type = holder.screen.managerType
+        navigator.navEntry<Screen.ProfileSettings>(false) {
+            val type = screen.managerType
             ProfileSettingsScreen(type)
-            holder.setSubtitle("profiles", type.name, "settings")
+            setSubtitle("profiles", type.name, "settings")
         }
 
-        navigator.navEntry<Screen.Community> { holder ->
+        navigator.navEntry<Screen.Community> {
             val controller = rememberCodeforcesCommunityController()
             CommunityScreen(controller = controller)
-            holder.menu = communityMenuBuilder(
+            menu = communityMenuBuilder(
                 controller = controller,
                 onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
                 onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
-            holder.bottomBar = communityBottomBarBuilder(
+            bottomBar = communityBottomBarBuilder(
                 controller = controller
             )
-            holder.setSubtitle("community", "codeforces", controller.currentTab.name)
+            setSubtitle("community", "codeforces", controller.currentTab.name)
         }
 
-        navigator.navEntry<Screen.CommunitySettings>(false) { holder ->
+        navigator.navEntry<Screen.CommunitySettings>(false) {
             CommunitySettingsScreen()
-            holder.setSubtitle("community", "settings")
+            setSubtitle("community", "settings")
         }
 
-        navigator.navEntry<Screen.CommunityFollowList> { holder ->
+        navigator.navEntry<Screen.CommunityFollowList> {
             CommunityFollowScreen { handle ->
                 navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
             }
-            holder.bottomBar = communityFollowListBottomBarBuilder()
-            holder.setSubtitle("community", "codeforces", "follow", "list")
+            bottomBar = communityFollowListBottomBarBuilder()
+            setSubtitle("community", "codeforces", "follow", "list")
         }
 
-        navigator.navEntry<Screen.CommunityCodeforcesBlog> { holder ->
-            NavContentCodeforcesBlog(holder = holder)
+        navigator.navEntry<Screen.CommunityCodeforcesBlog> {
+            NavContentCodeforcesBlog(holder = this)
         }
 
-        navigator.navEntry<Screen.Contests> { holder ->
+        navigator.navEntry<Screen.Contests> {
             NavContentContestsScreen(
-                holder = holder,
+                holder = this,
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }
 
-        navigator.navEntry<Screen.ContestsSettings>(false) { holder ->
+        navigator.navEntry<Screen.ContestsSettings>(false) {
             ContestsSettingsScreen()
-            holder.setSubtitle("contests", "settings")
+            setSubtitle("contests", "settings")
         }
 
-        navigator.navEntry<Screen.Development> { holder ->
+        navigator.navEntry<Screen.Development> {
             DevelopScreen()
-            holder.bottomBar = developAdditionalBottomBarBuilder()
-            holder.setSubtitle("develop")
+            bottomBar = developAdditionalBottomBarBuilder()
+            setSubtitle("develop")
         }
     }
 

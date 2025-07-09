@@ -81,7 +81,7 @@ private fun CodeforcesUserBlogContent(
 
 @Composable
 fun NavContentCodeforcesBlog(
-    holder: CPSNavigator.DuringCompositionHolder<Screen.CommunityCodeforcesBlog>
+    holder: CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>
 ) {
     val handle = holder.screen.handle
 

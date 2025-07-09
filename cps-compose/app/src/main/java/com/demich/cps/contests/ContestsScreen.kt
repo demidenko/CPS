@@ -305,7 +305,7 @@ private fun ColumnScope.LoadingError(
 
 @Composable
 fun NavContentContestsScreen(
-    holder: CPSNavigator.DuringCompositionHolder<Screen.Contests>,
+    holder: CPSNavigator.ScreenScope<Screen.Contests>,
     onOpenSettings: () -> Unit
 ) {
     val context = context

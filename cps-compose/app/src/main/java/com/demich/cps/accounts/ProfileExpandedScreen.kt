@@ -91,7 +91,7 @@ private fun profileExpandedMenuBuilder(
 
 @Composable
 fun NavContentProfilesExpandedScreen(
-    holder: CPSNavigator.DuringCompositionHolder<Screen.ProfileExpanded>,
+    holder: CPSNavigator.ScreenScope<Screen.ProfileExpanded>,
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
