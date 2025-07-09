@@ -28,6 +28,7 @@ import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.navEntry
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme

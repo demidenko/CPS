@@ -126,27 +126,6 @@ class CPSNavigator(
         }
     }
 
-    context(builder: NavGraphBuilder)
-    inline fun <reified T: Screen> navEntry(
-        includeFontPadding: Boolean = true,
-        crossinline content: @Composable ScreenScope<T>.() -> Unit
-    ) {
-        builder.composable<T> {
-            val scope = remember {
-                ScreenScope(it.toRoute<T>()).apply {
-                    menu = null
-                    bottomBar = null
-                }
-            }
-            Surface(modifier = Modifier.fillMaxSize()) {
-                //TODO: remove it (use default includeFontPadding = false)
-                ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
-                    scope.content()
-                }
-            }
-        }
-    }
-
     @Composable
     fun NavHost(
         modifier: Modifier = Modifier,
@@ -186,5 +165,26 @@ class CPSNavigator(
 
     val additionalBottomBar: AdditionalBottomBarBuilder
         get() = bottomBarBuilderState.value ?: {}
+}
+
+context(builder: NavGraphBuilder)
+inline fun <reified T: Screen> CPSNavigator.navEntry(
+    includeFontPadding: Boolean = true,
+    crossinline content: @Composable CPSNavigator.ScreenScope<T>.() -> Unit
+) {
+    builder.composable<T> {
+        val scope = remember {
+            ScreenScope(it.toRoute<T>()).apply {
+                menu = null
+                bottomBar = null
+            }
+        }
+        Surface(modifier = Modifier.fillMaxSize()) {
+            //TODO: remove it (use default includeFontPadding = false)
+            ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
+                scope.content()
+            }
+        }
+    }
 }
 
