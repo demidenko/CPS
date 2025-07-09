@@ -83,7 +83,7 @@ inline fun SettingsContainerScope.SettingsSectionHeader(
     content()
 }
 
-private object SettingsColumnScopeInstance: SettingsContainerScope {
+object SettingsColumnScopeInstance: SettingsContainerScope {
     @Composable
     override fun append(
         modifier: Modifier,
