@@ -50,11 +50,16 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         ClistApi.ApiAccess(login = login, key = key)
     }
 
-    val contestsDateConstraints = jsonCPS.item(name = "contests_date_constraints") {
+    val contestMaxDuration = jsonCPS.item(name = "contest_max_duration", defaultValue = 30.days)
+    val contestMaxNowToStart = jsonCPS.item(name = "contest_max_now_to_start", defaultValue = 120.days)
+    val contestMaxEndToNow = jsonCPS.item(name = "contest_max_end_to_now", defaultValue = 7.days)
+    val contestsDateConstraints = combine(
+        contestMaxDuration, contestMaxNowToStart, contestMaxEndToNow
+    ) { maxDuration, maxNowToStart, maxEndToNow ->
         ContestDateRelativeConstraints(
-            maxDuration = 30.days,
-            nowToStartTimeMaxDuration = 120.days,
-            endTimeToNowMaxDuration = 7.days
+            maxDuration = maxDuration,
+            nowToStartTimeMaxDuration = maxNowToStart,
+            endTimeToNowMaxDuration = maxEndToNow
         )
     }
 

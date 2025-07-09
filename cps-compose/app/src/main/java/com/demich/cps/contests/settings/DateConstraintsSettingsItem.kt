@@ -44,12 +44,6 @@ internal fun SettingsContainerScope.DateConstraintsSettingsItem() {
     val settings = remember { context.settingsContests }
     val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
 
-    fun saveConstraints(newConstraints: ContestDateRelativeConstraints) {
-        scope.launch {
-            settings.contestsDateConstraints.setValue(newConstraints)
-        }
-    }
-
     Expandable(
         title = "Date constraints",
         collapsedContent = {
@@ -60,17 +54,17 @@ internal fun SettingsContainerScope.DateConstraintsSettingsItem() {
                 DurationRow(
                     title = "Max duration = ",
                     duration = dateConstraints.maxDuration,
-                    onDurationChange = { saveConstraints(dateConstraints.copy(maxDuration = it)) }
+                    onDurationChange = { scope.launch { settings.contestMaxDuration.setValue(it) } }
                 )
                 DurationRow(
                     title = "Max start - now = ",
                     duration = dateConstraints.nowToStartTimeMaxDuration,
-                    onDurationChange = { saveConstraints(dateConstraints.copy(nowToStartTimeMaxDuration = it)) }
+                    onDurationChange = { scope.launch { settings.contestMaxNowToStart.setValue(it) } }
                 )
                 DurationRow(
                     title = "Max now - end = ",
                     duration = dateConstraints.endTimeToNowMaxDuration,
-                    onDurationChange = { saveConstraints(dateConstraints.copy(endTimeToNowMaxDuration = it)) }
+                    onDurationChange = { scope.launch { settings.contestMaxEndToNow.setValue(it) } }
                 )
             }
         }
