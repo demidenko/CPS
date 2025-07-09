@@ -27,31 +27,9 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
 
-@Composable
-private fun ProfileExpandedScreen(
-    type: AccountManagerType,
-    showDeleteDialog: Boolean,
-    onDeleteRequest: (AccountManager<out UserInfo>) -> Unit,
-    onDismissDeleteDialog: () -> Unit,
-    setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
-) {
-    val manager = remember(type) { accountManagerOf(type) }
-    ProfileExpandedContent(
-        manager = manager,
-        setBottomBarContent = setBottomBarContent
-    )
-
-    if (showDeleteDialog) {
-        CPSDeleteDialog(
-            title = "Delete $type profile?",
-            onConfirmRequest = { onDeleteRequest(manager) },
-            onDismissRequest = onDismissDeleteDialog
-        )
-    }
-}
 
 @Composable
-private fun<U: UserInfo> ProfileExpandedContent(
+private fun <U: UserInfo> ProfileExpandedContent(
     manager: AccountManager<U>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
@@ -95,15 +73,10 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
     val type = screen.managerType
+    val manager = remember(type) { accountManagerOf(type) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    ProfileExpandedScreen(
-        type = type,
-        showDeleteDialog = showDeleteDialog,
-        onDeleteRequest = onDeleteRequest,
-        onDismissDeleteDialog = { showDeleteDialog = false },
-        setBottomBarContent = { bottomBar = it }
-    )
+    setSubtitle("profiles", type.name)
 
     menu = profileExpandedMenuBuilder(
         type = type,
@@ -111,5 +84,16 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
         onOpenSettings = onOpenSettings
     )
 
-    setSubtitle("profiles", type.name)
+    ProfileExpandedContent(
+        manager = manager,
+        setBottomBarContent = { bottomBar = it }
+    )
+
+    if (showDeleteDialog) {
+        CPSDeleteDialog(
+            title = "Delete $type profile?",
+            onConfirmRequest = { onDeleteRequest(manager) },
+            onDismissRequest = { showDeleteDialog = false }
+        )
+    }
 }
