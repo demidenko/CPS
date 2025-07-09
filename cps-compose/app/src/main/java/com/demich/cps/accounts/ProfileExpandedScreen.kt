@@ -103,7 +103,7 @@ fun NavContentProfilesExpandedScreen(
         showDeleteDialog = showDeleteDialog,
         onDeleteRequest = onDeleteRequest,
         onDismissDeleteDialog = { showDeleteDialog = false },
-        setBottomBarContent = holder.bottomBarSetter
+        setBottomBarContent = { holder.bottomBar = it }
     )
 
     holder.menu = profileExpandedMenuBuilder(

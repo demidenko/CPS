@@ -118,8 +118,6 @@ class CPSNavigator(
             if (screen == currentScreen) bottomBarBuilderState.value = it
         }
 
-        val bottomBarSetter: (AdditionalBottomBarBuilder) -> Unit get() = { bottomBar = it }
-
         fun setSubtitle(vararg words: String) {
             if (screen == currentScreen) {
                 subtitleState.value =
@@ -134,15 +132,15 @@ class CPSNavigator(
         crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
     ) {
         builder.composable<T> {
-            //TODO: remove it (includeFontPadding = false)
-            ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    val holder = remember {
-                        DuringCompositionHolder(it.toRoute<T>()).apply {
-                            menu = null
-                            bottomBar = null
-                        }
-                    }
+            val holder = remember {
+                DuringCompositionHolder(it.toRoute<T>()).apply {
+                    menu = null
+                    bottomBar = null
+                }
+            }
+            Surface(modifier = Modifier.fillMaxSize()) {
+                //TODO: remove it (use default includeFontPadding = false)
+                ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
                     content(holder)
                 }
             }
