@@ -128,11 +128,12 @@ class CPSNavigator(
         }
     }
 
-    inline fun <reified T: Screen> NavGraphBuilder.navEntry(
+    context(builder: NavGraphBuilder)
+    inline fun <reified T: Screen> navEntry(
         includeFontPadding: Boolean = true,
         crossinline content: @Composable (DuringCompositionHolder<T>) -> Unit
     ) {
-        composable<T> {
+        builder.composable<T> {
             //TODO: remove it (includeFontPadding = false)
             ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
                 Surface(modifier = Modifier.fillMaxSize()) {

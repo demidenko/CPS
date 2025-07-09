@@ -67,15 +67,14 @@ private fun CPSContent() {
     val navigator = rememberCPSNavigator()
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        with(navigator) { //second receiver
-        navEntry<Screen.Profiles> { holder ->
+        navigator.navEntry<Screen.Profiles> { holder ->
             NavContentProfilesScreen(
                 holder = holder,
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
 
-        navEntry<Screen.ProfileExpanded> { holder ->
+        navigator.navEntry<Screen.ProfileExpanded> { holder ->
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
@@ -91,13 +90,13 @@ private fun CPSContent() {
             )
         }
 
-        navEntry<Screen.ProfileSettings>(false) { holder ->
+        navigator.navEntry<Screen.ProfileSettings>(false) { holder ->
             val type = holder.screen.managerType
             ProfileSettingsScreen(type)
             holder.setSubtitle("profiles", type.name, "settings")
         }
 
-        navEntry<Screen.Community> { holder ->
+        navigator.navEntry<Screen.Community> { holder ->
             val controller = rememberCodeforcesCommunityController()
             CommunityScreen(controller = controller)
             holder.menu = communityMenuBuilder(
@@ -111,12 +110,12 @@ private fun CPSContent() {
             holder.setSubtitle("community", "codeforces", controller.currentTab.name)
         }
 
-        navEntry<Screen.CommunitySettings>(false) { holder ->
+        navigator.navEntry<Screen.CommunitySettings>(false) { holder ->
             CommunitySettingsScreen()
             holder.setSubtitle("community", "settings")
         }
 
-        navEntry<Screen.CommunityFollowList> { holder ->
+        navigator.navEntry<Screen.CommunityFollowList> { holder ->
             CommunityFollowScreen { handle ->
                 navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
             }
@@ -124,27 +123,26 @@ private fun CPSContent() {
             holder.setSubtitle("community", "codeforces", "follow", "list")
         }
 
-        navEntry<Screen.CommunityCodeforcesBlog> { holder ->
+        navigator.navEntry<Screen.CommunityCodeforcesBlog> { holder ->
             NavContentCodeforcesBlog(holder = holder)
         }
 
-        navEntry<Screen.Contests> { holder ->
+        navigator.navEntry<Screen.Contests> { holder ->
             NavContentContestsScreen(
                 holder = holder,
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }
 
-        navEntry<Screen.ContestsSettings>(false) { holder ->
+        navigator.navEntry<Screen.ContestsSettings>(false) { holder ->
             ContestsSettingsScreen()
             holder.setSubtitle("contests", "settings")
         }
 
-        navEntry<Screen.Development> { holder ->
+        navigator.navEntry<Screen.Development> { holder ->
             DevelopScreen()
             holder.bottomBar = developAdditionalBottomBarBuilder()
             holder.setSubtitle("develop")
-        }
         }
     }
 
