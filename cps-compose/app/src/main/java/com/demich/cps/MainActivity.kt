@@ -17,11 +17,8 @@ import com.demich.cps.accounts.NavContentProfilesScreen
 import com.demich.cps.accounts.ProfileSettingsScreen
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.profilesViewModel
-import com.demich.cps.community.CommunityScreen
+import com.demich.cps.community.NavContentCommunityScreen
 import com.demich.cps.community.codeforces.NavContentCodeforcesBlog
-import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
-import com.demich.cps.community.communityBottomBarBuilder
-import com.demich.cps.community.communityMenuBuilder
 import com.demich.cps.community.follow.CommunityFollowScreen
 import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
 import com.demich.cps.community.settings.CommunitySettingsScreen
@@ -95,17 +92,10 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.Community> {
-            val controller = rememberCodeforcesCommunityController()
-            CommunityScreen(controller = controller)
-            menu = communityMenuBuilder(
-                controller = controller,
+            NavContentCommunityScreen(
                 onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
                 onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
-            bottomBar = communityBottomBarBuilder(
-                controller = controller
-            )
-            setSubtitle("community", "codeforces", controller.currentTab.name)
         }
 
         navigator.navEntry<Screen.CommunitySettings>(false) {

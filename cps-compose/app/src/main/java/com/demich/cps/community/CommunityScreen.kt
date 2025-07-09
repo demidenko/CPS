@@ -6,7 +6,10 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
+import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
@@ -15,7 +18,7 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 
 @Composable
-fun CommunityScreen(
+private fun CommunityScreen(
     controller: CodeforcesCommunityController
 ) {
     CodeforcesCommunityScreen(
@@ -24,7 +27,7 @@ fun CommunityScreen(
 }
 
 
-fun communityBottomBarBuilder(
+private fun communityBottomBarBuilder(
     controller: CodeforcesCommunityController
 ): AdditionalBottomBarBuilder = {
     val context = context
@@ -37,7 +40,7 @@ fun communityBottomBarBuilder(
     }
 }
 
-fun communityMenuBuilder(
+private fun communityMenuBuilder(
     controller: CodeforcesCommunityController,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
@@ -57,4 +60,25 @@ fun communityMenuBuilder(
             onOpenFollowList()
         }
     }
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
+    onOpenSettings: () -> Unit,
+    onOpenFollowList: () -> Unit
+) {
+    val controller = rememberCodeforcesCommunityController()
+    CommunityScreen(controller = controller)
+
+    menu = communityMenuBuilder(
+        controller = controller,
+        onOpenSettings = onOpenSettings,
+        onOpenFollowList = onOpenFollowList
+    )
+
+    bottomBar = communityBottomBarBuilder(
+        controller = controller
+    )
+
+    setSubtitle("community", "codeforces", controller.currentTab.name)
 }
