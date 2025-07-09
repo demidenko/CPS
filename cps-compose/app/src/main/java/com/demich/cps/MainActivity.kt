@@ -104,9 +104,11 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.CommunityFollowList> {
-            CommunityFollowScreen { handle ->
-                navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
-            }
+            CommunityFollowScreen(
+                onShowBlogScreen = { handle ->
+                    navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
+                }
+            )
             bottomBar = communityFollowListBottomBarBuilder()
             setSubtitle("community", "codeforces", "follow", "list")
         }
