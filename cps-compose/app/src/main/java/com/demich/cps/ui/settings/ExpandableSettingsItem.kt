@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,7 +43,7 @@ fun SettingsContainerScope.Expandable(
             ) {
                 CollapseIcon(modifier = Modifier.size(24.dp))
             }
-            Column {
+            ColumnSpaced(space = 2.dp) {
                 Title(
                     title = title,
                     modifier = Modifier

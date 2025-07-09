@@ -1,7 +1,6 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,8 +32,8 @@ inline fun SettingsColumn(
 ) {
     val border: Dp = 10.dp
     //spaceBy adds space only between items but start + end required too
-    Column(
-        verticalArrangement = Arrangement.spacedBy(border),
+    ColumnSpaced(
+        space = border,
         modifier = modifier
             .padding(horizontal = border)
             .verticalScroll(rememberScrollState())
@@ -84,7 +83,7 @@ inline fun SettingsContainerScope.SettingsSectionHeader(
     content()
 }
 
-object SettingsColumnScopeInstance: SettingsContainerScope {
+private object SettingsColumnScopeInstance: SettingsContainerScope {
     @Composable
     override fun append(
         modifier: Modifier,

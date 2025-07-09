@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 
 
 interface SettingsContainerScope {
-
     @Composable
     fun append(
         modifier: Modifier = Modifier,

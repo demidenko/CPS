@@ -1,6 +1,5 @@
 package com.demich.cps.ui.settings
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -9,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.theme.cpsColors
@@ -24,7 +24,9 @@ fun <T> SettingsContainerScope.SubtitledByValue(
 ) {
     Item(modifier = modifier) {
         val value by collectItemAsState { item }
-        Column {
+        ColumnSpaced(
+            space = 2.dp
+        ) {
             Title(title = title)
             ProvideTextStyle(subtitleTextStyle()) {
                 subtitle(value)
