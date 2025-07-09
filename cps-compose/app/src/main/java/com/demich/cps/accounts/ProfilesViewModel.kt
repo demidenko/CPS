@@ -50,7 +50,7 @@ class ProfilesViewModel: ViewModel() {
         if (loadingStatuses.value[manager.type] == LoadingStatus.LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val dataStore = manager.dataStore(context)
-            val savedProfile = dataStore.getProfile() ?: return@launch
+            val savedProfile = dataStore.profile() ?: return@launch
 
             setLoadingStatus(manager, LoadingStatus.LOADING)
             val profileResult = manager.fetchProfile(savedProfile.userId)
@@ -87,7 +87,7 @@ class ProfilesViewModel: ViewModel() {
                 launch {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
-                    val savedUserId = manager.dataStore(context).getProfile()?.userId
+                    val savedUserId = manager.dataStore(context).profile()?.userId
                     if (userId.equals(savedUserId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
                         reload(manager, context)

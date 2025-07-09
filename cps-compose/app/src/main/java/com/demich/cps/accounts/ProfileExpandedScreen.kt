@@ -22,7 +22,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
-import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
-    val profileResult by collectAsState { manager.dataStore(context).flowOfProfile() }
+    val profileResult by collectItemAsState { manager.dataStore(context).profile }
     profileResult?.let {
         manager.ExpandedContent(
             profileResult = it,
@@ -59,7 +59,7 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             accountManagerOf(type)
-                .dataStore(context).getProfile()
+                .dataStore(context).profile()
                 ?.userInfoOrNull()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }

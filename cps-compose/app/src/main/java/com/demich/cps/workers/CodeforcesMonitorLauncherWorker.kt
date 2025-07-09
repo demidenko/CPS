@@ -40,7 +40,7 @@ class CodeforcesMonitorLauncherWorker(
 
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        val info = dataStore.getProfile()?.userInfoOrNull() ?: return Result.success()
+        val info = dataStore.profile()?.userInfoOrNull() ?: return Result.success()
 
         with(dataStore) {
             val (firstParticipation, firstSubmission) = getFirstNewSubmissions(

@@ -105,7 +105,7 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileRe
 
 
 private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
-    dataStore(context).flowOfProfile().map { getRank(it) }
+    dataStore(context).profile.asFlow().map { getRank(it) }
 
 private class RankGetter(
     private val validRanks: List<RatedRank>,

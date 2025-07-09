@@ -44,7 +44,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     override suspend fun runWork(): Result {
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        val handle = dataStore.getProfile()
+        val handle = dataStore.profile()
             ?.userInfoOrNull()
             ?.takeIf { it.rating != null }
             ?.handle

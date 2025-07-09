@@ -7,6 +7,7 @@ import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.jsonProfile
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -22,10 +23,11 @@ abstract class ProfileDataStore<U: UserInfo>(
 
     protected abstract suspend fun onResetProfile()
 
-    suspend fun getProfile(): ProfileResult<U>? = profileItem()
+    val profile: DataStoreValue<ProfileResult<U>?>
+        get() = profileItem
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
-        val oldUserId = getProfile()?.userId
+        val oldUserId = profile()?.userId
         profileItem.setValue(profileResult)
         if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
             onResetProfile()
@@ -35,8 +37,6 @@ abstract class ProfileDataStore<U: UserInfo>(
     suspend fun deleteProfile() {
         profileItem.setValue(null)
     }
-
-    fun flowOfProfile() = profileItem.asFlow()
 }
 
 abstract class ProfileUniqueDataStore<U: UserInfo>(
@@ -54,12 +54,11 @@ abstract class ProfileUniqueDataStore<U: UserInfo>(
 
 internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multiple_profiles")
 
-internal inline fun<reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
+internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
 
         override suspend fun onResetProfile() { }
-
     }
 
 

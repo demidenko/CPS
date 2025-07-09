@@ -23,7 +23,7 @@ import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.flow.emptyFlow
@@ -44,7 +44,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     val scope = rememberCoroutineScope()
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    val profileResult by collectAsState { manager.dataStore(context).flowOfProfile() }
+    val profileResult by collectItemAsState { manager.dataStore(context).profile }
 
     profileResult?.let {
         ProfileSettingsItems(

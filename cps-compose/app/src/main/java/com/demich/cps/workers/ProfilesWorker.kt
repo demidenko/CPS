@@ -55,7 +55,7 @@ class ProfilesWorker(
     }
 
     private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.dataStore(context).getProfile()
+        val userInfo = codeforcesAccountManager.dataStore(context).profile()
             ?.userInfoOrNull() ?: return
 
         val lastRatingChange = CodeforcesClient.runCatching {
@@ -67,7 +67,7 @@ class ProfilesWorker(
 
     private suspend fun codeforcesContribution() {
         val dataStore = codeforcesAccountManager.dataStore(context)
-        val userInfo = dataStore.getProfile()
+        val userInfo = dataStore.profile()
             ?.userInfoOrNull() ?: return
 
         val handle = userInfo.handle
@@ -94,7 +94,7 @@ class ProfilesWorker(
 
     private suspend fun atcoderRating() {
         val dataStore = atcoderAccountManager.dataStore(context)
-        val userInfo = dataStore.getProfile()
+        val userInfo = dataStore.profile()
             ?.userInfoOrNull() ?: return
 
         val lastRatingChange = AtCoderClient.runCatching {

@@ -77,7 +77,7 @@ data class ProfileResultWithManager<U: UserInfo>(
 }
 
 fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
-    dataStore(context).flowOfProfile().map { result ->
+    dataStore(context).profile.asFlow().map { result ->
         result?.let { ProfileResultWithManager(it, this) }
     }
 

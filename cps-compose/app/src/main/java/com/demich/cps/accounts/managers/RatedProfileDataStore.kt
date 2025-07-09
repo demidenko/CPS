@@ -37,7 +37,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         if (prev == null) return //TODO: consider cases
 
         //update userInfo
-        val profile = getProfile() ?: return
+        val profile = profile() ?: return
 
         val newProfile = manager.fetchProfile(data = profile.userId)
         if (newProfile is ProfileResult.Failed) {
