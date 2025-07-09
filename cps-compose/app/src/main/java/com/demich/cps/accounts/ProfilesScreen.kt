@@ -83,8 +83,7 @@ private fun ProfilesScreen(
 }
 
 @Composable
-fun NavContentProfilesScreen(
-    holder: CPSNavigator.ScreenScope<Screen.Profiles>,
+fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
     onExpandProfile: (AccountManagerType) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
@@ -95,8 +94,8 @@ fun NavContentProfilesScreen(
         onExpandProfile = onExpandProfile,
         reorderEnabled = reorderEnabled
     )
-    
-    holder.menu =
+
+    menu =
         if (profilesOrder.size > 1) {
             {
                 CPSDropdownMenuItem(
@@ -109,13 +108,13 @@ fun NavContentProfilesScreen(
             null
         }
 
-    holder.bottomBar = profilesBottomBarBuilder(
+    bottomBar = profilesBottomBarBuilder(
         profiles = profilesOrder,
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
     
-    holder.setSubtitle("profiles")
+    setSubtitle("profiles")
 }
 
 @Composable

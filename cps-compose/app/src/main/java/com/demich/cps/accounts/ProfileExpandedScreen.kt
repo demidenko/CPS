@@ -90,12 +90,11 @@ private fun profileExpandedMenuBuilder(
 }
 
 @Composable
-fun NavContentProfilesExpandedScreen(
-    holder: CPSNavigator.ScreenScope<Screen.ProfileExpanded>,
+fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedScreen(
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
-    val type = holder.screen.managerType
+    val type = screen.managerType
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     ProfileExpandedScreen(
@@ -103,14 +102,14 @@ fun NavContentProfilesExpandedScreen(
         showDeleteDialog = showDeleteDialog,
         onDeleteRequest = onDeleteRequest,
         onDismissDeleteDialog = { showDeleteDialog = false },
-        setBottomBarContent = { holder.bottomBar = it }
+        setBottomBarContent = { bottomBar = it }
     )
 
-    holder.menu = profileExpandedMenuBuilder(
+    menu = profileExpandedMenuBuilder(
         type = type,
         onShowDeleteDialog = { showDeleteDialog = true },
         onOpenSettings = onOpenSettings
     )
 
-    holder.setSubtitle("profiles", type.name)
+    setSubtitle("profiles", type.name)
 }

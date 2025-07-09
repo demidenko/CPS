@@ -132,7 +132,7 @@ class CPSNavigator(
         crossinline content: @Composable ScreenScope<T>.() -> Unit
     ) {
         builder.composable<T> {
-            val holder = remember {
+            val scope = remember {
                 ScreenScope(it.toRoute<T>()).apply {
                     menu = null
                     bottomBar = null
@@ -141,7 +141,7 @@ class CPSNavigator(
             Surface(modifier = Modifier.fillMaxSize()) {
                 //TODO: remove it (use default includeFontPadding = false)
                 ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
-                    content(holder)
+                    scope.content()
                 }
             }
         }

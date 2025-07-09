@@ -69,7 +69,6 @@ private fun CPSContent() {
     val navBuilder: NavGraphBuilder.() -> Unit = {
         navigator.navEntry<Screen.Profiles> {
             NavContentProfilesScreen(
-                holder = this,
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
@@ -78,7 +77,6 @@ private fun CPSContent() {
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
-                holder = this,
                 onOpenSettings = {
                     val type = screen.managerType
                     navigator.navigateTo(Screen.ProfileSettings(type))
@@ -124,12 +122,11 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.CommunityCodeforcesBlog> {
-            NavContentCodeforcesBlog(holder = this)
+            NavContentCodeforcesBlog()
         }
 
         navigator.navEntry<Screen.Contests> {
             NavContentContestsScreen(
-                holder = this,
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }

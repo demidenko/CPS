@@ -80,10 +80,8 @@ private fun CodeforcesUserBlogContent(
 }
 
 @Composable
-fun NavContentCodeforcesBlog(
-    holder: CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>
-) {
-    val handle = holder.screen.handle
+fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
+    val handle = screen.handle
 
     var dataKey by rememberUUIDState
     val blogEntriesResult by codeforcesCommunityViewModel()
@@ -98,11 +96,11 @@ fun NavContentCodeforcesBlog(
         filterState = filterState
     )
 
-    holder.bottomBar = {
+    bottomBar = {
         FilterIconButton(filterState = filterState)
     }
 
-    holder.setSubtitle("community", "codeforces", "blog")
+    setSubtitle("community", "codeforces", "blog")
 }
 
 private fun List<CodeforcesBlogEntry>.filterBy(state: FilterState) =

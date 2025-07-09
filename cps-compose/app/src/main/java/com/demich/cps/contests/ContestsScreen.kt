@@ -304,8 +304,7 @@ private fun ColumnScope.LoadingError(
 }
 
 @Composable
-fun NavContentContestsScreen(
-    holder: CPSNavigator.ScreenScope<Screen.Contests>,
+fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     onOpenSettings: () -> Unit
 ) {
     val context = context
@@ -326,7 +325,7 @@ fun NavContentContestsScreen(
         onReload = onReload
     )
 
-    holder.bottomBar = contestsBottomBarBuilder(
+    bottomBar = contestsBottomBarBuilder(
         viewState = viewState,
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
@@ -334,14 +333,14 @@ fun NavContentContestsScreen(
         onReloadClick = onReload
     )
 
-    holder.menu = contestsMenuBuilder(
+    menu = contestsMenuBuilder(
         onOpenSettings = onOpenSettings,
         isReloading = isReloading
     )
 
     when (viewState.contestsPage) {
-        ContestsListViewState.ContestsPage.Finished -> holder.setSubtitle("contests", "finished")
-        ContestsListViewState.ContestsPage.RunningOrFuture -> holder.setSubtitle("contests")
+        ContestsListViewState.ContestsPage.Finished -> setSubtitle("contests", "finished")
+        ContestsListViewState.ContestsPage.RunningOrFuture -> setSubtitle("contests")
     }
 }
 
