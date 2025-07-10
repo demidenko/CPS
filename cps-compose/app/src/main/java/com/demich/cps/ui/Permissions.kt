@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.DangerType
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -70,33 +71,39 @@ private fun PermissionPanel(
     message: String,
     onClick: () -> Unit
 ) {
+    val shape = RoundedCornerShape(6.dp)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .background(color = cpsColors.backgroundAdditional, shape = RoundedCornerShape(4.dp))
-            .border(color = cpsColors.error, width = 1.dp, shape = RoundedCornerShape(4.dp))
+            .background(color = cpsColors.backgroundAdditional, shape = shape)
+            .border(color = cpsColors.error, width = 1.dp, shape = shape)
             .padding(all = 8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            IconSp(
-                imageVector = CPSIcons.Attention,
-                size = 19.sp,
-                color = cpsColors.error
+            AttentionIcon(
+                dangerType = DangerType.DANGER,
+                size = 19.sp
             )
             Text(
-                text = message,
+                text = "Permissions",
                 fontWeight = FontWeight.SemiBold,
-                color = cpsColors.error,
-                modifier = Modifier.weight(1f)
+                color = cpsColors.error
             )
         }
 
+        Text(
+            text = message,
+            modifier = Modifier.fillMaxWidth()
+        )
+
         OutlinedButton(
             onClick = onClick,
-            content = { Text(text = "Request permission") },
+            content = { Text(text = "Allow permission") },
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = cpsColors.content
             )
