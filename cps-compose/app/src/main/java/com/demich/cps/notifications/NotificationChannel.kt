@@ -1,8 +1,16 @@
 package com.demich.cps.notifications
 
+import android.app.NotificationChannelGroup
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+
+class NotificationChannelInfo internal constructor(
+    val id: String,
+    val name: String,
+    val importance: Importance,
+    val group: NotificationChannelGroup
+)
 
 class NotificationChannelSingleId internal constructor(
     val notificationId: Int,
@@ -36,4 +44,14 @@ class NotificationChannelRangeId internal constructor(
             notificationId = key.hashCode().mod(idRange.last - idRange.first + 1) + idRange.first,
             channelInfo = channelInfo
         )
+}
+
+private fun NotificationManagerCompat.createNotificationChannel(channelInfo: NotificationChannelInfo) {
+    with(channelInfo) {
+        createNotificationChannelGroup(group)
+        val androidChannel = android.app.NotificationChannel(id, name, importance.toAndroidImportance()).also {
+            it.group = group.id
+        }
+        createNotificationChannel(androidChannel)
+    }
 }
