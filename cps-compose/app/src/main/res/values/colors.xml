@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="textColor">#D4D4D4</color>
+    <color name="content">#D4D4D4</color>
     <color name="backgroundColor">#121212</color>
 
     <color name="success">#339933</color>

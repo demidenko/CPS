@@ -6,13 +6,13 @@
   <path
       android:pathData="M0,0L0,4.23333L4.23333,4.23333L4.23333,0L0,0zM0.26458,0.26458L3.96875,0.26458L3.96875,3.96875L0.26458,3.96875L0.26458,0.26458z"
       android:strokeWidth="0.99903071"
-      android:fillColor="@color/textColor"/>
+      android:fillColor="@color/content"/>
   <path
       android:pathData="M2.11667,1.5875L2.11667,3.70417L2.64583,3.70417L3.70417,3.70417L3.70417,3.175L2.64583,3.175L2.64583,2.91042L3.70417,2.91042L3.70417,2.38125L2.64583,2.38125L2.64583,2.11667L3.70417,2.11667L3.70417,1.5875L2.64583,1.5875L2.11667,1.5875z"
       android:strokeWidth="0.17035268"
-      android:fillColor="@color/textColor"/>
+      android:fillColor="@color/content"/>
   <path
       android:pathData="M0.52917,0.52917L0.52917,1.05833L0.52917,1.5875L0.52917,2.64583L1.05833,2.64583L1.05833,2.11667L1.5875,2.11667C1.88066,2.11667 2.11667,1.88066 2.11667,1.5875L2.11667,1.05833C2.11667,0.76518 1.88066,0.52917 1.5875,0.52917L1.05833,0.52917L0.52917,0.52917zM1.05833,1.05833L1.5875,1.05833L1.5875,1.5875L1.05833,1.5875L1.05833,1.05833z"
       android:strokeWidth="0.99999994"
-      android:fillColor="@color/textColor"/>
+      android:fillColor="@color/content"/>
 </vector>
