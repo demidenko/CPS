@@ -2,6 +2,7 @@ package com.demich.cps.develop
 
 import android.content.Context
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -159,7 +160,7 @@ private fun WorkerDialog(
                 }
 
                 workInfo?.repeatInterval?.let {
-                    Text(text = "repeat interval: $it")
+                    Text(text = "interval: $it")
                 }
 
                 Text(text = buildString {
@@ -288,7 +289,7 @@ private fun WorkerItem(
         workState = workState,
         progressInfo = progressInfo
     ) {
-        Row(modifier = Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             if (lastResult != null) {
                 ResultIcon(
                     result = lastResult,
@@ -324,7 +325,10 @@ private fun WorkerItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
                 text = name,
                 style = CPSDefaults.MonospaceTextStyle.copy(fontSize = 18.sp),

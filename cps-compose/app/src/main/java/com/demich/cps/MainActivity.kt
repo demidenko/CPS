@@ -129,7 +129,7 @@ private fun CPSContent() {
             setSubtitle("contests", "settings")
         }
 
-        navigator.navEntry<Screen.Development> {
+        navigator.navEntry<Screen.Development>(false) {
             DevelopScreen()
             bottomBar = developAdditionalBottomBarBuilder()
             setSubtitle("develop")
