@@ -37,7 +37,7 @@ import com.demich.cps.utils.timerFull
 internal fun ContestExpandedItemContent(
     contest: Contest,
     collisionType: DangerType,
-    onDeleteRequest: () -> Unit
+    onDeleteRequest: (Contest) -> Unit
 ) {
     val phase = contest.getPhase(localCurrentTime)
     ContestPlatform(
@@ -120,7 +120,7 @@ private fun ContestCounter(
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     collisionType: DangerType,
-    onDeleteRequest: () -> Unit
+    onDeleteRequest: (Contest) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideTextStyle(contestSubtitleTextStyle()) {
@@ -142,7 +142,7 @@ private fun ContestItemDatesAndMenuButton(
 private fun ContestItemMenuButton(
     contest: Contest,
     modifier: Modifier = Modifier,
-    onDeleteRequest: () -> Unit
+    onDeleteRequest: (Contest) -> Unit
 ) {
     val context = context
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -165,7 +165,7 @@ private fun ContestItemMenuButton(
         CPSDeleteDialog(
             title = "Delete contest from list?",
             onDismissRequest = { showDeleteDialog = false },
-            onConfirmRequest = onDeleteRequest
+            onConfirmRequest = { onDeleteRequest(contest) }
         )
     }
 }
