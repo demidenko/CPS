@@ -28,6 +28,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.toSignedString
 import kotlin.time.Instant
 
@@ -50,15 +51,18 @@ private fun ContestResult(
     ratingChange: RatingChange,
     ratingColor: Color,
     modifier: Modifier = Modifier,
-    titleFontSize: TextUnit = 16.sp,
-    subTitleFontSize: TextUnit = 12.sp,
+    titleFontSize: TextUnit = 18.sp,
+    subTitleFontSize: TextUnit = 13.sp,
     ratingFontSize: TextUnit = 30.sp
 ) {
     Row(
         modifier = modifier.height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             Text(
                 text = ratingChange.title,
                 fontSize = titleFontSize,
@@ -68,7 +72,7 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = ratingChange.run {
+                text = with(ratingChange) {
                     date.ratingChangeDate() + "  rank: $rank"
                 },
                 fontSize = subTitleFontSize,
@@ -100,20 +104,21 @@ private fun RatingChange(
     change: Int,
     fontSize: TextUnit
 ) {
-    val color = if (change < 0) cpsColors.error else cpsColors.success
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        IconSp(
-            imageVector = if (change < 0) CPSIcons.RatingDown else CPSIcons.RatingUp,
-            size = fontSize,
-            color = color
-        )
-        Text(
-            text = change.toSignedString(zeroAsPositive = true),
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold,
-            color = color,
-            modifier = Modifier.padding(start = 3.dp)
-        )
+    ProvideContentColor(if (change < 0) cpsColors.error else cpsColors.success) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            IconSp(
+                imageVector = if (change < 0) CPSIcons.RatingDown else CPSIcons.RatingUp,
+                size = fontSize
+            )
+            Text(
+                text = change.toSignedString(zeroAsPositive = true),
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 

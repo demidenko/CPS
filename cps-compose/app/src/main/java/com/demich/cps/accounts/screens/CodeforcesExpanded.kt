@@ -1,6 +1,7 @@
 package com.demich.cps.accounts.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle
@@ -80,7 +82,7 @@ fun CodeforcesUserInfoExpandedContent(
                         UpsolvingSuggestionsList(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 3.dp)
+                                .padding(top = 5.dp)
                                 .heightIn(max = 240.dp)
                         )
                     }
@@ -119,12 +121,14 @@ private enum class ItemType {
 
 @Composable
 private fun Contribution(contribution: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
         Text(
             text = "contribution:",
             color = cpsColors.contentAdditional,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(end = 5.dp)
+            fontSize = 18.sp
         )
         VotedRating(
             rating = contribution,
@@ -151,10 +155,10 @@ private fun UpsolvingSuggestionsList(
     ) {
         Text(
             text = "${it.problemId}. ${it.name}",
+            fontSize = CPSFontSize.itemTitle,
+            fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .clickable {
                     context.openUrlInBrowser(
@@ -164,7 +168,8 @@ private fun UpsolvingSuggestionsList(
                         )
                     )
                 }
-                .padding(all = 2.dp)
+                .padding(horizontal = 2.dp)
+                .padding(vertical = 4.dp)
                 .fillMaxWidth()
         )
         Divider()

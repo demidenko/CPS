@@ -65,13 +65,13 @@ private fun CPSContent() {
     val navigator = rememberCPSNavigator()
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        navigator.navEntry<Screen.Profiles> {
+        navigator.navEntry<Screen.Profiles>(false) {
             NavContentProfilesScreen(
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
 
-        navigator.navEntry<Screen.ProfileExpanded> {
+        navigator.navEntry<Screen.ProfileExpanded>(false) {
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
