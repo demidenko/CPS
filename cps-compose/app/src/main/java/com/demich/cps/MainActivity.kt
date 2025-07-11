@@ -114,7 +114,7 @@ private fun CPSContent() {
             setSubtitle("community", "codeforces", "follow", "list")
         }
 
-        navigator.navEntry<Screen.CommunityCodeforcesBlog> {
+        navigator.navEntry<Screen.CommunityCodeforcesBlog>(false) {
             NavContentCodeforcesBlog()
         }
 

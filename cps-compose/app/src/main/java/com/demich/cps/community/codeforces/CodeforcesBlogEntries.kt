@@ -2,6 +2,7 @@ package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.context
 import com.demich.cps.utils.plusIf
 import com.demich.cps.utils.toTimeAgoString
@@ -68,7 +70,7 @@ fun CodeforcesBlogEntries(
                 .padding(
                     start = 5.dp,
                     end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth },
-                    top = 1.dp,
+                    top = 4.dp,
                     bottom = 4.dp
                 )
                 .animateItem()
@@ -91,16 +93,18 @@ private fun BlogEntryInfo(
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?
 ) {
-    BlogEntryInfo(
-        title = blogEntry.title,
-        authorHandle = blogEntry.author.toHandleSpan(),
-        rating = blogEntry.rating,
-        commentsCount = blogEntry.commentsCount ?: 0,
-        timeAgo = blogEntry.creationTime.toTimeAgoString(),
-        markNew = markNew,
-        label = label,
-        modifier = modifier
-    )
+    IncludeFontPadding(false) {
+        BlogEntryInfo(
+            title = blogEntry.title,
+            authorHandle = blogEntry.author.toHandleSpan(),
+            rating = blogEntry.rating,
+            commentsCount = blogEntry.commentsCount ?: 0,
+            timeAgo = blogEntry.creationTime.toTimeAgoString(),
+            markNew = markNew,
+            label = label,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -114,7 +118,10 @@ private fun BlogEntryInfo(
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
         BlogEntryInfoHeader(
             title = title,
             rating = rating,
@@ -147,7 +154,7 @@ private fun BlogEntryInfoHeader(
         VotedRating(
             rating = rating,
             fontSize = 14.sp,
-            modifier = Modifier.padding(start = 3.dp, top = 3.dp)
+            modifier = Modifier.padding(start = 3.dp, top = 2.dp)
         )
     }
 }
@@ -163,9 +170,8 @@ private fun BlogEntryInfoFooter(
 ) {
     Box(modifier = modifier) {
         Row(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 1.dp)
+            modifier = Modifier.align(Alignment.TopStart),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = authorHandle,
@@ -176,9 +182,7 @@ private fun BlogEntryInfoFooter(
                 text = timeAgo,
                 color = cpsColors.contentAdditional,
                 fontSize = 11.sp,
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .alignByBaseline()
+                modifier = Modifier.alignByBaseline()
             )
             if (markNew) {
                 NewEntryCircle(Modifier.alignBy { it.measuredHeight })
@@ -201,7 +205,6 @@ private fun BlogEntryInfoFooter(
 @Composable
 private fun NewEntryCircle(modifier: Modifier = Modifier) {
     Box(modifier = modifier
-        .padding(start = 4.dp)
         .size(6.dp)
         .clip(CircleShape)
         .background(cpsColors.newEntry)
