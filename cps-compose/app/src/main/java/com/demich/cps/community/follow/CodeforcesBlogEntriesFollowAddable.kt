@@ -42,24 +42,37 @@ fun CodeforcesBlogEntriesFollowAddable(
     )
 
     showAddToFollowDialogFor?.let { blogEntry ->
-        /*
-            TODO:
-            - user already in follow
-            - note if follow disabled
-            - show user blog
-         */
-        CPSYesNoDialog(
-            title = {
-                Text(text = buildAnnotatedString {
-                    append("Add ")
-                    append(blogEntry.author.toHandleSpan())
-                    append(" to follow list?")
-                })
-            },
+        BlogEntryDialog(
+            blogEntry = blogEntry,
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
                 controller.addToFollowList(handle = blogEntry.authorHandle, context = context)
             }
         )
     }
+}
+
+@Composable
+private fun BlogEntryDialog(
+    blogEntry: CodeforcesBlogEntry,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    /*
+        TODO:
+        - user already in follow
+        - note if follow disabled
+        - show user blog
+     */
+    CPSYesNoDialog(
+        title = {
+            Text(text = buildAnnotatedString {
+                append("Add ")
+                append(blogEntry.author.toHandleSpan())
+                append(" to follow list?")
+            })
+        },
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest
+    )
 }
