@@ -8,8 +8,7 @@ import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import com.demich.datastore_itemized.transform
 
 val Context.settingsCommunity: CommunitySettingsDataStore
     get() = CommunitySettingsDataStore(this)
@@ -30,14 +29,12 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
-    fun flowOfCodeforcesTabs(): Flow<List<CodeforcesTitle>> {
-        return codeforcesLostEnabled.asFlow().map { lostEnabled ->
-            buildList {
-                add(CodeforcesTitle.MAIN)
-                add(CodeforcesTitle.TOP)
-                add(CodeforcesTitle.RECENT)
-                if (lostEnabled) add(CodeforcesTitle.LOST)
-            }
+    val codeforcesTabs = transform(codeforcesLostEnabled) { lostEnabled ->
+        buildList {
+            add(CodeforcesTitle.MAIN)
+            add(CodeforcesTitle.TOP)
+            add(CodeforcesTitle.RECENT)
+            if (lostEnabled) add(CodeforcesTitle.LOST)
         }
     }
 

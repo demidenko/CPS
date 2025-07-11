@@ -23,6 +23,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
@@ -41,9 +42,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
 
-    val tabsState = collectAsState {
-        context.settingsCommunity.flowOfCodeforcesTabs()
-    }
+    val tabsState = collectItemAsState { context.settingsCommunity.codeforcesTabs }
 
     val controller = rememberSaveable(saver = controllerSaver(viewModel, tabsState)) {
         val settings = context.settingsCommunity
