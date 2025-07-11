@@ -24,4 +24,5 @@ android {
 
 dependencies {
     implementation(project(":data:contests:database"))
+    implementation(project(":kotlin-stdlib-boost"))
 }

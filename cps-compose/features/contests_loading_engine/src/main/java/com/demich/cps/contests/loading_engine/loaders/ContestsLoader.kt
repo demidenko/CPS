@@ -3,7 +3,7 @@ package com.demich.cps.contests.loading_engine.loaders
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsLoaderType
-import java.util.EnumSet
+import com.demich.kotlin_stdlib_boost.toEnumSet
 
 
 abstract class ContestsLoader {
@@ -63,7 +63,7 @@ abstract class ContestsLoaderMultiple: ContestsLoader() {
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
-        val platforms = EnumSet.copyOf(platforms)
+        val platforms = platforms.toEnumSet()
         return loadContests(
             platforms = platforms,
             dateConstraints = dateConstraints

@@ -31,6 +31,7 @@ import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,7 +95,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
         Contest.platformsExceptUnknown.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableLoaders = ContestsLoaderType.entries.filter { platform in it.supportedPlatforms }.toSet(),
+                availableLoaders = ContestsLoaderType.entries.filter { platform in it.supportedPlatforms }.toEnumSet(),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
