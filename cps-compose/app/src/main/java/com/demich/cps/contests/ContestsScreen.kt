@@ -261,7 +261,7 @@ private fun ContestsColumn(
         ContestItem(
             contest = contest,
             isExpanded = viewState::isExpanded,
-            collisionType = { viewState.collisionType(contest) },
+            collisionType = viewState::collisionType,
             onDeleteRequest = onDeleteRequest,
             modifier = Modifier
                 .fillMaxWidth()

@@ -31,7 +31,7 @@ import com.demich.cps.utils.toSystemDateTime
 fun ContestItem(
     contest: Contest,
     isExpanded: (Contest) -> Boolean,
-    collisionType: () -> DangerType,
+    collisionType: (Contest) -> DangerType,
     modifier: Modifier = Modifier,
     onDeleteRequest: (Contest) -> Unit
 ) {
@@ -42,14 +42,14 @@ fun ContestItem(
     ) {
         //TODO: pass collisionType lambda down
         if (!expanded) ContestItemContent(contest, collisionType)
-        else ContestExpandedItemContent(contest, collisionType(), onDeleteRequest = onDeleteRequest)
+        else ContestExpandedItemContent(contest, collisionType(contest), onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
 private fun ContestItemContent(
     contest: Contest,
-    collisionType: () -> DangerType
+    collisionType: (Contest) -> DangerType
 ) {
     //TODO: call recomposes two times
     val phase = contest.getPhase(localCurrentTime)
@@ -99,7 +99,7 @@ fun ContestItemHeader(
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
-    collisionType: () -> DangerType,
+    collisionType: (Contest) -> DangerType,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -110,7 +110,7 @@ private fun ContestItemFooter(
                     Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
                     Contest.Phase.FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == Contest.Phase.BEFORE) collisionType() else DangerType.SAFE,
+                collisionType = if (phase == Contest.Phase.BEFORE) collisionType(contest) else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(
