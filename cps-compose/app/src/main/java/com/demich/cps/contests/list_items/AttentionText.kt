@@ -2,8 +2,8 @@ package com.demich.cps.contests.list_items
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,13 +41,14 @@ private fun AttentionWithMark(
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
         Text(text = text)
         if (collisionType != DangerType.SAFE) {
-            AttentionIcon(
-                dangerType = collisionType,
-                modifier = Modifier.padding(start = 3.dp)
-            )
+            AttentionIcon(dangerType = collisionType)
         }
     }
 }
