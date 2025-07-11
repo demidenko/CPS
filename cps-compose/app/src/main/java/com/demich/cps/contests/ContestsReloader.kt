@@ -24,6 +24,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
+import java.util.EnumSet
 
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
@@ -48,7 +49,7 @@ interface ContestsReloader {
 
         coroutineScope {
             contestsLoadingFlows(
-                platforms = platforms.toSet(),
+                platforms = EnumSet.copyOf(platforms),
                 settings = settings
             ).forEach { (platform, resultsFlow) ->
                 launch {
