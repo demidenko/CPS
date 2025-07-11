@@ -6,8 +6,6 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.localCurrentTime
 import kotlin.time.Duration
 
-internal fun Contest.platformName() = host ?: platform.name
-
 @Composable
 @ReadOnlyComposable
 internal inline fun Contest.counter(

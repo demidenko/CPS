@@ -58,6 +58,8 @@ internal fun ContestExpandedItemContent(
     )
 }
 
+private fun Contest.platformName() = host ?: platform.name
+
 @Composable
 private fun ContestPlatform(
     platform: Contest.Platform,
