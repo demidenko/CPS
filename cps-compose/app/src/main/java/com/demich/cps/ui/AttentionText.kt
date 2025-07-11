@@ -1,4 +1,4 @@
-package com.demich.cps.contests.list_items
+package com.demich.cps.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.colorFor
-
 
 @Composable
 internal fun AttentionText(

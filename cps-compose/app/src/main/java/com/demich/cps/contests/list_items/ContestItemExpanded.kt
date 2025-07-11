@@ -20,6 +20,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
