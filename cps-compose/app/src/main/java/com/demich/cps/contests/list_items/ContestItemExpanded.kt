@@ -100,20 +100,6 @@ private fun ContestTitle(
 }
 
 @Composable
-private fun ContestItemDatesAndMenuButton(
-    contest: Contest,
-    collisionType: DangerType,
-    onDeleteRequest: () -> Unit
-) {
-    ContestItemDatesAndMenuButton(
-        contest = contest,
-        collisionType = collisionType,
-        modifier = Modifier.fillMaxWidth(),
-        onDeleteRequest = onDeleteRequest
-    )
-}
-
-@Composable
 private fun ContestCounter(
     contest: Contest,
     phase: Contest.Phase
@@ -134,10 +120,9 @@ private fun ContestCounter(
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     collisionType: DangerType,
-    modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = contest.dateRange(),
