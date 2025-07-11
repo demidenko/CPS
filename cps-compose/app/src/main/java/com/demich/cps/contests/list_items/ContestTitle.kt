@@ -14,8 +14,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
@@ -30,7 +30,7 @@ internal fun ContestTitleCollapsed(
     Text(
         text = title.makeTitle(),
         color = colorFor(phase, isVirtual),
-        fontSize = 19.sp,
+        fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
         maxLines = 1,
@@ -49,7 +49,7 @@ internal fun ContestTitleExpanded(
     Text(
         text = title.makeTitle(useNewLine = isMultiline),
         color = colorFor(phase, isVirtual),
-        fontSize = 19.sp,
+        fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
         textAlign = TextAlign.Center,

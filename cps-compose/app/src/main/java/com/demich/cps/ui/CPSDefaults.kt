@@ -32,4 +32,6 @@ object CPSFontSize {
     val settingsSubtitle get() = 15.sp
     val settingsDescription get() = 14.sp
     val settingsSectionTitle get() = 14.sp
+
+    val itemTitle get() = 19.sp
 }

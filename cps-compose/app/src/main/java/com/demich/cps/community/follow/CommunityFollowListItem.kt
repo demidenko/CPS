@@ -21,6 +21,7 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.ui.AttentionIcon
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
@@ -81,7 +82,7 @@ private fun UserHandle(
             handle = userInfo?.handle ?: handle,
             colorTag = CodeforcesUtils.colorTagFrom(userInfo?.rating)
         ).toHandleSpan(),
-        fontSize = 18.sp,
+        fontSize = CPSFontSize.itemTitle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier

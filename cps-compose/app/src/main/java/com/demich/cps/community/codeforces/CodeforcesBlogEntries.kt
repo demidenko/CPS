@@ -25,6 +25,7 @@ import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
@@ -139,7 +140,7 @@ private fun BlogEntryInfoHeader(
     Row(modifier = modifier) {
         Text(
             text = title,
-            fontSize = 19.sp,
+            fontSize = CPSFontSize.itemTitle,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )

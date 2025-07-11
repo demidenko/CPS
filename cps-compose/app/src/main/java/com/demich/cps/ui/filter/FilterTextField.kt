@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.theme.cpsColors
@@ -35,7 +35,7 @@ fun FilterTextField(
                 .imePadding()
                 .focusRequester(focusRequester),
             singleLine = true,
-            textStyle = TextStyle(fontSize = 19.sp, fontWeight = FontWeight.Bold),
+            textStyle = TextStyle(fontSize = CPSFontSize.itemTitle, fontWeight = FontWeight.Bold),
             value = filterState.filter,
             onValueChange = {
                 filterState.filter = it
