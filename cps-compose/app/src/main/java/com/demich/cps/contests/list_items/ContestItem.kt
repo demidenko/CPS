@@ -1,10 +1,10 @@
 package com.demich.cps.contests.list_items
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -77,11 +77,11 @@ fun ContestItemHeader(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         ContestPlatformIcon(
             platform = platform,
-            modifier = Modifier.padding(end = 4.dp),
             size = 18.sp,
             color = cpsColors.contentAdditional
         )
