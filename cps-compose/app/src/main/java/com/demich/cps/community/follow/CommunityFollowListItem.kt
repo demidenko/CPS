@@ -1,14 +1,17 @@
 package com.demich.cps.community.follow
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -35,84 +38,100 @@ fun CommunityFollowListItem(
     blogEntriesCount: Int?,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = CodeforcesHandle(
-                    handle = userInfo?.handle ?: handle,
-                    colorTag = CodeforcesUtils.colorTagFrom(userInfo?.rating)
-                ).toHandleSpan(),
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+            UserHandle(
+                handle = handle,
+                userInfo = userInfo,
+                modifier = Modifier.weight(1f)
             )
             if (blogEntriesCount != null) {
-                CommunityFollowListItemBlogEntryCount(
+                BlogEntryCount(
                     count = blogEntriesCount,
                     iconSize = 18.sp,
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
         }
         if (userInfo != null) {
-            CommunityFollowListItemInfo(
+            BottomInfo(
                 userInfo = userInfo,
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 13.sp
+                fontSize = 14.sp
             )
         }
     }
 }
 
 @Composable
-private fun CommunityFollowListItemBlogEntryCount(
-    count: Int,
-    iconSize: TextUnit,
-    fontSize: TextUnit,
+private fun UserHandle(
+    handle: String,
+    userInfo: CodeforcesUserInfo?,
+    modifier: Modifier = Modifier
 ) {
-    IconSp(
-        imageVector = CPSIcons.BlogEntry,
-        color = cpsColors.contentAdditional,
-        size = iconSize,
-        modifier = Modifier.padding(end = 2.dp)
-    )
     Text(
-        text = count.toString(),
-        fontSize = fontSize,
-        color = cpsColors.content,
-        modifier = Modifier
+        text = CodeforcesHandle(
+            handle = userInfo?.handle ?: handle,
+            colorTag = CodeforcesUtils.colorTagFrom(userInfo?.rating)
+        ).toHandleSpan(),
+        fontSize = 18.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
     )
 }
 
 @Composable
-private fun CommunityFollowListItemInfo(
+private fun BlogEntryCount(
+    count: Int,
+    iconSize: TextUnit,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        IconSp(
+            imageVector = CPSIcons.BlogEntry,
+            color = cpsColors.contentAdditional,
+            size = iconSize
+        )
+        Text(
+            text = count.toString(),
+            fontSize = fontSize,
+            color = cpsColors.content
+        )
+    }
+}
+
+@Composable
+private fun BottomInfo(
     userInfo: CodeforcesUserInfo,
     modifier: Modifier = Modifier,
     fontSize: TextUnit
 ) {
-    Box(modifier = modifier) {
-        UserOnlineInfo(
-            time = userInfo.lastOnlineTime,
-            fontSize = fontSize,
-            modifier = Modifier.align(Alignment.CenterStart)
-        )
-        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
-            Text(
-                text = "cont.: ",
-                color = cpsColors.contentAdditional,
-                fontSize = fontSize
+    ProvideTextStyle(TextStyle(fontSize = fontSize, color = cpsColors.contentAdditional)) {
+        Box(modifier = modifier) {
+            UserOnlineInfo(
+                time = userInfo.lastOnlineTime,
+                modifier = Modifier.align(Alignment.CenterStart)
             )
-            VotedRating(
-                rating = userInfo.contribution,
-                fontSize = fontSize,
-                showZero = true
-            )
+            Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+                Text(text = "cont.: ")
+                VotedRating(
+                    rating = userInfo.contribution,
+                    showZero = true
+                )
+            }
         }
     }
 }
@@ -120,12 +139,10 @@ private fun CommunityFollowListItemInfo(
 @Composable
 private fun UserOnlineInfo(
     modifier: Modifier = Modifier,
-    fontSize: TextUnit,
     time: Instant
 ) {
     UserOnlineInfo(
         modifier = modifier,
-        fontSize = fontSize,
         text = "online: " + time.toTimeAgoString(),
         showWarning = localCurrentTime - time > 365.days
     )
@@ -134,16 +151,11 @@ private fun UserOnlineInfo(
 @Composable
 private fun UserOnlineInfo(
     modifier: Modifier = Modifier,
-    fontSize: TextUnit,
     text: String,
     showWarning: Boolean
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = text,
-            color = cpsColors.contentAdditional,
-            fontSize = fontSize
-        )
+        Text(text = text)
         if (showWarning) {
             AttentionIcon(
                 dangerType = DangerType.WARNING,

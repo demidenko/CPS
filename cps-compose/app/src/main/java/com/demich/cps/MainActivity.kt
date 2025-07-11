@@ -104,7 +104,7 @@ private fun CPSContent() {
             setSubtitle("community", "settings")
         }
 
-        navigator.navEntry<Screen.CommunityFollowList> {
+        navigator.navEntry<Screen.CommunityFollowList>(false) {
             CommunityFollowScreen(
                 onShowBlogScreen = { handle ->
                     navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))

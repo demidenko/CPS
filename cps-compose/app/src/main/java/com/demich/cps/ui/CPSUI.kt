@@ -396,7 +396,7 @@ fun WordsWithCounterOnOverflow(
 @Composable
 fun VotedRating(
     rating: Int,
-    fontSize: TextUnit,
+    fontSize: TextUnit = TextUnit.Unspecified,
     modifier: Modifier = Modifier,
     showZero: Boolean = false
 ) {
