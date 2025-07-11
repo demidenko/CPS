@@ -40,9 +40,8 @@ fun ContestItem(
         modifier = modifier,
         horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
     ) {
-        //TODO: pass collisionType lambda down
         if (!expanded) ContestItemContent(contest, collisionType)
-        else ContestExpandedItemContent(contest, collisionType(contest), onDeleteRequest = onDeleteRequest)
+        else ContestExpandedItemContent(contest, collisionType, onDeleteRequest = onDeleteRequest)
     }
 }
 
