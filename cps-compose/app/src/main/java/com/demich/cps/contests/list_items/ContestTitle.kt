@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +45,8 @@ internal fun ContestTitleExpanded(
     isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
-    var isMultiline by remember(title) { mutableStateOf(false) }
+    // TODO: find better solution
+    var isMultiline by rememberSaveable(title) { mutableStateOf(false) }
     Text(
         text = title.makeTitle(useNewLine = isMultiline),
         color = colorFor(phase, isVirtual),
