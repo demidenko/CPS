@@ -34,3 +34,16 @@ inline fun <T> collectItemAsState(
         val item = block()
         item.asFlow() to runBlocking { item() }
     }.run { first.collectAsState(initial = second) }
+
+@Composable
+inline fun <T> rememberFirst(crossinline block: () -> Flow<T>): T =
+    remember(block).let { flow ->
+        if (flow is StateFlow<T>) flow.value
+        else runBlocking { flow.first() }
+    }
+
+@Composable
+inline fun <T> rememberValue(crossinline block: () -> DataStoreValue<T>): T =
+    remember(block).let { item ->
+        runBlocking { item() }
+    }
