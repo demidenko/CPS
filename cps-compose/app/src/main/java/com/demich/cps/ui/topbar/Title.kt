@@ -1,7 +1,7 @@
 package com.demich.cps.ui.topbar
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
@@ -35,16 +35,16 @@ internal fun Title(
             color = cpsColors.contentAdditional
         )
     ) {
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             Text(
                 text = "Competitive Programming && Solving",
                 color = cpsColors.content,
                 maxLines = 1
             )
-            SubTitle(
-                text = subtitle,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            SubTitle(text = subtitle)
         }
     }
 }
