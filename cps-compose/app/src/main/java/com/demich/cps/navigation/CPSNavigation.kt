@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -16,8 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -30,6 +27,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -180,8 +178,7 @@ inline fun <reified T: Screen> CPSNavigator.navEntry(
             }
         }
         Surface(modifier = Modifier.fillMaxSize()) {
-            //TODO: remove it (use default includeFontPadding = false)
-            ProvideTextStyle(TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding))) {
+            IncludeFontPadding(includeFontPadding) {
                 scope.content()
             }
         }
