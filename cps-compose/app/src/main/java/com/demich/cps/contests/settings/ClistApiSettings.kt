@@ -33,9 +33,9 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.rememberValue
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @Composable
 internal fun SettingsContainerScope.ClistApiAccessSettingsItem() {
@@ -73,9 +73,9 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val initApiAcces = remember { runBlocking { context.settingsContests.clistApiAccess() } }
-    var login by rememberSaveable { mutableStateOf(initApiAcces.login) }
-    var key by rememberSaveable { mutableStateOf(initApiAcces.key) }
+    val initApiAccess = rememberValue { context.settingsContests.clistApiAccess }
+    var login by rememberSaveable { mutableStateOf(initApiAccess.login) }
+    var key by rememberSaveable { mutableStateOf(initApiAccess.key) }
 
     CPSDialog(onDismissRequest = onDismissRequest) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

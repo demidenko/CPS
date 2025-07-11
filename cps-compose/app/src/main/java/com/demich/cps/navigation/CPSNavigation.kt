@@ -32,11 +32,10 @@ import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
-import com.demich.cps.utils.rememberFrom
+import com.demich.cps.utils.rememberValue
 import com.demich.cps.utils.writeOnlyProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun rememberCPSNavigator(
@@ -129,9 +128,11 @@ class CPSNavigator(
         modifier: Modifier = Modifier,
         builder: NavGraphBuilder.() -> Unit
     ) {
-        val startScreen: Screen = rememberFrom(context) {
-            runBlocking { StartScreenDataStore(it).startRootScreen() }
+        val context = context
+        val startScreen: Screen = rememberValue {
+            StartScreenDataStore(context).startRootScreen
         }
+
         androidx.navigation.compose.NavHost(
             navController = navController,
             startDestination = startScreen,
