@@ -41,7 +41,7 @@ fun ContestItem(
         horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
     ) {
         //TODO: pass collisionType lambda down
-        if (!expanded) ContestItemContent(contest, collisionType())
+        if (!expanded) ContestItemContent(contest, collisionType)
         else ContestExpandedItemContent(contest, collisionType(), onDeleteRequest = onDeleteRequest)
     }
 }
@@ -49,7 +49,7 @@ fun ContestItem(
 @Composable
 private fun ContestItemContent(
     contest: Contest,
-    collisionType: DangerType
+    collisionType: () -> DangerType
 ) {
     //TODO: call recomposes two times
     val phase = contest.getPhase(localCurrentTime)
@@ -63,7 +63,7 @@ private fun ContestItemContent(
     ContestItemFooter(
         contest = contest,
         phase = phase,
-        collisionType = if (phase == Contest.Phase.BEFORE) collisionType else DangerType.SAFE,
+        collisionType = collisionType,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -99,7 +99,7 @@ fun ContestItemHeader(
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
-    collisionType: DangerType,
+    collisionType: () -> DangerType,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -110,7 +110,7 @@ private fun ContestItemFooter(
                     Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
                     Contest.Phase.FINISHED -> contest.dateRange()
                 },
-                collisionType = collisionType,
+                collisionType = if (phase == Contest.Phase.BEFORE) collisionType() else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(
