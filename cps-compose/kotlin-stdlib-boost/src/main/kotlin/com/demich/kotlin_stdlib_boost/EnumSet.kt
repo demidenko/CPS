@@ -8,6 +8,3 @@ inline fun <reified T: Enum<T>> emptyEnumSet(): EnumSet<T> =
 inline fun <reified T: Enum<T>> Collection<T>.toEnumSet(): EnumSet<T> =
     if (isEmpty()) emptyEnumSet()
     else EnumSet.copyOf(this)
-
-inline fun <reified T: Enum<T>> buildEnumSet(block: (EnumSet<T>) -> Unit): EnumSet<T> =
-    emptyEnumSet<T>().apply(block)

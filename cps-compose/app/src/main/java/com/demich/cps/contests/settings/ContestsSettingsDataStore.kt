@@ -11,6 +11,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
+import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -38,8 +39,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         enabledKnownPlatforms,
         clistAdditionalResources
     ) { platforms, clistAdditional ->
-        buildSet {
-            addAll(platforms)
+        platforms.toEnumSet().apply {
             if (clistAdditional.isNotEmpty()) add(Contest.Platform.unknown)
         }
     }
