@@ -11,20 +11,20 @@ data class TimedCollection<T>(
     fun valuesSortedByTime(): List<T> =
         m.entries.sortedBy { it.value }.map { it.key }
 
-    fun add(value: T, time: Instant): TimedCollection<T> =
+    fun plus(value: T, time: Instant): TimedCollection<T> =
         TimedCollection(m.plus(value to time))
 
     fun internalFilterByTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterValues(predicate))
 
-    fun filterByValue(predicate: (T) -> Boolean): TimedCollection<T> =
+    fun filterValues(predicate: (T) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterKeys(predicate))
 }
 
 fun <T> emptyTimedCollection(): TimedCollection<T> = TimedCollection()
 
 suspend fun <T> DataStoreItem<TimedCollection<T>>.add(value: T, time: Instant) {
-    update { it.add(value, time) }
+    update { it.plus(value, time) }
 }
 
 suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
