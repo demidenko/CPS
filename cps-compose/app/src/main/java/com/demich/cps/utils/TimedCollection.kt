@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-class TimedCollection<T>(
+data class TimedCollection<T>(
     private val m: Map<T, Instant> = emptyMap()
 ): Collection<T> by m.keys {
     fun valuesSortedByTime(): List<T> =
