@@ -22,6 +22,9 @@ import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -41,7 +44,7 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @Composable
-fun CommunityFollowScreen(
+private fun CommunityFollowScreen(
     onShowBlogScreen: (String) -> Unit
 ) {
     val context = context
@@ -73,6 +76,19 @@ fun CommunityFollowScreen(
 
     //TODO: block if worker in progress
 
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFollowListScreen(
+    onShowBlogScreen: (String) -> Unit
+) {
+    screenTitle = ScreenStaticTitleState("community", "codeforces", "follow", "list")
+
+    CommunityFollowScreen(
+        onShowBlogScreen = onShowBlogScreen
+    )
+
+    bottomBar = communityFollowListBottomBarBuilder()
 }
 
 @Composable

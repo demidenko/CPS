@@ -84,6 +84,8 @@ private fun CodeforcesUserBlogContent(
 fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
     val handle = screen.handle
 
+    screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
+
     var dataKey by rememberUUIDState
     val blogEntriesResult by codeforcesCommunityViewModel()
         .flowOfBlogEntriesResult(handle, context, key = dataKey)
@@ -100,8 +102,6 @@ fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforce
     bottomBar = {
         FilterIconButton(filterState = filterState)
     }
-
-    screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
 }
 
 private fun List<CodeforcesBlogEntry>.filterBy(state: FilterState) =

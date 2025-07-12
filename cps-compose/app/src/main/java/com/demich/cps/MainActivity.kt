@@ -14,21 +14,18 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
 import com.demich.cps.accounts.NavContentProfilesExpandedScreen
 import com.demich.cps.accounts.NavContentProfilesScreen
-import com.demich.cps.accounts.ProfileSettingsScreen
+import com.demich.cps.accounts.NavContentProfilesSettingsScreen
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.profilesViewModel
 import com.demich.cps.community.NavContentCommunityScreen
 import com.demich.cps.community.codeforces.NavContentCodeforcesBlog
-import com.demich.cps.community.follow.CommunityFollowScreen
-import com.demich.cps.community.follow.communityFollowListBottomBarBuilder
-import com.demich.cps.community.settings.CommunitySettingsScreen
+import com.demich.cps.community.follow.NavContentCommunityFollowListScreen
+import com.demich.cps.community.settings.NavContentCommunitySettingsScreen
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.contests.NavContentContestsScreen
-import com.demich.cps.contests.settings.ContestsSettingsScreen
-import com.demich.cps.develop.DevelopScreen
-import com.demich.cps.develop.developAdditionalBottomBarBuilder
+import com.demich.cps.contests.settings.NavContentContestsSettingsScreen
+import com.demich.cps.develop.NavContentDevelopmentScreen
 import com.demich.cps.navigation.Screen
-import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.navigation.navEntry
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
@@ -88,9 +85,7 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.ProfileSettings>(false) {
-            val type = screen.managerType
-            ProfileSettingsScreen(type)
-            screenTitle = ScreenStaticTitleState("profiles", type.name, "settings")
+            NavContentProfilesSettingsScreen()
         }
 
         navigator.navEntry<Screen.Community> {
@@ -101,18 +96,15 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.CommunitySettings>(false) {
-            CommunitySettingsScreen()
-            screenTitle = ScreenStaticTitleState("community", "settings")
+            NavContentCommunitySettingsScreen()
         }
 
         navigator.navEntry<Screen.CommunityFollowList>(false) {
-            CommunityFollowScreen(
+            NavContentCommunityFollowListScreen(
                 onShowBlogScreen = { handle ->
                     navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
                 }
             )
-            bottomBar = communityFollowListBottomBarBuilder()
-            screenTitle = ScreenStaticTitleState("community", "codeforces", "follow", "list")
         }
 
         navigator.navEntry<Screen.CommunityCodeforcesBlog>(false) {
@@ -126,14 +118,11 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.ContestsSettings>(false) {
-            ContestsSettingsScreen()
-            screenTitle = ScreenStaticTitleState("contests", "settings")
+            NavContentContestsSettingsScreen()
         }
 
         navigator.navEntry<Screen.Development>(false) {
-            DevelopScreen()
-            bottomBar = developAdditionalBottomBarBuilder()
-            screenTitle = ScreenStaticTitleState("develop")
+            NavContentDevelopmentScreen()
         }
     }
 

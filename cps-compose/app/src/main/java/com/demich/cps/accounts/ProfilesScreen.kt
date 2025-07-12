@@ -89,12 +89,8 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
     val profilesOrder by profilesOrderState()
-    
-    ProfilesScreen(
-        profiles = profilesOrder,
-        onExpandProfile = onExpandProfile,
-        reorderEnabled = reorderEnabled
-    )
+
+    screenTitle = ScreenStaticTitleState("profiles")
 
     menu =
         if (profilesOrder.size > 1) {
@@ -109,13 +105,17 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
             null
         }
 
+    ProfilesScreen(
+        profiles = profilesOrder,
+        onExpandProfile = onExpandProfile,
+        reorderEnabled = reorderEnabled
+    )
+
     bottomBar = profilesBottomBarBuilder(
         profiles = profilesOrder,
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
-    
-    screenTitle = ScreenStaticTitleState("profiles")
 }
 
 @Composable

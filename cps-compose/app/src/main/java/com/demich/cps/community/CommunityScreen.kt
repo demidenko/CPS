@@ -71,7 +71,12 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val controller = rememberCodeforcesCommunityController()
-    CommunityScreen(controller = controller)
+
+    screenTitle = remember(controller) {
+        ScreenTitleState {
+            cpsScreenTitle("community", "codeforces", controller.currentTab.name)
+        }
+    }
 
     menu = communityMenuBuilder(
         controller = controller,
@@ -79,13 +84,9 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
         onOpenFollowList = onOpenFollowList
     )
 
+    CommunityScreen(controller = controller)
+
     bottomBar = communityBottomBarBuilder(
         controller = controller
     )
-
-    screenTitle = remember(controller) {
-        ScreenTitleState {
-            cpsScreenTitle("community", "codeforces", controller.currentTab.name)
-        }
-    }
 }

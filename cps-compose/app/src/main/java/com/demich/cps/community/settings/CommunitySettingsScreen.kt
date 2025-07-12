@@ -22,6 +22,9 @@ import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
@@ -53,7 +56,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 @Composable
-fun CommunitySettingsScreen() {
+private fun CommunitySettingsScreen() {
     val context = context
     val devEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
 
@@ -91,6 +94,13 @@ fun CommunitySettingsScreen() {
             }
         }
     }
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.CommunitySettings>.NavContentCommunitySettingsScreen() {
+    screenTitle = ScreenStaticTitleState("community", "settings")
+
+    CommunitySettingsScreen()
 }
 
 private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =

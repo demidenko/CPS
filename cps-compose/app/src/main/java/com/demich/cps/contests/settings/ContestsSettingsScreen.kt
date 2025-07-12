@@ -2,13 +2,15 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.runtime.Composable
 import com.demich.cps.contests.ContestsInfoDataStore
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.utils.LaunchedEffectOneTime
 import com.demich.cps.utils.context
 
-
 @Composable
-fun ContestsSettingsScreen() {
+private fun ContestsSettingsScreen() {
     SettingsColumn {
         ContestPlatformsSettingsItem()
         DateConstraintsSettingsItem()
@@ -26,4 +28,11 @@ fun ContestsSettingsScreen() {
             it ?: snapshot
         }
     }
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.ContestsSettings>.NavContentContestsSettingsScreen() {
+    screenTitle = ScreenStaticTitleState("contests", "settings")
+
+    ContestsSettingsScreen()
 }

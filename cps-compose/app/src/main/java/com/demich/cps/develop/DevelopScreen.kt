@@ -22,6 +22,9 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -41,7 +44,7 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-fun DevelopScreen() {
+private fun DevelopScreen() {
     //TestHandles(modifier = Modifier.fillMaxWidth())
     Column {
         WorkersList(modifier = Modifier.fillMaxWidth().weight(1f))
@@ -49,7 +52,7 @@ fun DevelopScreen() {
     }
 }
 
-fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
+private fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val progressBarsViewModel = progressBarsViewModel()
 
     CPSIconButton(icon = CPSIcons.Add) {
@@ -62,6 +65,15 @@ fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
             }
         }
     }
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.Development>.NavContentDevelopmentScreen() {
+    screenTitle = ScreenStaticTitleState("develop")
+
+    DevelopScreen()
+
+    bottomBar = developAdditionalBottomBarBuilder()
 }
 
 @Composable

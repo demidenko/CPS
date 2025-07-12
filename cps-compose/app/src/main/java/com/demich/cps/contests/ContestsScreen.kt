@@ -314,10 +314,25 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     val contestsViewModel = contestsViewModel()
     val viewState = rememberContestsListViewState()
     val filterState = rememberFilterState()
-    val loadingStatus by combinedLoadingStatusState()
-    val anyPlatformEnabled = anyPlatformEnabled()
 
+    screenTitle = remember(viewState) {
+        ScreenTitleState {
+            when (viewState.contestsPage) {
+                ContestsListViewState.ContestsPage.Finished -> cpsScreenTitle("contests", "finished")
+                ContestsListViewState.ContestsPage.RunningOrFuture -> cpsScreenTitle("contests")
+            }
+        }
+    }
+
+    val loadingStatus by combinedLoadingStatusState()
     val isReloading = { loadingStatus == LoadingStatus.LOADING }
+
+    menu = contestsMenuBuilder(
+        onOpenSettings = onOpenSettings,
+        isReloading = isReloading
+    )
+
+    val anyPlatformEnabled = anyPlatformEnabled()
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
@@ -335,20 +350,6 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         loadingStatus = { loadingStatus },
         onReloadClick = onReload
     )
-
-    menu = contestsMenuBuilder(
-        onOpenSettings = onOpenSettings,
-        isReloading = isReloading
-    )
-
-    screenTitle = remember(viewState) {
-        ScreenTitleState {
-            when (viewState.contestsPage) {
-                ContestsListViewState.ContestsPage.Finished -> cpsScreenTitle("contests", "finished")
-                ContestsListViewState.ContestsPage.RunningOrFuture -> cpsScreenTitle("contests")
-            }
-        }
-    }
 }
 
 private fun contestsMenuBuilder(

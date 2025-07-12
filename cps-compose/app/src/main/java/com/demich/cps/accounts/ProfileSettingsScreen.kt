@@ -19,6 +19,9 @@ import com.demich.cps.accounts.managers.ProfileSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
+import com.demich.cps.navigation.CPSNavigator
+import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
@@ -29,11 +32,20 @@ import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
-fun ProfileSettingsScreen(
+private fun ProfileSettingsScreen(
     type: AccountManagerType
 ) {
     val manager = remember(type) { accountManagerOf(type) }
     ProfileSettingsScreen(manager = manager)
+}
+
+@Composable
+fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsScreen() {
+    val type = screen.managerType
+    
+    screenTitle = ScreenStaticTitleState("profiles", type.name, "settings")
+    
+    ProfileSettingsScreen(type)
 }
 
 @Composable
