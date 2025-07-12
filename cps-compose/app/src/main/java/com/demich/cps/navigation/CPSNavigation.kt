@@ -104,19 +104,24 @@ class CPSNavigator(
         navController.popBackStack()
     }
 
-    inner class ScreenScope<T: Screen>(
-        val screen: T
+    inner class ScreenScope<S: Screen>(
+        val screen: S
     ) {
-        var menu: CPSMenuBuilder? by writeOnlyProperty {
-            if (screen == currentScreen) menuBuilderState.value = it
+        private inline fun <T> screenScopeProperty(crossinline block: (T) -> Unit) =
+            writeOnlyProperty<T> {
+                if (screen == currentScreen) block(it)
+            }
+
+        var menu: CPSMenuBuilder? by screenScopeProperty {
+            menuBuilderState.value = it
         }
 
-        var bottomBar: AdditionalBottomBarBuilder? by writeOnlyProperty {
-            if (screen == currentScreen) bottomBarBuilderState.value = it
+        var bottomBar: AdditionalBottomBarBuilder? by screenScopeProperty {
+            bottomBarBuilderState.value = it
         }
 
-        var screenTitle: ScreenTitleState by writeOnlyProperty {
-            if (screen == currentScreen) titleState.value = it
+        var screenTitle: ScreenTitleState by screenScopeProperty {
+            titleState.value = it
         }
     }
 
