@@ -18,6 +18,7 @@ import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -76,7 +77,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     val manager = remember(type) { accountManagerOf(type) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    setSubtitle("profiles", type.name)
+    screenTitle = ScreenStaticTitleState("profiles", type.name)
 
     menu = profileExpandedMenuBuilder(
         type = type,

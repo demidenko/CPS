@@ -12,6 +12,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.LoadingContentBox
@@ -100,7 +101,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforce
         FilterIconButton(filterState = filterState)
     }
 
-    setSubtitle("community", "codeforces", "blog")
+    screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
 }
 
 private fun List<CodeforcesBlogEntry>.filterBy(state: FilterState) =

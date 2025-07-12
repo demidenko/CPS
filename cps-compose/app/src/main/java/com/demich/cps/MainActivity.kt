@@ -28,6 +28,7 @@ import com.demich.cps.contests.settings.ContestsSettingsScreen
 import com.demich.cps.develop.DevelopScreen
 import com.demich.cps.develop.developAdditionalBottomBarBuilder
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.navigation.navEntry
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.ui.CPSScaffold
@@ -89,7 +90,7 @@ private fun CPSContent() {
         navigator.navEntry<Screen.ProfileSettings>(false) {
             val type = screen.managerType
             ProfileSettingsScreen(type)
-            setSubtitle("profiles", type.name, "settings")
+            screenTitle = ScreenStaticTitleState("profiles", type.name, "settings")
         }
 
         navigator.navEntry<Screen.Community> {
@@ -101,7 +102,7 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.CommunitySettings>(false) {
             CommunitySettingsScreen()
-            setSubtitle("community", "settings")
+            screenTitle = ScreenStaticTitleState("community", "settings")
         }
 
         navigator.navEntry<Screen.CommunityFollowList>(false) {
@@ -111,7 +112,7 @@ private fun CPSContent() {
                 }
             )
             bottomBar = communityFollowListBottomBarBuilder()
-            setSubtitle("community", "codeforces", "follow", "list")
+            screenTitle = ScreenStaticTitleState("community", "codeforces", "follow", "list")
         }
 
         navigator.navEntry<Screen.CommunityCodeforcesBlog>(false) {
@@ -126,13 +127,13 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.ContestsSettings>(false) {
             ContestsSettingsScreen()
-            setSubtitle("contests", "settings")
+            screenTitle = ScreenStaticTitleState("contests", "settings")
         }
 
         navigator.navEntry<Screen.Development>(false) {
             DevelopScreen()
             bottomBar = developAdditionalBottomBarBuilder()
-            setSubtitle("develop")
+            screenTitle = ScreenStaticTitleState("develop")
         }
     }
 

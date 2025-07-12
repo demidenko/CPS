@@ -30,6 +30,7 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -114,7 +115,7 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
         onReorderDone = { reorderEnabled = false }
     )
     
-    setSubtitle("profiles")
+    screenTitle = ScreenStaticTitleState("profiles")
 }
 
 @Composable

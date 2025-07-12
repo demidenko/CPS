@@ -2,6 +2,7 @@ package com.demich.cps.community
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
@@ -10,6 +11,8 @@ import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenTitleState
+import com.demich.cps.navigation.cpsScreenTitle
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
@@ -80,5 +83,9 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
         controller = controller
     )
 
-    setSubtitle("community", "codeforces", controller.currentTab.name)
+    screenTitle = remember(controller) {
+        ScreenTitleState {
+            cpsScreenTitle("community", "codeforces", controller.currentTab.name)
+        }
+    }
 }

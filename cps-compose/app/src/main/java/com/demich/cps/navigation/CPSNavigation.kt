@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.flow
 fun rememberCPSNavigator(
     navController: NavHostController = rememberNavController()
 ): CPSNavigator {
-    val subtitleState = remember { mutableStateOf("") }
+    val subtitleState = remember { mutableStateOf<ScreenTitleState>(ScreenStaticTitleState()) }
 
     val currentScreenState: State<Screen?> =
         collectAsState { navController.flowOfCurrentScreen() }
@@ -52,7 +52,7 @@ fun rememberCPSNavigator(
     return CPSNavigator(
         navController = navController,
         currentScreenState = currentScreenState,
-        subtitleState = subtitleState,
+        titleState = subtitleState,
         menuBuilderState = menuBuilderState,
         bottomBarBuilderState = bottomBarBuilderState
     )
@@ -70,7 +70,7 @@ private fun NavController.flowOfCurrentScreen(): Flow<Screen?> =
 class CPSNavigator(
     private val navController: NavHostController,
     currentScreenState: State<Screen?>,
-    private val subtitleState: MutableState<String>,
+    private val titleState: MutableState<ScreenTitleState>,
     private val menuBuilderState: MutableState<CPSMenuBuilder?>,
     private val bottomBarBuilderState: MutableState<AdditionalBottomBarBuilder?>
 ) {
@@ -115,11 +115,8 @@ class CPSNavigator(
             if (screen == currentScreen) bottomBarBuilderState.value = it
         }
 
-        fun setSubtitle(vararg words: String) {
-            if (screen == currentScreen) {
-                subtitleState.value =
-                    words.joinToString(prefix = "::", separator = ".", transform = String::lowercase)
-            }
+        var screenTitle: ScreenTitleState by writeOnlyProperty {
+            if (screen == currentScreen) titleState.value = it
         }
     }
 
@@ -156,7 +153,7 @@ class CPSNavigator(
                 .statusBarsPadding()
         ) {
             CPSTopBar(
-                subtitle = { subtitleState.value },
+                subtitle = { titleState.value.title() },
                 additionalMenu = { menuBuilderState.value }
             )
         }

@@ -44,6 +44,8 @@ import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.ScreenTitleState
+import com.demich.cps.navigation.cpsScreenTitle
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.AnimatedVisibleByNotNull
@@ -339,9 +341,13 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         isReloading = isReloading
     )
 
-    when (viewState.contestsPage) {
-        ContestsListViewState.ContestsPage.Finished -> setSubtitle("contests", "finished")
-        ContestsListViewState.ContestsPage.RunningOrFuture -> setSubtitle("contests")
+    screenTitle = remember(viewState) {
+        ScreenTitleState {
+            when (viewState.contestsPage) {
+                ContestsListViewState.ContestsPage.Finished -> cpsScreenTitle("contests", "finished")
+                ContestsListViewState.ContestsPage.RunningOrFuture -> cpsScreenTitle("contests")
+            }
+        }
     }
 }
 
