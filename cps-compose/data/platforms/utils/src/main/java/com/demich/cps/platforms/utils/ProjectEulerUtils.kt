@@ -60,9 +60,16 @@ object ProjectEulerUtils {
     }
 
     private class RssItem(private val item: Element) {
-        val guid get() = item.expectFirst("guid")
         val description get() = item.expectFirst("description")
+
         val title get() = item.expectFirst("title")
+
+        inline fun <T> guidOrNull(prefix: String, block: (String) -> T): T? {
+            val idFull = item.expectFirst("guid").text()
+            val id = idFull.removePrefix(prefix)
+            if (id == idFull) return null
+            return block(id)
+        }
     }
 
     private fun extractRssItems(rssPage: String) =
@@ -76,16 +83,12 @@ object ProjectEulerUtils {
 
     fun extractNewsFromRSSPage(rssPage: String): List<NewsPost> =
         extractRssItems(rssPage).mapNotNull { item ->
-            val idFull = item.guid.text()
-            val id = idFull.removePrefix("news_id_")
-            if (id != idFull) {
+            item.guidOrNull(prefix = "news_id_") { id ->
                 NewsPost(
                     title = item.title.text(),
                     descriptionHtml = item.description.html(),
                     id = id
                 )
-            } else {
-                null
             }
         }
 
@@ -103,17 +106,13 @@ object ProjectEulerUtils {
             offset(UtcOffset.Formats.FOUR_DIGITS)
         }
         return extractRssItems(rssPage).mapNotNull { item ->
-            val idFull = item.guid.text()
-            val id = idFull.removePrefix("problem_id_")
-            if (id != idFull) {
+            item.guidOrNull(prefix = "problem_id_") { id ->
                 val description = item.description.text()
                 val date = Instant.parse(
                     input = description.run { substring(startIndex = indexOf(',') + 2) },
                     format = format
                 )
                 id.toInt() to date
-            } else {
-                null
             }
         }
     }
