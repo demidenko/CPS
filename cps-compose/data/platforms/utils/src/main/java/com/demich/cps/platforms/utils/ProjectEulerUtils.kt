@@ -11,6 +11,7 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
 object ProjectEulerUtils {
@@ -58,27 +59,35 @@ object ProjectEulerUtils {
             }
     }
 
+    private class RssItem(private val item: Element) {
+        val guid get() = item.expectFirst("guid")
+        val description get() = item.expectFirst("description")
+        val title get() = item.expectFirst("title")
+    }
+
+    private fun extractRssItems(rssPage: String) =
+        Jsoup.parse(rssPage).select("item").map { RssItem(it) }
+
     class NewsPost(
         val title: String,
         val descriptionHtml: String,
         override val id: String
     ): NewsPostEntry
 
-    fun extractNewsFromRSSPage(rssPage: String): List<NewsPost?> =
-        Jsoup.parse(rssPage).select("item")
-            .map { item ->
-                val idFull = item.expectFirst("guid").text()
-                val id = idFull.removePrefix("news_id_")
-                if (id != idFull) {
-                    NewsPost(
-                        title = item.expectFirst("title").text(),
-                        descriptionHtml = item.expectFirst("description").html(),
-                        id = id
-                    )
-                } else {
-                    null
-                }
+    fun extractNewsFromRSSPage(rssPage: String): List<NewsPost> =
+        extractRssItems(rssPage).mapNotNull { item ->
+            val idFull = item.guid.text()
+            val id = idFull.removePrefix("news_id_")
+            if (id != idFull) {
+                NewsPost(
+                    title = item.title.text(),
+                    descriptionHtml = item.description.html(),
+                    id = id
+                )
+            } else {
+                null
             }
+        }
 
     fun extractProblemsFromRssPage(rssPage: String): List<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
@@ -93,11 +102,11 @@ object ProjectEulerUtils {
             char(' ')
             offset(UtcOffset.Formats.FOUR_DIGITS)
         }
-        return Jsoup.parse(rssPage).select("item").mapNotNull { item ->
-            val idFull = item.expectFirst("guid").text()
+        return extractRssItems(rssPage).mapNotNull { item ->
+            val idFull = item.guid.text()
             val id = idFull.removePrefix("problem_id_")
             if (id != idFull) {
-                val description = item.expectFirst("description").text()
+                val description = item.description.text()
                 val date = Instant.parse(
                     input = description.run { substring(startIndex = indexOf(',') + 2) },
                     format = format
