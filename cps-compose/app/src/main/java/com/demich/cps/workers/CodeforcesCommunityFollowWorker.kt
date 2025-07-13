@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.utils.toSystemDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -35,7 +36,15 @@ class CodeforcesCommunityFollowWorker(
 
     //note that cf can have different lastOnlineTime from api and web sources
     private fun CodeforcesUserBlog.isUserInactive() =
-        workerStartTime - userLastOnlineTime() > 7.days
+        workerStartTime - userLastOnlineTime() > 2.days
+
+    private suspend fun needFullCheck(): Boolean {
+        val lastSuccess = hintsDataStore.followLastSuccessTime() ?: return true
+        if (workerStartTime.toSystemDateTime().date != lastSuccess.toSystemDateTime().date) {
+            return true
+        }
+        return false
+    }
 
     override suspend fun runWork(): Result {
         val repository = context.followRepository
@@ -44,13 +53,11 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
 
-        val lastSuccessItem = hintsDataStore.followLastSuccessTime
         val blogs = repository.blogs()
 
         blogs
             .let {
-                val lastSuccess = lastSuccessItem()
-                if (lastSuccess == null || workerStartTime - lastSuccess > 1.days) it
+                if (needFullCheck()) it
                 else it.filter { blog -> blog.blogEntries == null || !blog.isUserInactive() }
             }
             .sortedByDescending { it.userLastOnlineTime() }
@@ -66,7 +73,7 @@ class CodeforcesCommunityFollowWorker(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
 
-        lastSuccessItem.setValue(workerStartTime)
+        hintsDataStore.followLastSuccessTime.setValue(workerStartTime)
 
         return Result.success()
     }
