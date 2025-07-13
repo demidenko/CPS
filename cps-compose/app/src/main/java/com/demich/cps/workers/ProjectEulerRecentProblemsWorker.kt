@@ -12,6 +12,7 @@ import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 class ProjectEulerRecentProblemsWorker(
     context: Context,
@@ -59,12 +60,20 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun enqueueByHint() {
+        val nextTime = getPublishTimeHint() ?: return
+        work.enqueueAtIfEarlier(nextTime + 1.minutes)
+    }
+
+    private suspend fun getPublishTimeHint(): Instant? {
+        val item = hintsDataStore.projectEulerProblemPublishTime
+        item().let {
+            if (it != null && it > workerStartTime) return it
+        }
+
         val rssPage = ProjectEulerClient.getRSSPage()
 
-        val nextDate = ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
+        return ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
             .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }
-            ?: return
-
-        work.enqueueAtIfEarlier(nextDate + 1.minutes)
+            .also { item.setValue(it) }
     }
 }
