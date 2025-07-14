@@ -88,5 +88,9 @@ class NewsWorker(
                 url = ProjectEulerUrls.news
             }
         }
+
+        if (ProjectEulerRecentProblemsWorker.getWork(context).isEnabled()) {
+            ProjectEulerRecentProblemsWorker.extractAndSaveHint(rssPage = rssPage, context = context)
+        }
     }
 }

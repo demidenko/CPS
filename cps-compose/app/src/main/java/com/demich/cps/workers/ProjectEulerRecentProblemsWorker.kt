@@ -9,6 +9,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.cps.utils.getCurrentTime
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -31,11 +32,22 @@ class ProjectEulerRecentProblemsWorker(
                     repeatInterval = 6.hours
                 )
         }
+
+        suspend fun extractAndSaveHint(
+            rssPage: String,
+            context: Context
+        ): Instant? {
+            val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
+            val currentTime = getCurrentTime()
+            return ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
+                .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
+                .also { item.setValue(it) }
+        }
     }
 
     override suspend fun runWork(): Result {
         scanProblems()
-        //TODO: improve logic with hint: sync with recent news worker, wait if time is close
+        //TODO: wait if time is close
         enqueueByHint()
         return Result.success()
     }
@@ -65,15 +77,9 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun getPublishTimeHint(): Instant? {
-        val item = hintsDataStore.projectEulerProblemPublishTime
-        item().let {
+        hintsDataStore.projectEulerProblemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
-
-        val rssPage = ProjectEulerClient.getRSSPage()
-
-        return ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
-            .minOfNotNull { (id, date) -> date.takeIf { it > workerStartTime } }
-            .also { item.setValue(it) }
+        return extractAndSaveHint(rssPage = ProjectEulerClient.getRSSPage(), context = context)
     }
 }
