@@ -43,7 +43,8 @@ class ProjectEulerRecentProblemsWorker(
                 .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 ?.also { time ->
                     item.update {
-                        if (it == null || it > time) time else it
+                        if (it != null && it > currentTime && it < time) it
+                        else time
                     }
                 }
         }
