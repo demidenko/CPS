@@ -1,16 +1,21 @@
 package com.demich.cps.develop
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
@@ -163,12 +168,21 @@ private fun WorkerDialog(
                     Text(text = "interval: $it")
                 }
 
-                Text(text = buildString {
-                    append("events: ")
-                    append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
-                    append(" / ")
-                    append(events.size)
-                })
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = buildString {
+                        append("events: ")
+                        append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
+                        append(" / ")
+                        append(events.size)
+                    })
+                    EventsTimeline(
+                        events = events,
+                        modifier = Modifier.fillMaxWidth().height(8.dp).padding(start = 4.dp)
+                    )
+                }
             }
         }
 
@@ -388,6 +402,28 @@ private fun ResultIcon(
 }
 
 @Composable
+private fun EventsTimeline(
+    modifier: Modifier = Modifier,
+    events: List<CPSWorker.ExecutionEvent>
+) {
+    Row(modifier = modifier) {
+        events.forEach { event ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .background(
+                        color = colorFor(event.resultType),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+            ) {
+
+            }
+        }
+    }
+}
+
+@Composable
 @ReadOnlyComposable
 private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
     when (workState) {
@@ -395,6 +431,17 @@ private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
         WorkInfo.State.RUNNING -> success
         WorkInfo.State.BLOCKED, WorkInfo.State.FAILED -> error
         WorkInfo.State.CANCELLED -> contentAdditional
+    }
+}
+
+@Composable
+@ReadOnlyComposable
+private fun colorFor(result: CPSWorker.ResultType?) = with(cpsColors) {
+    when (result) {
+        CPSWorker.ResultType.SUCCESS -> success
+        CPSWorker.ResultType.RETRY -> warning
+        CPSWorker.ResultType.FAILURE -> error
+        null -> contentAdditional
     }
 }
 
