@@ -41,12 +41,7 @@ class ProjectEulerRecentProblemsWorker(
             val currentTime = getCurrentTime()
             return ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
                 .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
-                ?.also { time ->
-                    item.update {
-                        if (it != null && it > currentTime && it < time) it
-                        else time
-                    }
-                }
+                ?.also { item.setValue(it) }
         }
     }
 
