@@ -7,18 +7,23 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
+
+context(manager: RatedAccountManager<U>)
+fun <U: RatedUserInfo> CPSColors.colorFor(handleColor: HandleColor): Color =
+    if (useOriginalHandleColors) manager.originalColor(handleColor)
+    else handleColor(handleColor)
+
+context(manager: RatedAccountManager<U>)
+fun <U: RatedUserInfo> CPSColors.colorFor(rating: Int): Color =
+    colorFor(handleColor = manager.getHandleColor(rating))
 
 @Composable
 @ReadOnlyComposable
 fun RatedAccountManager<*>.colorFor(handleColor: HandleColor): Color =
     cpsColors.colorFor(handleColor = handleColor)
-
-@Composable
-@ReadOnlyComposable
-fun RatedAccountManager<*>.colorFor(rating: Int): Color =
-    colorFor(rating = rating, cpsColors = cpsColors)
 
 @Composable
 @ReadOnlyComposable

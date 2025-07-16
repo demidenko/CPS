@@ -25,14 +25,11 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
 
     abstract fun originalColor(handleColor: HandleColor): Color
 
-    fun colorFor(rating: Int, cpsColors: CPSColors): Color =
-        cpsColors.colorFor(handleColor = getHandleColor(rating))
-
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
             text = text,
             spanStyle = SpanStyle(
-                color = colorFor(rating = rating, cpsColors = cpsColors),
+                color = cpsColors.colorFor(rating = rating),
                 fontWeight = FontWeight.Bold
             )
         )
@@ -61,11 +58,6 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
         getRatingChanges(userId).sortedBy { it.date }
 
 }
-
-context(manager: RatedAccountManager<U>)
-fun <U: RatedUserInfo> CPSColors.colorFor(handleColor: HandleColor): Color =
-    if (useOriginalHandleColors) manager.originalColor(handleColor)
-    else handleColor(handleColor)
 
 
 fun RatedAccountManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =

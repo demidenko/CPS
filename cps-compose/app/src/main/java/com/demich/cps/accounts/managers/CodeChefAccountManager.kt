@@ -113,7 +113,7 @@ class CodeChefAccountManager :
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors) =
         buildAnnotatedString {
-            append(text = "${getRatingStarNumber(rating)}$star ", color = colorFor(rating, cpsColors))
+            append(text = "${getRatingStarNumber(rating)}$star ", color = cpsColors.colorFor(rating))
             append(text)
         }
 
@@ -126,7 +126,7 @@ class CodeChefAccountManager :
     ) {
         Text(
             modifier = modifier
-                .background(color = colorFor(rating = rating))
+                .background(color = cpsColors.colorFor(rating = rating))
                 .padding(horizontal = 4.dp, vertical = 1.dp),
             text = buildAnnotatedString {
                 append(getRatingStarNumber(rating).toString())

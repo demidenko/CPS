@@ -247,7 +247,7 @@ fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
             Text(
                 text = userInfo.ratingToString(),
                 fontSize = 25.sp,
-                color = userInfo.rating?.let { colorFor(rating = it) } ?: cpsColors.contentAdditional,
+                color = userInfo.rating?.let { cpsColors.colorFor(rating = it) } ?: cpsColors.contentAdditional,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
