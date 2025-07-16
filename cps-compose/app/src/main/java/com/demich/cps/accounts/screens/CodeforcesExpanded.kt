@@ -13,7 +13,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,13 +43,12 @@ import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
 
 @Composable
+context(manager: CodeforcesAccountManager)
 fun CodeforcesUserInfoExpandedContent(
     profileResult: ProfileResult<CodeforcesUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
     modifier: Modifier
 ) {
-    val manager = remember { CodeforcesAccountManager() }
-
     var showItem: ItemType? by rememberSaveable(stateSaver = jsonCPS.saver()) {
         mutableStateOf(null)
     }
@@ -72,7 +70,7 @@ fun CodeforcesUserInfoExpandedContent(
                     if (profileResult is ProfileResult.Success) {
                         RatingGraphItem(
                             manager = manager,
-                            userInfo = profileResult.userInfo
+                            handle = profileResult.userInfo.handle
                         )
                     }
                 }

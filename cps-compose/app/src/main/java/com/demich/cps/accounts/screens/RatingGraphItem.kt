@@ -13,16 +13,16 @@ import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 
 @Composable
-internal fun<U: RatedUserInfo> RatingGraphItem(
-    manager: RatedAccountManager<U>,
-    userInfo: U,
+internal fun RatingGraphItem(
+    manager: RatedAccountManager<out RatedUserInfo>,
+    handle: String,
     modifier: Modifier = Modifier
 ) {
     val viewModel = profilesViewModel()
     var dataKey by rememberUUIDState
 
     val ratingChangesResult by viewModel
-        .flowOfRatingResult(manager = manager, userId = userInfo.handle, key = dataKey)
+        .flowOfRatingResult(manager = manager, userId = handle, key = dataKey)
         .collectAsState()
 
     RatingGraph(
