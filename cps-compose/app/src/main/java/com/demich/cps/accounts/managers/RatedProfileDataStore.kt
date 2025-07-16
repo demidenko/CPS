@@ -21,7 +21,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         jsonCPS.itemNullable(name = "last_rating_change")
 
     protected abstract val ratingChangeNotificationChannel: NotificationChannelSingleId
-    protected abstract fun U.withNewRating(rating: Int): U
+    protected abstract fun U.copyRating(rating: Int): U
 
     suspend fun applyRatingChange(ratingChange: RatingChange) {
         val prev = lastRatingChange()
@@ -42,7 +42,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         val newProfile = manager.fetchProfile(data = profile.userId)
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
-                val newUserInfo = profile.userInfo.withNewRating(rating = ratingChange.rating)
+                val newUserInfo = profile.userInfo.copyRating(rating = ratingChange.rating)
                 profileItem.setValue(ProfileResult(newUserInfo))
             } else {
                 // TODO ??????????
@@ -51,32 +51,22 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
             profileItem.setValue(newProfile)
         }
 
-        //notify
         notifyRatingChange(
-            channel = ratingChangeNotificationChannel,
             ratingChange = ratingChange,
-            handle = profile.userId,
-            manager = manager,
-            context = context
+            handle = profile.userId
         )
     }
-}
 
-private fun notifyRatingChange(
-    channel: NotificationChannelSingleId,
-    ratingChange: RatingChange,
-    handle: String,
-    manager: RatedAccountManager<out RatedUserInfo>,
-    context: Context
-) {
-    channel.notify(context) {
-        val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
-        smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
-        contentTitle = "$handle new rating: ${ratingChange.rating}"
-        contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
-        subText = "${manager.type.name} rating changes"
-        color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
-        ratingChange.url?.let { url = it }
-        time = ratingChange.date
+    private fun notifyRatingChange(ratingChange: RatingChange, handle: String) {
+        ratingChangeNotificationChannel.notify(context) {
+            val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
+            smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
+            contentTitle = "$handle new rating: ${ratingChange.rating}"
+            contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
+            subText = "${manager.type} rating changes"
+            color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
+            ratingChange.url?.let { url = it }
+            time = ratingChange.date
+        }
     }
 }

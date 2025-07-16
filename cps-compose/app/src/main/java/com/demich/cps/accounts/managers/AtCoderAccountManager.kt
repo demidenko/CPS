@@ -124,7 +124,7 @@ class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.atcoder.rating_changes
 
-    override fun AtCoderUserInfo.withNewRating(rating: Int) = copy(rating = rating)
+    override fun AtCoderUserInfo.copyRating(rating: Int) = copy(rating = rating)
 }
 
 class AtCoderProfileSettingsDataStore(context: Context):

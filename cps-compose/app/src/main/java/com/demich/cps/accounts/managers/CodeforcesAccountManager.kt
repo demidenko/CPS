@@ -261,7 +261,7 @@ class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Con
     override val ratingChangeNotificationChannel: NotificationChannelSingleId
         get() = notificationChannels.codeforces.rating_changes
 
-    override fun CodeforcesUserInfo.withNewRating(rating: Int) = copy(rating = rating)
+    override fun CodeforcesUserInfo.copyRating(rating: Int) = copy(rating = rating)
 
 
     val monitorLastSubmissionId = itemLongNullable(name = "monitor_last_submission")
