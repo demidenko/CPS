@@ -22,7 +22,7 @@ internal fun<U: RatedUserInfo> RatingGraphItem(
     var dataKey by rememberUUIDState
 
     val ratingChangesResult by viewModel
-        .flowOfRatingResult(manager, userInfo.userId, key = dataKey)
+        .flowOfRatingResult(manager = manager, userId = userInfo.handle, key = dataKey)
         .collectAsState()
 
     RatingGraph(

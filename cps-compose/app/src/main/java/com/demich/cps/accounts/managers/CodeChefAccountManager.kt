@@ -27,6 +27,7 @@ import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.accounts.userinfo.ratingToString
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codechef.CodeChefUrls
@@ -167,7 +168,7 @@ class CodeChefAccountManager :
                         )
                     }
                     Text(
-                        text = profileResult.userId,
+                        text = profileResult.handle,
                         fontSize = 30.sp
                     )
                 }

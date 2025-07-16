@@ -7,6 +7,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
@@ -36,5 +37,5 @@ fun <U: RatedUserInfo> RatedAccountManager<U>.makeHandleSpan(profileResult: Prof
             cpsColors = cpsColors
         )
     } else {
-        AnnotatedString(text = profileResult.userId)
+        AnnotatedString(text = profileResult.handle)
     }

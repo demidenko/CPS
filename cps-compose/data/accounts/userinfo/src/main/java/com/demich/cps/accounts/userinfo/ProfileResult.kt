@@ -25,6 +25,14 @@ sealed interface ProfileResult<out U: UserInfo> {
 
 fun <U: UserInfo> ProfileResult(userInfo: U) = ProfileResult.Success(userInfo)
 
+fun <U: UserInfo> ProfileResult<U>.userInfoOrNull(): U? =
+    if (this is ProfileResult.Success) userInfo else null
+
+val <U: RatedUserInfo> ProfileResult<U>.handle: String
+    get() = userId
+
+
+
 private val userInfoSerializersModule = SerializersModule {
     polymorphic(UserInfo::class) {
         subclass(ACMPUserInfo::class)
@@ -40,6 +48,3 @@ val jsonProfile = Json {
     ignoreUnknownKeys = true
     serializersModule = userInfoSerializersModule
 }
-
-fun <U: UserInfo> ProfileResult<U>.userInfoOrNull(): U? =
-    if (this is ProfileResult.Success) userInfo else null

@@ -4,6 +4,7 @@ import android.content.Context
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.toSignedString
@@ -39,7 +40,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         //update userInfo
         val profile = profile() ?: return
 
-        val newProfile = manager.fetchProfile(data = profile.userId)
+        val newProfile = manager.fetchProfile(data = profile.handle)
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
                 val newUserInfo = profile.userInfo.copyRating(rating = ratingChange.rating)
@@ -53,7 +54,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
 
         notifyRatingChange(
             ratingChange = ratingChange,
-            handle = profile.userId
+            handle = profile.handle
         )
     }
 

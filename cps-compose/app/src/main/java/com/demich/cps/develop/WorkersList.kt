@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkInfo
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
@@ -120,7 +121,7 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
     doJob(id = "run_cf_monitor $contestId") { progress ->
         val handle = CodeforcesAccountManager()
             .dataStore(context)
-            .profile()?.userId ?: return@doJob
+            .profile()?.handle ?: return@doJob
         var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
         progress(progressInfo)
         repeat(progressInfo.total) {
