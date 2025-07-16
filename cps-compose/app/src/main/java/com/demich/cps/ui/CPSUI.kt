@@ -93,7 +93,7 @@ fun AttentionIcon(
     IconSp(
         imageVector = CPSIcons.Attention,
         size = size,
-        color = colorFor(dangerType),
+        color = cpsColors.colorFor(dangerType),
         modifier = modifier
     )
 }

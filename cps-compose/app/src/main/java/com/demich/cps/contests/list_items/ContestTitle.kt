@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSFontSize
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
@@ -29,7 +30,7 @@ internal fun ContestTitleCollapsed(
 ) {
     Text(
         text = title.makeTitle(),
-        color = colorFor(phase, isVirtual),
+        color = cpsColors.colorFor(phase, isVirtual),
         fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
@@ -49,7 +50,7 @@ internal fun ContestTitleExpanded(
     var isMultiline by rememberSaveable(title) { mutableStateOf(false) }
     Text(
         text = title.makeTitle(useNewLine = isMultiline),
-        color = colorFor(phase, isVirtual),
+        color = cpsColors.colorFor(phase, isVirtual),
         fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
         modifier = modifier,
@@ -60,12 +61,9 @@ internal fun ContestTitleExpanded(
     )
 }
 
-@Composable
-@ReadOnlyComposable
-private fun colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
-    if (phase == Contest.Phase.RUNNING && !isVirtual) cpsColors.success
-    else cpsColors.content
-
+fun CPSColors.colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
+    if (phase == Contest.Phase.RUNNING && !isVirtual) success
+    else content
 
 @Composable
 @ReadOnlyComposable

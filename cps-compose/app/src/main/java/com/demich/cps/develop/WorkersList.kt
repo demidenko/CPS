@@ -22,7 +22,6 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +52,7 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
+import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
@@ -363,7 +364,7 @@ private fun WorkerItem(
                 text = workState.name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = colorFor(workState)
+                color = cpsColors.colorFor(workState)
             )
             AnimatedVisibleByNotNull(
                 value = progressInfo,
@@ -413,7 +414,7 @@ private fun EventsTimeline(
                     .fillMaxSize()
                     .weight(1f)
                     .background(
-                        color = colorFor(event.resultType),
+                        color = cpsColors.colorFor(event.resultType),
                         shape = RoundedCornerShape(4.dp)
                     )
             ) {
@@ -423,27 +424,21 @@ private fun EventsTimeline(
     }
 }
 
-@Composable
-@ReadOnlyComposable
-private fun colorFor(workState: WorkInfo.State) = with(cpsColors) {
+fun CPSColors.colorFor(workState: WorkInfo.State): Color =
     when (workState) {
         WorkInfo.State.ENQUEUED, WorkInfo.State.SUCCEEDED -> content
         WorkInfo.State.RUNNING -> success
         WorkInfo.State.BLOCKED, WorkInfo.State.FAILED -> error
         WorkInfo.State.CANCELLED -> contentAdditional
     }
-}
 
-@Composable
-@ReadOnlyComposable
-private fun colorFor(result: CPSWorker.ResultType?) = with(cpsColors) {
+fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
     when (result) {
         CPSWorker.ResultType.SUCCESS -> success
         CPSWorker.ResultType.RETRY -> warning
         CPSWorker.ResultType.FAILURE -> error
         null -> contentAdditional
     }
-}
 
 
 @Composable

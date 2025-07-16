@@ -29,7 +29,7 @@ private fun AttentionHighlighted(
     Text(
         text = text,
         modifier = modifier,
-        color = colorFor(collisionType)
+        color = cpsColors.colorFor(collisionType)
     )
 }
 
@@ -67,7 +67,7 @@ private fun AttentionBoxed(
             text = text,
             color = cpsColors.background,
             modifier = modifier
-                .background(color = colorFor(collisionType))
+                .background(color = cpsColors.colorFor(collisionType))
                 .border(color = cpsColors.background, width = 0.dp),
         )
     }
