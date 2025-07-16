@@ -289,12 +289,12 @@ private fun WorkerItem(
         workState = workState,
         progressInfo = progressInfo
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
             if (lastResult != null) {
-                ResultIcon(
-                    result = lastResult,
-                    modifier = Modifier.padding(end = 3.dp)
-                )
+                ResultIcon(result = lastResult)
             }
 
             Text(
@@ -304,10 +304,7 @@ private fun WorkerItem(
             )
 
             if (lastDuration != null) {
-                Text(
-                    text = "(${lastDuration.toExecTimeString()})",
-                    modifier = Modifier.padding(start = 3.dp)
-                )
+                Text(text = "(${lastDuration.toExecTimeString()})")
             }
         }
     }
