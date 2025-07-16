@@ -111,18 +111,6 @@ class CodeforcesAccountManager :
             else -> illegalHandleColorError(handleColor)
         }
 
-    private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
-        when (this) {
-            CodeforcesColorTag.GRAY -> HandleColor.GRAY
-            CodeforcesColorTag.GREEN -> HandleColor.GREEN
-            CodeforcesColorTag.CYAN -> HandleColor.CYAN
-            CodeforcesColorTag.BLUE -> HandleColor.BLUE
-            CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
-            CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
-            CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
-            CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
-        }
-
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
             append(handle, color = cpsColors.content)
@@ -241,6 +229,18 @@ class CodeforcesAccountManager :
         )
 
 }
+
+private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
+    when (this) {
+        CodeforcesColorTag.GRAY -> HandleColor.GRAY
+        CodeforcesColorTag.GREEN -> HandleColor.GREEN
+        CodeforcesColorTag.CYAN -> HandleColor.CYAN
+        CodeforcesColorTag.BLUE -> HandleColor.BLUE
+        CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
+        CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
+        CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
+        CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
+    }
 
 @Composable
 @ReadOnlyComposable
