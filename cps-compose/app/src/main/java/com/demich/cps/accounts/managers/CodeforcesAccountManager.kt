@@ -128,7 +128,7 @@ class CodeforcesAccountManager :
             append(handle, color = cpsColors.content)
             tag.toHandleColor()?.let { handleColor ->
                 addStyle(
-                    style = SpanStyle(color = colorFor(handleColor, cpsColors)),
+                    style = SpanStyle(color = cpsColors.colorFor(handleColor)),
                     start = if (tag == CodeforcesColorTag.LEGENDARY) 1 else 0,
                     end = handle.length
                 )

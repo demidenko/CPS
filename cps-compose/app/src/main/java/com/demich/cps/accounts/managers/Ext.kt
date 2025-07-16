@@ -13,7 +13,7 @@ import com.demich.cps.ui.theme.cpsColors
 @Composable
 @ReadOnlyComposable
 fun RatedAccountManager<*>.colorFor(handleColor: HandleColor): Color =
-    colorFor(handleColor = handleColor, cpsColors = cpsColors)
+    cpsColors.colorFor(handleColor = handleColor)
 
 @Composable
 @ReadOnlyComposable

@@ -25,12 +25,8 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
 
     abstract fun originalColor(handleColor: HandleColor): Color
 
-    fun colorFor(handleColor: HandleColor, cpsColors: CPSColors): Color =
-        if (cpsColors.useOriginalHandleColors) originalColor(handleColor)
-        else cpsColors.handleColor(handleColor)
-
     fun colorFor(rating: Int, cpsColors: CPSColors): Color =
-        colorFor(handleColor = getHandleColor(rating), cpsColors = cpsColors)
+        cpsColors.colorFor(handleColor = getHandleColor(rating))
 
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
@@ -65,6 +61,12 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
         getRatingChanges(userId).sortedBy { it.date }
 
 }
+
+context(manager: RatedAccountManager<U>)
+fun <U: RatedUserInfo> CPSColors.colorFor(handleColor: HandleColor): Color =
+    if (useOriginalHandleColors) manager.originalColor(handleColor)
+    else handleColor(handleColor)
+
 
 fun RatedAccountManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
     throw IllegalArgumentException("Manager ${type.name} does not support color ${handleColor.name}")
