@@ -18,9 +18,9 @@ import kotlin.time.Instant
 val localCurrentTime: Instant
     @Composable
     @ReadOnlyComposable
-    get() = LocalCurrentTime.current
+    inline get() = LocalCurrentTime.current
 
-private val LocalCurrentTime = compositionLocalOf<Instant> {
+val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
 }
 

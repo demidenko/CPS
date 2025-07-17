@@ -9,12 +9,12 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
 
-internal val LocalCPSColors = compositionLocalOf<CPSColors> { throw IllegalAccessError() }
+val LocalCPSColors = compositionLocalOf<CPSColors> { throw IllegalAccessError() }
 
 val cpsColors: CPSColors
     @Composable
     @ReadOnlyComposable
-    get() = LocalCPSColors.current
+    inline get() = LocalCPSColors.current
 
 class CPSColors(
     val accent: Color,

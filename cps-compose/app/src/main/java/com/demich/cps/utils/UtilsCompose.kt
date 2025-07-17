@@ -54,7 +54,7 @@ import kotlin.random.Random
 val context: Context
     @Composable
     @ReadOnlyComposable
-    get() = LocalContext.current
+    inline get() = LocalContext.current
 
 
 @Composable
