@@ -1,5 +1,6 @@
 package com.demich.cps.utils
 
+import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -54,6 +55,15 @@ suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> 
                 }
             }
         }
+    }
+}
+
+suspend fun List<suspend () -> Unit>.joinAllWithProgress(
+    title: String,
+    block: suspend (ProgressBarInfo) -> Unit
+) {
+    joinAllWithCounter {
+        block(ProgressBarInfo(title = title, total = size, current = it))
     }
 }
 

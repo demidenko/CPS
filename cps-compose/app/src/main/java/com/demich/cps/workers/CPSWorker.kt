@@ -10,7 +10,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableE
 import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.getCurrentTime
-import com.demich.cps.utils.joinAllWithCounter
+import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.repeatUntilSuccessOrLast
 import com.demich.cps.utils.update
@@ -102,8 +102,8 @@ abstract class CPSWorker(
 
     protected suspend fun List<suspend () -> Unit>.joinAllWithProgress() {
         if (isEmpty()) return
-        joinAllWithCounter {
-            setProgressInfo(ProgressBarInfo(current = it, total = size))
+        joinAllWithProgress(title = "") {
+            setProgressInfo(it)
         }
     }
 
