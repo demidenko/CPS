@@ -170,8 +170,8 @@ fun animateToggleColorAsState(
 
 
 @Composable
-fun LaunchedEffectOneTime(
-    block: suspend CoroutineScope.() -> Unit
+inline fun LaunchedEffectOneTime(
+    crossinline block: suspend CoroutineScope.() -> Unit
 ) {
     val state = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(state) {
@@ -206,7 +206,7 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
 
 val rememberUUIDState: MutableLongState
     @Composable
-    get() = rememberSaveable { mutableLongStateOf(randomUuid()) }
+    inline get() = rememberSaveable { mutableLongStateOf(randomUuid()) }
 
 fun randomUuid(): Long = Random.nextLong()
 
