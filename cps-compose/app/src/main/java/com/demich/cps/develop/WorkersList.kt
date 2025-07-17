@@ -16,10 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -77,7 +78,6 @@ import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.nextScheduleTime
 import com.demich.cps.workers.repeatInterval
 import com.demich.cps.workers.stateOrCancelled
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -102,7 +102,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
         showRestartDialogFor?.let { work ->
             WorkerDialog(
                 work = work,
-                scope = scope,
+                onRestartWork = { scope.launch { work.startImmediate() } },
                 onDismissRequest = { showRestartDialogFor = null }
             )
         }
@@ -140,7 +140,7 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
 @Composable
 private fun WorkerDialog(
     work: CPSPeriodicWork,
-    scope: CoroutineScope,
+    onRestartWork: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val workInfo by work.workInfoAsState()
@@ -162,7 +162,7 @@ private fun WorkerDialog(
                         }
                     }
                     else -> {
-                        Text(text = "$state")
+                        Text(text = state.name.lowercase())
                     }
                 }
 
@@ -170,9 +170,8 @@ private fun WorkerDialog(
                     Text(text = "interval: $it")
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = buildString {
                         append("events: ")
@@ -182,19 +181,25 @@ private fun WorkerDialog(
                     })
                     EventsTimeline(
                         events = events,
-                        modifier = Modifier.fillMaxWidth().height(8.dp).padding(start = 4.dp)
+                        radius = 2.dp,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
         }
 
-        Button(
-            content = { Text(text = "restart") },
-            onClick = {
-                scope.launch { work.startImmediate() }
-                onDismissRequest()
-            }
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                content = { Text(text = "restart") },
+                onClick = {
+                    onRestartWork()
+                    onDismissRequest()
+                }
+            )
+        }
     }
 }
 
@@ -406,9 +411,10 @@ private fun ResultIcon(
 @Composable
 private fun EventsTimeline(
     modifier: Modifier = Modifier,
+    radius: Dp,
     events: List<CPSWorker.ExecutionEvent>
 ) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.height(radius * 2)) {
         events.forEach { event ->
             Box(
                 modifier = Modifier
@@ -416,7 +422,7 @@ private fun EventsTimeline(
                     .weight(1f)
                     .background(
                         color = cpsColors.colorFor(event.resultType),
-                        shape = RoundedCornerShape(4.dp)
+                        shape = RoundedCornerShape(radius)
                     )
             ) {
 
