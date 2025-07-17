@@ -16,7 +16,7 @@ import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
 import com.demich.cps.utils.flowOfCurrentTimeEachSecond
 import com.demich.cps.utils.getCurrentTime
-import com.demich.cps.utils.truncateBy
+import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.demich.kotlin_stdlib_boost.partitionIndex
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
@@ -138,7 +137,7 @@ internal fun produceSortedContestsWithTime(
 
     val init = remember {
         val initContests = runBlocking { flowOfContests(context).first() }
-        val currentTime = getCurrentTime().truncateBy(1.seconds)
+        val currentTime = getCurrentTime().truncateBySeconds(1)
         val sorter = ContestsSmartSorter()
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)

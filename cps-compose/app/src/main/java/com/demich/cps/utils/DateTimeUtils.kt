@@ -7,7 +7,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -18,13 +17,9 @@ fun getCurrentTime(): Instant = kotlin.time.Clock.System.now()
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
-operator fun Instant.rem(period: Duration): Duration {
-    val periodMillis = period.inWholeMilliseconds
-    val thisMillis = toEpochMilliseconds()
-    return (thisMillis % periodMillis).milliseconds
+fun Instant.truncateBySeconds(seconds: Long): Instant {
+    return Instant.fromEpochSeconds(epochSeconds = epochSeconds - epochSeconds % seconds)
 }
-
-fun Instant.truncateBy(period: Duration): Instant = this - this % period
 
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 
