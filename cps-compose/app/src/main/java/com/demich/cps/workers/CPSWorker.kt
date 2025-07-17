@@ -1,5 +1,6 @@
 package com.demich.cps.workers
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
@@ -112,6 +113,7 @@ abstract class CPSWorker(
         SUCCESS, RETRY, FAILURE
     }
 
+    @SuppressLint("RestrictedApi")
     private fun Result.toType(): ResultType? {
         return when (this) {
             is Result.Success -> ResultType.SUCCESS
