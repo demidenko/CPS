@@ -10,6 +10,7 @@ import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.ItemizedMutablePreferences
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
@@ -21,16 +22,18 @@ abstract class ProfileDataStore<U: UserInfo>(
     protected inline fun <reified T: UserInfo> makeProfileItem(): DataStoreItem<ProfileResult<T>?> =
         jsonProfile.itemNullable(name = "profile_result")
 
-    protected abstract suspend fun onResetProfile()
+    protected abstract fun onResetProfile(prefs: ItemizedMutablePreferences)
 
     val profile: DataStoreValue<ProfileResult<U>?>
         get() = profileItem
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
-        val oldUserId = profile()?.userId
-        profileItem.setValue(profileResult)
-        if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
-            onResetProfile()
+        edit {
+            val oldUserId = it[profileItem]?.userId
+            if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
+                onResetProfile(it)
+            }
+            it[profileItem] = profileResult
         }
     }
 
@@ -42,13 +45,8 @@ abstract class ProfileDataStore<U: UserInfo>(
 abstract class ProfileUniqueDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ProfileDataStore<U>(dataStoreWrapper) {
-    final override suspend fun onResetProfile() {
-        edit { prefs ->
-            prefs[profileItem].let {
-                prefs.clear()
-                prefs[profileItem] = it
-            }
-        }
+    final override fun onResetProfile(prefs: ItemizedMutablePreferences) {
+        prefs.clear()
     }
 }
 
@@ -58,7 +56,7 @@ internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataSto
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
 
-        override suspend fun onResetProfile() { }
+        override fun onResetProfile(prefs: ItemizedMutablePreferences) { }
     }
 
 
