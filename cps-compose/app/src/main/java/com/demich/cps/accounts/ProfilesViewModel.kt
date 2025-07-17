@@ -18,6 +18,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
+import com.demich.cps.utils.joinAllWithCounter
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,11 +80,9 @@ class ProfilesViewModel: ViewModel() {
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 getManager(resource, userData.first, userData.second)
             }
-            var progressBarInfo = ProgressBarInfo(title = "clist import", total = supported.size)
-            progress(progressBarInfo)
             supported.map { (type, userId) ->
                 val manager = accountManagerOf(type)
-                launch {
+                suspend {
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
                     val savedUserId = manager.dataStore(context).profile()?.userId
@@ -96,10 +94,10 @@ class ProfilesViewModel: ViewModel() {
                         getAndSave(manager, userId, context)
                         setLoadingStatus(manager, LoadingStatus.PENDING)
                     }
-                    progressBarInfo++
-                    progress(progressBarInfo)
                 }
-            }.joinAll()
+            }.joinAllWithCounter {
+                progress(ProgressBarInfo(title = "clist import", total = supported.size, current = it))
+            }
         }
     }
 
