@@ -60,8 +60,9 @@ operator fun Duration.rem(other: Duration): Duration {
 
             // this % other = this - floor(this / other) * other
 
-            // this / other >= (a1 * k) / (a2 * k + k) >= a1 / (a2 + 1)
-            // this / other <= (a1 * k + k) / (a2 * k) <= (a1 + 1) / a2
+            // this / other > (a1 * k) / (a2 * k + k)
+            // this / other < (a1 * k + k) / (a2 * k)
+            // a1 / (a2 + 1) < this / other < (a1 + 1) / a2
             // floor(a1 / (a2 + 1)) <= floor(this / other) <= floor((a1 + 1) / a2)
 
             TODO()
