@@ -66,11 +66,26 @@ operator fun Duration.rem(other: Duration): Duration {
             // floor(this / other) <= floor((a1 * k + b1) / (a2 * k)) <= floor(a1 / a2)
             // floor(a1 / (a2 + 1)) <= floor(this / other) <= floor(a1 / a2)
 
+            // let p = k / b2
+            // floor(a1 / (a2 * p + 1)) * p + floor((a1 % (a2 * p + 1) - 1) ?: 0 / a2) <= floor(this / other)
+
             var a = a1
             var b = b1
             while (a > a2 || a == a2 && b >= b2) {
                 if (a == a2) return (b - b2).nanoseconds
-                val div = a / (a2 + 1)
+
+                // now a > a2
+                val div: Long
+                val p = k / b2
+                if (p > (a - 1) / a2) {
+                    div = (a - 1) / a2
+                } else {
+                    val w: Long = a2 * p + 1
+                    val l = a / w
+                    val r = a % w
+                    div = l * p + (if (r > 0) (r - 1) / a2 else 0)
+                }
+
                 val l = div / k
                 val r = div % k
                 val a3 = a2 * div + b2 * l + (b2 * r) / k
