@@ -138,72 +138,6 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
 }
 
 @Composable
-private fun WorkerDialog(
-    work: CPSPeriodicWork,
-    onRestartWork: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    val workInfo by work.workInfoAsState()
-    val events by work.eventsState()
-
-    CPSDialog(
-        modifier = Modifier.fillMaxWidth(),
-        onDismissRequest = onDismissRequest
-    ) {
-        ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
-            Text(text = work.name, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 5.dp))
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-                when (val state = workInfo.stateOrCancelled) {
-                    WorkInfo.State.ENQUEUED -> {
-                        workInfo?.nextScheduleTime?.let { nextTime ->
-                            val d = nextTime - localCurrentTime
-                            Text(text = "next: in ${d.toDropSecondsString()}")
-                        }
-                    }
-                    else -> {
-                        Text(text = state.name.lowercase())
-                    }
-                }
-
-                workInfo?.repeatInterval?.let {
-                    Text(text = "interval: $it")
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = buildString {
-                        append("events: ")
-                        append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
-                        append(" / ")
-                        append(events.size)
-                    })
-                    EventsTimeline(
-                        events = events,
-                        radius = 2.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(
-                content = { Text(text = "restart") },
-                onClick = {
-                    onRestartWork()
-                    onDismissRequest()
-                }
-            )
-        }
-    }
-}
-
-@Composable
 private fun WorkersList(
     modifier: Modifier,
     onClick: (CPSPeriodicWork) -> Unit,
@@ -405,6 +339,72 @@ private fun ResultIcon(
             dangerType = if (result == CPSWorker.ResultType.RETRY) DangerType.WARNING else DangerType.DANGER,
             modifier = modifier
         )
+    }
+}
+
+@Composable
+private fun WorkerDialog(
+    work: CPSPeriodicWork,
+    onRestartWork: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val workInfo by work.workInfoAsState()
+    val events by work.eventsState()
+
+    CPSDialog(
+        modifier = Modifier.fillMaxWidth(),
+        onDismissRequest = onDismissRequest
+    ) {
+        ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
+            Text(text = work.name, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 5.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                when (val state = workInfo.stateOrCancelled) {
+                    WorkInfo.State.ENQUEUED -> {
+                        workInfo?.nextScheduleTime?.let { nextTime ->
+                            val d = nextTime - localCurrentTime
+                            Text(text = "next: in ${d.toDropSecondsString()}")
+                        }
+                    }
+                    else -> {
+                        Text(text = state.name.lowercase())
+                    }
+                }
+
+                workInfo?.repeatInterval?.let {
+                    Text(text = "interval: $it")
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = buildString {
+                        append("events: ")
+                        append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
+                        append(" / ")
+                        append(events.size)
+                    })
+                    EventsTimeline(
+                        events = events,
+                        radius = 2.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                content = { Text(text = "restart") },
+                onClick = {
+                    onRestartWork()
+                    onDismissRequest()
+                }
+            )
+        }
     }
 }
 
