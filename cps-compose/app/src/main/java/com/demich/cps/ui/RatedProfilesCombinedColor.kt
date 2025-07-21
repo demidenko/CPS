@@ -19,8 +19,9 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.collectAsState
-import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -35,25 +36,20 @@ fun ratedProfilesColorState(
     val context = context
     val rank by collectAsState {
         combine(
-            flow = makeFlowOfRankGetter(context),
+            flow = flowOfRankGetter(context),
             flow2 = navigator.flowOfCurrentScreen()
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 
-    // TODO: assume !enabled is rank = null ?
-    val ratedColorEnabled by collectItemAsState { context.settingsUI.coloredStatusBar }
-
     return colorState(
-        enabled = ratedColorEnabled && rank != null,
-        enabledColor = rank?.run { manager.colorFor(handleColor) } ?: disabledColor,
+        enabledColor = rank?.run { manager.colorFor(handleColor) },
         disabledColor = disabledColor
     )
 }
 
 @Composable
 private fun colorState(
-    enabled: Boolean,
-    enabledColor: Color,
+    enabledColor: Color?,
     disabledColor: Color
 ): State<Color> {
     /*
@@ -61,13 +57,13 @@ private fun colorState(
         with statusbar=off switching dark/light mode MUST be as fast as everywhere else
     */
     val statusBarColorState = animateColorAsState(
-        targetValue = enabledColor,
+        targetValue = enabledColor ?: disabledColor,
         animationSpec = CPSDefaults.toggleAnimationSpec()
     )
     return animateToggleColorAsState(
         enabledColorState = statusBarColorState,
         disabledColor = disabledColor,
-        isEnabled = enabled,
+        isEnabled = enabledColor != null,
         animationSpec = CPSDefaults.toggleAnimationSpec()
     )
 }
@@ -107,6 +103,9 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileRe
 private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
     dataStore(context).profile.asFlow().map { getRank(it) }
 
+private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
+    combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
+
 private class RankGetter(
     private val validRanks: List<RatedRank>,
     disabledManagers: Set<AccountManagerType>,
@@ -127,16 +126,27 @@ private class RankGetter(
         }
 }
 
-private fun makeFlowOfRankGetter(context: Context): Flow<RankGetter> =
+private data class Settings(
+    val enabled: Boolean,
+    val disabledManagers: Set<AccountManagerType>,
+    val rankSelector: UISettingsDataStore.StatusBarRankSelector
+)
+
+private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
     combine(
-        flow = combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it }, //TODO: optimize
-        flow2 = context.settingsUI.statusBarDisabledManagers.asFlow(),
-        flow3 = context.settingsUI.statusBarRankSelector.asFlow()
-    ) { ranks, disabledManagers, rankSelector ->
+        flow = flowOfValidRanks(context),
+        flow2 = context.settingsUI.flowOf {
+            Settings(
+                enabled = coloredStatusBar.value,
+                disabledManagers = statusBarDisabledManagers.value,
+                rankSelector = statusBarRankSelector.value
+            )
+        }
+    ) { validRanks, settings ->
         RankGetter(
-            validRanks = ranks.filterNotNull(),
-            disabledManagers = disabledManagers,
-            rankSelector = rankSelector
+            validRanks = if (settings.enabled) validRanks else emptyList(),
+            disabledManagers = settings.disabledManagers,
+            rankSelector = settings.rankSelector
         )
     }
 
