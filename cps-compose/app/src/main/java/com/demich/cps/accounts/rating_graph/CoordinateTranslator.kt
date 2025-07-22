@@ -32,20 +32,30 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
 
     var borderX: Float = 0f
 
+    private fun RatingGraphBounds.setAsWindow() {
+        require(startTime < endTime)
+
+        val ratingBorder = 100f
+
+        o = Offset(
+            x = startTime.epochSeconds.toFloat(),
+            y = minRating.toFloat() - ratingBorder
+        )
+
+        size = Size(
+            width = (endTime - startTime).inWholeSeconds.toFloat(),
+            height = maxRating - minRating + ratingBorder * 2
+        )
+    }
+
     fun setWindow(bounds: RatingGraphBounds) {
         if (bounds.startTime == bounds.endTime) {
-            setWindow(bounds.copy(
+            bounds.copy(
                 startTime = bounds.startTime - 1.days,
                 endTime = bounds.endTime + 1.days
-            ))
-            return
-        }
-        with(bounds) {
-            o = Offset(x = startTime.epochSeconds.toFloat(), y = minRating.toFloat() - 100f)
-            size = Size(
-                width = (endTime - startTime).inWholeSeconds.toFloat(),
-                height = maxRating - minRating + 200f
-            )
+            ).setAsWindow()
+        } else {
+            bounds.setAsWindow()
         }
     }
 
