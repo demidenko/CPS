@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
@@ -68,10 +71,10 @@ private fun RatingGraphCanvas(
     getColor: (HandleColor) -> Color,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier,
-    circleRadius: Float = 6f,
-    circleBorderWidth: Float = 3f,
-    pathWidth: Float = 4f,
-    shadowOffset: Offset = Offset(4f, 4f),
+    circleRadius: Dp = 2.25.dp,
+    circleBorderWidth: Dp = 1.25.dp,
+    pathWidth: Dp = 1.5.dp,
+    shadowOffset: DpOffset = DpOffset(1.5.dp, 1.5.dp),
     shadowAlpha: Float = 0.3f,
     selectedPointScale: Float = 1.5f
 ) {
@@ -89,6 +92,10 @@ private fun RatingGraphCanvas(
             .fillMaxSize()
             .clipToBounds()
     ) {
+        val circleBorderWidth = circleBorderWidth.toPx()
+        val circleRadius = circleRadius.toPx()
+        val pathWidth = pathWidth.toPx()
+
         translator.canvasSize = size
         translator.borderX = circleRadius * 5
 
@@ -136,7 +143,7 @@ private fun RatingGraphCanvas(
         }
 
         //shadow
-        translate(left = shadowOffset.x, top = shadowOffset.y) {
+        translate(left = shadowOffset.x.toPx(), top = shadowOffset.y.toPx()) {
             //shadow of rating path
             drawPath(
                 path = ratingPath,
