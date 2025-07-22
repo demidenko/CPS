@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -390,6 +391,7 @@ private fun WorkerDialog(
                     EventsTimeline(
                         events = events,
                         period = 24.hours,
+                        lineWidth = 1.dp,
                         modifier = Modifier.fillMaxWidth().height(6.dp)
                     )
                 }
@@ -415,6 +417,7 @@ private fun WorkerDialog(
 private fun EventsTimeline(
     period: Duration,
     events: List<CPSWorker.ExecutionEvent>,
+    lineWidth: Dp,
     modifier: Modifier = Modifier
 ) {
     val cpsColors = cpsColors
@@ -433,13 +436,13 @@ private fun EventsTimeline(
             ((this - startTime) / period).toFloat() * (size.width - radius * 2) + radius
 
 
-        val strokeWidth = 1.dp.toPx()
+        val lineWidth = lineWidth.toPx()
 
         drawLine(
             color = cpsColors.divider,
             start = Offset(x = 0f, y = radius),
             end = Offset(x = size.width, y = radius),
-            strokeWidth = strokeWidth
+            strokeWidth = lineWidth
         )
 
         events.forEach { event ->
@@ -450,7 +453,7 @@ private fun EventsTimeline(
             drawRoundRectWithBorderInside(
                 color = cpsColors.colorFor(event.resultType),
                 borderColor = cpsColors.divider,
-                borderWidth = strokeWidth,
+                borderWidth = lineWidth,
                 topLeft = Offset(x = mid - radius, y = 0f),
                 size = Size(width = r - l + radius * 2, height = size.height),
                 cornerRadius = CornerRadius(radius),
