@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.userinfo.RatedUserInfo
@@ -142,7 +143,8 @@ private fun RatingGraphWithHeader(
                     detectTapGestures { tapPoint ->
                         selectedRatingChange = translator.getNearestRatingChange(
                             ratingChanges = ratingChanges,
-                            tap = tapPoint
+                            tap = tapPoint,
+                            size = size.toSize()
                         )
                     }
                 }

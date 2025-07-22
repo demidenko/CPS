@@ -54,19 +54,19 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         toWidth: Float
     ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
-    fun pointXToOffsetX(x: Long) =
+    fun pointXToOffsetX(x: Long, canvasSize: Size) =
         transformX(
             x = (x - o.x) / size.width * canvasSize.width,
             fromWidth = canvasSize.width,
             toWidth = canvasSize.width + borderX * 2
         )
 
-    fun pointYToOffsetY(y: Long) =
+    fun pointYToOffsetY(y: Long, canvasSize: Size) =
         canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
 
-    fun pointToOffset(point: Point) = Offset(
-        x = pointXToOffsetX(point.x),
-        y = pointYToOffsetY(point.y)
+    fun pointToOffset(point: Point, canvasSize: Size) = Offset(
+        x = pointXToOffsetX(point.x, canvasSize),
+        y = pointYToOffsetY(point.y, canvasSize)
     )
 
     private fun offsetToPoint(offset: Offset) = Offset(
@@ -89,20 +89,6 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         size /= scale
     }
 
-    fun getNearestRatingChange(
-        ratingChanges: List<RatingChange>,
-        tap: Offset,
-        tapRadius: Float = 50f
-    ): RatingChange? {
-        val pos = ratingChanges.minOfWithIndex {
-            val o = pointToOffset(it.toPoint())
-            (o - tap).getDistance()
-        }.takeIf { it.value <= tapRadius }?.index ?: return null
-        val res = ratingChanges[pos]
-        if (pos == 0 || res.oldRating != null) return res
-        return res.copy(oldRating = ratingChanges[pos-1].rating)
-    }
-
     companion object {
         internal val saver get() = listSaver<CoordinateTranslator, Float>(
             save = {
@@ -120,7 +106,19 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 }
 
-context(drawScope: DrawScope)
+context(scope: DrawScope)
+internal fun CoordinateTranslator.pointXToOffsetX(x: Long) =
+    pointXToOffsetX(x = x, canvasSize = scope.size)
+
+context(scope: DrawScope)
+internal fun CoordinateTranslator.pointYToOffsetY(y: Long) =
+    pointYToOffsetY(y = y, canvasSize = scope.size)
+
+context(scope: DrawScope)
+internal fun CoordinateTranslator.pointToOffset(point: Point) =
+    pointToOffset(point = point, canvasSize = scope.size)
+
+context(scope: DrawScope)
 internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     bottomLeft: Point,
     topRight: Point,
@@ -131,7 +129,7 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     }
 
     val maxX = with(topRight) {
-        val width = drawScope.size.width
+        val width = scope.size.width
         if (x == Long.MAX_VALUE) width else round(pointXToOffsetX(x)).coerceAtMost(width)
     }
 
@@ -140,7 +138,7 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     }
 
     val maxY = with(bottomLeft) {
-        val height = drawScope.size.height
+        val height = scope.size.height
         if (y == Long.MIN_VALUE) height else round(pointYToOffsetY(y)).coerceAtMost(height)
     }
 
@@ -150,6 +148,21 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
             Size(maxX - minX, maxY - minY)
         )
     }
+}
+
+internal fun CoordinateTranslator.getNearestRatingChange(
+    ratingChanges: List<RatingChange>,
+    tap: Offset,
+    size: Size,
+    tapRadius: Float = 50f
+): RatingChange? {
+    val pos = ratingChanges.minOfWithIndex {
+        val o = pointToOffset(it.toPoint(), size)
+        (o - tap).getDistance()
+    }.takeIf { it.value <= tapRadius }?.index ?: return null
+    val res = ratingChanges[pos]
+    if (pos == 0 || res.oldRating != null) return res
+    return res.copy(oldRating = ratingChanges[pos-1].rating)
 }
 
 private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
