@@ -430,7 +430,17 @@ private fun EventsTimeline(
         val radius = size.height / 2
 
         fun Instant.toX(): Float =
-            ((this - startTime) / period * size.width).toFloat()
+            ((this - startTime) / period).toFloat() * (size.width - radius * 2) + radius
+
+
+        val strokeWidth = 1.dp.toPx()
+
+        drawLine(
+            color = cpsColors.divider,
+            start = Offset(x = 0f, y = radius),
+            end = Offset(x = size.width, y = radius),
+            strokeWidth = strokeWidth
+        )
 
         events.forEach { event ->
             val l = event.start.toX()
@@ -439,8 +449,8 @@ private fun EventsTimeline(
 
             drawRoundRectWithBorderInside(
                 color = cpsColors.colorFor(event.resultType),
-                borderColor = Color.Black,
-                borderWidth = 1.dp.toPx(),
+                borderColor = cpsColors.divider,
+                borderWidth = strokeWidth,
                 topLeft = Offset(x = mid - radius, y = 0f),
                 size = Size(width = r - l + radius * 2, height = size.height),
                 cornerRadius = CornerRadius(radius),
