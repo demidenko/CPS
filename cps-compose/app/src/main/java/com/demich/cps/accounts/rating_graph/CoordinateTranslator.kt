@@ -10,6 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.minOfWithIndex
 import kotlin.math.round
@@ -28,7 +30,6 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     private var o: Offset by mutableStateOf(Offset(x = minX, y = minY))
     private var size: Size by mutableStateOf(Size(width = maxX - minX, height = maxY - minY))
 
-    var canvasSize: Size = Size.Unspecified
     var borderX: Float = 0f
 
     fun setWindow(bounds: RatingGraphBounds) {
@@ -69,7 +70,7 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         y = pointYToOffsetY(point.y, canvasSize)
     )
 
-    private fun offsetToPoint(offset: Offset) = Offset(
+    private fun offsetToPoint(offset: Offset, canvasSize: Size) = Offset(
         x = transformX(
             x = offset.x,
             fromWidth = canvasSize.width + borderX * 2,
@@ -78,13 +79,16 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
     )
 
+    context(scope: PointerInputScope)
     fun move(offset: Offset) {
-        o -= offsetToPoint(offset) - offsetToPoint(Offset.Zero)
+        val canvasSize = scope.size.toSize()
+        o -= offsetToPoint(offset, canvasSize) - offsetToPoint(Offset.Zero, canvasSize)
     }
 
+    context(scope: PointerInputScope)
     fun scale(center: Offset, scale: Float) {
         val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
-        val center = offsetToPoint(center)
+        val center = offsetToPoint(offset = center, canvasSize = scope.size.toSize())
         o = (o - center) / scale + center
         size /= scale
     }
@@ -150,14 +154,14 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     }
 }
 
+context(scope: PointerInputScope)
 internal fun CoordinateTranslator.getNearestRatingChange(
     ratingChanges: List<RatingChange>,
     tap: Offset,
-    size: Size,
     tapRadius: Float = 50f
 ): RatingChange? {
     val pos = ratingChanges.minOfWithIndex {
-        val o = pointToOffset(it.toPoint(), size)
+        val o = pointToOffset(point = it.toPoint(), canvasSize = scope.size.toSize())
         (o - tap).getDistance()
     }.takeIf { it.value <= tapRadius }?.index ?: return null
     val res = ratingChanges[pos]
