@@ -1,21 +1,18 @@
 package com.demich.cps.develop
 
 import android.content.Context
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -31,11 +28,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,6 +61,7 @@ import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.drawRoundRectWithBorderInside
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.localCurrentTime
@@ -83,6 +84,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -384,10 +386,11 @@ private fun WorkerDialog(
                         append(" / ")
                         append(events.size)
                     })
+
                     EventsTimeline(
                         events = events,
-                        radius = 2.dp,
-                        modifier = Modifier.fillMaxWidth()
+                        period = 24.hours,
+                        modifier = Modifier.fillMaxWidth().height(6.dp)
                     )
                 }
             }
@@ -410,23 +413,38 @@ private fun WorkerDialog(
 
 @Composable
 private fun EventsTimeline(
-    modifier: Modifier = Modifier,
-    radius: Dp,
-    events: List<CPSWorker.ExecutionEvent>
+    period: Duration,
+    events: List<CPSWorker.ExecutionEvent>,
+    modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier.height(radius * 2)) {
-        events.forEach { event ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .background(
-                        color = cpsColors.colorFor(event.resultType),
-                        shape = RoundedCornerShape(radius)
-                    )
-            ) {
+    val cpsColors = cpsColors
 
-            }
+    val endTime = localCurrentTime
+    val startTime = endTime - period
+
+    val events = events.sortedBy { it.start }
+
+    Canvas(
+        modifier = modifier.clipToBounds()
+    ) {
+        val radius = size.height / 2
+
+        fun Instant.toX(): Float =
+            ((this - startTime) / period * size.width).toFloat()
+
+        events.forEach { event ->
+            val l = event.start.toX()
+            val r = event.end?.toX() ?: l
+            val mid = (l + r) / 2
+
+            drawRoundRectWithBorderInside(
+                color = cpsColors.colorFor(event.resultType),
+                borderColor = Color.Black,
+                borderWidth = 1.dp.toPx(),
+                topLeft = Offset(x = mid - radius, y = 0f),
+                size = Size(width = r - l + radius * 2, height = size.height),
+                cornerRadius = CornerRadius(radius),
+            )
         }
     }
 }
