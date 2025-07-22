@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.minOfWithIndex
 import kotlin.math.round
@@ -77,37 +78,6 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
     )
 
-    inline fun pointRectToCanvasRect(
-        bottomLeft: Point,
-        topRight: Point,
-        block: (Offset, Size) -> Unit
-    ) {
-        val minX = with(bottomLeft) {
-            if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)).coerceAtLeast(0f)
-        }
-
-        val maxX = with(topRight) {
-            val width = canvasSize.width
-            if (x == Long.MAX_VALUE) width else round(pointXToOffsetX(x)).coerceAtMost(width)
-        }
-
-        val minY = with(topRight) {
-            if (y == Long.MAX_VALUE) 0f else round(pointYToOffsetY(y)).coerceAtLeast(0f)
-        }
-
-        val maxY = with(bottomLeft) {
-            val height = canvasSize.height
-            if (y == Long.MIN_VALUE) height else round(pointYToOffsetY(y)).coerceAtMost(height)
-        }
-
-        if (minX <= maxX && minY <= maxY) {
-            block(
-                Offset(minX, minY),
-                Size(maxX - minX, maxY - minY)
-            )
-        }
-    }
-
     fun move(offset: Offset) {
         o -= offsetToPoint(offset) - offsetToPoint(Offset.Zero)
     }
@@ -146,6 +116,38 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
                     maxY = it[1] + it[3]
                 )
             }
+        )
+    }
+}
+
+context(drawScope: DrawScope)
+internal inline fun CoordinateTranslator.pointRectToCanvasRect(
+    bottomLeft: Point,
+    topRight: Point,
+    block: (Offset, Size) -> Unit
+) {
+    val minX = with(bottomLeft) {
+        if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)).coerceAtLeast(0f)
+    }
+
+    val maxX = with(topRight) {
+        val width = drawScope.size.width
+        if (x == Long.MAX_VALUE) width else round(pointXToOffsetX(x)).coerceAtMost(width)
+    }
+
+    val minY = with(topRight) {
+        if (y == Long.MAX_VALUE) 0f else round(pointYToOffsetY(y)).coerceAtLeast(0f)
+    }
+
+    val maxY = with(bottomLeft) {
+        val height = drawScope.size.height
+        if (y == Long.MIN_VALUE) height else round(pointYToOffsetY(y)).coerceAtMost(height)
+    }
+
+    if (minX <= maxX && minY <= maxY) {
+        block(
+            Offset(minX, minY),
+            Size(maxX - minX, maxY - minY)
         )
     }
 }
