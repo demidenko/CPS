@@ -1,8 +1,12 @@
 package com.demich.cps.accounts.rating_graph
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import com.demich.cps.accounts.managers.RatingChange
@@ -109,11 +113,9 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     fun scale(center: Offset, scale: Float) {
-        size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f).let {
-            if (scale > it) return scale(center, it)
-        }
-        val c = offsetToPoint(center)
-        o = (o - c) / scale + c
+        val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
+        val center = offsetToPoint(center)
+        o = (o - center) / scale + center
         size /= scale
     }
 
@@ -132,14 +134,6 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     companion object {
-        private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
-            //width / scale >= minWidth
-            //width / minWidth >= scale
-            //height / scale >= minHeight
-            //height / minHeight >= scale
-            return minOf(width / minWidth, height / minHeight)
-        }
-
         internal val saver get() = listSaver<CoordinateTranslator, Float>(
             save = {
                 listOf(it.o.x, it.o.y, it.size.width, it.size.height)
@@ -154,4 +148,12 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
             }
         )
     }
+}
+
+private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
+    //width / scale >= minWidth
+    //width / minWidth >= scale
+    //height / scale >= minHeight
+    //height / minHeight >= scale
+    return minOf(width / minWidth, height / minHeight)
 }
