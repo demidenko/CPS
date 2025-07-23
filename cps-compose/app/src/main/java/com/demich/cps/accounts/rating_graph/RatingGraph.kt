@@ -138,7 +138,8 @@ private fun RatingGraphWithHeader(
                     detectTapGestures { tapPoint ->
                         selectedRatingChange = translator.getNearestRatingChange(
                             ratingChanges = ratingChanges,
-                            tap = tapPoint
+                            tap = tapPoint,
+                            tapRadius = 24.dp.toPx()
                         )
                     }
                 }

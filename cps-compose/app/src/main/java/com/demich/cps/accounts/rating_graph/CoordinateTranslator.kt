@@ -175,7 +175,7 @@ context(scope: PointerInputScope)
 internal fun CoordinateTranslator.getNearestRatingChange(
     ratingChanges: List<RatingChange>,
     tap: Offset,
-    tapRadius: Float = 50f
+    tapRadius: Float
 ): RatingChange? {
     val pos = ratingChanges.minOfWithIndex {
         val o = pointToOffset(point = it.toPoint(), canvasSize = scope.size.toSize())
