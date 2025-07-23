@@ -2,7 +2,6 @@ package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -132,11 +131,8 @@ private fun RatingGraphWithHeader(
             modifier = Modifier
                 .height(graphHeight)
                 .clip(shape)
-                .pointerInput(Unit) {
-                    detectTransformGestures { centroid, pan, zoom, _ ->
-                        translator.move(pan)
-                        translator.scale(centroid, zoom)
-                    }
+                .pointerInput(translator) {
+                    translator.detectTransformGestures()
                 }
                 .pointerInput(ratingChanges) {
                     detectTapGestures { tapPoint ->

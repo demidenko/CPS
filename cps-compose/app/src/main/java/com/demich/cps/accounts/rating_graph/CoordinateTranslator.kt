@@ -1,5 +1,6 @@
 package com.demich.cps.accounts.rating_graph
 
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -89,18 +90,24 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
     )
 
-    context(scope: PointerInputScope)
-    fun move(offset: Offset) {
-        val canvasSize = scope.size.toSize()
+    private fun move(offset: Offset, canvasSize: Size) {
         o -= offsetToPoint(offset, canvasSize) - offsetToPoint(Offset.Zero, canvasSize)
     }
 
-    context(scope: PointerInputScope)
-    fun scale(center: Offset, scale: Float) {
+    private fun scale(center: Offset, scale: Float, canvasSize: Size) {
         val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
-        val center = offsetToPoint(offset = center, canvasSize = scope.size.toSize())
+        val center = offsetToPoint(offset = center, canvasSize = canvasSize)
         o = (o - center) / scale + center
         size /= scale
+    }
+
+    context(scope: PointerInputScope)
+    suspend fun detectTransformGestures() {
+        scope.detectTransformGestures { centroid, pan, zoom, _ ->
+            val canvasSize = scope.size.toSize()
+            move(offset = pan, canvasSize = canvasSize)
+            if (zoom != 1f) scale(center = centroid, scale = zoom, canvasSize = canvasSize)
+        }
     }
 
     companion object {
