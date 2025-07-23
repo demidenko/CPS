@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.demich.cps"
-        targetSdk = 35
+        targetSdk = 36
 
         versionCode = 466
         versionName = "1.9.9"
