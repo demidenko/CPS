@@ -53,11 +53,12 @@ internal fun RatingGraphCanvas(
 
     RatingGraphCanvas(
         ratingPoints = ratingChanges.map { it.toPoint() }.sortedBy { it.x },
-        translator = translator,
         selectedPoint = selectedRatingChange?.toPoint(),
         markVerticals = timeMarkers.map { it.epochSeconds },
         getColor = colorsMap::getValue,
+        translator = translator,
         rectangles = rectangles,
+        lineColor = Color.Black,
         modifier = modifier
     )
 }
@@ -65,16 +66,19 @@ internal fun RatingGraphCanvas(
 @Composable
 private fun RatingGraphCanvas(
     ratingPoints: List<Point>,
-    translator: CoordinateTranslator,
     selectedPoint: Point?,
     markVerticals: List<Long>,
     getColor: (HandleColor) -> Color,
+    translator: CoordinateTranslator,
     rectangles: RatingGraphRectangles,
+    lineColor: Color,
+    markerColor: Color = lineColor,
     modifier: Modifier = Modifier,
     circleRadius: Dp = 2.25.dp,
     circleBorderWidth: Dp = 1.25.dp,
     pathWidth: Dp = 1.5.dp,
     shadowOffset: DpOffset = DpOffset(1.5.dp, 1.5.dp),
+    shadowColor: Color = Color.Black,
     shadowAlpha: Float = 0.3f,
     selectedPointScale: Float = 1.5f
 ) {
@@ -124,7 +128,7 @@ private fun RatingGraphCanvas(
         if (selectedPoint != null) {
             val p = translator.pointToOffset(selectedPoint)
             drawLine(
-                color = Color.Black,
+                color = markerColor,
                 start = Offset(p.x, 0f),
                 end = p,
                 pathEffect = dashEffect
@@ -133,7 +137,7 @@ private fun RatingGraphCanvas(
             markVerticals.forEach { x ->
                 val px = translator.pointXToOffsetX(x)
                 drawLine(
-                    color = Color.Black,
+                    color = markerColor,
                     start = Offset(px, 0f),
                     end = Offset(px, size.height),
                     pathEffect = dashEffect
@@ -146,7 +150,7 @@ private fun RatingGraphCanvas(
             //shadow of rating path
             drawPath(
                 path = ratingPath,
-                color = Color.Black,
+                color = shadowColor,
                 style = Stroke(width = pathWidth),
                 alpha = shadowAlpha
             )
@@ -154,7 +158,7 @@ private fun RatingGraphCanvas(
             ratingPoints.forEach { point ->
                 val center = translator.pointToOffset(point)
                 drawCircle(
-                    color = Color.Black,
+                    color = shadowColor,
                     radius = radius(point, circleRadius + circleBorderWidth),
                     center = center,
                     style = Fill,
@@ -166,7 +170,7 @@ private fun RatingGraphCanvas(
         //rating path
         drawPath(
             path = ratingPath,
-            color = Color.Black,
+            color = lineColor,
             style = Stroke(width = pathWidth)
         )
 
@@ -174,7 +178,7 @@ private fun RatingGraphCanvas(
         pointsWithColors.forEach { (point, color) ->
             val center = translator.pointToOffset(point)
             drawCircle(
-                color = Color.Black,
+                color = lineColor,
                 radius = radius(point, circleRadius + circleBorderWidth),
                 center = center,
                 style = Fill
@@ -187,7 +191,7 @@ private fun RatingGraphCanvas(
             )
             if (point == selectedPoint) {
                 drawCircle(
-                    color = Color.Black,
+                    color = lineColor,
                     radius = radius(point, circleRadius / 2),
                     center = center,
                     style = Fill
