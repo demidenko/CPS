@@ -9,10 +9,7 @@ import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
-import com.demich.cps.contests.settings.ContestDateRelativeConstraints
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
-import com.demich.cps.platforms.api.clist.ClistApi
-import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.DmojClient
@@ -48,15 +45,13 @@ interface ContestsReloader {
         }
 
         coroutineScope {
-            contestsLoadingFlows(
-                platforms = EnumSet.copyOf(platforms),
-                settings = settings
-            ).forEach { (platform, resultsFlow) ->
-                launch {
-                    val last = transform(platform, resultsFlow).last()
-                    last.result.onSuccess { contestsReceiver.save(platform, it) }
+            settings.contestsLoadingFlows(platforms = EnumSet.copyOf(platforms))
+                .forEach { (platform, resultsFlow) ->
+                    launch {
+                        val last = transform(platform, resultsFlow).last()
+                        last.result.onSuccess { contestsReceiver.save(platform, it) }
+                    }
                 }
-            }
         }
     }
 
@@ -69,35 +64,21 @@ interface ContestsReloader {
 }
 
 
-private suspend fun contestsLoadingFlows(
-    platforms: Set<Contest.Platform>,
-    settings: ContestsSettingsDataStore
-): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
-
-    val clistApiAccess: ClistApi.ApiAccess
-    val clistAdditionalResources: List<ClistResource>
-    val contestsDateConstraints: ContestDateRelativeConstraints
-    val contestsLoadersPriorityLists: Map<Contest.Platform, List<ContestsLoaderType>>
-    settings.fromSnapshot {
-        clistApiAccess = this.clistApiAccess.value
-        clistAdditionalResources = this.clistAdditionalResources.value
-        contestsDateConstraints = this.contestsDateConstraints.value
-        contestsLoadersPriorityLists = this.contestsLoadersPriorityLists.value
-    }
-
-    return contestsLoadingFlows(
-        setup = contestsLoadersPriorityLists.filterKeys { it in platforms },
-        dateConstraints = contestsDateConstraints.at(currentTime = getCurrentTime()),
-    ) { loaderType ->
-        when (loaderType) {
-            ContestsLoaderType.clist_api -> ClistContestsLoader(
-                api = ClistClient,
-                apiAccess = clistApiAccess,
-                resources = clistAdditionalResources
-            )
-            ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
-            ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
-            ContestsLoaderType.dmoj_api -> DmojContestsLoader(api = DmojClient)
+private suspend fun ContestsSettingsDataStore.contestsLoadingFlows(platforms: Set<Contest.Platform>) =
+    fromSnapshot {
+        contestsLoadingFlows(
+            setup = contestsLoadersPriorityLists.value.filterKeys { it in platforms },
+            dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
+        ) { loaderType ->
+            when (loaderType) {
+                ContestsLoaderType.clist_api -> ClistContestsLoader(
+                    api = ClistClient,
+                    apiAccess = clistApiAccess.value,
+                    resources = clistAdditionalResources.value
+                )
+                ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
+                ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
+                ContestsLoaderType.dmoj_api -> DmojContestsLoader(api = DmojClient)
+            }
         }
     }
-}
