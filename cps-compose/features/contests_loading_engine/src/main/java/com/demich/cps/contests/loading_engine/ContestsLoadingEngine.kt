@@ -24,7 +24,7 @@ fun contestsLoadingFlows(
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
     val possibleLoaders = setup.flatMapTo(emptyEnumSet()) { it.value }
-        .associateWith { createLoader(it) }
+        .associateWith { lazy { createLoader(it) } }
 
     return setup.mapValues { (platform, priorities) ->
         contestsLoadingFlow(
@@ -32,7 +32,7 @@ fun contestsLoadingFlows(
             priorities = priorities,
             dateConstraints = dateConstraints,
             memoizer = memoizer,
-            getLoader = possibleLoaders::getValue
+            getLoader = { possibleLoaders.getValue(it).value }
         )
     }
 }
