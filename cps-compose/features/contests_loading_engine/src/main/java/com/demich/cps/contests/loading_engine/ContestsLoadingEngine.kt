@@ -7,6 +7,7 @@ import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
+import com.demich.kotlin_stdlib_boost.emptyEnumSet
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -22,7 +23,7 @@ fun contestsLoadingFlows(
 ): Map<Contest.Platform, Flow<ContestsLoadingResult>> {
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
-    val possibleLoaders = setup.flatMapTo(mutableSetOf()) { it.value }
+    val possibleLoaders = setup.flatMapTo(emptyEnumSet()) { it.value }
         .associateWith { createLoader(it) }
 
     return setup.mapValues { (platform, priorities) ->

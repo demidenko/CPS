@@ -17,11 +17,11 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.getCurrentTime
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
+import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
-import java.util.EnumSet
 
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
@@ -45,7 +45,7 @@ interface ContestsReloader {
         }
 
         coroutineScope {
-            settings.contestsLoadingFlows(platforms = EnumSet.copyOf(platforms))
+            settings.contestsLoadingFlows(platforms = platforms.toEnumSet())
                 .forEach { (platform, resultsFlow) ->
                     launch {
                         val last = transform(platform, resultsFlow).last()
