@@ -85,20 +85,20 @@ private class MultipleLoadersMemoizer(
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsLoaderType, Deferred<ContestsResult>>()
     suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsResult {
-        return coroutineScope {
-            mutex.withLock {
-                results.getOrPut(loader.type) {
-                    async { runLoader(loader) }
+        return mutex.withLock {
+            results.getOrPut(loader.type) {
+                coroutineScope {
+                    async { loader.getContestsResult() }
                 }
             }
         }.await()
     }
 
-    private suspend fun runLoader(loader: ContestsLoaderMultiple): ContestsResult {
+    private suspend fun ContestsLoaderMultiple.getContestsResult(): ContestsResult {
         val platforms = setup.mapNotNull { (platform, loaderTypes) ->
-            if (loader.type in loaderTypes) platform else null
+            if (type in loaderTypes) platform else null
         }
-        return loader.runCatching {
+        return runCatching {
             getContests(
                 platforms = platforms,
                 dateConstraints = dateConstraints
