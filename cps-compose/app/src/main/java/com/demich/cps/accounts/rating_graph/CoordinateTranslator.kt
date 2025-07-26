@@ -9,33 +9,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.minOfWithIndex
-import com.demich.cps.utils.offsetSaver
-import com.demich.cps.utils.sizeSaver
+import com.demich.cps.utils.rectSaver
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
 internal fun rememberCoordinateTranslator(): CoordinateTranslator  {
-    val offsetState = rememberSaveable(stateSaver = offsetSaver()) { mutableStateOf(Offset.Unspecified) }
-    val sizeState = rememberSaveable(stateSaver = sizeSaver()) { mutableStateOf(Size.Unspecified) }
-    return CoordinateTranslator(offsetState, sizeState)
+    val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
+    return CoordinateTranslator(rectState)
 }
 
 @Stable
 internal class CoordinateTranslator(
-    offsetState: MutableState<Offset>,
-    sizeState: MutableState<Size>
+    rectState: MutableState<Rect>
 ) {
     //x is seconds, y is rating
-    private var o: Offset by offsetState
-    private var size: Size by sizeState
+    private var rect: Rect by rectState
 
     //TODO: get rid of this
     var borderX: Float = 0f
@@ -43,23 +40,13 @@ internal class CoordinateTranslator(
     private fun RatingGraphBounds.setAsWindow() {
         require(startTime < endTime)
 
-        val ratingBorder = 100f
+        val ratingBorder = 100
 
-        val topLeft = Offset(
-            x = startTime.epochSeconds.toFloat(),
-            y = minRating - ratingBorder
-        )
-
-        val bottomRight = Offset(
-            x = endTime.epochSeconds.toFloat(),
-            y = maxRating + ratingBorder
-        )
-
-        o = topLeft
-
-        size = Size(
-            width = bottomRight.x - topLeft.x,
-            height = bottomRight.y - topLeft.y
+        rect = Rect(
+            left = startTime.epochSeconds.toFloat(),
+            right = endTime.epochSeconds.toFloat(),
+            top = (minRating - ratingBorder).toFloat(),
+            bottom = (maxRating + ratingBorder).toFloat()
         )
     }
 
@@ -84,13 +71,13 @@ internal class CoordinateTranslator(
 
     fun pointXToCanvasX(x: Long, canvasSize: Size) =
         transformX(
-            x = (x - o.x) / size.width * canvasSize.width,
+            x = (x - rect.left) / rect.size.width * canvasSize.width,
             fromWidth = canvasSize.width,
             toWidth = canvasSize.width + borderX * 2
         )
 
     fun pointYToCanvasY(y: Long, canvasSize: Size) =
-        canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
+        canvasSize.height - ((y - rect.top) / rect.size.height * canvasSize.height)
 
     fun pointToCanvas(point: Point, canvasSize: Size) = Offset(
         x = pointXToCanvasX(point.x, canvasSize),
@@ -102,27 +89,31 @@ internal class CoordinateTranslator(
             x = offset.x,
             fromWidth = canvasSize.width + borderX * 2,
             toWidth = canvasSize.width
-        ) / canvasSize.width * size.width + o.x,
-        y = (canvasSize.height - offset.y) / canvasSize.height * size.height + o.y
+        ) / canvasSize.width * rect.size.width + rect.left,
+        y = (canvasSize.height - offset.y) / canvasSize.height * rect.size.height + rect.top
     )
 
-    private fun move(offset: Offset, canvasSize: Size) {
-        o -= offsetToPoint(offset, canvasSize) - offsetToPoint(Offset.Zero, canvasSize)
+    private fun Rect.move(offset: Offset, canvasSize: Size): Rect {
+        val offset = offsetToPoint(offset, canvasSize) - offsetToPoint(Offset.Zero, canvasSize)
+        return translate(-offset)
     }
 
-    private fun scale(center: Offset, scale: Float, canvasSize: Size) {
-        val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
+    private fun Rect.scale(center: Offset, scale: Float, canvasSize: Size): Rect {
+        val scale = scale.coerceAtMost(rect.size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
         val center = offsetToPoint(offset = center, canvasSize = canvasSize)
-        o = (o - center) / scale + center
-        size /= scale
+        return Rect(
+            topLeft = (topLeft - center) / scale + center,
+            bottomRight = (bottomRight - center) / scale + center
+        )
     }
 
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
             val canvasSize = scope.size.toSize()
-            move(offset = pan, canvasSize = canvasSize)
-            if (zoom != 1f) scale(center = centroid, scale = zoom, canvasSize = canvasSize)
+            rect = rect
+                .move(offset = pan, canvasSize = canvasSize)
+                .scale(center = centroid, scale = zoom, canvasSize = canvasSize)
         }
     }
 }

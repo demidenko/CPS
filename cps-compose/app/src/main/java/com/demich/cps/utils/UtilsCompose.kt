@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -88,6 +89,21 @@ fun sizeSaver() = listSaver(
     },
     restore = {
         Size(width = it[0], height = it[1])
+    }
+)
+
+@Stable
+fun rectSaver() = listSaver(
+    save = {
+        listOf(it.left, it.top, it.right, it.bottom)
+    },
+    restore = {
+        Rect(
+            left = it[0],
+            top = it[1],
+            right = it[2],
+            bottom = it[3]
+        )
     }
 )
 
