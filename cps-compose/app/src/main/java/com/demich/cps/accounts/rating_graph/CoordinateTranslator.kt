@@ -50,13 +50,15 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
     }
 
     fun setWindow(bounds: RatingGraphBounds) {
-        if (bounds.startTime == bounds.endTime) {
-            bounds.copy(
-                startTime = bounds.startTime - 1.days,
-                endTime = bounds.endTime + 1.days
-            ).setAsWindow()
-        } else {
-            bounds.setAsWindow()
+        with(bounds) {
+            if (startTime == endTime) {
+                copy(
+                    startTime = bounds.startTime - 1.days,
+                    endTime = bounds.endTime + 1.days
+                ).setAsWindow()
+            } else {
+                setAsWindow()
+            }
         }
     }
 
