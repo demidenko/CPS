@@ -134,7 +134,7 @@ context(scope: DrawScope)
 internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     bottomLeft: Point,
     topRight: Point,
-    block: (Offset, Size) -> Unit
+    block: (Rect) -> Unit
 ) {
     val minX = with(bottomLeft) {
         if (x == Long.MIN_VALUE) 0f else round(pointXToCanvasX(x)).coerceAtLeast(0f)
@@ -155,10 +155,7 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     }
 
     if (minX <= maxX && minY <= maxY) {
-        block(
-            Offset(minX, minY),
-            Size(maxX - minX, maxY - minY)
-        )
+        block(Rect(left = minX, top = minY, right = maxX, bottom = maxY))
     }
 }
 

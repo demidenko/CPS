@@ -115,11 +115,11 @@ private fun RatingGraphCanvas(
             translator.pointRectToCanvasRect(
                 bottomLeft = bottomLeft,
                 topRight = topRight
-            ) { topLeft, size ->
+            ) { rect ->
                 drawRect(
                     color = getColor(handleColor),
-                    topLeft = topLeft,
-                    size = size
+                    topLeft = rect.topLeft,
+                    size = rect.size
                 )
             }
         }
