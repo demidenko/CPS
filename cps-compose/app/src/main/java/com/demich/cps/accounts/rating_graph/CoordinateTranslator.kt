@@ -38,14 +38,21 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
 
         val ratingBorder = 100f
 
-        o = Offset(
+        val topLeft = Offset(
             x = startTime.epochSeconds.toFloat(),
-            y = minRating.toFloat() - ratingBorder
+            y = minRating - ratingBorder
         )
 
+        val bottomRight = Offset(
+            x = endTime.epochSeconds.toFloat(),
+            y = maxRating + ratingBorder
+        )
+
+        o = topLeft
+
         size = Size(
-            width = (endTime - startTime).inWholeSeconds.toFloat(),
-            height = maxRating - minRating + ratingBorder * 2
+            width = bottomRight.x - topLeft.x,
+            height = bottomRight.y - topLeft.y
         )
     }
 
