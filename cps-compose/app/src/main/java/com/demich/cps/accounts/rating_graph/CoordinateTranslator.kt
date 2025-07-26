@@ -66,19 +66,19 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
         toWidth: Float
     ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
-    fun pointXToOffsetX(x: Long, canvasSize: Size) =
+    fun pointXToCanvasX(x: Long, canvasSize: Size) =
         transformX(
             x = (x - o.x) / size.width * canvasSize.width,
             fromWidth = canvasSize.width,
             toWidth = canvasSize.width + borderX * 2
         )
 
-    fun pointYToOffsetY(y: Long, canvasSize: Size) =
+    fun pointYToCanvasY(y: Long, canvasSize: Size) =
         canvasSize.height - ((y - o.y) / size.height * canvasSize.height)
 
-    fun pointToOffset(point: Point, canvasSize: Size) = Offset(
-        x = pointXToOffsetX(point.x, canvasSize),
-        y = pointYToOffsetY(point.y, canvasSize)
+    fun pointToCanvas(point: Point, canvasSize: Size) = Offset(
+        x = pointXToCanvasX(point.x, canvasSize),
+        y = pointYToCanvasY(point.y, canvasSize)
     )
 
     private fun offsetToPoint(offset: Offset, canvasSize: Size) = Offset(
@@ -128,16 +128,16 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
 }
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointXToOffsetX(x: Long) =
-    pointXToOffsetX(x = x, canvasSize = scope.size)
+internal fun CoordinateTranslator.pointXToCanvasX(x: Long) =
+    pointXToCanvasX(x = x, canvasSize = scope.size)
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointYToOffsetY(y: Long) =
-    pointYToOffsetY(y = y, canvasSize = scope.size)
+internal fun CoordinateTranslator.pointYToCanvasY(y: Long) =
+    pointYToCanvasY(y = y, canvasSize = scope.size)
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointToOffset(point: Point) =
-    pointToOffset(point = point, canvasSize = scope.size)
+internal fun CoordinateTranslator.pointToCanvas(point: Point) =
+    pointToCanvas(point = point, canvasSize = scope.size)
 
 context(scope: DrawScope)
 internal inline fun CoordinateTranslator.pointRectToCanvasRect(
@@ -146,21 +146,21 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     block: (Offset, Size) -> Unit
 ) {
     val minX = with(bottomLeft) {
-        if (x == Long.MIN_VALUE) 0f else round(pointXToOffsetX(x)).coerceAtLeast(0f)
+        if (x == Long.MIN_VALUE) 0f else round(pointXToCanvasX(x)).coerceAtLeast(0f)
     }
 
     val maxX = with(topRight) {
         val width = scope.size.width
-        if (x == Long.MAX_VALUE) width else round(pointXToOffsetX(x)).coerceAtMost(width)
+        if (x == Long.MAX_VALUE) width else round(pointXToCanvasX(x)).coerceAtMost(width)
     }
 
     val minY = with(topRight) {
-        if (y == Long.MAX_VALUE) 0f else round(pointYToOffsetY(y)).coerceAtLeast(0f)
+        if (y == Long.MAX_VALUE) 0f else round(pointYToCanvasY(y)).coerceAtLeast(0f)
     }
 
     val maxY = with(bottomLeft) {
         val height = scope.size.height
-        if (y == Long.MIN_VALUE) height else round(pointYToOffsetY(y)).coerceAtMost(height)
+        if (y == Long.MIN_VALUE) height else round(pointYToCanvasY(y)).coerceAtMost(height)
     }
 
     if (minX <= maxX && minY <= maxY) {
@@ -178,7 +178,7 @@ internal fun CoordinateTranslator.getNearestRatingChange(
     tapRadius: Float
 ): RatingChange? {
     val pos = ratingChanges.minOfWithIndex {
-        val o = pointToOffset(point = it.toPoint(), canvasSize = scope.size.toSize())
+        val o = pointToCanvas(point = it.toPoint(), canvasSize = scope.size.toSize())
         (o - tap).getDistance()
     }.takeIf { it.value <= tapRadius }?.index ?: return null
     val res = ratingChanges[pos]

@@ -104,7 +104,7 @@ private fun RatingGraphCanvas(
 
         val ratingPath = Path().apply {
             ratingPoints.forEachIndexed { index, point ->
-                val (px, py) = translator.pointToOffset(point)
+                val (px, py) = translator.pointToCanvas(point)
                 if (index == 0) moveTo(px, py)
                 else lineTo(px, py)
             }
@@ -126,7 +126,7 @@ private fun RatingGraphCanvas(
 
         //time dashes
         if (selectedPoint != null) {
-            val p = translator.pointToOffset(selectedPoint)
+            val p = translator.pointToCanvas(selectedPoint)
             drawLine(
                 color = markerColor,
                 start = Offset(p.x, 0f),
@@ -135,7 +135,7 @@ private fun RatingGraphCanvas(
             )
         } else {
             markVerticals.forEach { x ->
-                val px = translator.pointXToOffsetX(x)
+                val px = translator.pointXToCanvasX(x)
                 drawLine(
                     color = markerColor,
                     start = Offset(px, 0f),
@@ -156,7 +156,7 @@ private fun RatingGraphCanvas(
             )
             //shadow of rating points
             ratingPoints.forEach { point ->
-                val center = translator.pointToOffset(point)
+                val center = translator.pointToCanvas(point)
                 drawCircle(
                     color = shadowColor,
                     radius = radius(point, circleRadius + circleBorderWidth),
@@ -176,7 +176,7 @@ private fun RatingGraphCanvas(
 
         //rating points
         pointsWithColors.forEach { (point, color) ->
-            val center = translator.pointToOffset(point)
+            val center = translator.pointToCanvas(point)
             drawCircle(
                 color = lineColor,
                 radius = radius(point, circleRadius + circleBorderWidth),
