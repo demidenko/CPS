@@ -2,10 +2,10 @@ package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
@@ -15,22 +15,29 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.minOfWithIndex
+import com.demich.cps.utils.offsetSaver
+import com.demich.cps.utils.sizeSaver
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-internal fun rememberCoordinateTranslator(): CoordinateTranslator =
-    rememberSaveable(saver = CoordinateTranslator.saver) {
-        CoordinateTranslator(minX = 0f, maxX = 0f, minY = 0f, maxY = 0f)
-    }
+internal fun rememberCoordinateTranslator(): CoordinateTranslator  {
+    val offsetState = rememberSaveable(stateSaver = offsetSaver()) { mutableStateOf(Offset.Unspecified) }
+    val sizeState = rememberSaveable(stateSaver = sizeSaver()) { mutableStateOf(Size.Unspecified) }
+    return CoordinateTranslator(offsetState, sizeState)
+}
 
 @Stable
-internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY: Float) {
+internal class CoordinateTranslator(
+    offsetState: MutableState<Offset>,
+    sizeState: MutableState<Size>
+) {
     //x is seconds, y is rating
-    private var o: Offset by mutableStateOf(Offset(x = minX, y = minY))
-    private var size: Size by mutableStateOf(Size(width = maxX - minX, height = maxY - minY))
+    private var o: Offset by offsetState
+    private var size: Size by sizeState
 
+    //TODO: get rid of this
     var borderX: Float = 0f
 
     private fun RatingGraphBounds.setAsWindow() {
@@ -117,22 +124,6 @@ internal class CoordinateTranslator(minX: Float, maxX: Float, minY: Float, maxY:
             move(offset = pan, canvasSize = canvasSize)
             if (zoom != 1f) scale(center = centroid, scale = zoom, canvasSize = canvasSize)
         }
-    }
-
-    companion object {
-        internal val saver get() = listSaver<CoordinateTranslator, Float>(
-            save = {
-                listOf(it.o.x, it.o.y, it.size.width, it.size.height)
-            },
-            restore = {
-                CoordinateTranslator(
-                    minX = it[0],
-                    minY = it[1],
-                    maxX = it[0] + it[2],
-                    maxY = it[1] + it[3]
-                )
-            }
-        )
     }
 }
 

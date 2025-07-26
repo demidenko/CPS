@@ -27,11 +27,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -67,6 +70,26 @@ inline fun<reified T> Json.saver() =
         restore = ::decodeFromString,
         save = { encodeToString(it) }
     )
+
+@Stable
+fun offsetSaver() = listSaver(
+    save = {
+        listOf(it.x, it.y)
+    },
+    restore = {
+        Offset(x = it[0], y = it[1])
+    }
+)
+
+@Stable
+fun sizeSaver() = listSaver(
+    save = {
+        listOf(it.width, it.height)
+    },
+    restore = {
+        Size(width = it[0], height = it[1])
+    }
+)
 
 @Composable
 inline fun <T, K> rememberFrom(
