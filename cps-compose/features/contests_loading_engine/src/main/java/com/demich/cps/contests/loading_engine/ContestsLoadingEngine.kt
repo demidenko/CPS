@@ -88,13 +88,13 @@ private class MultipleLoadersMemoizer(
         return mutex.withLock {
             results.getOrPut(loader.type) {
                 coroutineScope {
-                    async { loader.getContestsResult() }
+                    async { loader.getContests() }
                 }
             }
         }.await()
     }
 
-    private suspend fun ContestsLoaderMultiple.getContestsResult(): ContestsResult {
+    private suspend fun ContestsLoaderMultiple.getContests(): ContestsResult {
         val platforms = setup.mapNotNull { (platform, loaderTypes) ->
             if (type in loaderTypes) platform else null
         }
