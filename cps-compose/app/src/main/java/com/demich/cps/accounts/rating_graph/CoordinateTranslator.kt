@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.toSize
@@ -84,34 +85,15 @@ internal class CoordinateTranslator(
         y = pointYToCanvasY(point.y, canvasSize)
     )
 
-    private fun offsetToPoint(offset: Offset, canvasSize: Size, viewPort: Rect) = Offset(
-        x = transformX(
-            x = offset.x,
-            fromWidth = canvasSize.width + borderX * 2,
-            toWidth = canvasSize.width
-        ) / canvasSize.width * viewPort.size.width + viewPort.left,
-        y = (canvasSize.height - offset.y) / canvasSize.height * viewPort.size.height + viewPort.top
-    )
-
-    private fun Rect.move(offset: Offset, canvasSize: Size): Rect {
-        val offset = offsetToPoint(offset, canvasSize, this) - offsetToPoint(Offset.Zero, canvasSize, this)
-        return translate(-offset)
-    }
-
-    private fun Rect.scale(scale: Float, canvasCenter: Offset, canvasSize: Size): Rect {
-        val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
-        if (scale == 1f) return this
-        val center = offsetToPoint(offset = canvasCenter, canvasSize = canvasSize, viewPort = this)
-        return scale(scale = scale, center = center)
-    }
-
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
-            val canvasSize = scope.size.toSize()
+            val canvasRect = scope.size.toSize().toRect()
+                .inflate(horizontal = borderX, vertical = 0f)
+
             rect = rect
-                .move(offset = pan, canvasSize = canvasSize)
-                .scale(scale = zoom, canvasCenter = centroid, canvasSize = canvasSize)
+                .move(offset = pan, canvasRect = canvasRect)
+                .scale(scale = zoom, canvasCenter = centroid, canvasRect = canvasRect)
         }
     }
 }
@@ -202,8 +184,37 @@ private fun Rect.scale(scale: Float, center: Offset): Rect =
         bottom = bottom.scale(scale, center.y)
     )
 
+private fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
+    Rect(
+        left = left + horizontal,
+        right = right - horizontal,
+        top = top + vertical,
+        bottom = bottom - vertical
+    )
+
 private fun transformX(
     x: Float,
     fromWidth: Float,
     toWidth: Float
 ) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
+
+private fun canvasOffsetToPoint(
+    offset: Offset,
+    canvasRect: Rect,
+    viewPort: Rect
+): Offset = Offset(
+    x = (offset.x - canvasRect.left) / canvasRect.width * viewPort.width + viewPort.left,
+    y = (canvasRect.bottom - offset.y) / canvasRect.height * viewPort.height + viewPort.top
+)
+
+private fun Rect.move(offset: Offset, canvasRect: Rect): Rect {
+    val offset = canvasOffsetToPoint(offset, canvasRect, this) - canvasOffsetToPoint(Offset.Zero, canvasRect, this)
+    return translate(-offset)
+}
+
+private fun Rect.scale(scale: Float, canvasCenter: Offset, canvasRect: Rect): Rect {
+    val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
+    if (scale == 1f) return this
+    val center = canvasOffsetToPoint(offset = canvasCenter, canvasRect = canvasRect, viewPort = this)
+    return scale(scale = scale, center = center)
+}
