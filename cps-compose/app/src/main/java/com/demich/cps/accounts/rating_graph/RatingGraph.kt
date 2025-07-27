@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
@@ -103,6 +105,8 @@ private fun RatingGraphWithHeader(
 
     val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
 
+    val scope = rememberCoroutineScope()
+
     Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
             manager = manager,
@@ -111,9 +115,11 @@ private fun RatingGraphWithHeader(
                 ?: FilterHeader(filterType, ratingChanges, currentTime),
             onHeaderChange = { header ->
                 if (header is FilterHeader) {
-                    translator.setWindow(
-                        createBounds(ratingChanges = ratingChanges, filterType = header.filterType, now = currentTime)
-                    )
+                    scope.launch {
+                        translator.animateToWindow(
+                            createBounds(ratingChanges = ratingChanges, filterType = header.filterType, now = currentTime)
+                        )
+                    }
                     filterType = header.filterType
                 }
             },

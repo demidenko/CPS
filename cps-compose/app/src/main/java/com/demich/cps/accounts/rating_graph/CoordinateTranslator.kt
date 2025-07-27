@@ -1,5 +1,7 @@
 package com.demich.cps.accounts.rating_graph
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -37,12 +39,12 @@ internal class CoordinateTranslator(
     //TODO: get rid of this
     var borderX: Float = 0f
 
-    private fun RatingGraphBounds.setAsWindow() {
+    private fun RatingGraphBounds.toRect(): Rect {
         require(startTime < endTime)
 
         val ratingBorder = 100
 
-        rect = Rect(
+        return Rect(
             left = startTime.epochSeconds.toFloat(),
             right = endTime.epochSeconds.toFloat(),
             top = (minRating - ratingBorder).toFloat(),
@@ -51,15 +53,18 @@ internal class CoordinateTranslator(
     }
 
     fun setWindow(bounds: RatingGraphBounds) {
-        with(bounds) {
-            if (startTime == endTime) {
-                copy(
-                    startTime = bounds.startTime - 1.days,
-                    endTime = bounds.endTime + 1.days
-                ).setAsWindow()
-            } else {
-                setAsWindow()
-            }
+        rect = bounds.fixTimeWidth().toRect()
+    }
+
+    // TODO:
+    // cancel ongoing
+    // cancel on gesture
+    suspend fun animateToWindow(bounds: RatingGraphBounds) {
+        val anim = Animatable(typeConverter = Rect.VectorConverter, initialValue = rect)
+        anim.animateTo(
+            targetValue = bounds.fixTimeWidth().toRect(),
+        ) {
+            rect = value
         }
     }
 
@@ -181,3 +186,13 @@ private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
     //height / minHeight >= scale
     return minOf(width / minWidth, height / minHeight)
 }
+
+private fun RatingGraphBounds.fixTimeWidth() =
+    if (startTime == endTime) {
+        copy(
+            startTime = startTime - 1.days,
+            endTime = endTime + 1.days
+        )
+    } else {
+        this
+    }
