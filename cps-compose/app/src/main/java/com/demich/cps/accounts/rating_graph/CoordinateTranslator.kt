@@ -8,6 +8,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
@@ -26,7 +27,7 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 internal fun rememberCoordinateTranslator(): CoordinateTranslator  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
-    return CoordinateTranslator(rectState)
+    return remember(rectState) { CoordinateTranslator(rectState) }
 }
 
 @Stable
