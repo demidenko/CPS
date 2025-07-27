@@ -18,6 +18,8 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.inflate
@@ -37,18 +39,16 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 internal fun rememberCoordinateTranslator(): CoordinateTranslator  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
-    return remember(rectState) { CoordinateTranslator(rectState) }
+    return remember(rectState) { CoordinateTranslator(rectState = rectState, borderX = 10.dp) }
 }
 
 @Stable
 internal class CoordinateTranslator(
-    rectState: MutableState<Rect>
+    rectState: MutableState<Rect>,
+    val borderX: Dp
 ) {
     //x is seconds, y is rating
     private var rect: Rect by rectState
-
-    //TODO: get rid of this
-    var borderX: Float = 0f
 
     private fun RatingGraphBounds.toRect(): Rect {
         require(startTime < endTime)
@@ -93,7 +93,7 @@ internal class CoordinateTranslator(
 
     context(density: Density)
     private fun Rect.inflateBorders(): Rect =
-        inflate(horizontal = borderX, vertical = 0f)
+        inflate(horizontal = density.run { borderX.toPx() }, vertical = 0f)
 
     context(scope: DrawScope)
     fun canvasRect(): Rect = scope.size.toRect().inflateBorders()

@@ -100,8 +100,6 @@ private fun RatingGraphCanvas(
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
 
-        translator.borderX = circleRadius * 5
-
         val ratingPath = Path().apply {
             ratingPoints.forEachIndexed { index, point ->
                 val (px, py) = translator.pointToCanvas(point)
