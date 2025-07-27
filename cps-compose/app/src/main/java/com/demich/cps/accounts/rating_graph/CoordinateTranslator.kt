@@ -19,8 +19,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.utils.inflate
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
+import com.demich.cps.utils.scale
+import com.demich.cps.utils.transform
+import com.demich.cps.utils.transformVector
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -173,48 +177,21 @@ private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
     return minOf(width / minWidth, height / minHeight)
 }
 
-private fun Float.scale(scale: Float, center: Float) =
-    (this - center) / scale + center
-
-private fun Rect.scale(scale: Float, center: Offset): Rect =
-    Rect(
-        left = left.scale(scale, center.x),
-        right = right.scale(scale, center.x),
-        top = top.scale(scale, center.y),
-        bottom = bottom.scale(scale, center.y)
-    )
-
-private fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
-    Rect(
-        left = left + horizontal,
-        right = right - horizontal,
-        top = top + vertical,
-        bottom = bottom - vertical
-    )
-
 private fun transformX(
     x: Float,
     fromWidth: Float,
     toWidth: Float
 ) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
 
-private fun canvasOffsetToPoint(
-    offset: Offset,
-    canvasRect: Rect,
-    viewPort: Rect
-): Offset = Offset(
-    x = (offset.x - canvasRect.left) / canvasRect.width * viewPort.width + viewPort.left,
-    y = (canvasRect.bottom - offset.y) / canvasRect.height * viewPort.height + viewPort.top
-)
 
 private fun Rect.move(offset: Offset, canvasRect: Rect): Rect {
-    val offset = canvasOffsetToPoint(offset, canvasRect, this) - canvasOffsetToPoint(Offset.Zero, canvasRect, this)
+    val offset = offset.transformVector(from = canvasRect, to = this)
     return translate(-offset)
 }
 
 private fun Rect.scale(scale: Float, canvasCenter: Offset, canvasRect: Rect): Rect {
     val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
     if (scale == 1f) return this
-    val center = canvasOffsetToPoint(offset = canvasCenter, canvasRect = canvasRect, viewPort = this)
+    val center = canvasCenter.transform(from = canvasRect, to = this)
     return scale(scale = scale, center = center)
 }
