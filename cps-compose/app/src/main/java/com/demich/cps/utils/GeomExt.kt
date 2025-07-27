@@ -34,9 +34,6 @@ fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
         bottom = bottom - vertical
     )
 
-fun Rect.flipVertical(): Rect =
-    copy(top = bottom, bottom = top)
-
 fun Float.scale(scale: Float, center: Float) =
     (this - center) / scale + center
 

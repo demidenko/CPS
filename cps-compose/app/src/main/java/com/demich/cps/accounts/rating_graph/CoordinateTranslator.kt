@@ -20,7 +20,6 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
-import com.demich.cps.utils.flipVertical
 import com.demich.cps.utils.inflate
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
@@ -60,7 +59,7 @@ internal class CoordinateTranslator(
             right = endTime.epochSeconds.toFloat(),
             top = (maxRating + ratingBorder).toFloat(),
             bottom = (minRating - ratingBorder).toFloat()
-        ).flipVertical()
+        )
     }
 
     fun setWindow(bounds: RatingGraphBounds) {
@@ -83,7 +82,7 @@ internal class CoordinateTranslator(
         x.toFloat().transformX(from = rect, to = canvasRect)
 
     fun pointYToCanvasY(y: Long, canvasRect: Rect) =
-        y.toFloat().transformY(from = rect.flipVertical(), to = canvasRect)
+        y.toFloat().transformY(from = rect, to = canvasRect)
 
     fun pointToCanvas(point: Point, canvasRect: Rect) =
         Offset(
@@ -111,14 +110,13 @@ internal class CoordinateTranslator(
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
             val canvasRect = canvasRect()
 
-            val rect = rect.flipVertical()
+            val rect = rect
             val pan = pan.transformVector(from = canvasRect, to = rect)
             val centroid = centroid.transform(from = canvasRect, to = rect)
 
             this.rect = rect
                 .translate(-pan)
                 .coercedScale(scale = zoom, center = centroid, limitSize = limitScaleSize)
-                .flipVertical()
         }
     }
 }
