@@ -26,6 +26,7 @@ import com.demich.cps.utils.rectSaver
 import com.demich.cps.utils.scale
 import com.demich.cps.utils.transform
 import com.demich.cps.utils.transformVector
+import kotlin.math.absoluteValue
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -90,13 +91,13 @@ internal class CoordinateTranslator(
         y = pointYToCanvasY(point.y, canvasSize)
     )
 
-    private val limitScaleSize = Size(
-        width = 1.hours.inWholeSeconds.toFloat(),
-        height = 1f
-    )
-
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
+        val limitScaleSize = Size(
+            width = 1.hours.inWholeSeconds.toFloat(),
+            height = 1f
+        )
+
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
             val canvasRect = scope.size.toSize().toRect()
                 .inflate(horizontal = borderX, vertical = 0f)
@@ -181,11 +182,13 @@ private fun RatingGraphBounds.fixTimeWidth() =
     }
 
 private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
-    //width / scale >= minWidth
-    //width / minWidth >= scale
-    //height / scale >= minHeight
-    //height / minHeight >= scale
-    return minOf(width / minWidth, height / minHeight)
+    require(minWidth > 0)
+    require(minHeight > 0)
+    // |width| / scale >= minWidth
+    // |width| / minWidth >= scale
+    // |height| / scale >= minHeight
+    // |height| / minHeight >= scale
+    return minOf(width.absoluteValue / minWidth, height.absoluteValue / minHeight)
 }
 
 private fun transformX(
@@ -193,7 +196,6 @@ private fun transformX(
     fromWidth: Float,
     toWidth: Float
 ) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
-
 
 private fun Rect.coercedScale(scale: Float, center: Offset, limitSize: Size): Rect {
     val scale = scale.coerceAtMost(size.maxScale(minWidth = limitSize.width, minHeight = limitSize.height))
