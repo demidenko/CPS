@@ -55,9 +55,9 @@ internal class CoordinateTranslator(
         return Rect(
             left = startTime.epochSeconds.toFloat(),
             right = endTime.epochSeconds.toFloat(),
-            top = (minRating - ratingBorder).toFloat(),
-            bottom = (maxRating + ratingBorder).toFloat()
-        )
+            top = (maxRating + ratingBorder).toFloat(),
+            bottom = (minRating - ratingBorder).toFloat()
+        ).flipVertical()
     }
 
     fun setWindow(bounds: RatingGraphBounds) {
