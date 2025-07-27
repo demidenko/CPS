@@ -3,12 +3,22 @@ package com.demich.cps.utils
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 
+fun Float.transformX(
+    from: Rect,
+    to: Rect
+): Float = (this - from.left) / from.width * to.width + to.left
+
+fun Float.transformY(
+    from: Rect,
+    to: Rect
+): Float = (this - from.top) / from.height * to.height + to.top
+
 fun Offset.transform(
     from: Rect,
     to: Rect
 ): Offset = Offset(
-    x = (x - from.left) / from.width * to.width + to.left,
-    y = (y - from.top) / from.height * to.height + to.top
+    x = x.transformX(from, to),
+    y = y.transformY(from, to)
 )
 
 fun Offset.transformVector(
