@@ -68,12 +68,6 @@ internal class CoordinateTranslator(
         }
     }
 
-    private fun transformX(
-        x: Float,
-        fromWidth: Float,
-        toWidth: Float
-    ) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
-
     fun pointXToCanvasX(x: Long, canvasSize: Size) =
         transformX(
             x = (x - rect.left) / rect.size.width * canvasSize.width,
@@ -89,23 +83,24 @@ internal class CoordinateTranslator(
         y = pointYToCanvasY(point.y, canvasSize)
     )
 
-    private fun offsetToPoint(offset: Offset, canvasSize: Size) = Offset(
+    private fun offsetToPoint(offset: Offset, canvasSize: Size, viewPort: Rect) = Offset(
         x = transformX(
             x = offset.x,
             fromWidth = canvasSize.width + borderX * 2,
             toWidth = canvasSize.width
-        ) / canvasSize.width * rect.size.width + rect.left,
-        y = (canvasSize.height - offset.y) / canvasSize.height * rect.size.height + rect.top
+        ) / canvasSize.width * viewPort.size.width + viewPort.left,
+        y = (canvasSize.height - offset.y) / canvasSize.height * viewPort.size.height + viewPort.top
     )
 
     private fun Rect.move(offset: Offset, canvasSize: Size): Rect {
-        val offset = offsetToPoint(offset, canvasSize) - offsetToPoint(Offset.Zero, canvasSize)
+        val offset = offsetToPoint(offset, canvasSize, this) - offsetToPoint(Offset.Zero, canvasSize, this)
         return translate(-offset)
     }
 
     private fun Rect.scale(center: Offset, scale: Float, canvasSize: Size): Rect {
         val scale = scale.coerceAtMost(rect.size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
-        val center = offsetToPoint(offset = center, canvasSize = canvasSize)
+        if (scale == 1f) return this
+        val center = offsetToPoint(offset = center, canvasSize = canvasSize, viewPort = this)
         return Rect(
             topLeft = (topLeft - center) / scale + center,
             bottomRight = (bottomRight - center) / scale + center
@@ -122,6 +117,12 @@ internal class CoordinateTranslator(
         }
     }
 }
+
+private fun transformX(
+    x: Float,
+    fromWidth: Float,
+    toWidth: Float
+) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointXToCanvasX(x: Long) =
