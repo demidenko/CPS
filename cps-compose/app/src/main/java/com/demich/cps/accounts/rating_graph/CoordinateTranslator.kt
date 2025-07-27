@@ -98,7 +98,7 @@ internal class CoordinateTranslator(
     }
 
     private fun Rect.scale(center: Offset, scale: Float, canvasSize: Size): Rect {
-        val scale = scale.coerceAtMost(rect.size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
+        val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
         if (scale == 1f) return this
         val center = offsetToPoint(offset = center, canvasSize = canvasSize, viewPort = this)
         return Rect(
