@@ -98,14 +98,11 @@ internal class CoordinateTranslator(
         return translate(-offset)
     }
 
-    private fun Rect.scale(center: Offset, scale: Float, canvasSize: Size): Rect {
+    private fun Rect.scale(scale: Float, canvasCenter: Offset, canvasSize: Size): Rect {
         val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
         if (scale == 1f) return this
-        val center = offsetToPoint(offset = center, canvasSize = canvasSize, viewPort = this)
-        return Rect(
-            topLeft = (topLeft - center) / scale + center,
-            bottomRight = (bottomRight - center) / scale + center
-        )
+        val center = offsetToPoint(offset = canvasCenter, canvasSize = canvasSize, viewPort = this)
+        return scale(scale = scale, center = center)
     }
 
     context(scope: PointerInputScope)
@@ -114,16 +111,10 @@ internal class CoordinateTranslator(
             val canvasSize = scope.size.toSize()
             rect = rect
                 .move(offset = pan, canvasSize = canvasSize)
-                .scale(center = centroid, scale = zoom, canvasSize = canvasSize)
+                .scale(scale = zoom, canvasCenter = centroid, canvasSize = canvasSize)
         }
     }
 }
-
-private fun transformX(
-    x: Float,
-    fromWidth: Float,
-    toWidth: Float
-) = (x - fromWidth/2) * (fromWidth / toWidth) + (fromWidth / 2)
 
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointXToCanvasX(x: Long) =
@@ -181,13 +172,6 @@ internal fun CoordinateTranslator.getNearestRatingChange(
     return res.copy(oldRating = ratingChanges[pos-1].rating)
 }
 
-private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
-    //width / scale >= minWidth
-    //width / minWidth >= scale
-    //height / scale >= minHeight
-    //height / minHeight >= scale
-    return minOf(width / minWidth, height / minHeight)
-}
 
 private fun RatingGraphBounds.fixTimeWidth() =
     if (startTime == endTime) {
@@ -198,3 +182,28 @@ private fun RatingGraphBounds.fixTimeWidth() =
     } else {
         this
     }
+
+private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
+    //width / scale >= minWidth
+    //width / minWidth >= scale
+    //height / scale >= minHeight
+    //height / minHeight >= scale
+    return minOf(width / minWidth, height / minHeight)
+}
+
+private fun Float.scale(scale: Float, center: Float) =
+    (this - center) / scale + center
+
+private fun Rect.scale(scale: Float, center: Offset): Rect =
+    Rect(
+        left = left.scale(scale, center.x),
+        right = right.scale(scale, center.x),
+        top = top.scale(scale, center.y),
+        bottom = bottom.scale(scale, center.y)
+    )
+
+private fun transformX(
+    x: Float,
+    fromWidth: Float,
+    toWidth: Float
+) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
