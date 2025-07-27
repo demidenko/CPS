@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.utils.flipVertical
@@ -26,6 +27,8 @@ import com.demich.cps.utils.rectSaver
 import com.demich.cps.utils.scale
 import com.demich.cps.utils.transform
 import com.demich.cps.utils.transformVector
+import com.demich.cps.utils.transformX
+import com.demich.cps.utils.transformY
 import kotlin.math.absoluteValue
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
@@ -76,20 +79,27 @@ internal class CoordinateTranslator(
         }
     }
 
-    fun pointXToCanvasX(x: Long, canvasSize: Size) =
-        transformX(
-            x = (x - rect.left) / rect.size.width * canvasSize.width,
-            fromWidth = canvasSize.width,
-            toWidth = canvasSize.width + borderX * 2
+    fun pointXToCanvasX(x: Long, canvasRect: Rect) =
+        x.toFloat().transformX(from = rect, to = canvasRect)
+
+    fun pointYToCanvasY(y: Long, canvasRect: Rect) =
+        y.toFloat().transformY(from = rect.flipVertical(), to = canvasRect)
+
+    fun pointToCanvas(point: Point, canvasRect: Rect) =
+        Offset(
+            x = pointXToCanvasX(point.x, canvasRect),
+            y = pointYToCanvasY(point.y, canvasRect)
         )
 
-    fun pointYToCanvasY(y: Long, canvasSize: Size) =
-        canvasSize.height - ((y - rect.top) / rect.size.height * canvasSize.height)
+    context(density: Density)
+    private fun Rect.inflateBorders(): Rect =
+        inflate(horizontal = borderX, vertical = 0f)
 
-    fun pointToCanvas(point: Point, canvasSize: Size) = Offset(
-        x = pointXToCanvasX(point.x, canvasSize),
-        y = pointYToCanvasY(point.y, canvasSize)
-    )
+    context(scope: DrawScope)
+    fun canvasRect(): Rect = scope.size.toRect().inflateBorders()
+
+    context(scope: PointerInputScope)
+    fun canvasRect(): Rect = scope.size.toSize().toRect().inflateBorders()
 
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
@@ -99,8 +109,7 @@ internal class CoordinateTranslator(
         )
 
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
-            val canvasRect = scope.size.toSize().toRect()
-                .inflate(horizontal = borderX, vertical = 0f)
+            val canvasRect = canvasRect()
 
             val rect = rect.flipVertical()
             val pan = pan.transformVector(from = canvasRect, to = rect)
@@ -116,15 +125,15 @@ internal class CoordinateTranslator(
 
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointXToCanvasX(x: Long) =
-    pointXToCanvasX(x = x, canvasSize = scope.size)
+    pointXToCanvasX(x = x, canvasRect = canvasRect())
 
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointYToCanvasY(y: Long) =
-    pointYToCanvasY(y = y, canvasSize = scope.size)
+    pointYToCanvasY(y = y, canvasRect = canvasRect())
 
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointToCanvas(point: Point) =
-    pointToCanvas(point = point, canvasSize = scope.size)
+    pointToCanvas(point = point, canvasRect = canvasRect())
 
 context(scope: DrawScope)
 internal inline fun CoordinateTranslator.pointRectToCanvasRect(
@@ -132,22 +141,27 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     topRight: Point,
     block: (Rect) -> Unit
 ) {
+    val canvasRect = canvasRect()
+    val (width, height) = scope.size
+
     val minX = with(bottomLeft) {
-        if (x == Long.MIN_VALUE) 0f else round(pointXToCanvasX(x)).coerceAtLeast(0f)
+        if (x == Long.MIN_VALUE) 0f
+        else round(pointXToCanvasX(x, canvasRect)).coerceAtLeast(0f)
     }
 
     val maxX = with(topRight) {
-        val width = scope.size.width
-        if (x == Long.MAX_VALUE) width else round(pointXToCanvasX(x)).coerceAtMost(width)
+        if (x == Long.MAX_VALUE) width
+        else round(pointXToCanvasX(x, canvasRect)).coerceAtMost(width)
     }
 
     val minY = with(topRight) {
-        if (y == Long.MAX_VALUE) 0f else round(pointYToCanvasY(y)).coerceAtLeast(0f)
+        if (y == Long.MAX_VALUE) 0f
+        else round(pointYToCanvasY(y, canvasRect)).coerceAtLeast(0f)
     }
 
     val maxY = with(bottomLeft) {
-        val height = scope.size.height
-        if (y == Long.MIN_VALUE) height else round(pointYToCanvasY(y)).coerceAtMost(height)
+        if (y == Long.MIN_VALUE) height
+        else round(pointYToCanvasY(y, canvasRect)).coerceAtMost(height)
     }
 
     if (minX <= maxX && minY <= maxY) {
@@ -161,8 +175,9 @@ internal fun CoordinateTranslator.getNearestRatingChange(
     tap: Offset,
     tapRadius: Float
 ): RatingChange? {
+    val canvasRect = canvasRect()
     val pos = ratingChanges.minOfWithIndex {
-        val o = pointToCanvas(point = it.toPoint(), canvasSize = scope.size.toSize())
+        val o = pointToCanvas(point = it.toPoint(), canvasRect = canvasRect)
         (o - tap).getDistance()
     }.takeIf { it.value <= tapRadius }?.index ?: return null
     val res = ratingChanges[pos]
@@ -190,12 +205,6 @@ private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
     // |height| / minHeight >= scale
     return minOf(width.absoluteValue / minWidth, height.absoluteValue / minHeight)
 }
-
-private fun transformX(
-    x: Float,
-    fromWidth: Float,
-    toWidth: Float
-) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
 
 private fun Rect.coercedScale(scale: Float, center: Offset, limitSize: Size): Rect {
     val scale = scale.coerceAtMost(size.maxScale(minWidth = limitSize.width, minHeight = limitSize.height))
