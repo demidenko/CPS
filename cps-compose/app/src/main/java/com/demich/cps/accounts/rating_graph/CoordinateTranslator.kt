@@ -90,16 +90,25 @@ internal class CoordinateTranslator(
         y = pointYToCanvasY(point.y, canvasSize)
     )
 
+    private val limitScaleSize = Size(
+        width = 1.hours.inWholeSeconds.toFloat(),
+        height = 1f
+    )
+
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
             val canvasRect = scope.size.toSize().toRect()
                 .inflate(horizontal = borderX, vertical = 0f)
-                .flipVertical()
 
-            rect = rect
-                .move(offset = pan, canvasRect = canvasRect)
-                .scale(scale = zoom, canvasCenter = centroid, canvasRect = canvasRect)
+            val rect = rect.flipVertical()
+            val pan = pan.transformVector(from = canvasRect, to = rect)
+            val centroid = centroid.transform(from = canvasRect, to = rect)
+
+            this.rect = rect
+                .translate(-pan)
+                .coercedScale(scale = zoom, center = centroid, limitSize = limitScaleSize)
+                .flipVertical()
         }
     }
 }
@@ -186,14 +195,8 @@ private fun transformX(
 ) = x.scale(scale = toWidth / fromWidth, center = fromWidth / 2)
 
 
-private fun Rect.move(offset: Offset, canvasRect: Rect): Rect {
-    val offset = offset.transformVector(from = canvasRect, to = this)
-    return translate(-offset)
-}
-
-private fun Rect.scale(scale: Float, canvasCenter: Offset, canvasRect: Rect): Rect {
-    val scale = scale.coerceAtMost(size.maxScale(minWidth = 1.hours.inWholeSeconds.toFloat(), minHeight = 1f))
+private fun Rect.coercedScale(scale: Float, center: Offset, limitSize: Size): Rect {
+    val scale = scale.coerceAtMost(size.maxScale(minWidth = limitSize.width, minHeight = limitSize.height))
     if (scale == 1f) return this
-    val center = canvasCenter.transform(from = canvasRect, to = this)
     return scale(scale = scale, center = center)
 }
