@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.utils.flipVertical
 import com.demich.cps.utils.inflate
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
@@ -94,6 +95,7 @@ internal class CoordinateTranslator(
         scope.detectTransformGestures { centroid, pan, zoom, _ ->
             val canvasRect = scope.size.toSize().toRect()
                 .inflate(horizontal = borderX, vertical = 0f)
+                .flipVertical()
 
             rect = rect
                 .move(offset = pan, canvasRect = canvasRect)

@@ -8,7 +8,7 @@ fun Offset.transform(
     to: Rect
 ): Offset = Offset(
     x = (x - from.left) / from.width * to.width + to.left,
-    y = (from.bottom - y) / from.height * to.height + to.top
+    y = (y - from.top) / from.height * to.height + to.top
 )
 
 fun Offset.transformVector(
@@ -23,6 +23,9 @@ fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
         top = top + vertical,
         bottom = bottom - vertical
     )
+
+fun Rect.flipVertical(): Rect =
+    copy(top = bottom, bottom = top)
 
 fun Float.scale(scale: Float, center: Float) =
     (this - center) / scale + center
