@@ -29,7 +29,8 @@ import com.demich.cps.utils.transformVector
 import com.demich.cps.utils.transformX
 import com.demich.cps.utils.transformY
 import kotlin.math.absoluteValue
-import kotlin.math.round
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
@@ -142,28 +143,13 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
     val canvasRect = canvasRect()
     val (width, height) = scope.size
 
-    val minX = with(bottomLeft) {
-        if (x == Long.MIN_VALUE) 0f
-        else round(pointXToCanvasX(x, canvasRect)).coerceAtLeast(0f)
-    }
+    val left = floor(pointXToCanvasX(bottomLeft.x, canvasRect).coerceAtLeast(0f))
+    val right = ceil(pointXToCanvasX(topRight.x, canvasRect).coerceAtMost(width))
+    val top = floor(pointYToCanvasY(topRight.y, canvasRect).coerceAtLeast(0f))
+    val bottom = ceil(pointYToCanvasY(bottomLeft.y, canvasRect).coerceAtMost(height))
 
-    val maxX = with(topRight) {
-        if (x == Long.MAX_VALUE) width
-        else round(pointXToCanvasX(x, canvasRect)).coerceAtMost(width)
-    }
-
-    val minY = with(topRight) {
-        if (y == Long.MAX_VALUE) 0f
-        else round(pointYToCanvasY(y, canvasRect)).coerceAtLeast(0f)
-    }
-
-    val maxY = with(bottomLeft) {
-        if (y == Long.MIN_VALUE) height
-        else round(pointYToCanvasY(y, canvasRect)).coerceAtMost(height)
-    }
-
-    if (minX <= maxX && minY <= maxY) {
-        block(Rect(left = minX, top = minY, right = maxX, bottom = maxY))
+    if (left <= right && top <= bottom) {
+        block(Rect(left = left, top = top, right = right, bottom = bottom))
     }
 }
 
