@@ -93,14 +93,14 @@ internal class GraphViewPortState(
         )
 
     context(density: Density)
-    private fun Rect.inflateBorders(): Rect =
-        inflate(horizontal = density.run { borderX.toPx() }, vertical = 0f)
+    private fun Size.toBorderedRect(): Rect =
+        toRect().inflate(horizontal = density.run { borderX.toPx() }, vertical = 0f)
 
     context(scope: DrawScope)
-    fun canvasRect(): Rect = scope.size.toRect().inflateBorders()
+    fun canvasRect(): Rect = scope.size.toBorderedRect()
 
     context(scope: PointerInputScope)
-    fun canvasRect(): Rect = scope.size.toSize().toRect().inflateBorders()
+    fun canvasRect(): Rect = scope.size.toSize().toBorderedRect()
 
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
