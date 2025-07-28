@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.Density
@@ -133,6 +134,18 @@ internal fun CoordinateTranslator.pointYToCanvasY(y: Long) =
 context(scope: DrawScope)
 internal fun CoordinateTranslator.pointToCanvas(point: Point) =
     pointToCanvas(point = point, canvasRect = canvasRect())
+
+context(scope: DrawScope)
+internal fun CoordinateTranslator.pointsToCanvasPath(points: List<Point>): Path {
+    val canvasRect = canvasRect()
+    return Path().apply {
+        points.forEachIndexed { index, point ->
+            val (px, py) = pointToCanvas(point = point, canvasRect = canvasRect)
+            if (index == 0) moveTo(px, py)
+            else lineTo(px, py)
+        }
+    }
+}
 
 context(scope: DrawScope)
 internal inline fun CoordinateTranslator.pointRectToCanvasRect(

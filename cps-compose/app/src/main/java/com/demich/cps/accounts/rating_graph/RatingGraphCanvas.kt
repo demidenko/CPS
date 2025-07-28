@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -100,13 +99,7 @@ private fun RatingGraphCanvas(
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
 
-        val ratingPath = Path().apply {
-            ratingPoints.forEachIndexed { index, point ->
-                val (px, py) = translator.pointToCanvas(point)
-                if (index == 0) moveTo(px, py)
-                else lineTo(px, py)
-            }
-        }
+        val ratingPath = translator.pointsToCanvasPath(ratingPoints)
 
         //rating filled areas
         rectangles.forEachRect { bottomLeft, topRight, handleColor ->
