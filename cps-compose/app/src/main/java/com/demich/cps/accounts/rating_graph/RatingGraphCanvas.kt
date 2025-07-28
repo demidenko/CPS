@@ -27,7 +27,7 @@ internal fun RatingGraphCanvas(
     ratingChanges: List<RatingChange>,
     manager: RatedAccountManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
-    translator: CoordinateTranslator,
+    viewPortState: GraphViewPortState,
     currentTime: Instant,
     filterType: RatingFilterType,
     selectedRatingChange: RatingChange?,
@@ -55,7 +55,7 @@ internal fun RatingGraphCanvas(
         selectedPoint = selectedRatingChange?.toPoint(),
         markVerticals = timeMarkers.map { it.epochSeconds },
         getColor = colorsMap::getValue,
-        translator = translator,
+        viewPortState = viewPortState,
         rectangles = rectangles,
         lineColor = Color.Black,
         modifier = modifier
@@ -68,7 +68,7 @@ private fun RatingGraphCanvas(
     selectedPoint: Point?,
     markVerticals: List<Long>,
     getColor: (HandleColor) -> Color,
-    translator: CoordinateTranslator,
+    viewPortState: GraphViewPortState,
     rectangles: RatingGraphRectangles,
     lineColor: Color,
     markerColor: Color = lineColor,
@@ -99,11 +99,11 @@ private fun RatingGraphCanvas(
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
 
-        val ratingPath = translator.pointsToCanvasPath(ratingPoints)
+        val ratingPath = viewPortState.pointsToCanvasPath(ratingPoints)
 
         //rating filled areas
         rectangles.forEachRect { bottomLeft, topRight, handleColor ->
-            translator.pointRectToCanvasRect(
+            viewPortState.pointRectToCanvasRect(
                 bottomLeft = bottomLeft,
                 topRight = topRight
             ) { rect ->
@@ -117,7 +117,7 @@ private fun RatingGraphCanvas(
 
         //time dashes
         if (selectedPoint != null) {
-            val p = translator.pointToCanvas(selectedPoint)
+            val p = viewPortState.pointToCanvas(selectedPoint)
             drawLine(
                 color = markerColor,
                 start = Offset(p.x, 0f),
@@ -126,7 +126,7 @@ private fun RatingGraphCanvas(
             )
         } else {
             markVerticals.forEach { x ->
-                val px = translator.pointXToCanvasX(x)
+                val px = viewPortState.pointXToCanvasX(x)
                 drawLine(
                     color = markerColor,
                     start = Offset(px, 0f),
@@ -147,7 +147,7 @@ private fun RatingGraphCanvas(
             )
             //shadow of rating points
             ratingPoints.forEach { point ->
-                val center = translator.pointToCanvas(point)
+                val center = viewPortState.pointToCanvas(point)
                 drawCircle(
                     color = shadowColor,
                     radius = radius(point, circleRadius + circleBorderWidth),
@@ -167,7 +167,7 @@ private fun RatingGraphCanvas(
 
         //rating points
         pointsWithColors.forEach { (point, color) ->
-            val center = translator.pointToCanvas(point)
+            val center = viewPortState.pointToCanvas(point)
             drawCircle(
                 color = lineColor,
                 radius = radius(point, circleRadius + circleBorderWidth),

@@ -38,13 +38,13 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-internal fun rememberCoordinateTranslator(): CoordinateTranslator  {
+internal fun rememberGraphViewPortState(): GraphViewPortState  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
-    return remember(rectState) { CoordinateTranslator(rectState = rectState, borderX = 10.dp) }
+    return remember(rectState) { GraphViewPortState(rectState = rectState, borderX = 10.dp) }
 }
 
 @Stable
-internal class CoordinateTranslator(
+internal class GraphViewPortState(
     rectState: MutableState<Rect>,
     val borderX: Dp
 ) {
@@ -64,14 +64,14 @@ internal class CoordinateTranslator(
         )
     }
 
-    fun setWindow(bounds: RatingGraphBounds) {
+    fun setViewPort(bounds: RatingGraphBounds) {
         rect = bounds.fixTimeWidth().toRect()
     }
 
     // TODO:
     // cancel ongoing
     // cancel on gesture
-    suspend fun animateToWindow(bounds: RatingGraphBounds) {
+    suspend fun animateToViewPort(bounds: RatingGraphBounds) {
         val anim = Animatable(typeConverter = Rect.VectorConverter, initialValue = rect)
         anim.animateTo(
             targetValue = bounds.fixTimeWidth().toRect(),
@@ -124,19 +124,19 @@ internal class CoordinateTranslator(
 }
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointXToCanvasX(x: Long) =
+internal fun GraphViewPortState.pointXToCanvasX(x: Long) =
     pointXToCanvasX(x = x, canvasRect = canvasRect())
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointYToCanvasY(y: Long) =
+internal fun GraphViewPortState.pointYToCanvasY(y: Long) =
     pointYToCanvasY(y = y, canvasRect = canvasRect())
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointToCanvas(point: Point) =
+internal fun GraphViewPortState.pointToCanvas(point: Point) =
     pointToCanvas(point = point, canvasRect = canvasRect())
 
 context(scope: DrawScope)
-internal fun CoordinateTranslator.pointsToCanvasPath(points: List<Point>): Path {
+internal fun GraphViewPortState.pointsToCanvasPath(points: List<Point>): Path {
     val canvasRect = canvasRect()
     return Path().apply {
         points.forEachIndexed { index, point ->
@@ -148,7 +148,7 @@ internal fun CoordinateTranslator.pointsToCanvasPath(points: List<Point>): Path 
 }
 
 context(scope: DrawScope)
-internal inline fun CoordinateTranslator.pointRectToCanvasRect(
+internal inline fun GraphViewPortState.pointRectToCanvasRect(
     bottomLeft: Point,
     topRight: Point,
     block: (Rect) -> Unit
@@ -167,7 +167,7 @@ internal inline fun CoordinateTranslator.pointRectToCanvasRect(
 }
 
 context(scope: PointerInputScope)
-internal fun CoordinateTranslator.getNearestRatingChange(
+internal fun GraphViewPortState.getNearestRatingChange(
     ratingChanges: List<RatingChange>,
     tap: Offset,
     tapRadius: Float

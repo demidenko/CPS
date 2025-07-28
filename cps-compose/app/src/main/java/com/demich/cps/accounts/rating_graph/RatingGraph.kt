@@ -90,11 +90,11 @@ private fun RatingGraphWithHeader(
     require(ratingChanges.isNotEmpty())
 
     //TODO: saveables not reset after ratings changes
-    val translator = rememberCoordinateTranslator()
+    val viewPortState = rememberGraphViewPortState()
 
     val currentTime = remember { getCurrentTime() }
     var filterType by rememberSaveable {
-        translator.setWindow(
+        viewPortState.setViewPort(
             createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
         )
         mutableStateOf(RatingFilterType.ALL)
@@ -116,7 +116,7 @@ private fun RatingGraphWithHeader(
             onHeaderChange = { header ->
                 if (header is FilterHeader) {
                     scope.launch {
-                        translator.animateToWindow(
+                        viewPortState.animateToViewPort(
                             createBounds(ratingChanges = ratingChanges, filterType = header.filterType, now = currentTime)
                         )
                     }
@@ -130,19 +130,19 @@ private fun RatingGraphWithHeader(
             ratingChanges = ratingChanges,
             manager = manager,
             rectangles = rectangles,
-            translator = translator,
+            viewPortState = viewPortState,
             currentTime = currentTime,
             filterType = filterType,
             selectedRatingChange = selectedRatingChange,
             modifier = Modifier
                 .height(graphHeight)
                 .clip(shape)
-                .pointerInput(translator) {
-                    translator.detectTransformGestures()
+                .pointerInput(viewPortState) {
+                    viewPortState.detectTransformGestures()
                 }
                 .pointerInput(ratingChanges) {
                     detectTapGestures { tapPoint ->
-                        selectedRatingChange = translator.getNearestRatingChange(
+                        selectedRatingChange = viewPortState.getNearestRatingChange(
                             ratingChanges = ratingChanges,
                             tap = tapPoint,
                             tapRadius = 24.dp.toPx()
