@@ -1,8 +1,13 @@
 package com.demich.cps.accounts.rating_graph
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -63,6 +68,15 @@ internal fun RatingGraphCanvas(
 }
 
 @Composable
+private fun spawnDpState(value: Dp): State<Dp> {
+    val anim = remember { Animatable(initialValue = 0.dp, typeConverter = Dp.VectorConverter) }
+    LaunchedEffect(anim, value) {
+        anim.animateTo(value)
+    }
+    return anim.asState()
+}
+
+@Composable
 private fun RatingGraphCanvas(
     ratingPoints: List<Point>,
     selectedPoint: Point?,
@@ -81,8 +95,9 @@ private fun RatingGraphCanvas(
     shadowAlpha: Float = 0.3f,
     selectedPointScale: Float = 1.5f
 ) {
-    fun radius(point: Point, radius: Float) =
-        if (selectedPoint == point) selectedPointScale * radius else radius
+    val circleBorderWidth by spawnDpState(circleBorderWidth)
+    val circleRadius by spawnDpState(circleRadius)
+    val pathWidth by spawnDpState(pathWidth)
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
@@ -95,6 +110,9 @@ private fun RatingGraphCanvas(
             .fillMaxSize()
             .clipToBounds()
     ) {
+        fun radius(point: Point, radius: Float) =
+            if (selectedPoint == point) selectedPointScale * radius else radius
+
         val circleBorderWidth = circleBorderWidth.toPx()
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
