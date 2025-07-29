@@ -104,7 +104,7 @@ internal class GraphViewPortState(
 
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
-        val limitScaleSize = Size(
+        val minSize = Size(
             width = 1.hours.inWholeSeconds.toFloat(),
             height = 1f
         )
@@ -118,7 +118,7 @@ internal class GraphViewPortState(
 
             this.rect = rect
                 .translate(-pan)
-                .coercedScale(scale = zoom, center = centroid, limitSize = limitScaleSize)
+                .coercedScale(scale = zoom, center = centroid, minSize = minSize)
         }
     }
 }
@@ -206,8 +206,8 @@ private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
     return minOf(width.absoluteValue / minWidth, height.absoluteValue / minHeight)
 }
 
-private fun Rect.coercedScale(scale: Float, center: Offset, limitSize: Size): Rect {
-    val scale = scale.coerceAtMost(size.maxScale(minWidth = limitSize.width, minHeight = limitSize.height))
+private fun Rect.coercedScale(scale: Float, center: Offset, minSize: Size): Rect {
+    val scale = scale.coerceAtMost(size.maxScale(minWidth = minSize.width, minHeight = minSize.height))
     if (scale == 1f) return this
     return scale(scale = scale, center = center)
 }
