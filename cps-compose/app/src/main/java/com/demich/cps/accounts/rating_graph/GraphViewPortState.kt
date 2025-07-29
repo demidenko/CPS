@@ -81,10 +81,10 @@ internal class GraphViewPortState(
     }
 
     fun pointXToCanvasX(x: Long, canvasRect: Rect) =
-        x.toFloat().transformX(from = rect, to = canvasRect)
+        x.toFloatUseInf().transformX(from = rect, to = canvasRect)
 
     fun pointYToCanvasY(y: Long, canvasRect: Rect) =
-        y.toFloat().transformY(from = rect, to = canvasRect)
+        y.toFloatUseInf().transformY(from = rect, to = canvasRect)
 
     fun pointToCanvas(point: Point, canvasRect: Rect) =
         Offset(
@@ -208,3 +208,10 @@ private fun Rect.coercedScale(scale: Float, center: Offset, limitSize: Size): Re
     if (scale == 1f) return this
     return scale(scale = scale, center = center)
 }
+
+private fun Long.toFloatUseInf(): Float =
+    when (this) {
+        Long.MIN_VALUE -> Float.NEGATIVE_INFINITY
+        Long.MAX_VALUE -> Float.POSITIVE_INFINITY
+        else -> toFloat()
+    }
