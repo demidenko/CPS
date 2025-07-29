@@ -102,6 +102,12 @@ internal class GraphViewPortState(
     context(scope: PointerInputScope)
     fun canvasRect(): Rect = scope.size.toSize().toBorderedRect()
 
+    context(scope: DrawScope)
+    fun translator() = GraphPointTranslator(
+        viewPortRect = rect,
+        canvasRect = canvasRect()
+    )
+
     context(scope: PointerInputScope)
     suspend fun detectTransformGestures() {
         val limitScaleSize = Size(
@@ -123,24 +129,28 @@ internal class GraphViewPortState(
     }
 }
 
-context(scope: DrawScope)
-internal fun GraphViewPortState.pointXToCanvasX(x: Long) =
-    pointXToCanvasX(x = x, canvasRect = canvasRect())
+internal class GraphPointTranslator(
+    val viewPortRect: Rect,
+    val canvasRect: Rect
+) {
+    fun pointXToCanvasX(x: Long) =
+        x.toFloatUseInf().transformX(from = viewPortRect, to = canvasRect)
 
-context(scope: DrawScope)
-internal fun GraphViewPortState.pointYToCanvasY(y: Long) =
-    pointYToCanvasY(y = y, canvasRect = canvasRect())
+    fun pointYToCanvasY(y: Long) =
+        y.toFloatUseInf().transformY(from = viewPortRect, to = canvasRect)
 
-context(scope: DrawScope)
-internal fun GraphViewPortState.pointToCanvas(point: Point) =
-    pointToCanvas(point = point, canvasRect = canvasRect())
+    fun pointToCanvas(point: Point) =
+        Offset(
+            x = pointXToCanvasX(point.x),
+            y = pointYToCanvasY(point.y)
+        )
 
-context(scope: DrawScope)
-internal fun GraphViewPortState.pointsToCanvasPath(points: List<Point>): Path {
-    val canvasRect = canvasRect()
+}
+
+internal fun GraphPointTranslator.pointsToCanvasPath(points: List<Point>): Path {
     return Path().apply {
         points.forEachIndexed { index, point ->
-            val (px, py) = pointToCanvas(point = point, canvasRect = canvasRect)
+            val (px, py) = pointToCanvas(point = point)
             if (index == 0) moveTo(px, py)
             else lineTo(px, py)
         }
@@ -148,18 +158,17 @@ internal fun GraphViewPortState.pointsToCanvasPath(points: List<Point>): Path {
 }
 
 context(scope: DrawScope)
-internal inline fun GraphViewPortState.pointRectToCanvasRect(
+internal inline fun GraphPointTranslator.pointRectToCanvasRect(
     bottomLeft: Point,
     topRight: Point,
     block: (Rect) -> Unit
 ) {
-    val canvasRect = canvasRect()
     val (width, height) = scope.size
 
-    val left = floor(pointXToCanvasX(bottomLeft.x, canvasRect).coerceAtLeast(0f))
-    val right = ceil(pointXToCanvasX(topRight.x, canvasRect).coerceAtMost(width))
-    val top = floor(pointYToCanvasY(topRight.y, canvasRect).coerceAtLeast(0f))
-    val bottom = ceil(pointYToCanvasY(bottomLeft.y, canvasRect).coerceAtMost(height))
+    val left = floor(pointXToCanvasX(bottomLeft.x).coerceAtLeast(0f))
+    val right = ceil(pointXToCanvasX(topRight.x).coerceAtMost(width))
+    val top = floor(pointYToCanvasY(topRight.y).coerceAtLeast(0f))
+    val bottom = ceil(pointYToCanvasY(bottomLeft.y).coerceAtMost(height))
 
     if (left <= right && top <= bottom) {
         block(Rect(left = left, top = top, right = right, bottom = bottom))

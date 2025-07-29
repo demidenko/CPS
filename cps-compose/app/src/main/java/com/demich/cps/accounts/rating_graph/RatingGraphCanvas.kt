@@ -117,11 +117,13 @@ private fun RatingGraphCanvas(
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
 
-        val ratingPath = viewPortState.pointsToCanvasPath(ratingPoints)
+        val translator = viewPortState.translator()
+
+        val ratingPath = translator.pointsToCanvasPath(ratingPoints)
 
         //rating filled areas
         rectangles.forEachRect { bottomLeft, topRight, handleColor ->
-            viewPortState.pointRectToCanvasRect(
+            translator.pointRectToCanvasRect(
                 bottomLeft = bottomLeft,
                 topRight = topRight
             ) { rect ->
@@ -135,7 +137,7 @@ private fun RatingGraphCanvas(
 
         //time dashes
         if (selectedPoint != null) {
-            val p = viewPortState.pointToCanvas(selectedPoint)
+            val p = translator.pointToCanvas(selectedPoint)
             drawLine(
                 color = markerColor,
                 start = Offset(p.x, 0f),
@@ -144,7 +146,7 @@ private fun RatingGraphCanvas(
             )
         } else {
             markVerticals.forEach { x ->
-                val px = viewPortState.pointXToCanvasX(x)
+                val px = translator.pointXToCanvasX(x)
                 drawLine(
                     color = markerColor,
                     start = Offset(px, 0f),
@@ -165,7 +167,7 @@ private fun RatingGraphCanvas(
             )
             //shadow of rating points
             ratingPoints.forEach { point ->
-                val center = viewPortState.pointToCanvas(point)
+                val center = translator.pointToCanvas(point)
                 drawCircle(
                     color = shadowColor,
                     radius = radius(point, circleRadius + circleBorderWidth),
@@ -185,7 +187,7 @@ private fun RatingGraphCanvas(
 
         //rating points
         pointsWithColors.forEach { (point, color) ->
-            val center = viewPortState.pointToCanvas(point)
+            val center = translator.pointToCanvas(point)
             drawCircle(
                 color = lineColor,
                 radius = radius(point, circleRadius + circleBorderWidth),
