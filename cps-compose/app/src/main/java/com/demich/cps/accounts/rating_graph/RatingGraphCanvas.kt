@@ -26,6 +26,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
+import com.demich.cps.ui.theme.cpsColors
 import kotlin.time.Instant
 
 @Composable
@@ -39,13 +40,15 @@ internal fun RatingGraphCanvas(
     selectedRatingChange: RatingChange?,
     modifier: Modifier = Modifier
 ) {
-    val managerSupportedColors = remember(manager.type) {
-        HandleColor.entries.filter {
-            runCatching { manager.originalColor(it) }.isSuccess
+    val cpsColors = cpsColors
+    val colorsMap = remember(manager.type, cpsColors) {
+        manager.run {
+            val availableColors = HandleColor.entries.filter {
+                runCatching { originalColor(it) }.isSuccess
+            }
+            availableColors.associateWith { cpsColors.colorFor(handleColor = it) }
         }
     }
-
-    val colorsMap = managerSupportedColors.associateWith { manager.colorFor(handleColor = it) }
 
     val timeMarkers: List<Instant> = remember(filterType, ratingChanges, currentTime) {
         if (filterType == RatingFilterType.ALL || ratingChanges.size < 2) emptyList()
@@ -56,8 +59,12 @@ internal fun RatingGraphCanvas(
         }
     }
 
+    val ratingPoints = remember(ratingChanges) {
+        ratingChanges.map { it.toGraphPoint() }.sortedBy { it.x }
+    }
+
     RatingGraphCanvas(
-        ratingPoints = ratingChanges.map { it.toGraphPoint() }.sortedBy { it.x },
+        ratingPoints = ratingPoints,
         selectedPoint = selectedRatingChange?.toGraphPoint(),
         markVerticals = timeMarkers.map { it.epochSeconds },
         getColor = colorsMap::getValue,
