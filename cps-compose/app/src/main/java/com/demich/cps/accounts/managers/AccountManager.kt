@@ -43,6 +43,12 @@ fun accountManagerOf(type: AccountManagerType) =
 abstract class AccountManager<U: UserInfo> {
     abstract val type: AccountManagerType
 
+    override fun equals(other: Any?): Boolean {
+        return other is AccountManager<U> && type == other.type
+    }
+
+    override fun hashCode() = type.hashCode()
+
     abstract val userIdTitle: String
     abstract val urlHomePage: String
 

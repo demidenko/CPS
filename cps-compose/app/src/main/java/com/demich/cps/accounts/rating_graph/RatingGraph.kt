@@ -103,7 +103,7 @@ private fun RatingGraphWithHeader(
     var selectedRatingChange: RatingChange?
             by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(null) }
 
-    val rectangles = remember(manager.type) { RatingGraphRectangles(manager) }
+    val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 
     val scope = rememberCoroutineScope()
 
