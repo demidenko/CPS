@@ -12,13 +12,13 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
 
-context(manager: RatedAccountManager<U>)
-fun <U: RatedUserInfo> CPSColors.colorFor(handleColor: HandleColor): Color =
+context(manager: RatedAccountManager<*>)
+fun CPSColors.colorFor(handleColor: HandleColor): Color =
     if (useOriginalHandleColors) manager.originalColor(handleColor)
     else handleColor(handleColor)
 
-context(manager: RatedAccountManager<U>)
-fun <U: RatedUserInfo> CPSColors.colorFor(rating: Int): Color =
+context(manager: RatedAccountManager<*>)
+fun CPSColors.colorFor(rating: Int): Color =
     colorFor(handleColor = manager.getHandleColor(rating))
 
 @Composable
