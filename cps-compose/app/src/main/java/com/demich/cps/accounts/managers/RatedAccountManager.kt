@@ -63,6 +63,9 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
 fun RatedAccountManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
     throw IllegalArgumentException("Manager ${type.name} does not support color ${handleColor.name}")
 
+fun RatedAccountManager<*>.availableHandleColors(): List<HandleColor> =
+    HandleColor.entries.filter { runCatching { originalColor(it) }.isSuccess }
+
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
     val ratingUpperBoundRevolutions: List<Pair<Instant, List<HandleColorBound>>>

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.managers.availableHandleColors
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.theme.cpsColors
@@ -41,12 +42,9 @@ internal fun RatingGraphCanvas(
     modifier: Modifier = Modifier
 ) {
     val cpsColors = cpsColors
-    val colorsMap = remember(manager.type, cpsColors) {
+    val colorsMap = remember(manager, cpsColors) {
         manager.run {
-            val availableColors = HandleColor.entries.filter {
-                runCatching { originalColor(it) }.isSuccess
-            }
-            availableColors.associateWith { cpsColors.colorFor(handleColor = it) }
+            availableHandleColors().associateWith { cpsColors.colorFor(handleColor = it) }
         }
     }
 
