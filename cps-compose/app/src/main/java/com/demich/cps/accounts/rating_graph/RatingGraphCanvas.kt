@@ -212,6 +212,3 @@ private fun RatingGraphCanvas(
     }
 }
 
-internal data class GraphPoint(val x: Long, val y: Long)
-
-internal fun RatingChange.toGraphPoint() = GraphPoint(x = date.epochSeconds, y = rating.toLong())
