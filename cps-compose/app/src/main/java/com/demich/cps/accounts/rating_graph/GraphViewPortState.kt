@@ -133,7 +133,7 @@ internal class GraphPointTranslator(
     fun pointYToCanvasY(y: Long) =
         y.toFloatUseInf().transformY(from = viewPortRect, to = canvasRect)
 
-    fun pointToCanvas(point: Point) =
+    fun pointToCanvas(point: GraphPoint) =
         Offset(
             x = pointXToCanvasX(point.x),
             y = pointYToCanvasY(point.y)
@@ -141,7 +141,7 @@ internal class GraphPointTranslator(
 
 }
 
-internal fun GraphPointTranslator.pointsToCanvasPath(points: List<Point>): Path {
+internal fun GraphPointTranslator.pointsToCanvasPath(points: List<GraphPoint>): Path {
     return Path().apply {
         points.forEachIndexed { index, point ->
             val (px, py) = pointToCanvas(point = point)
@@ -153,8 +153,8 @@ internal fun GraphPointTranslator.pointsToCanvasPath(points: List<Point>): Path 
 
 context(scope: DrawScope)
 internal inline fun GraphPointTranslator.pointRectToCanvasRect(
-    bottomLeft: Point,
-    topRight: Point,
+    bottomLeft: GraphPoint,
+    topRight: GraphPoint,
     block: (Rect) -> Unit
 ) {
     val (width, height) = scope.size
@@ -177,7 +177,7 @@ internal fun GraphViewPortState.getNearestRatingChange(
 ): RatingChange? {
     val translator = translator()
     val pos = ratingChanges.minOfWithIndex {
-        val o = translator.pointToCanvas(it.toPoint())
+        val o = translator.pointToCanvas(it.toGraphPoint())
         (o - tap).getDistance()
     }.takeIf { it.value <= tapRadius }?.index ?: return null
     val res = ratingChanges[pos]

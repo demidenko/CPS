@@ -56,8 +56,8 @@ internal fun RatingGraphCanvas(
     }
 
     RatingGraphCanvas(
-        ratingPoints = ratingChanges.map { it.toPoint() }.sortedBy { it.x },
-        selectedPoint = selectedRatingChange?.toPoint(),
+        ratingPoints = ratingChanges.map { it.toGraphPoint() }.sortedBy { it.x },
+        selectedPoint = selectedRatingChange?.toGraphPoint(),
         markVerticals = timeMarkers.map { it.epochSeconds },
         getColor = colorsMap::getValue,
         viewPortState = viewPortState,
@@ -78,8 +78,8 @@ private fun spawnDpState(value: Dp): State<Dp> {
 
 @Composable
 private fun RatingGraphCanvas(
-    ratingPoints: List<Point>,
-    selectedPoint: Point?,
+    ratingPoints: List<GraphPoint>,
+    selectedPoint: GraphPoint?,
     markVerticals: List<Long>,
     getColor: (HandleColor) -> Color,
     viewPortState: GraphViewPortState,
@@ -110,7 +110,7 @@ private fun RatingGraphCanvas(
             .fillMaxSize()
             .clipToBounds()
     ) {
-        fun radius(point: Point, radius: Float) =
+        fun radius(point: GraphPoint, radius: Float) =
             if (selectedPoint == point) selectedPointScale * radius else radius
 
         val circleBorderWidth = circleBorderWidth.toPx()
@@ -212,6 +212,6 @@ private fun RatingGraphCanvas(
     }
 }
 
-internal data class Point(val x: Long, val y: Long)
+internal data class GraphPoint(val x: Long, val y: Long)
 
-internal fun RatingChange.toPoint() = Point(x = date.epochSeconds, y = rating.toLong())
+internal fun RatingChange.toGraphPoint() = GraphPoint(x = date.epochSeconds, y = rating.toLong())

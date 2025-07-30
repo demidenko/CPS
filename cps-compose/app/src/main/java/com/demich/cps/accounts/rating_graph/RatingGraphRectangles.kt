@@ -14,12 +14,12 @@ internal class RatingGraphRectangles(
     manager: RatedAccountManager<out RatedUserInfo>
 ) {
     //point is upperBound (endTime, ratingUpperBound)
-    private val rectangles: List<Pair<Point, HandleColor>> = buildList {
+    private val rectangles: List<Pair<GraphPoint, HandleColor>> = buildList {
         fun addBounds(x: Long, bounds: List<HandleColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
-                add(Point(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
+                add(GraphPoint(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
             }
-            add(Point(x = x, y = Long.MAX_VALUE) to HandleColor.RED)
+            add(GraphPoint(x = x, y = Long.MAX_VALUE) to HandleColor.RED)
         }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
@@ -30,21 +30,21 @@ internal class RatingGraphRectangles(
         }
         addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
     }.apply {
-        check(isSortedWith(compareBy<Pair<Point, HandleColor>> { it.first.x }.thenBy { it.first.y }))
+        check(isSortedWith(compareBy<Pair<GraphPoint, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
 
-    fun getHandleColor(point: Point): HandleColor =
+    fun getHandleColor(point: GraphPoint): HandleColor =
         rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
 
-    inline fun forEachUpperBound(block: (Point, HandleColor) -> Unit) =
+    inline fun forEachUpperBound(block: (GraphPoint, HandleColor) -> Unit) =
         rectangles.asReversed().forEach { block(it.first, it.second) }
 
-    inline fun forEachRect(block: (Point, Point, HandleColor) -> Unit) {
+    inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
         var prevX: Long = Long.MIN_VALUE
         rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Long = Long.MIN_VALUE
             rectangles.forEach(l, r) { (point, handleColor) ->
-                block(Point(prevX, prevY), point, handleColor)
+                block(GraphPoint(prevX, prevY), point, handleColor)
                 prevY = point.y
             }
             prevX = rectangles[l].first.x
