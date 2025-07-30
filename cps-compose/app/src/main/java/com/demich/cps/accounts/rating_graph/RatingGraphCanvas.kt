@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
@@ -122,18 +123,11 @@ private fun RatingGraphCanvas(
         val ratingPath = translator.pointsToCanvasPath(ratingPoints)
 
         //rating filled areas
-        rectangles.forEachRect { bottomLeft, topRight, handleColor ->
-            translator.pointRectToCanvasRect(
-                bottomLeft = bottomLeft,
-                topRight = topRight
-            ) { rect ->
-                drawRect(
-                    color = getColor(handleColor),
-                    topLeft = rect.topLeft,
-                    size = rect.size
-                )
-            }
-        }
+        drawRatingBackground(
+            rectangles = rectangles,
+            translator = translator,
+            getColor = getColor
+        )
 
         //time dashes
         if (selectedPoint != null) {
@@ -212,3 +206,21 @@ private fun RatingGraphCanvas(
     }
 }
 
+private inline fun DrawScope.drawRatingBackground(
+    rectangles: RatingGraphRectangles,
+    translator: GraphPointTranslator,
+    getColor: (HandleColor) -> Color
+) {
+    rectangles.forEachRect { bottomLeft, topRight, handleColor ->
+        translator.pointRectToCanvasRect(
+            bottomLeft = bottomLeft,
+            topRight = topRight
+        ) { rect ->
+            drawRect(
+                color = getColor(handleColor),
+                topLeft = rect.topLeft,
+                size = rect.size
+            )
+        }
+    }
+}
