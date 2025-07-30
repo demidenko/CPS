@@ -137,19 +137,17 @@ private fun RatingGraphCanvas(
         //time dashes
         if (selectedPoint != null) {
             val p = translator.pointToCanvas(selectedPoint)
-            drawLine(
+            drawVertical(
+                x = p.x,
+                bottomY = p.y,
                 color = markerColor,
-                start = Offset(p.x, 0f),
-                end = p,
                 pathEffect = dashEffect
             )
         } else {
             markVerticals.forEach { x ->
-                val px = translator.pointXToCanvasX(x)
-                drawLine(
+                drawVertical(
+                    x = translator.pointXToCanvasX(x),
                     color = markerColor,
-                    start = Offset(px, 0f),
-                    end = Offset(px, size.height),
                     pathEffect = dashEffect
                 )
             }
@@ -228,4 +226,19 @@ private inline fun DrawScope.drawRatingBackground(
             )
         }
     }
+}
+
+private fun DrawScope.drawVertical(
+    x: Float,
+    topY: Float = 0f,
+    bottomY: Float = size.height,
+    color: Color,
+    pathEffect: PathEffect? = null
+) {
+    drawLine(
+        color = color,
+        start = Offset(x = x, y = topY),
+        end = Offset(x = x, y = bottomY),
+        pathEffect = pathEffect
+    )
 }
