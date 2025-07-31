@@ -228,8 +228,8 @@ inline fun LaunchedEffectOneTime(
     val state = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(state) {
         if (!state.value) {
-            block()
             state.value = true
+            block()
         }
     }
 }
