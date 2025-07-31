@@ -34,7 +34,7 @@ fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
         bottom = bottom - vertical
     )
 
-fun Float.scale(scale: Float, center: Float) =
+private fun Float.scale(scale: Float, center: Float) =
     (this - center) / scale + center
 
 fun Rect.scale(scale: Float, center: Offset): Rect =
