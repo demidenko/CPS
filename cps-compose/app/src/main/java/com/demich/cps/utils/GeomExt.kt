@@ -1,7 +1,10 @@
 package com.demich.cps.utils
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 
 fun Float.transformX(
     from: Rect,
@@ -44,3 +47,10 @@ fun Rect.scale(scale: Float, center: Offset): Rect =
         top = top.scale(scale, center.y),
         bottom = bottom.scale(scale, center.y)
     )
+
+@Stable
+context(density: Density)
+fun DpOffset.toOffset(): Offset =
+    density.run {
+        Offset(x = x.toPx(), y = y.toPx())
+    }

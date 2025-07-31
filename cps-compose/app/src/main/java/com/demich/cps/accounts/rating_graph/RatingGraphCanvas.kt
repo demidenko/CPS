@@ -25,6 +25,7 @@ import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.spawnDpState
+import com.demich.cps.utils.toOffset
 import kotlin.time.Instant
 
 @Composable
@@ -110,6 +111,7 @@ private fun RatingGraphCanvas(
         val circleBorderWidth = circleBorderWidth.toPx()
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
+        val shadowOffset = shadowOffset.toOffset()
 
         val translator = viewPortState.translator()
 
@@ -142,7 +144,7 @@ private fun RatingGraphCanvas(
         }
 
         //shadow
-        translate(left = shadowOffset.x.toPx(), top = shadowOffset.y.toPx()) {
+        translate(left = shadowOffset.x, top = shadowOffset.y) {
             //shadow of rating path
             drawPath(
                 path = ratingPath,
