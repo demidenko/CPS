@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -49,6 +51,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
@@ -207,6 +210,16 @@ fun animateToggleColorAsState(
     }
 }
 
+@Composable
+fun spawnDpState(value: Dp, initialValue: Dp = 0.dp): State<Dp> {
+    val anim = remember {
+        Animatable(initialValue = initialValue, typeConverter = Dp.VectorConverter)
+    }
+    LaunchedEffect(anim, value) {
+        anim.animateTo(value)
+    }
+    return anim.asState()
+}
 
 @Composable
 inline fun LaunchedEffectOneTime(

@@ -1,12 +1,8 @@
 package com.demich.cps.accounts.rating_graph
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -28,6 +24,7 @@ import com.demich.cps.accounts.managers.availableHandleColors
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.spawnDpState
 import kotlin.time.Instant
 
 @Composable
@@ -74,15 +71,6 @@ internal fun RatingGraphCanvas(
 }
 
 @Composable
-private fun spawnDpState(value: Dp): State<Dp> {
-    val anim = remember { Animatable(initialValue = 0.dp, typeConverter = Dp.VectorConverter) }
-    LaunchedEffect(anim, value) {
-        anim.animateTo(value)
-    }
-    return anim.asState()
-}
-
-@Composable
 private fun RatingGraphCanvas(
     ratingPoints: List<GraphPoint>,
     selectedPoint: GraphPoint?,
@@ -101,8 +89,8 @@ private fun RatingGraphCanvas(
     shadowAlpha: Float = 0.3f,
     selectedPointScale: Float = 1.5f
 ) {
-    val circleBorderWidth by spawnDpState(circleBorderWidth)
     val circleRadius by spawnDpState(circleRadius)
+    val circleBorderWidth by spawnDpState(circleBorderWidth)
     val pathWidth by spawnDpState(pathWidth)
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
