@@ -9,11 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.layer.GraphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -100,6 +104,8 @@ private fun RatingGraphCanvas(
         ratingPoints.map { it to getColor(rectangles.getHandleColor(it)) }
     }
 
+    val shadowLayer = rememberGraphicsLayer()
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -143,59 +149,65 @@ private fun RatingGraphCanvas(
             }
         }
 
-        //shadow
-        translate(left = shadowOffset.x, top = shadowOffset.y) {
-            //shadow of rating path
+        drawWithShadow(
+            shadowColor = shadowColor,
+            shadowAlpha = shadowAlpha,
+            offset = shadowOffset,
+            graphicsLayer = shadowLayer
+        ) {
+            //rating path
             drawPath(
                 path = ratingPath,
-                color = shadowColor,
-                style = Stroke(width = pathWidth),
-                alpha = shadowAlpha
+                color = lineColor,
+                style = Stroke(width = pathWidth)
             )
-            //shadow of rating points
-            ratingPoints.forEach { point ->
+
+            //rating points
+            pointsWithColors.forEach { (point, color) ->
                 val center = translator.pointToCanvas(point)
                 drawCircle(
-                    color = shadowColor,
-                    radius = radius(point, circleRadius + circleBorderWidth),
-                    center = center,
-                    style = Fill,
-                    alpha = shadowAlpha
-                )
-            }
-        }
-
-        //rating path
-        drawPath(
-            path = ratingPath,
-            color = lineColor,
-            style = Stroke(width = pathWidth)
-        )
-
-        //rating points
-        pointsWithColors.forEach { (point, color) ->
-            val center = translator.pointToCanvas(point)
-            drawCircle(
-                color = lineColor,
-                radius = radius(point, circleRadius + circleBorderWidth),
-                center = center,
-                style = Fill
-            )
-            drawCircle(
-                color = color,
-                radius = radius(point, circleRadius),
-                center = center,
-                style = Fill
-            )
-            if (point == selectedPoint) {
-                drawCircle(
                     color = lineColor,
-                    radius = radius(point, circleRadius / 2),
+                    radius = radius(point, circleRadius + circleBorderWidth),
                     center = center,
                     style = Fill
                 )
+                drawCircle(
+                    color = color,
+                    radius = radius(point, circleRadius),
+                    center = center,
+                    style = Fill
+                )
+                if (point == selectedPoint) {
+                    drawCircle(
+                        color = lineColor,
+                        radius = radius(point, circleRadius / 2),
+                        center = center,
+                        style = Fill
+                    )
+                }
             }
         }
+    }
+}
+
+private inline fun DrawScope.drawWithShadow(
+    shadowColor: Color,
+    shadowAlpha: Float,
+    offset: Offset,
+    graphicsLayer: GraphicsLayer,
+    crossinline block: DrawScope.() -> Unit
+) {
+    graphicsLayer.apply {
+        colorFilter = ColorFilter.tint(color = shadowColor)
+        alpha = shadowAlpha
+        record {
+            block()
+        }
+    }
+
+    drawLayer(graphicsLayer)
+    translate(left = offset.x, top = offset.y) {
+        block()
     }
 }
 
