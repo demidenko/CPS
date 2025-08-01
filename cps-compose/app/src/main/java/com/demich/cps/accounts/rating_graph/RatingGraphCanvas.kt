@@ -224,10 +224,10 @@ private inline fun DrawScope.drawWithShadow(
         }
     }
 
-    drawLayer(graphicsLayer)
     translate(left = offset.x, top = offset.y) {
-        block()
+        drawLayer(graphicsLayer)
     }
+    block()
 }
 
 private fun DrawScope.drawVertical(
