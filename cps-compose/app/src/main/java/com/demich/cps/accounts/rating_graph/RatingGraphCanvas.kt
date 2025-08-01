@@ -237,13 +237,13 @@ private inline fun DrawScope.drawWithShadow(
         colorFilter = ColorFilter.tint(color = shadowColor)
         alpha = shadowAlpha
         record {
-            block()
+            translate(left = offset.x, top = offset.y) {
+                block()
+            }
         }
     }
 
-    translate(left = offset.x, top = offset.y) {
-        drawLayer(graphicsLayer)
-    }
+    drawLayer(graphicsLayer)
     block()
 }
 
