@@ -190,6 +190,25 @@ private fun RatingGraphCanvas(
     }
 }
 
+private inline fun DrawScope.drawRatingBackground(
+    rectangles: RatingGraphRectangles,
+    translator: GraphPointTranslator,
+    getColor: (HandleColor) -> Color
+) {
+    rectangles.forEachRect { bottomLeft, topRight, handleColor ->
+        translator.pointRectToCanvasRect(
+            bottomLeft = bottomLeft,
+            topRight = topRight
+        ) { rect ->
+            drawRect(
+                color = getColor(handleColor),
+                topLeft = rect.topLeft,
+                size = rect.size
+            )
+        }
+    }
+}
+
 private inline fun DrawScope.drawWithShadow(
     shadowColor: Color,
     shadowAlpha: Float,
@@ -208,25 +227,6 @@ private inline fun DrawScope.drawWithShadow(
     drawLayer(graphicsLayer)
     translate(left = offset.x, top = offset.y) {
         block()
-    }
-}
-
-private inline fun DrawScope.drawRatingBackground(
-    rectangles: RatingGraphRectangles,
-    translator: GraphPointTranslator,
-    getColor: (HandleColor) -> Color
-) {
-    rectangles.forEachRect { bottomLeft, topRight, handleColor ->
-        translator.pointRectToCanvasRect(
-            bottomLeft = bottomLeft,
-            topRight = topRight
-        ) { rect ->
-            drawRect(
-                color = getColor(handleColor),
-                topLeft = rect.topLeft,
-                size = rect.size
-            )
-        }
     }
 }
 
