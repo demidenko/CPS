@@ -111,9 +111,6 @@ private fun RatingGraphCanvas(
             .fillMaxSize()
             .clipToBounds()
     ) {
-        fun radius(point: GraphPoint, radius: Float) =
-            if (selectedPoint == point) selectedPointScale * radius else radius
-
         val circleBorderWidth = circleBorderWidth.toPx()
         val circleRadius = circleRadius.toPx()
         val pathWidth = pathWidth.toPx()
@@ -164,29 +161,49 @@ private fun RatingGraphCanvas(
 
             //rating points
             pointsWithColors.forEach { (point, color) ->
-                val center = translator.pointToCanvas(point)
-                drawCircle(
-                    color = lineColor,
-                    radius = radius(point, circleRadius + circleBorderWidth),
-                    center = center,
-                    style = Fill
-                )
-                drawCircle(
+                drawPoint(
+                    center = translator.pointToCanvas(point),
                     color = color,
-                    radius = radius(point, circleRadius),
-                    center = center,
-                    style = Fill
+                    borderColor = lineColor,
+                    radius = circleRadius,
+                    borderWidth = circleBorderWidth,
+                    isSelected = point == selectedPoint,
+                    selectedScale = selectedPointScale
                 )
-                if (point == selectedPoint) {
-                    drawCircle(
-                        color = lineColor,
-                        radius = radius(point, circleRadius / 2),
-                        center = center,
-                        style = Fill
-                    )
-                }
             }
         }
+    }
+}
+
+private fun DrawScope.drawPoint(
+    center: Offset,
+    color: Color,
+    borderColor: Color,
+    radius: Float,
+    borderWidth: Float,
+    isSelected: Boolean,
+    selectedScale: Float
+) {
+    val multiplier = if (isSelected) selectedScale else 1f
+    drawCircle(
+        color = borderColor,
+        radius = (radius + borderWidth) * multiplier,
+        center = center,
+        style = Fill
+    )
+    drawCircle(
+        color = color,
+        radius = radius * multiplier,
+        center = center,
+        style = Fill
+    )
+    if (isSelected) {
+        drawCircle(
+            color = borderColor,
+            radius = radius / 2 * multiplier,
+            center = center,
+            style = Fill
+        )
     }
 }
 
