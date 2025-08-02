@@ -1,11 +1,13 @@
 package com.demich.cps.ui.lazylist
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.EmptyMessageBox
@@ -68,3 +70,14 @@ inline fun <T> LazyListScope.itemsNotEmpty(
 }
 
 data object EmptyMessageContentType
+
+@Composable
+inline fun LazyItemScope.ItemWithDivider(
+    modifier: Modifier = Modifier,
+    content: @Composable LazyItemScope.() -> Unit
+) {
+    Column(modifier = modifier) {
+        content()
+        Divider()
+    }
+}
