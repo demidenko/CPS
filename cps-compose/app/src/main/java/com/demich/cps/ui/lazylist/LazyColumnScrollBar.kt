@@ -18,7 +18,7 @@ import kotlin.math.max
 
 internal fun Modifier.drawScrollBar(
     state: LazyListState,
-    color: Color,
+    color: () -> Color,
     scrollBarWidth: Dp,
     minimumScrollBarHeight: Dp
 ): Modifier = this.drawWithContent {
@@ -30,7 +30,7 @@ internal fun Modifier.drawScrollBar(
         val y = if (barHeight == h) windowOffset / totalSize * windowSize
         else windowOffset / (totalSize - windowSize) * (windowSize - h)
         drawRoundRect(
-            color = color,
+            color = color(),
             topLeft = Offset(x = size.width - w, y = y),
             size = Size(width = w, height = h),
             cornerRadius = CornerRadius(w / 2)
@@ -47,6 +47,7 @@ internal fun Modifier.drawScrollBar(
     enterAnimationSpec: AnimationSpec<Float>,
     exitAnimationSpec: AnimationSpec<Float>,
 ): Modifier = composed {
+    // TODO: this read recreates modifier
     val scrollInProgress = state.isScrollInProgress
 
     val fraction by animateFloatAsState(
@@ -57,7 +58,7 @@ internal fun Modifier.drawScrollBar(
 
     drawScrollBar(
         state = state,
-        color = lerp(start = inactiveColor, stop = activeColor, fraction),
+        color = { lerp(start = inactiveColor, stop = activeColor, fraction) },
         scrollBarWidth = scrollBarWidth,
         minimumScrollBarHeight = minimumScrollBarHeight
     )
