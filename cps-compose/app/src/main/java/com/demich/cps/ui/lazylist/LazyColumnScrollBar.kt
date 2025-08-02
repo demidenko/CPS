@@ -23,12 +23,8 @@ internal fun Modifier.drawScrollBar(
     minimumScrollBarHeight: Dp
 ): Modifier = this.drawWithContent {
     drawContent()
-    state.layoutInfo.calculateSizes { windowSize, totalSize, windowOffset ->
+    state.layoutInfo.calculateBarSize(minBarSize = minimumScrollBarHeight.toPx()) { y, h ->
         val w = scrollBarWidth.toPx()
-        val barHeight = windowSize / totalSize * windowSize
-        val h = max(barHeight, minimumScrollBarHeight.toPx())
-        val y = if (barHeight == h) windowOffset / totalSize * windowSize
-        else windowOffset / (totalSize - windowSize) * (windowSize - h)
         drawRoundRect(
             color = color(),
             topLeft = Offset(x = size.width - w, y = y),
@@ -77,5 +73,18 @@ private inline fun LazyListLayoutInfo.calculateSizes(
             val windowOffset: Float = visibleItems.first().run { index * itemAvgSize - offset }
             block(windowSize, totalSize, windowOffset)
         }
+    }
+}
+
+private inline fun LazyListLayoutInfo.calculateBarSize(
+    minBarSize: Float,
+    block: (offset: Float, size: Float) -> Unit
+) {
+    calculateSizes { windowSize, totalSize, windowOffset ->
+        val rawSize = windowSize / totalSize * windowSize
+        val size = max(rawSize, minBarSize)
+        val offset = if (size == rawSize) windowOffset / totalSize * windowSize
+            else windowOffset / (totalSize - windowSize) * (windowSize - size)
+        block(offset, size)
     }
 }
