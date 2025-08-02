@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +59,7 @@ import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
+import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
@@ -261,19 +261,22 @@ private fun ContestsColumn(
         items = contests,
         key = { it.compositeId }
     ) { contest ->
-        ContestItem(
-            contest = contest,
-            isExpanded = viewState::isExpanded,
-            collisionType = viewState::collisionType,
-            onDeleteRequest = onDeleteRequest,
+        ItemWithDivider(
             modifier = Modifier
-                .fillMaxWidth()
-                .clickableNoRipple { viewState.toggleExpanded(contest) }
-                .contestItemPaddings()
                 .animateItem(placementSpec = spring())
                 .animateContentSize(spring())
-        )
-        Divider(Modifier.animateItem(placementSpec = spring()))
+        ) {
+            ContestItem(
+                contest = contest,
+                isExpanded = viewState::isExpanded,
+                collisionType = viewState::collisionType,
+                onDeleteRequest = onDeleteRequest,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickableNoRipple { viewState.toggleExpanded(contest) }
+                    .contestItemPaddings()
+            )
+        }
     }
 }
 

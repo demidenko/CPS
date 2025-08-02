@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -31,6 +30,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.dialogs.CPSDialog
+import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.BackgroundDataLoader
@@ -144,15 +144,15 @@ private fun ClistResourcesList(
 ) {
     LazyColumnWithScrollBar(modifier = modifier) {
         items(items = resources(), key = { it.id }) { resource ->
-            Text(
-                text = resource.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onItemClick(resource) }
-                    .padding(all = 2.dp)
-                    .animateItem()
-            )
-            Divider(modifier = Modifier.animateItem())
+            ItemWithDivider(modifier = Modifier.animateItem()) {
+                Text(
+                    text = resource.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onItemClick(resource) }
+                        .padding(all = 2.dp)
+                )
+            }
         }
     }
 }
