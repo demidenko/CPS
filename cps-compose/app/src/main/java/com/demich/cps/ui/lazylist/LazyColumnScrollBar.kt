@@ -66,13 +66,14 @@ internal fun Modifier.drawScrollBar(
 private inline fun LazyListLayoutInfo.calculateSizes(
     block: (windowSize: Int, totalSize: Float, windowOffset: Float) -> Unit
 ) {
-    if (visibleItemsInfo.isNotEmpty()) {
+    val visibleItems = visibleItemsInfo
+    if (visibleItems.isNotEmpty()) {
         val windowSize = viewportEndOffset - viewportStartOffset
-        val visibleItemsSize = visibleItemsInfo.sumOf { it.size }
+        val visibleItemsSize = visibleItems.sumOf { it.size }
         if (windowSize < visibleItemsSize) {
-            val itemAvgSize: Float = visibleItemsSize.toFloat() / visibleItemsInfo.size
+            val itemAvgSize: Float = visibleItemsSize.toFloat() / visibleItems.size
             val totalSize: Float = totalItemsCount * itemAvgSize
-            val windowOffset: Float = visibleItemsInfo.first().run { index * itemAvgSize - offset }
+            val windowOffset: Float = visibleItems.first().run { index * itemAvgSize - offset }
             block(windowSize, totalSize, windowOffset)
         }
     }
