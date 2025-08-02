@@ -141,6 +141,6 @@ private fun ContestCounter(
 @ReadOnlyComposable
 internal fun contestSubtitleTextStyle() =
     CPSDefaults.MonospaceTextStyle.copy(
-        fontSize = 15.5.sp,
+        fontSize = 15.sp,
         color = cpsColors.contentAdditional
     )
