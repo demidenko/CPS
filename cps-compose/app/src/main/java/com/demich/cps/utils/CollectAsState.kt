@@ -1,7 +1,6 @@
 package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -28,7 +27,7 @@ inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): St
 
 @Composable
 inline fun <T> collectItemAsState(
-    crossinline block: @DisallowComposableCalls () -> DataStoreValue<T>
+    crossinline block: () -> DataStoreValue<T>
 ): State<T> =
     remember {
         val item = block()
@@ -37,13 +36,15 @@ inline fun <T> collectItemAsState(
 
 @Composable
 inline fun <T> rememberFirst(crossinline block: () -> Flow<T>): T =
-    remember(block).let { flow ->
+    remember {
+        val flow = block()
         if (flow is StateFlow<T>) flow.value
         else runBlocking { flow.first() }
     }
 
 @Composable
 inline fun <T> rememberValue(crossinline block: () -> DataStoreValue<T>): T =
-    remember(block).let { item ->
+    remember {
+        val item = block()
         runBlocking { item() }
     }
