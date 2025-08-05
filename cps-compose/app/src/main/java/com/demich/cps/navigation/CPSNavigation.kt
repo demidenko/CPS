@@ -32,7 +32,7 @@ import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
-import com.demich.cps.utils.rememberValue
+import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.utils.writeOnlyProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -131,7 +131,7 @@ class CPSNavigator(
         builder: NavGraphBuilder.() -> Unit
     ) {
         val context = context
-        val startScreen: Screen = rememberValue {
+        val startScreen: Screen = rememberFirstValue {
             StartScreenDataStore(context).startRootScreen
         }
 

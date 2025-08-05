@@ -43,7 +43,7 @@ inline fun <T> rememberFirst(crossinline block: () -> Flow<T>): T =
     }
 
 @Composable
-inline fun <T> rememberValue(crossinline block: () -> DataStoreValue<T>): T =
+inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T =
     remember {
         val item = block()
         runBlocking { item() }

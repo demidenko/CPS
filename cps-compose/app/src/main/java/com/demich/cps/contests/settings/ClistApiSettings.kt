@@ -33,7 +33,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberValue
+import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
@@ -73,7 +73,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val initApiAccess = rememberValue { context.settingsContests.clistApiAccess }
+    val initApiAccess = rememberFirstValue { context.settingsContests.clistApiAccess }
     var login by rememberSaveable { mutableStateOf(initApiAccess.login) }
     var key by rememberSaveable { mutableStateOf(initApiAccess.key) }
 

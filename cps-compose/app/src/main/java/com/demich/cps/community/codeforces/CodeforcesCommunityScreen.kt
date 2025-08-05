@@ -34,7 +34,7 @@ import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberValue
+import com.demich.cps.utils.rememberFirstValue
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTitle {
@@ -79,7 +79,7 @@ private fun CodeforcesPager(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val renderAllTabs = rememberValue { context.settingsCommunity.renderAllTabs }
+    val renderAllTabs = rememberFirstValue { context.settingsCommunity.renderAllTabs }
 
     val newEntriesState = rememberNewEntriesState()
     ProvideTimeEachMinute {
