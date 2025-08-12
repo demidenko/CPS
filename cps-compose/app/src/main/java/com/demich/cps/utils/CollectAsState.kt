@@ -11,18 +11,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
+fun <T> Flow<T>.firstBlocking(): T =
+    when (this) {
+        is StateFlow<T> -> value
+        else -> runBlocking { first() }
+    }
+
 @Composable
 inline fun <T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
-    remember(block).let { flow ->
-        if (flow is StateFlow<T>) flow.collectAsState()
-        else flow.collectAsState(initial = remember { runBlocking { flow.first() } })
+    remember(calculation = block).let { flow ->
+        flow.collectAsState(initial = remember { flow.firstBlocking() })
     }
 
 @Composable
 inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
-    remember(block).let { flow ->
-        if (flow is StateFlow<T>) flow.collectAsStateWithLifecycle()
-        else flow.collectAsStateWithLifecycle(initialValue = remember { runBlocking { flow.first() } })
+    remember(calculation = block).let { flow ->
+        flow.collectAsStateWithLifecycle(initialValue = remember { flow.firstBlocking() })
     }
 
 @Composable
@@ -36,11 +40,7 @@ inline fun <T> collectItemAsState(
 
 @Composable
 inline fun <T> rememberFirst(crossinline block: () -> Flow<T>): T =
-    remember {
-        val flow = block()
-        if (flow is StateFlow<T>) flow.value
-        else runBlocking { flow.first() }
-    }
+    remember { block().firstBlocking() }
 
 @Composable
 inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T =
