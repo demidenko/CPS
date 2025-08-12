@@ -6,6 +6,7 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -21,7 +22,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberFrom
 
 @Composable
 fun CodeforcesCommunityRecentPage(
@@ -109,8 +109,8 @@ private fun RecentCommentsInBlogEntry(
     blogEntry: CodeforcesRecentFeedBlogEntry,
     modifier: Modifier = Modifier
 ) {
-    val filteredComments by rememberFrom(blogEntry) {
-        val id = it.id
+    val id = blogEntry.id
+    val filteredComments by remember(key1 = id, key2 = comments) {
         derivedStateOf {
             comments().filter { it.blogEntry?.id == id }
         }
