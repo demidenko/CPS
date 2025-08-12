@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +27,7 @@ import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
@@ -57,25 +57,25 @@ fun CodeforcesBlogEntries(
         key = CodeforcesBlogEntry::id,
         contentType = { CodeforcesBlogEntryContentType }
     ) { blogEntry ->
-        BlogEntryInfo(
-            blogEntry = blogEntry,
-            markNew = blogEntriesState.isNew(blogEntry.id),
-            label = label?.let { { it(blogEntry) } },
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onClick = { blogEntriesState.openBlogEntry(blogEntry, context) },
-                    onLongClick = onLongClick?.let { { it(blogEntry) } }
-                )
-                .padding(
-                    start = 5.dp,
-                    end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth },
-                    top = 4.dp,
-                    bottom = 4.dp
-                )
-                .animateItem()
-        )
-        Divider(modifier = Modifier.animateItem())
+        ItemWithDivider(modifier = Modifier.animateItem()) {
+            BlogEntryInfo(
+                blogEntry = blogEntry,
+                markNew = blogEntriesState.isNew(blogEntry.id),
+                label = label?.let { { it(blogEntry) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = { blogEntriesState.openBlogEntry(blogEntry, context) },
+                        onLongClick = onLongClick?.let { { it(blogEntry) } }
+                    )
+                    .padding(
+                        start = 5.dp,
+                        end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth },
+                        top = 4.dp,
+                        bottom = 4.dp
+                    )
+            )
+        }
     }
 }
 
