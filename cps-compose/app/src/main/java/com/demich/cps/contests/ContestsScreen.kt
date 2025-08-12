@@ -74,8 +74,8 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.rememberFirst
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
 import kotlinx.coroutines.flow.combine
@@ -335,7 +335,10 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         isReloading = isReloading
     )
 
-    val anyPlatformEnabled = anyPlatformEnabled()
+    val anyPlatformEnabled = remember {
+        context.settingsContests.enabledPlatforms.getValueBlocking().isNotEmpty()
+    }
+
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
@@ -410,14 +413,6 @@ private fun ContestsPageSwitchButton(
             )
         }
     )
-}
-
-@Composable
-private fun anyPlatformEnabled(): Boolean {
-    val context = context
-    return rememberFirst {
-        context.settingsContests.enabledPlatforms.asFlow().map { it.isNotEmpty() }
-    }
 }
 
 
