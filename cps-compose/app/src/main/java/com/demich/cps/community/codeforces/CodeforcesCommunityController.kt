@@ -26,6 +26,7 @@ import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
+import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.isRunning
@@ -33,7 +34,6 @@ import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
 
@@ -46,7 +46,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 
     val controller = rememberSaveable(saver = controllerSaver(viewModel, tabsState)) {
         val settings = context.settingsCommunity
-        val defaultTab = runBlocking { settings.codeforcesDefaultTab() }
+        val defaultTab = settings.codeforcesDefaultTab.getValueBlocking()
         CodeforcesCommunityController(
             viewModel = viewModel,
             tabsState = tabsState,

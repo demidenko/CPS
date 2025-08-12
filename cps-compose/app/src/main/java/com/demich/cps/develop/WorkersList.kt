@@ -65,6 +65,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.drawRoundRectWithBorderInside
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
+import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toDropSecondsString
 import com.demich.cps.utils.toExecTimeString
@@ -83,7 +84,6 @@ import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -483,10 +483,10 @@ fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
 private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
     val context = context
     var contestId: String by rememberSaveable {
-        mutableStateOf(value = runBlocking {
-            CodeforcesMonitorDataStore(context).args()?.contestId?.toString() ?: ""
-        })
+        val args = CodeforcesMonitorDataStore(context).args.getValueBlocking()
+        mutableStateOf(value = args?.contestId?.toString() ?: "")
     }
+
     CPSYesNoDialog(
         onDismissRequest = onDismissRequest,
         onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
