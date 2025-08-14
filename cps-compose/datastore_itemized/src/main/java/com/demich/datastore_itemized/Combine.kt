@@ -11,15 +11,16 @@ internal fun <D: ItemizedDataStore, R> D.dataStoreValue(
     ) { }
 
 
-fun <D: ItemizedDataStore, T, R> D.transform(
-    item: DataStoreValue<T>,
+context(dataStore: ItemizedDataStore)
+fun <T, R> DataStoreValue<T>.transform(
     transform: (T) -> R
-): DataStoreValue<R> = dataStoreValue(object : PreferencesReader<R> {
+): DataStoreValue<R> =
+    dataStore.dataStoreValue(object : PreferencesReader<R> {
         override fun restore(prefs: Preferences): R =
-            transform(item.reader.restore(prefs))
+            transform(reader.restore(prefs))
 
         override fun prefsEquivalent(old: Preferences, new: Preferences): Boolean =
-            item.reader.prefsEquivalent(old, new)
+            reader.prefsEquivalent(old, new)
     })
 
 fun <D: ItemizedDataStore, T1, T2, R> D.combine(
