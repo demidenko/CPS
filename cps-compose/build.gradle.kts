@@ -23,13 +23,15 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-val javaVersion = JavaLanguageVersion.of(21).asJavaVersion()
+private val javaVersion = JavaLanguageVersion.of(21).asJavaVersion()
 
 fun BaseExtension.baseAndroidConfig() {
-    compileSdkVersion(apiLevel = 35)
+    val apiLevel = 36
+    compileSdkVersion(apiLevel = apiLevel)
 
     defaultConfig.apply {
         minSdk = 26
+        targetSdk = apiLevel
     }
 
     compileOptions.apply {
