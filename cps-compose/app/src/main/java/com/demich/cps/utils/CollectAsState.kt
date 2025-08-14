@@ -2,6 +2,7 @@ package com.demich.cps.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.annotation.RememberInComposition
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -11,14 +12,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-// TODO: add @RememberInComposition
+@RememberInComposition
 fun <T> Flow<T>.firstBlocking(): T =
     when (this) {
         is StateFlow<T> -> value
         else -> runBlocking { first() }
     }
 
-// TODO: add @RememberInComposition
+@RememberInComposition
 fun <T> DataStoreValue<T>.getValueBlocking(): T =
     runBlocking { invoke() }
 
