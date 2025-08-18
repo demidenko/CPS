@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
@@ -22,6 +21,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
+import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
@@ -32,7 +32,6 @@ import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
@@ -112,15 +111,13 @@ class CodeforcesCommunityController internal constructor(
     var topPageType by mutableStateOf(data.topPageType)
     var recentPageType by mutableStateOf(data.recentPageType)
 
-    fun flowOfBadgeCount(tab: CodeforcesTitle, context: Context): Flow<Int>? =
+    fun flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
         when (tab) {
-            CodeforcesTitle.MAIN -> flowOfBadgeCount(
-                isTabVisibleFlow = snapshotFlow { currentTab == CodeforcesTitle.MAIN },
+            CodeforcesTitle.MAIN -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfMainBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
-            CodeforcesTitle.LOST -> flowOfBadgeCount(
-                isTabVisibleFlow = snapshotFlow { currentTab == CodeforcesTitle.LOST },
+            CodeforcesTitle.LOST -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfLostBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
@@ -188,18 +185,14 @@ private fun controllerSaver(
     }
 )
 
-private fun flowOfBadgeCount(
-    isTabVisibleFlow: Flow<Boolean>,
+private fun flowOfNewEntryCounters(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
     newEntriesItem: NewEntriesDataStoreItem
-): Flow<Int> =
+): Flow<NewEntryTypeCounters> =
     combineToCounters(
         flowOfIds = blogEntriesFlow.map { it.map { it.id } },
         flowOfTypes = newEntriesItem.asFlow()
-    ).combine(isTabVisibleFlow) { counters, isTabVisible ->
-        if (isTabVisible) counters.seenCount + counters.unseenCount
-        else counters.unseenCount
-    }
+    )
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
     visitedTabs.forEach { tab ->
