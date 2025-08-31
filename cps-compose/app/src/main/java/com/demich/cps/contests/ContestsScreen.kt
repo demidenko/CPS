@@ -144,16 +144,7 @@ private fun ContestsContent(
     viewState: ContestsListViewState,
     filterState: FilterState
 ) {
-    val context = context
-
-    val contestsViewModel = contestsViewModel()
-    val errorsMessage by collectAsState {
-        combine(
-            flow = contestsViewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsUI.devModeEnabled.asFlow(),
-            transform = ::makeCombinedMessage
-        )
-    }
+    val errorsMessage by loadingErrorsMessageState()
 
     Column {
         LoadingError(
@@ -488,15 +479,25 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     }
 }
 
-private fun makeCombinedMessage(
-    errors: List<Pair<ContestsLoaderType, Throwable>>,
-    exposeAll: Boolean
-): String {
-    if (errors.isEmpty()) return ""
-    return errors.groupBy(
-        keySelector = { (_, e) ->
-            e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
-        },
-        valueTransform = { it.first }
-    ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
+@Composable
+private fun loadingErrorsMessageState(): State<String> {
+    val context = context
+    val viewModel = contestsViewModel()
+
+    return collectAsState {
+        combine(
+            flow = viewModel.flowOfLoadingErrors(),
+            flow2 = context.settingsUI.devModeEnabled.asFlow(),
+        ) { errors: List<Pair<ContestsLoaderType, Throwable>>, exposeAll: Boolean ->
+            when {
+                errors.isEmpty() -> ""
+                else -> errors.groupBy(
+                    keySelector = { (_, e) ->
+                        e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
+                    },
+                    valueTransform = { it.first }
+                ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
+            }
+        }
+    }
 }
