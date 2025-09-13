@@ -51,21 +51,29 @@ private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 fun LocalDateTime.contestDate() = "${formatDate()} ${formatTime()}"
 
 fun Contest.dateShortRange(): String {
+    require(startTime <= endTime)
+
     val startLocalDateTime = startTime.toSystemDateTime()
-    val endLocalDateTime = endTime.toSystemDateTime()
     val start = startLocalDateTime.contestDate()
+    if (startTime == endTime) return start
+
+    val endLocalDateTime = endTime.toSystemDateTime()
     val end = if (eventDuration < 24.hours) endLocalDateTime.formatTime() else "..."
     return "$start-$end"
 }
 
 fun Contest.dateRange(): String {
+    require(startTime <= endTime)
+
     //TODO: show year
     val startLocalDateTime = startTime.toSystemDateTime()
     val endLocalDateTime = endTime.toSystemDateTime()
+
     val start = startLocalDateTime.contestDate()
     val end = endLocalDateTime.run {
         if (date == startLocalDateTime.date) formatTime() else contestDate()
     }
+
     return "$start - $end"
 }
 
