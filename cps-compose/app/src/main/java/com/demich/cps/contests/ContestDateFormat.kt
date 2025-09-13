@@ -50,7 +50,7 @@ private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 
 fun LocalDateTime.contestDate() = "${formatDate()} ${formatTime()}"
 
-fun Contest.dateShortRange(): String {
+fun Contest.dateBriefRange(): String {
     require(startTime <= endTime)
 
     val startLocalDateTime = startTime.toSystemDateTime()
