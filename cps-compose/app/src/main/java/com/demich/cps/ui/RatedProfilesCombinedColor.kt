@@ -17,8 +17,6 @@ import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
-import com.demich.cps.ui.UISettingsDataStore.StatusBarRankSelector.Max
-import com.demich.cps.ui.UISettingsDataStore.StatusBarRankSelector.Min
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -116,8 +114,8 @@ private class RankGetter(
     private val rank: RatedRank? =
         validRanks.filter { it.manager.type !in disabledManagers }.run {
             when (rankSelector) {
-                Min -> minByOrNull { it.rank }
-                Max -> maxByOrNull { it.rank }
+                UISettingsDataStore.StatusBarRankSelector.Min -> minByOrNull { it.rank }
+                UISettingsDataStore.StatusBarRankSelector.Max -> maxByOrNull { it.rank }
             }
         }
 

@@ -26,8 +26,6 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.UISettingsDataStore
-import com.demich.cps.ui.UISettingsDataStore.StatusBarRankSelector.Max
-import com.demich.cps.ui.UISettingsDataStore.StatusBarRankSelector.Min
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
@@ -134,8 +132,8 @@ private fun StatusBarAccountsPopup(
             selectedValue = rankSelector,
             text = { value ->
                 when (value) {
-                    Min -> "worst"
-                    Max -> "best"
+                    UISettingsDataStore.StatusBarRankSelector.Min -> "worst"
+                    UISettingsDataStore.StatusBarRankSelector.Max -> "best"
                 }
             },
             onSelect = onSetRankSelector,
