@@ -8,12 +8,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.HandleColor.BLUE
-import com.demich.cps.accounts.HandleColor.GRAY
-import com.demich.cps.accounts.HandleColor.GREEN
-import com.demich.cps.accounts.HandleColor.ORANGE
-import com.demich.cps.accounts.HandleColor.RED
-import com.demich.cps.accounts.HandleColor.VIOLET
 import com.demich.cps.accounts.screens.DmojUserInfoExpandedContent
 import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.DmojUserInfo
@@ -71,12 +65,12 @@ class DmojAccountManager :
 
     override fun originalColor(handleColor: HandleColor) =
         when (handleColor) {
-            GRAY -> Color(0xFF999999)
-            GREEN -> Color(0xff00a900)
-            BLUE -> Color(0xFF0000FF)
-            VIOLET -> Color(0xFF800080)
-            ORANGE -> Color(0xFFFFB100)
-            RED -> Color(0xFFEE0000)
+            HandleColor.GRAY -> Color(0xFF999999)
+            HandleColor.GREEN -> Color(0xff00a900)
+            HandleColor.BLUE -> Color(0xFF0000FF)
+            HandleColor.VIOLET -> Color(0xFF800080)
+            HandleColor.ORANGE -> Color(0xFFFFB100)
+            HandleColor.RED -> Color(0xFFEE0000)
             else -> illegalHandleColorError(handleColor)
         }
 

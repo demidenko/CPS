@@ -21,13 +21,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.HandleColor.BLUE
-import com.demich.cps.accounts.HandleColor.GRAY
-import com.demich.cps.accounts.HandleColor.GREEN
-import com.demich.cps.accounts.HandleColor.ORANGE
-import com.demich.cps.accounts.HandleColor.RED
-import com.demich.cps.accounts.HandleColor.VIOLET
-import com.demich.cps.accounts.HandleColor.YELLOW
 import com.demich.cps.accounts.SmallAccountPanelTwoLines
 import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.until
@@ -103,13 +96,13 @@ class CodeChefAccountManager :
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
-            GRAY -> Color(0xFF666666)
-            GREEN -> Color(0xFF1E7D22)
-            BLUE -> Color(0xFF3366CC)
-            VIOLET -> Color(0xFF684273)
-            YELLOW -> Color(255, 191, 0)
-            ORANGE -> Color(255, 127, 0)
-            RED -> Color(208,1,27)
+            HandleColor.GRAY -> Color(0xFF666666)
+            HandleColor.GREEN -> Color(0xFF1E7D22)
+            HandleColor.BLUE -> Color(0xFF3366CC)
+            HandleColor.VIOLET -> Color(0xFF684273)
+            HandleColor.YELLOW -> Color(255, 191, 0)
+            HandleColor.ORANGE -> Color(255, 127, 0)
+            HandleColor.RED -> Color(208,1,27)
             else -> illegalHandleColorError(handleColor)
         }
 

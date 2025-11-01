@@ -8,7 +8,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.HandleColor.RED
 import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
@@ -83,7 +82,7 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileRe
     val rating = profile?.userInfoOrNull()?.rating ?: return null
     val handleColor = getHandleColor(rating)
     val rank = when (handleColor) {
-        RED -> Double.POSITIVE_INFINITY
+        HandleColor.RED -> Double.POSITIVE_INFINITY
         else -> {
             val i = rankedHandleColors.indexOfFirst { handleColor == it }
             val j = rankedHandleColors.indexOfLast { handleColor == it }

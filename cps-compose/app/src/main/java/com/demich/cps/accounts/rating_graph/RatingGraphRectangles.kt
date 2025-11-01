@@ -2,7 +2,6 @@ package com.demich.cps.accounts.rating_graph
 
 import androidx.compose.runtime.Immutable
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.HandleColor.RED
 import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingRevolutionsProvider
@@ -20,7 +19,7 @@ internal class RatingGraphRectangles(
             bounds.sortedBy { it.ratingUpperBound }.forEach {
                 add(GraphPoint(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
             }
-            add(GraphPoint(x = x, y = Long.MAX_VALUE) to RED)
+            add(GraphPoint(x = x, y = Long.MAX_VALUE) to HandleColor.RED)
         }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
