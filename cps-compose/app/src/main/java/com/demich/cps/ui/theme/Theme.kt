@@ -18,8 +18,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.settingsUI
-import com.demich.cps.ui.theme.DarkLightMode.DARK
-import com.demich.cps.ui.theme.DarkLightMode.SYSTEM
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 
@@ -31,7 +29,7 @@ enum class DarkLightMode {
 @Composable
 @ReadOnlyComposable
 private fun DarkLightMode.isDarkMode(): Boolean =
-    if (this == SYSTEM) isSystemInDarkTheme() else this == DARK
+    if (this == DarkLightMode.SYSTEM) isSystemInDarkTheme() else this == DarkLightMode.DARK
 
 private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
     if (context is ComponentActivity) {
