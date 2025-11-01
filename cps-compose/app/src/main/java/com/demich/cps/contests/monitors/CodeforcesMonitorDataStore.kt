@@ -2,7 +2,9 @@ package com.demich.cps.contests.monitors
 
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.CODING
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.SYSTEM_TEST
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.UNDEFINED
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
@@ -83,13 +85,13 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
     flowOf {
         val contest = contestInfo.value ?: return@flowOf null
         args.value.let { if (it?.contestId != contest.id) return@flowOf null }
-        if (contest.phase == CodeforcesContestPhase.UNDEFINED) return@flowOf null
+        if (contest.phase == UNDEFINED) return@flowOf null
 
         val phase = when (contest.phase) {
-            CodeforcesContestPhase.CODING -> {
+            CODING -> {
                 CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
             }
-            CodeforcesContestPhase.SYSTEM_TEST -> {
+            SYSTEM_TEST -> {
                 CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
             }
             else -> {
@@ -138,7 +140,7 @@ fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
         when {
             contestInfo == null -> null
             contestInfo.id != contestId -> null
-            contestInfo.phase == CodeforcesContestPhase.UNDEFINED -> null
+            contestInfo.phase == UNDEFINED -> null
             else -> contestId
         }
     }

@@ -7,6 +7,11 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavail
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.BEFORE
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.CODING
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.FINISHED
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.PENDING_SYSTEM_TEST
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.SYSTEM_TEST
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
@@ -127,7 +132,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
     }.onFailure { e ->
         monitor.lastRequest.setValue(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
-            monitor.contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
+            monitor.contestInfo.update { it?.copy(phase = BEFORE) }
         }
         if (e is CodeforcesApiContestNotFoundException && e.contestId == contestId) {
             monitor.reset()
@@ -188,10 +193,10 @@ private suspend fun getDelay(
     ratingChangeWaiter: RatingChangeWaiter
 ): Duration {
     return when (contest?.phase) {
-        CodeforcesContestPhase.CODING -> 10.seconds
-        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
-        CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
-        CodeforcesContestPhase.FINISHED -> {
+        CODING -> 10.seconds
+        PENDING_SYSTEM_TEST -> 15.seconds
+        SYSTEM_TEST -> 3.seconds
+        FINISHED -> {
             ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
         }
         else -> 5.seconds
@@ -240,7 +245,7 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     delay: Duration,
     pageContentProvider: CodeforcesPageContentProvider
 ): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
-    if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
+    if (phase == SYSTEM_TEST) {
         while (true) {
             pageContentProvider.runCatching { getContestPage(contestId) }
                 .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
