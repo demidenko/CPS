@@ -29,7 +29,6 @@ import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.CODING
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.ui.AttentionIcon
@@ -167,7 +166,7 @@ private fun PhaseTitle(
     info: String = ""
 ) {
     val title = when (phase) {
-        CODING -> "left"
+        CodeforcesContestPhase.CODING -> "left"
         else -> phase.title.lowercase()
     }
     Text(

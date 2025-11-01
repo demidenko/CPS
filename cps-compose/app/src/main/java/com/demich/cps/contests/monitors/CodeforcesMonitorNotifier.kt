@@ -8,7 +8,7 @@ import androidx.core.text.bold
 import androidx.core.text.color
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.UNDEFINED
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.utils.getCurrentTime
@@ -74,7 +74,7 @@ class CodeforcesMonitorNotifier(
     }
 
     private var phase: CodeforcesMonitorData.ContestPhase by delegateWithOld(
-        initialValue = CodeforcesMonitorData.ContestPhase.Other(phase = UNDEFINED)
+        initialValue = CodeforcesMonitorData.ContestPhase.Other(CodeforcesContestPhase.UNDEFINED)
     ) { oldPhase, phase ->
         views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
