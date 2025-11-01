@@ -10,6 +10,7 @@ import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.ADMIN
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
@@ -235,7 +236,7 @@ private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixedHandleColors(
     return map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
         require(profile is ProfileResult.Success) { "fixedHandleColors: profile result is not success" }
-        if (blogEntry.author.colorTag == CodeforcesColorTag.ADMIN) blogEntry
+        if (blogEntry.author.colorTag == ADMIN) blogEntry
         else {
             val colorTag = CodeforcesUtils.colorTagFrom(profile.userInfo.rating)
             blogEntry.copy(author = blogEntry.author.copy(colorTag = colorTag))

@@ -166,6 +166,7 @@ private fun SettingsContainerScope.LostAuthorSettingsItem(
     CodeforcesColorTag.entries
     val names = remember {
         mapOf(
+            // TODO: rip context sensitive resolution :(
             CodeforcesColorTag.BLACK to "Exists",
             CodeforcesColorTag.GRAY to "Newbie",
             CodeforcesColorTag.GREEN to "Pupil",

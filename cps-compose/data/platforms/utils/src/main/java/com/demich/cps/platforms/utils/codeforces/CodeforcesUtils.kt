@@ -3,6 +3,15 @@ package com.demich.cps.platforms.utils.codeforces
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLACK
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLUE
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.CYAN
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.GRAY
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.GREEN
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.LEGENDARY
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.ORANGE
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.RED
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.VIOLET
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import kotlinx.datetime.LocalDateTime
@@ -195,15 +204,15 @@ object CodeforcesUtils {
 
     fun colorTagFrom(rating: Int?): CodeforcesColorTag =
         when {
-            rating == null -> CodeforcesColorTag.BLACK
-            rating < 1200 -> CodeforcesColorTag.GRAY
-            rating < 1400 -> CodeforcesColorTag.GREEN
-            rating < 1600 -> CodeforcesColorTag.CYAN
-            rating < 1900 -> CodeforcesColorTag.BLUE
-            rating < 2100 -> CodeforcesColorTag.VIOLET
-            rating < 2400 -> CodeforcesColorTag.ORANGE
-            rating < 3000 -> CodeforcesColorTag.RED
-            else -> CodeforcesColorTag.LEGENDARY
+            rating == null -> BLACK
+            rating < 1200 -> GRAY
+            rating < 1400 -> GREEN
+            rating < 1600 -> CYAN
+            rating < 1900 -> BLUE
+            rating < 2100 -> VIOLET
+            rating < 2400 -> ORANGE
+            rating < 3000 -> RED
+            else -> LEGENDARY
         }
 }
 
