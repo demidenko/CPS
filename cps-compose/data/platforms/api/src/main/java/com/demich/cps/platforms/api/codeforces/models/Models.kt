@@ -2,7 +2,6 @@ package com.demich.cps.platforms.api.codeforces.models
 
 import com.demich.cps.platforms.api.DurationAsSecondsSerializer
 import com.demich.cps.platforms.api.InstantAsSecondsSerializer
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.WAITING
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -130,7 +129,7 @@ data class CodeforcesSubmission(
     val author: CodeforcesContestStandings.CodeforcesContestParticipant,
 
     // Can be absent.
-    val verdict: CodeforcesProblemVerdict = WAITING,
+    val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
 
     // Number of passed tests
     val passedTestCount: Int,

@@ -15,7 +15,7 @@ import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.OK
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.datastore_itemized.edit
@@ -110,7 +110,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
     private fun notify(submission: CodeforcesSubmission) =
         notificationChannels.codeforces.submission_result(submission.id).notify(context) {
-            if (submission.verdict == OK) {
+            if (submission.verdict == CodeforcesProblemVerdict.OK) {
                 smallIcon = R.drawable.ic_problem_ok
                 colorResId = R.color.success
             } else {
@@ -128,5 +128,5 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 }
 
 private fun CodeforcesSubmission.verdictString() =
-    if (verdict == OK) "OK"
+    if (verdict == CodeforcesProblemVerdict.OK) "OK"
     else "${verdict.name} #${passedTestCount+1}"

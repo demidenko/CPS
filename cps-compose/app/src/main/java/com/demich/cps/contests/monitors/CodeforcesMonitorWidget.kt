@@ -31,9 +31,7 @@ import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.CODING
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType.CF
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType.ICPC
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType.CONTESTANT
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -259,9 +257,8 @@ private fun ProblemResultCell(
         }
         is CodeforcesMonitorData.ProblemResult.Points -> {
             ProblemResultCell(
-                text = when (contestType) {
-                    ICPC -> "+"
-                    else -> problemResult.pointsToNiceString()
+                text = if (contestType == CodeforcesContestType.ICPC) "+" else {
+                    problemResult.pointsToNiceString()
                 },
                 color = if (problemResult.isFinal) cpsColors.success else cpsColors.content,
                 modifier = modifier
@@ -303,7 +300,7 @@ private fun Rank(
             )
 
             val rankText = buildString {
-                if (contestantRank.participationType != CONTESTANT) append('*')
+                if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
                 append(rank)
             }
 
@@ -323,37 +320,37 @@ private fun TestProblemColumns() {
             ProblemColumn(
                 problemName = "A",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(1.0, true),
-                contestType = ICPC,
+                contestType = CodeforcesContestType.ICPC,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "A1",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, false),
-                contestType = CF,
+                contestType = CodeforcesContestType.CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "A2",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, true),
-                contestType = CF,
+                contestType = CodeforcesContestType.CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "F",
                 problemResult = CodeforcesMonitorData.ProblemResult.FailedSystemTest,
-                contestType = CF,
+                contestType = CodeforcesContestType.CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "P",
                 problemResult = CodeforcesMonitorData.ProblemResult.Pending,
-                contestType = CF,
+                contestType = CodeforcesContestType.CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "E",
                 problemResult = CodeforcesMonitorData.ProblemResult.Empty,
-                contestType = CF,
+                contestType = CodeforcesContestType.CF,
                 modifier = Modifier.weight(1f)
             )
         }
