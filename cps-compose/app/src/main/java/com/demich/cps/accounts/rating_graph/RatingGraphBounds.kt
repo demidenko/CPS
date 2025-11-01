@@ -1,6 +1,10 @@
 package com.demich.cps.accounts.rating_graph
 
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.rating_graph.RatingFilterType.ALL
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_10
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_MONTH
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_YEAR
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
@@ -32,10 +36,10 @@ internal fun createBounds(
     filterType: RatingFilterType,
     now: Instant
 ) = when (filterType) {
-    RatingFilterType.ALL -> createBounds(ratingChanges)
-    RatingFilterType.LAST_10 -> createBounds(ratingChanges.takeLast(10))
-    RatingFilterType.LAST_MONTH, RatingFilterType.LAST_YEAR -> {
-        val startTime = now - (if (filterType == RatingFilterType.LAST_MONTH) 30.days else 365.days)
+    ALL -> createBounds(ratingChanges)
+    LAST_10 -> createBounds(ratingChanges.takeLast(10))
+    LAST_MONTH, LAST_YEAR -> {
+        val startTime = now - (if (filterType == LAST_MONTH) 30.days else 365.days)
         createBounds(
             ratingChanges = ratingChanges.filter { it.date >= startTime },
             startTime = startTime,

@@ -26,6 +26,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.availableHandleColors
 import com.demich.cps.accounts.managers.colorFor
+import com.demich.cps.accounts.rating_graph.RatingFilterType.ALL
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.spawnDpState
@@ -51,7 +52,7 @@ internal fun RatingGraphCanvas(
     }
 
     val timeMarkers: List<Instant> = remember(filterType, ratingChanges, currentTime) {
-        if (filterType == RatingFilterType.ALL || ratingChanges.size < 2) emptyList()
+        if (filterType == ALL || ratingChanges.size < 2) emptyList()
         else {
             createBounds(ratingChanges, filterType, currentTime).run {
                 listOf(startTime, endTime)

@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
+import com.demich.cps.accounts.rating_graph.RatingFilterType.ALL
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_10
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_MONTH
+import com.demich.cps.accounts.rating_graph.RatingFilterType.LAST_YEAR
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
@@ -95,7 +99,7 @@ private fun RatingGraphWithHeader(
     val currentTime = remember { getCurrentTime() }
     var filterType by rememberSaveable {
         viewPortState.setViewPort(
-            createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
+            createBounds(ratingChanges = ratingChanges, filterType = ALL, now = currentTime)
         )
         mutableStateOf(RatingFilterType.ALL)
     }
@@ -202,16 +206,16 @@ private fun RatingGraphHeader(
 }
 
 private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Instant) =
-    buildList {
-        if (ratingChanges.size > 10) add(RatingFilterType.LAST_10)
+    buildList<RatingFilterType> {
+        if (ratingChanges.size > 10) add(LAST_10)
         val firstInMonth = ratingChanges.partitionIndex { it.date < currentTime - 30.days }
         val firstInYear = ratingChanges.partitionIndex { it.date < currentTime - 365.days }
         if (firstInMonth < ratingChanges.size && firstInMonth > 0) {
-            add(RatingFilterType.LAST_MONTH)
+            add(LAST_MONTH)
         }
         if (firstInYear < ratingChanges.size && firstInYear > 0 && firstInYear != firstInMonth) {
-            add(RatingFilterType.LAST_YEAR)
+            add(LAST_YEAR)
         }
-        if (isNotEmpty()) add(index = 0, RatingFilterType.ALL)
+        if (isNotEmpty()) add(index = 0, ALL)
     }
 
