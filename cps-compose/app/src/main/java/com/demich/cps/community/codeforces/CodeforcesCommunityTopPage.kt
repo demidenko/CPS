@@ -6,11 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.collectAsState
 
 @Composable
 fun CodeforcesCommunityTopPage(
@@ -21,12 +19,12 @@ fun CodeforcesCommunityTopPage(
 
     CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.TOP) {
         when (val key = controller.topPageType) {
-            BlogEntries -> {
+            CodeforcesCommunityController.TopPageType.BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
                     CodeforcesCommunityTopBlogEntries(controller, newEntriesState)
                 }
             }
-            Comments -> {
+            CodeforcesCommunityController.TopPageType.Comments -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
                     CodeforcesCommunityTopComments(controller = controller)
                 }

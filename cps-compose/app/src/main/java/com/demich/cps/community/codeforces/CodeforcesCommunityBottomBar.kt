@@ -3,8 +3,6 @@ package com.demich.cps.community.codeforces
 import androidx.compose.runtime.Composable
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 
@@ -34,8 +32,8 @@ private fun TopPageButton(
     pageType: TopPageType,
     onPageChange: (TopPageType) -> Unit
 ) {
-    CommentsModeButton(isOn = pageType == Comments) { isOn ->
-        onPageChange(if (isOn) Comments else BlogEntries)
+    CommentsModeButton(isOn = pageType == TopPageType.Comments) { isOn ->
+        onPageChange(if (isOn) TopPageType.Comments else TopPageType.BlogEntries)
     }
 }
 
