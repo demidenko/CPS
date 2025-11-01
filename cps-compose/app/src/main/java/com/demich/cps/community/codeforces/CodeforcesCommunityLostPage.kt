@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demich.cps.community.codeforces.CodeforcesTitle.LOST
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -26,7 +27,7 @@ fun CodeforcesCommunityLostPage(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(CodeforcesTitle.LOST) },
+        isTabVisible = { controller.isTabVisible(tab = LOST) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true

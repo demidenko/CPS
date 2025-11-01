@@ -2,6 +2,10 @@ package com.demich.cps.community.settings
 
 import android.content.Context
 import com.demich.cps.community.codeforces.CodeforcesTitle
+import com.demich.cps.community.codeforces.CodeforcesTitle.LOST
+import com.demich.cps.community.codeforces.CodeforcesTitle.MAIN
+import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
+import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.utils.isRuSystemLanguage
@@ -30,11 +34,11 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
     val codeforcesTabs = codeforcesLostEnabled.transform { lostEnabled ->
-        buildList {
-            add(CodeforcesTitle.MAIN)
-            add(CodeforcesTitle.TOP)
-            add(CodeforcesTitle.RECENT)
-            if (lostEnabled) add(CodeforcesTitle.LOST)
+        buildList<CodeforcesTitle> {
+            add(MAIN)
+            add(TOP)
+            add(RECENT)
+            if (lostEnabled) add(LOST)
         }
     }
 

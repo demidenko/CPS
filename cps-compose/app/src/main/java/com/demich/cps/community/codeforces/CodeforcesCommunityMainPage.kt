@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.demich.cps.community.codeforces.CodeforcesTitle.MAIN
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
@@ -12,7 +13,7 @@ fun CodeforcesCommunityMainPage(
     controller: CodeforcesCommunityController,
     newEntriesState: NewEntriesState
 ) {
-    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.MAIN) {
+    CodeforcesReloadablePage(controller = controller, title = MAIN) {
         CodeforcesCommunityMainList(controller, newEntriesState)
     }
 }
@@ -27,7 +28,7 @@ private fun CodeforcesCommunityMainList(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(CodeforcesTitle.MAIN) },
+        isTabVisible = { controller.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true

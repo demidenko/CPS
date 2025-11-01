@@ -5,6 +5,8 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentP
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
+import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
+import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 
@@ -13,13 +15,13 @@ fun CodeforcesCommunityBottomBar(
     controller: CodeforcesCommunityController,
 ) {
     when (controller.currentTab) {
-        CodeforcesTitle.TOP -> {
+        TOP -> {
             TopPageButton(
                 pageType = controller.topPageType,
                 onPageChange = { controller.topPageType = it }
             )
         }
-        CodeforcesTitle.RECENT -> {
+        RECENT -> {
             RecentPageButton(
                 pageType = controller.recentPageType,
                 onPageChange = { controller.recentPageType = it }
