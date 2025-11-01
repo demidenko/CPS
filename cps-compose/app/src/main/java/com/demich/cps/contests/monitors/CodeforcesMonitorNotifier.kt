@@ -10,7 +10,9 @@ import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.UNDEFINED
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType.ICPC
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType.CONTESTANT
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType.NOT_PARTICIPATED
 import com.demich.cps.utils.getCurrentTime
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
@@ -60,10 +62,10 @@ class CodeforcesMonitorNotifier(
     }
 
     private var contestantRank by delegate(
-        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = CodeforcesParticipationType.NOT_PARTICIPATED)
+        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = NOT_PARTICIPATED)
     ) {
         val rank = buildString {
-            if (it.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
+            if (it.participationType != CONTESTANT) append('*')
             append(it.rank)
         }
         viewBig.setTextViewText(R.id.cf_monitor_rank, rank)
@@ -135,8 +137,10 @@ class CodeforcesMonitorNotifier(
                 }
                 is CodeforcesMonitorData.ProblemResult.Points -> {
                     bold {
-                        val text = if (contestType == CodeforcesContestType.ICPC) "+"
-                                    else problemResult.pointsToNiceString()
+                        val text = when (contestType) {
+                            ICPC -> "+"
+                            else -> problemResult.pointsToNiceString()
+                        }
                         if (problemResult.isFinal) {
                             color(successColor) { append(text) }
                         } else {
@@ -150,7 +154,7 @@ class CodeforcesMonitorNotifier(
 
     private fun submitNotification() {
         notificationBuilder.edit {
-            val notParticipated = contestantRank.participationType == CodeforcesParticipationType.NOT_PARTICIPATED
+            val notParticipated = contestantRank.participationType == NOT_PARTICIPATED
 
             setCustomContentView(viewSmall.apply {
                 setTextViewText(

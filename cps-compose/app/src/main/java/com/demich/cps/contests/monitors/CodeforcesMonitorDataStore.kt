@@ -1,15 +1,23 @@
 package com.demich.cps.contests.monitors
 
 import android.content.Context
+import com.demich.cps.contests.monitors.CodeforcesMonitorData.ContestPhase.Coding
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.CODING
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.SYSTEM_TEST
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.UNDEFINED
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus.FINAL
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus.PRELIMINARY
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.OK
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.TESTING
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.WAITING
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset.PRETESTS
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset.TESTS
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -69,16 +77,16 @@ internal data class CodeforcesMonitorSubmissionInfo(
     )
 
     fun isPreliminary(): Boolean {
-        if (verdict == CodeforcesProblemVerdict.WAITING) return true
-        if (verdict == CodeforcesProblemVerdict.TESTING) return true
-        if (testset == CodeforcesTestset.PRETESTS) {
-            return verdict == CodeforcesProblemVerdict.OK
+        if (verdict == WAITING) return true
+        if (verdict == TESTING) return true
+        if (testset == PRETESTS) {
+            return verdict == OK
         }
         return false
     }
 
     fun isFailedSystemTest(): Boolean =
-        testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != CodeforcesProblemVerdict.OK
+        testset == TESTS && verdict.isResult() && verdict != OK
 }
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
@@ -89,7 +97,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
 
         val phase = when (contest.phase) {
             CODING -> {
-                CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
+                Coding(endTime = contest.startTime + contest.duration)
             }
             SYSTEM_TEST -> {
                 CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
@@ -109,12 +117,12 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
             CodeforcesMonitorData.ProblemInfo(
                 name = index,
                 result = when {
-                    contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
+                    contest.phase.isSystemTestOrFinished() && problem.type == PRELIMINARY
                         -> CodeforcesMonitorData.ProblemResult.Pending
                     problem.points != 0.0
                         -> CodeforcesMonitorData.ProblemResult.Points(
                             points = problem.points,
-                            isFinal = problem.type == CodeforcesProblemStatus.FINAL
+                            isFinal = problem.type == FINAL
                         )
                     submissionsInfo[index]?.any { it.isFailedSystemTest() } == true
                         -> CodeforcesMonitorData.ProblemResult.FailedSystemTest

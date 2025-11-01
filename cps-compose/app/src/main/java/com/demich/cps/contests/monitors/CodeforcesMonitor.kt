@@ -13,13 +13,14 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.FIN
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.PENDING_SYSTEM_TEST
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase.SYSTEM_TEST
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType.ICPC
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType.CONTESTANT
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus.FINAL
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.SKIPPED
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset.TESTS
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
@@ -75,7 +76,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             )?.let { submissions ->
                 val notified = notifiedSubmissionsIds()
                 submissions.filter {
-                    it.testset == CodeforcesTestset.TESTS
+                    it.testset == TESTS
                     && it.verdict.isResult()
                     && it.id !in notified
                 }.takeIf { it.isNotEmpty() }?.let { newSubmissions ->
@@ -151,7 +152,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
 }
 
 private fun CodeforcesParticipationType.isOfficial(): Boolean =
-    this == CodeforcesParticipationType.CONTESTANT
+    this == CONTESTANT
 
 private fun isOfficialChanged(
     old: CodeforcesParticipationType,
@@ -171,7 +172,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
             points = result?.points ?: 0.0,
-            type = result?.type ?: CodeforcesProblemStatus.FINAL
+            type = result?.type ?: FINAL
         )
     }
 
@@ -263,7 +264,7 @@ private fun needCheckSubmissions(
     participationType: CodeforcesParticipationType
 ): Boolean {
     if (!participationType.isContestParticipant()) return false
-    if (contestInfo.type == CodeforcesContestType.ICPC) return false
+    if (contestInfo.type == ICPC) return false
     return contestInfo.phase.isSystemTestOrFinished()
 }
 
@@ -271,7 +272,7 @@ private fun needCheckSubmissions(
     problemResult: CodeforcesMonitorProblemResult,
     submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
 ): Boolean {
-    if (problemResult.type != CodeforcesProblemStatus.FINAL) return false
+    if (problemResult.type != FINAL) return false
     val list = submissionsInfo[problemResult.problemIndex] ?: return true
     return list.any { it.isPreliminary() }
 }
@@ -296,7 +297,7 @@ private suspend fun CodeforcesApi.getSubmissionsOrNull(
     }.map { submissions ->
         submissions.filter {
                it.author.isContestParticipant()
-            && it.verdict != CodeforcesProblemVerdict.SKIPPED
+            && it.verdict != SKIPPED
         }
     }.getOrNull() //TODO: take this failure
 
