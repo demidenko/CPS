@@ -1,9 +1,6 @@
 package com.demich.cps.contests.database
 
 import androidx.room.Entity
-import com.demich.cps.contests.database.Contest.Phase.BEFORE
-import com.demich.cps.contests.database.Contest.Phase.FINISHED
-import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -24,9 +21,9 @@ data class Contest (
     val eventDuration: Duration get() = endTime - startTime
 
     fun getPhase(currentTime: Instant): Phase = when {
-        currentTime >= endTime -> FINISHED
-        currentTime < startTime -> BEFORE
-        else -> RUNNING
+        currentTime >= endTime -> Phase.FINISHED
+        currentTime < startTime -> Phase.BEFORE
+        else -> Phase.RUNNING
     }
 
     constructor(
@@ -93,16 +90,16 @@ data class Contest (
             if (phase1 != phase2) {
                 compareValuesBy(phase1, phase2) {
                     when (it) {
-                        RUNNING -> 0
-                        BEFORE -> 1
-                        FINISHED -> 2
+                        Phase.RUNNING -> 0
+                        Phase.BEFORE -> 1
+                        Phase.FINISHED -> 2
                     }
                 }
             } else {
                 when (phase1) {
-                    RUNNING -> compareValues(c1.endTime, c2.endTime)
-                    BEFORE -> compareValues(c1.startTime, c2.startTime)
-                    FINISHED -> -compareValues(c1.endTime, c2.endTime)
+                    Phase.RUNNING -> compareValues(c1.endTime, c2.endTime)
+                    Phase.BEFORE -> compareValues(c1.startTime, c2.startTime)
+                    Phase.FINISHED -> -compareValues(c1.endTime, c2.endTime)
                 }
             }
         }.thenBy { it.platform }.thenBy { it.id }.thenBy { it.duration }
