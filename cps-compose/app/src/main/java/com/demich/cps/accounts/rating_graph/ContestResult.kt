@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColor.ORANGE
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
@@ -126,7 +127,7 @@ private fun RatingChange(
 private fun ContestResultTest(
     change: Int?,
     longTitle: Boolean = false,
-    handleColor: HandleColor = HandleColor.ORANGE
+    handleColor: HandleColor = ORANGE
 ) {
     val rating = 2150
     ContestResult(

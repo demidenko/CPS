@@ -6,6 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColor.RED
 import com.demich.cps.accounts.HandleColorBound
 import com.demich.cps.accounts.SmallRatedAccountPanel
 import com.demich.cps.accounts.userinfo.ProfileResult
@@ -21,7 +22,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
     fun getHandleColor(rating: Int): HandleColor =
         ratingsUpperBounds
             .firstOrNull { rating < it.ratingUpperBound }?.handleColor
-            ?: HandleColor.RED
+            ?: RED
 
     abstract fun originalColor(handleColor: HandleColor): Color
 

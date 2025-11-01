@@ -5,6 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColor.BLUE
+import com.demich.cps.accounts.HandleColor.BROWN
+import com.demich.cps.accounts.HandleColor.CYAN
+import com.demich.cps.accounts.HandleColor.GRAY
+import com.demich.cps.accounts.HandleColor.GREEN
+import com.demich.cps.accounts.HandleColor.ORANGE
+import com.demich.cps.accounts.HandleColor.RED
+import com.demich.cps.accounts.HandleColor.YELLOW
 import com.demich.cps.accounts.screens.AtCoderUserInfoExpandedContent
 import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.AtCoderUserInfo
@@ -70,14 +78,14 @@ class AtCoderAccountManager :
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
-            HandleColor.GRAY -> Color(0xFF808080)
-            HandleColor.BROWN -> Color(0xFF804000)
-            HandleColor.GREEN -> Color(0xFF008000)
-            HandleColor.CYAN -> Color(0xFF00C0C0)
-            HandleColor.BLUE -> Color(0xFF0000FF)
-            HandleColor.YELLOW -> Color(0xFFC0C000)
-            HandleColor.ORANGE -> Color(0xFFFF8000)
-            HandleColor.RED -> Color(0xFFFF0000)
+            GRAY -> Color(0xFF808080)
+            BROWN -> Color(0xFF804000)
+            GREEN -> Color(0xFF008000)
+            CYAN -> Color(0xFF00C0C0)
+            BLUE -> Color(0xFF0000FF)
+            YELLOW -> Color(0xFFC0C000)
+            ORANGE -> Color(0xFFFF8000)
+            RED -> Color(0xFFFF0000)
             else -> illegalHandleColorError(handleColor)
         }
 

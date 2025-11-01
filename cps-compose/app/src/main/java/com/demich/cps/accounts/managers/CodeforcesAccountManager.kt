@@ -13,6 +13,14 @@ import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.LocalCodeforcesAccountManager
 import com.demich.cps.R
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.HandleColor.BLUE
+import com.demich.cps.accounts.HandleColor.CYAN
+import com.demich.cps.accounts.HandleColor.GRAY
+import com.demich.cps.accounts.HandleColor.GREEN
+import com.demich.cps.accounts.HandleColor.ORANGE
+import com.demich.cps.accounts.HandleColor.RED
+import com.demich.cps.accounts.HandleColor.VIOLET
+import com.demich.cps.accounts.HandleColor.YELLOW
 import com.demich.cps.accounts.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
@@ -110,14 +118,14 @@ class CodeforcesAccountManager :
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
-            HandleColor.GRAY -> Color(0xFF808080)
-            HandleColor.GREEN -> Color(0xFF008000)
-            HandleColor.CYAN -> Color(0xFF03A89E)
-            HandleColor.BLUE -> Color(0xFF0000FF)
-            HandleColor.VIOLET -> Color(0xFFAA00AA)
-            HandleColor.YELLOW -> Color(0xFFBBBB00)
-            HandleColor.ORANGE -> Color(0xFFFF8C00)
-            HandleColor.RED -> Color(0xFFFF0000)
+            GRAY -> Color(0xFF808080)
+            GREEN -> Color(0xFF008000)
+            CYAN -> Color(0xFF03A89E)
+            BLUE -> Color(0xFF0000FF)
+            VIOLET -> Color(0xFFAA00AA)
+            YELLOW -> Color(0xFFBBBB00)
+            ORANGE -> Color(0xFFFF8C00)
+            RED -> Color(0xFFFF0000)
             else -> illegalHandleColorError(handleColor)
         }
 
@@ -242,13 +250,13 @@ class CodeforcesAccountManager :
 
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
     when (this) {
-        GRAY -> HandleColor.GRAY
-        GREEN -> HandleColor.GREEN
-        CYAN -> HandleColor.CYAN
-        BLUE -> HandleColor.BLUE
-        VIOLET -> HandleColor.VIOLET
-        ORANGE -> HandleColor.ORANGE
-        RED, LEGENDARY -> HandleColor.RED
+        GRAY -> GRAY
+        GREEN -> GREEN
+        CYAN -> CYAN
+        BLUE -> BLUE
+        VIOLET -> VIOLET
+        ORANGE -> ORANGE
+        RED, LEGENDARY -> RED
         BLACK, ADMIN -> null
     }
 
