@@ -50,8 +50,6 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.LoadingStatus.FAILED
-import com.demich.cps.utils.LoadingStatus.LOADING
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.colorFor
 import com.demich.cps.utils.toSignedString
@@ -153,11 +151,11 @@ fun CPSReloadingButton(
     onClick: () -> Unit
 ) {
     IconButton(
-        enabled = enabled && loadingStatus != LOADING,
+        enabled = enabled && loadingStatus != LoadingStatus.LOADING,
         modifier = modifier,
         onClick = onClick
     ) {
-        if (loadingStatus == LOADING) {
+        if (loadingStatus == LoadingStatus.LOADING) {
             LoadingIndicator(
                 modifier = Modifier.size(20.dp),
                 strokeWidth = 2.dp
@@ -165,7 +163,7 @@ fun CPSReloadingButton(
         } else {
             CPSIcon(
                 icon = CPSIcons.Reload,
-                color = if (loadingStatus == FAILED) cpsColors.error else cpsColors.content,
+                color = if (loadingStatus == LoadingStatus.FAILED) cpsColors.error else cpsColors.content,
                 onState = enabled,
                 modifier = Modifier.size(28.dp)
             )

@@ -14,9 +14,6 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.LoadingStatus.FAILED
-import com.demich.cps.utils.LoadingStatus.LOADING
-import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
@@ -37,30 +34,30 @@ class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<AccountManagerType, LoadingStatus>())
 
     fun flowOfLoadingStatus(manager: AccountManager<out UserInfo>): Flow<LoadingStatus> =
-        loadingStatuses.map { it[manager.type] ?: PENDING }
+        loadingStatuses.map { it[manager.type] ?: LoadingStatus.PENDING }
 
     fun flowOfLoadingStatus(managers: Collection<AccountManager<out UserInfo>>): Flow<LoadingStatus> =
         loadingStatuses.map { map -> managers.mapNotNull { map[it.type] }.combine() }
 
     private fun setLoadingStatus(manager: AccountManager<out UserInfo>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
-            if (loadingStatus == PENDING) remove(manager.type)
+            if (loadingStatus == LoadingStatus.PENDING) remove(manager.type)
             else this[manager.type] = loadingStatus
         }
 
     fun <U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
-        if (loadingStatuses.value[manager.type] == LOADING) return
+        if (loadingStatuses.value[manager.type] == LoadingStatus.LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val dataStore = manager.dataStore(context)
             val savedProfile = dataStore.profile() ?: return@launch
 
-            setLoadingStatus(manager, LOADING)
+            setLoadingStatus(manager, LoadingStatus.LOADING)
             val profileResult = manager.fetchProfile(savedProfile.userId)
 
             if (profileResult is ProfileResult.Failed) {
-                setLoadingStatus(manager, FAILED)
+                setLoadingStatus(manager, LoadingStatus.FAILED)
             } else {
-                setLoadingStatus(manager, PENDING)
+                setLoadingStatus(manager, LoadingStatus.PENDING)
                 dataStore.setProfile(profileResult)
             }
         }
@@ -68,7 +65,7 @@ class ProfilesViewModel: ViewModel() {
 
     fun <U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            setLoadingStatus(manager, PENDING)
+            setLoadingStatus(manager, LoadingStatus.PENDING)
             manager.dataStore(context).deleteProfile()
         }
     }
@@ -86,15 +83,15 @@ class ProfilesViewModel: ViewModel() {
                 suspend {
                     val manager = accountManagerOf(type)
                     //wait for loading stops
-                    loadingStatuses.takeWhile { it[type] == LOADING }.collect()
+                    loadingStatuses.takeWhile { it[type] == LoadingStatus.LOADING }.collect()
                     val savedUserId = manager.dataStore(context).profile()?.userId
                     if (userId.equals(savedUserId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
                         reload(manager, context)
                     } else {
-                        setLoadingStatus(manager, LOADING)
+                        setLoadingStatus(manager, LoadingStatus.LOADING)
                         getAndSave(manager, userId, context)
-                        setLoadingStatus(manager, PENDING)
+                        setLoadingStatus(manager, LoadingStatus.PENDING)
                     }
                 }
             }.joinAllWithProgress(title = "clist import") {

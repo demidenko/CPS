@@ -41,8 +41,6 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.LoadingStatus.LOADING
-import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.append
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -71,11 +69,11 @@ fun <U: UserInfo> ProfilePanel(
     val loadingStatus by collectAsState {
         profilesViewModel.flowOfLoadingStatus(manager)
             .onEach {
-                if (it == LOADING) lastClick = Instant.DISTANT_PAST
+                if (it == LoadingStatus.LOADING) lastClick = Instant.DISTANT_PAST
             }
     }
 
-    val clickEnabled = loadingStatus != LOADING && visibleOrder == null
+    val clickEnabled = loadingStatus != LoadingStatus.LOADING && visibleOrder == null
 
     Box(modifier = modifier
         .fillMaxWidth()
@@ -126,17 +124,17 @@ private fun PanelUIButtons(
 ) {
     Row(modifier = modifier) {
         val uiAlpha by hidingState(lastClick)
-        if (loadingStatus != LOADING && uiAlpha > 0f) {
+        if (loadingStatus != LoadingStatus.LOADING && uiAlpha > 0f) {
             CPSIconButton(
                 icon = CPSIcons.Expand,
                 modifier = Modifier.alpha(uiAlpha),
                 onClick = onExpandRequest
             )
         }
-        if (loadingStatus != PENDING || uiAlpha > 0f) {
+        if (loadingStatus != LoadingStatus.PENDING || uiAlpha > 0f) {
             CPSReloadingButton(
                 loadingStatus = loadingStatus,
-                modifier = Modifier.alpha(if (loadingStatus == PENDING) uiAlpha else 1f),
+                modifier = Modifier.alpha(if (loadingStatus == LoadingStatus.PENDING) uiAlpha else 1f),
                 onClick = onReloadRequest
             )
         }

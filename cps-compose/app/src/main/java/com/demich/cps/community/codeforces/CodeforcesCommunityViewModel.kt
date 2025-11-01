@@ -21,9 +21,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.LoadingStatus.FAILED
-import com.demich.cps.utils.LoadingStatus.LOADING
-import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
@@ -121,12 +118,12 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            if (!followLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
+            if (!followLoadingStatus.compareAndSet(LoadingStatus.PENDING, LoadingStatus.LOADING)) return@launch
             context.followRepository.run {
                 updateUsers()
                 updateFailedBlogEntries()
             }
-            followLoadingStatus.value = PENDING
+            followLoadingStatus.value = LoadingStatus.PENDING
         }
     }
 
@@ -170,17 +167,17 @@ private class CodeforcesDataLoader<T: Any>(
     fun launchLoadIfActive(locale: CodeforcesLocale) {
         if (inactive) return
         loadingStatus.update {
-            if (it == LOADING) return
-            LOADING
+            if (it == LoadingStatus.LOADING) return
+            LoadingStatus.LOADING
         }
         scope.launch(Dispatchers.Default) {
             runCatching {
                 getData(locale)
             }.onFailure {
-                loadingStatus.value = FAILED
+                loadingStatus.value = LoadingStatus.FAILED
             }.onSuccess {
                 dataFlow.value = it
-                loadingStatus.value = PENDING
+                loadingStatus.value = LoadingStatus.PENDING
             }
         }
     }

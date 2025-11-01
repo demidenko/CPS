@@ -13,9 +13,6 @@ import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.LoadingStatus.FAILED
-import com.demich.cps.utils.LoadingStatus.LOADING
-import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
@@ -43,7 +40,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
         combine(loadingStatuses, errors) { loadingStatuses, errors ->
             loadingStatuses
-                .filter { it.value == FAILED }
+                .filter { it.value == LoadingStatus.FAILED }
                 .flatMap { errors[it.key] ?: emptyList() }
                 .distinct()
         }
@@ -53,8 +50,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
-            if (loadingStatus == LOADING) check(this[platform] != LOADING)
-            if (loadingStatus == PENDING) remove(platform)
+            if (loadingStatus == LoadingStatus.LOADING) check(this[platform] != LoadingStatus.LOADING)
+            if (loadingStatus == LoadingStatus.PENDING) remove(platform)
             else this[platform] = loadingStatus
         }
 
@@ -62,9 +59,9 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
         platform: Contest.Platform,
         flow: Flow<ContestsLoadingResult>
     ) = flow.run {
-        var lastStatus: LoadingStatus = PENDING
+        var lastStatus: LoadingStatus = LoadingStatus.PENDING
         onStart {
-            setLoadingStatus(platform, LOADING)
+            setLoadingStatus(platform, LoadingStatus.LOADING)
             errors.edit { remove(platform) }
         }.onEach { (platform, loaderType, result) ->
             result.onFailure { error ->
@@ -99,7 +96,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             diff.toRemove.forEach { platform ->
                 dao.replace(platform, emptyList())
                 errors.edit { remove(platform) }
-                setLoadingStatus(platform, PENDING)
+                setLoadingStatus(platform, LoadingStatus.PENDING)
             }
 
             reload(
