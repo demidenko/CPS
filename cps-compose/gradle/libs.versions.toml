@@ -16,9 +16,9 @@ compose-bom = "2025.10.00" # https://developer.android.com/develop/ui/compose/bo
 
 activity-compose = "1.11.0" # https://developer.android.com/jetpack/androidx/releases/activity
 navigation-compose = "2.9.5" # https://developer.android.com/jetpack/androidx/releases/navigation
-lifecycle = "2.9.3"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
+lifecycle = "2.9.4"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
-room = "2.8.2" # https://developer.android.com/jetpack/androidx/releases/room
+room = "2.8.3" # https://developer.android.com/jetpack/androidx/releases/room
 
 datastore = "1.1.7"
 
