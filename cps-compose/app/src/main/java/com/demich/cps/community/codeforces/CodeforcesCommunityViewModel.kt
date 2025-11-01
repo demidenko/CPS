@@ -13,7 +13,7 @@ import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLACK
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
@@ -140,7 +140,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             result.getOrThrow().map {
                 it.copy(
                     title = CodeforcesUtils.extractTitle(it),
-                    authorColorTag = colorTag ?: BLACK
+                    authorColorTag = colorTag ?: CodeforcesColorTag.BLACK
                 )
             }
         }

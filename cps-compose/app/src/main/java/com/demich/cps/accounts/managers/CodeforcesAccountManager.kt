@@ -22,16 +22,6 @@ import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.ADMIN
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLACK
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLUE
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.CYAN
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.GRAY
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.GREEN
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.LEGENDARY
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.ORANGE
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.RED
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.VIOLET
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
@@ -89,13 +79,13 @@ class CodeforcesAccountManager :
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
-        listOf<CodeforcesColorTag>(
-            GRAY,
-            GREEN,
-            CYAN,
-            BLUE,
-            VIOLET,
-            ORANGE
+        listOf(
+            CodeforcesColorTag.GRAY,
+            CodeforcesColorTag.GREEN,
+            CodeforcesColorTag.CYAN,
+            CodeforcesColorTag.BLUE,
+            CodeforcesColorTag.VIOLET,
+            CodeforcesColorTag.ORANGE
         ).map { colorTag ->
             //TODO: bs can be optimized if iterate from orange to gray
             val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
@@ -127,11 +117,11 @@ class CodeforcesAccountManager :
             tag.toHandleColor()?.let { handleColor ->
                 addStyle(
                     style = SpanStyle(color = cpsColors.colorFor(handleColor)),
-                    start = if (tag == LEGENDARY) 1 else 0,
+                    start = if (tag == CodeforcesColorTag.LEGENDARY) 1 else 0,
                     end = handle.length
                 )
             }
-            if (tag != BLACK) {
+            if (tag != CodeforcesColorTag.BLACK) {
                 addStyle(
                     style = SpanStyle(fontWeight = FontWeight.Bold),
                     start = 0,
@@ -242,14 +232,14 @@ class CodeforcesAccountManager :
 
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
     when (this) {
-        GRAY -> HandleColor.GRAY
-        GREEN -> HandleColor.GREEN
-        CYAN -> HandleColor.CYAN
-        BLUE -> HandleColor.BLUE
-        VIOLET -> HandleColor.VIOLET
-        ORANGE -> HandleColor.ORANGE
-        RED, LEGENDARY -> HandleColor.RED
-        BLACK, ADMIN -> null
+        CodeforcesColorTag.GRAY -> HandleColor.GRAY
+        CodeforcesColorTag.GREEN -> HandleColor.GREEN
+        CodeforcesColorTag.CYAN -> HandleColor.CYAN
+        CodeforcesColorTag.BLUE -> HandleColor.BLUE
+        CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
+        CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
+        CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
+        CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
     }
 
 @Composable

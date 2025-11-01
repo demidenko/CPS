@@ -2,7 +2,6 @@ package com.demich.cps.platforms.api.codeforces.models
 
 import com.demich.cps.platforms.api.DurationAsSecondsSerializer
 import com.demich.cps.platforms.api.InstantAsSecondsSerializer
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLACK
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict.WAITING
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -166,7 +165,7 @@ data class CodeforcesBlogEntry(
 
     val commentsCount: Int? = null,
 
-    val authorColorTag: CodeforcesColorTag = BLACK
+    val authorColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
 @Serializable
@@ -210,7 +209,7 @@ data class CodeforcesComment(
 
     val rating: Int,
 
-    val commentatorHandleColorTag: CodeforcesColorTag = BLACK
+    val commentatorHandleColorTag: CodeforcesColorTag = CodeforcesColorTag.BLACK
 )
 
 @Serializable

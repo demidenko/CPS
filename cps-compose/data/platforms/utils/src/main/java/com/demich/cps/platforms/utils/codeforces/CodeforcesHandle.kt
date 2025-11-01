@@ -2,7 +2,6 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag.BLACK
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
@@ -46,5 +45,5 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
 internal fun Element.extractRatedUser(): CodeforcesHandle =
     CodeforcesHandle(
         handle = text(),
-        colorTag = extractColorTag() ?: BLACK
+        colorTag = extractColorTag() ?: CodeforcesColorTag.BLACK
     )
