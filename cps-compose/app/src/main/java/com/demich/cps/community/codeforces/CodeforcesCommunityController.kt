@@ -26,6 +26,7 @@ import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.collectAsState
@@ -162,12 +163,12 @@ fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): St
         return remember {
             CodeforcesCommunityLostRecentWorker.getWork(context)
                 .flowOfWorkInfo()
-                .map { if (it.isRunning) LoadingStatus.LOADING else LoadingStatus.PENDING }
-        }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
+                .map { if (it.isRunning) LoadingStatus.LOADING else PENDING }
+        }.collectAsStateWithLifecycle(initialValue = PENDING)
     }
 
     return remember(title) { flowOfLoadingStatus(title) }
-        .collectAsState(initial = LoadingStatus.PENDING) //TODO: be sure this fake is ok
+        .collectAsState(initial = PENDING) //TODO: be sure this fake is ok
 }
 
 

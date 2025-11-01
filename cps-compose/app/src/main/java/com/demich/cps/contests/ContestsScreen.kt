@@ -66,6 +66,8 @@ import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.LoadingStatus.LOADING
+import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.ProvideCurrentTime
 import com.demich.cps.utils.add
 import com.demich.cps.utils.clickableNoRipple
@@ -321,7 +323,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     }
 
     val loadingStatus by combinedLoadingStatusState()
-    val isReloading = { loadingStatus == LoadingStatus.LOADING }
+    val isReloading = { loadingStatus == LOADING }
 
     menu = contestsMenuBuilder(
         onOpenSettings = onOpenSettings,
@@ -416,10 +418,10 @@ private fun combinedLoadingStatusState(): State<LoadingStatus> {
     return remember(viewModel) {
         viewModel.flowOfLoadingStatus()
             .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
-                if (workInfo.isRunning) LoadingStatus.LOADING
+                if (workInfo.isRunning) LOADING
                 else loadingStatus
             }
-    }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
+    }.collectAsStateWithLifecycle(initialValue = PENDING)
 }
 
 @Composable

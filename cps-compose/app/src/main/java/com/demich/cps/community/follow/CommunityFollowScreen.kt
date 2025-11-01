@@ -31,7 +31,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
-import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.LoadingStatus.LOADING
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
@@ -63,7 +63,7 @@ private fun CommunityFollowScreen(
     ProvideTimeEachMinute {
         CodeforcesFollowList(
             userBlogs = { userBlogs },
-            isRefreshing = { followLoadingStatus == LoadingStatus.LOADING },
+            isRefreshing = { followLoadingStatus == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { handle ->
                 scope.launch {
