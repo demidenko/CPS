@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.contestDate
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.Contest.Phase.BEFORE
+import com.demich.cps.contests.database.Contest.Phase.FINISHED
+import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.contests.dateBriefRange
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.isVirtual
@@ -105,11 +108,11 @@ private fun ContestItemFooter(
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = when (phase) {
-                    Contest.Phase.BEFORE -> contest.dateBriefRange()
-                    Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
-                    Contest.Phase.FINISHED -> contest.dateRange()
+                    BEFORE -> contest.dateBriefRange()
+                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
+                    FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == Contest.Phase.BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(

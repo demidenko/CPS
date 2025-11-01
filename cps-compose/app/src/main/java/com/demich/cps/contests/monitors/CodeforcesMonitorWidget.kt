@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.contestItemPaddings
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.Contest.Phase.BEFORE
+import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
@@ -81,8 +83,8 @@ private fun CodeforcesMonitor(
             platform = Contest.Platform.codeforces,
             contestTitle = contestData.contestInfo.name,
             phase = when (contestData.contestPhase) {
-                is CodeforcesMonitorData.ContestPhase.Coding -> Contest.Phase.RUNNING
-                else -> Contest.Phase.BEFORE
+                is CodeforcesMonitorData.ContestPhase.Coding -> RUNNING
+                else -> BEFORE
             },
             isVirtual = false,
             modifier = Modifier.fillMaxWidth()

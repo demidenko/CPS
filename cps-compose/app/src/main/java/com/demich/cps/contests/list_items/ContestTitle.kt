@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
@@ -62,7 +63,7 @@ internal fun ContestTitleExpanded(
 }
 
 fun CPSColors.colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
-    if (phase == Contest.Phase.RUNNING && !isVirtual) success
+    if (phase == RUNNING && !isVirtual) success
     else content
 
 @Composable

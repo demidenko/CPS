@@ -3,6 +3,9 @@ package com.demich.cps.contests.list_items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.Contest.Phase.BEFORE
+import com.demich.cps.contests.database.Contest.Phase.FINISHED
+import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.utils.localCurrentTime
 import kotlin.time.Duration
 
@@ -15,7 +18,7 @@ internal inline fun Contest.counter(
     finished: () -> String = { "" }
 ): String =
     when (phase) {
-        Contest.Phase.BEFORE -> before(startTime - localCurrentTime)
-        Contest.Phase.RUNNING -> running(endTime - localCurrentTime)
-        Contest.Phase.FINISHED -> finished()
+        BEFORE -> before(startTime - localCurrentTime)
+        RUNNING -> running(endTime - localCurrentTime)
+        FINISHED -> finished()
     }
