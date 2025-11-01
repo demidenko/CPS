@@ -12,7 +12,9 @@ import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.utils.NewEntriesMap
-import com.demich.cps.utils.NewEntryType
+import com.demich.cps.utils.NewEntryType.OPENED
+import com.demich.cps.utils.NewEntryType.SEEN
+import com.demich.cps.utils.NewEntryType.UNSEEN
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -42,12 +44,12 @@ fun rememberNewEntriesState(): NewEntriesState {
             override val types by typesState
 
             override suspend fun markSeen(ids: List<Int>) {
-                item.markAtLeast(ids, NewEntryType.SEEN)
+                item.markAtLeast(ids, SEEN)
             }
 
             override fun markOpened(id: Int) {
                 scope.launch {
-                    item.markAtLeast(id, NewEntryType.OPENED)
+                    item.markAtLeast(id, OPENED)
                 }
             }
         }
@@ -110,7 +112,7 @@ fun rememberCodeforcesBlogEntriesState(
             override fun isNew(id: Int): Boolean {
                 if (!showNewEntries) return false
                 val type = newEntriesState.types.getType(id)
-                return type == NewEntryType.UNSEEN || type == NewEntryType.SEEN
+                return type == UNSEEN || type == SEEN
             }
         }
     }
