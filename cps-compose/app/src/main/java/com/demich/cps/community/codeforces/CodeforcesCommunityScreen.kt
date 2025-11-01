@@ -24,10 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
-import com.demich.cps.community.codeforces.CodeforcesTitle.LOST
-import com.demich.cps.community.codeforces.CodeforcesTitle.MAIN
-import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
-import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDefaults
@@ -96,10 +92,10 @@ private fun CodeforcesPager(
             modifier = modifier
         ) { index ->
             when (controller.tabs[index]) {
-                MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
-                TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
-                RECENT -> CodeforcesCommunityRecentPage(controller = controller)
-                LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
+                CodeforcesTitle.MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
+                CodeforcesTitle.TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
+                CodeforcesTitle.RECENT -> CodeforcesCommunityRecentPage(controller = controller)
+                CodeforcesTitle.LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
             }
         }
     }

@@ -17,10 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
-import com.demich.cps.community.codeforces.CodeforcesTitle.LOST
-import com.demich.cps.community.codeforces.CodeforcesTitle.MAIN
-import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
-import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -119,11 +115,11 @@ class CodeforcesCommunityController internal constructor(
 
     fun flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
         when (tab) {
-            MAIN -> flowOfNewEntryCounters(
+            CodeforcesTitle.MAIN -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfMainBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
-            LOST -> flowOfNewEntryCounters(
+            CodeforcesTitle.LOST -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfLostBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
@@ -157,7 +153,7 @@ fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
 
 @Composable
 fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
-    if (title == LOST) {
+    if (title == CodeforcesTitle.LOST) {
         val context = context
         return remember {
             CodeforcesCommunityLostRecentWorker.getWork(context)
@@ -203,14 +199,14 @@ private fun flowOfNewEntryCounters(
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
     visitedTabs.forEach { tab ->
         when (tab) {
-            MAIN -> flowOfMainBlogEntries(context)
-            TOP -> {
+            CodeforcesTitle.MAIN -> flowOfMainBlogEntries(context)
+            CodeforcesTitle.TOP -> {
                 when (topPageType) {
                     BlogEntries -> flowOfTopBlogEntries(context)
                     Comments -> flowOfTopComments(context)
                 }
             }
-            RECENT -> flowOfRecent(context)
+            CodeforcesTitle.RECENT -> flowOfRecent(context)
             else -> { }
         }
     }

@@ -8,7 +8,6 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
-import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -20,7 +19,7 @@ fun CodeforcesCommunityTopPage(
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, title = TOP) {
+    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.TOP) {
         when (val key = controller.topPageType) {
             BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
@@ -46,7 +45,7 @@ private fun CodeforcesCommunityTopBlogEntries(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfTopBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(tab = TOP) },
+        isTabVisible = { controller.isTabVisible(CodeforcesTitle.TOP) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = false

@@ -6,10 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.community.codeforces.CodeforcesTitle.LOST
-import com.demich.cps.community.codeforces.CodeforcesTitle.MAIN
-import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
-import com.demich.cps.community.codeforces.CodeforcesTitle.TOP
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -48,13 +44,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
-            MAIN -> mainBlogEntries.loadingStatusFlow
-            TOP -> {
+            CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusFlow
+            CodeforcesTitle.TOP -> {
                 listOf(topBlogEntries.loadingStatusFlow, topComments.loadingStatusFlow)
                     .combine()
             }
-            RECENT -> recentActions.loadingStatusFlow
-            LOST -> throw IllegalArgumentException(title.name)
+            CodeforcesTitle.RECENT -> recentActions.loadingStatusFlow
+            CodeforcesTitle.LOST -> throw IllegalArgumentException(title.name)
         }
     }
 
@@ -74,13 +70,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when (title) {
-            MAIN -> mainBlogEntries.launchLoadIfActive(locale)
-            TOP -> {
+            CodeforcesTitle.MAIN -> mainBlogEntries.launchLoadIfActive(locale)
+            CodeforcesTitle.TOP -> {
                 topBlogEntries.launchLoadIfActive(locale)
                 //TODO: set comments inactive after many reloads without showing them
                 topComments.launchLoadIfActive(locale)
             }
-            RECENT -> recentActions.launchLoadIfActive(locale)
+            CodeforcesTitle.RECENT -> recentActions.launchLoadIfActive(locale)
             else -> return
         }
     }

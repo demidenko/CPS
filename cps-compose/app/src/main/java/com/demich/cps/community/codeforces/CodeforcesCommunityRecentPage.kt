@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
-import com.demich.cps.community.codeforces.CodeforcesTitle.RECENT
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
@@ -33,12 +32,12 @@ fun CodeforcesCommunityRecentPage(
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, title = RECENT) {
+    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntry = type.blogEntry
                 BackHandler(
-                    enabled = { controller.isTabVisible(RECENT) },
+                    enabled = { controller.isTabVisible(CodeforcesTitle.RECENT) },
                     onBackPressed = { controller.recentPageType = RecentPageType.RecentFeed }
                 ) {
                     RecentCommentsInBlogEntry(
