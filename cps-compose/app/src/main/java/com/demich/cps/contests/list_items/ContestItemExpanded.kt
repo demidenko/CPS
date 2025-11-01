@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.Contest.Phase.BEFORE
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
@@ -129,7 +128,7 @@ private fun ContestItemDatesAndMenuButton(
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = contest.dateRange(),
-                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == Contest.Phase.BEFORE) collisionType(contest) else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -177,7 +176,7 @@ private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
         return when (getPhase(currentTime = getCurrentTime())) {
-            BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
+            Contest.Phase.BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }
     }

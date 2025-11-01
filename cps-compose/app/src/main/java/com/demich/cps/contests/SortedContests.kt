@@ -10,7 +10,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.Contest.Phase.FINISHED
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
@@ -64,7 +63,7 @@ private interface ContestsSorter {
 }
 
 private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionIndex { it.getPhase(currentTime) != FINISHED }
+    partitionIndex { it.getPhase(currentTime) != Contest.Phase.FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)

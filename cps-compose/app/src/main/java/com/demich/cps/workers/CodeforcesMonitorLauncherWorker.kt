@@ -5,8 +5,6 @@ import androidx.work.WorkerParameters
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.Contest.Phase.BEFORE
-import com.demich.cps.contests.database.Contest.Phase.RUNNING
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
@@ -106,11 +104,11 @@ class CodeforcesMonitorLauncherWorker(
             currentTime = workerStartTime
         ).minOfNotNull {
             when (it.getPhase(workerStartTime)) {
-                RUNNING -> {
+                Contest.Phase.RUNNING -> {
                     work.enqueueAsap()
                     return
                 }
-                BEFORE -> it.startTime
+                Contest.Phase.BEFORE -> it.startTime
                 else -> null
             }
         }?.let {
