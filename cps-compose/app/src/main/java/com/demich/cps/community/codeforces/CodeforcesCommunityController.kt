@@ -15,6 +15,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.BlogEntries
+import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType.Comments
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -51,7 +53,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
             tabsState = tabsState,
             data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
-                topPageType = CodeforcesCommunityController.TopPageType.BlogEntries,
+                topPageType = BlogEntries,
                 recentPageType = CodeforcesCommunityController.RecentPageType.RecentFeed
             )
         )
@@ -200,8 +202,8 @@ private fun CodeforcesCommunityController.touchFlows(context: Context) {
             CodeforcesTitle.MAIN -> flowOfMainBlogEntries(context)
             CodeforcesTitle.TOP -> {
                 when (topPageType) {
-                    CodeforcesCommunityController.TopPageType.BlogEntries -> flowOfTopBlogEntries(context)
-                    CodeforcesCommunityController.TopPageType.Comments -> flowOfTopComments(context)
+                    BlogEntries -> flowOfTopBlogEntries(context)
+                    Comments -> flowOfTopComments(context)
                 }
             }
             CodeforcesTitle.RECENT -> flowOfRecent(context)
