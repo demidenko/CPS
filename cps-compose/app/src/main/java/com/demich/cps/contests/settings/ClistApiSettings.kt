@@ -38,7 +38,8 @@ import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun SettingsContainerScope.ClistApiAccessSettingsItem() {
+context(scope: SettingsContainerScope)
+internal fun ClistApiAccessSettingsItem() {
     val context = context
     val settings = remember { context.settingsContests }
 

@@ -23,7 +23,7 @@ fun Switch(
     description: String = "",
     onCheckedChange: (Boolean) -> Unit
 ) {
-    scope.ItemWithTrailer(
+    ItemWithTrailer(
         title = title,
         description = description
     ) {

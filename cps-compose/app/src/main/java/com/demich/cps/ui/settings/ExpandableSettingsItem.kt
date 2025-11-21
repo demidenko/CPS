@@ -23,10 +23,11 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.clickableNoRipple
 
 @Composable
-fun SettingsContainerScope.Expandable(
+context(scope: SettingsContainerScope)
+fun Expandable(
     title: String,
-    collapsedContent: @Composable SettingsContainerScope.() -> Unit,
-    expandedContent: @Composable SettingsContainerScope.() -> Unit,
+    collapsedContent: @Composable context(SettingsContainerScope) () -> Unit,
+    expandedContent: @Composable context(SettingsContainerScope) () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Item(

@@ -20,7 +20,8 @@ import com.demich.cps.utils.emptyTimedCollection
 import com.demich.datastore_itemized.setValueIn
 
 @Composable
-internal fun SettingsContainerScope.DeletedContestsSettingsItem() {
+context(scope: SettingsContainerScope)
+internal fun DeletedContestsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 

@@ -16,11 +16,12 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.datastore_itemized.DataStoreValue
 
 @Composable
-fun <T> SettingsContainerScope.SubtitledByValue(
+context(scope: SettingsContainerScope)
+fun <T> SubtitledByValue(
     modifier: Modifier = Modifier,
     item: DataStoreValue<T>,
     title: String,
-    subtitle: @Composable SettingsContainerScope.(T) -> Unit
+    subtitle: @Composable context(SettingsContainerScope) (T) -> Unit
 ) {
     Item(modifier = modifier) {
         val value by collectItemAsState { item }
@@ -45,7 +46,8 @@ private fun subtitleTextStyle() =
     )
 
 @Composable
-fun SettingsContainerScope.Subtitle(
+context(scope: SettingsContainerScope)
+fun Subtitle(
     text: String
 ) {
     Text(
@@ -57,7 +59,8 @@ fun SettingsContainerScope.Subtitle(
 }
 
 @Composable
-fun SettingsContainerScope.Subtitle(
+context(scope: SettingsContainerScope)
+fun Subtitle(
     selected: Collection<String>
 ) {
     ProvideTextStyle(value = subtitleTextStyle()) {
@@ -69,7 +72,8 @@ fun SettingsContainerScope.Subtitle(
 }
 
 @Composable
-fun <T: Enum<T>> SettingsContainerScope.Subtitle(
+context(scope: SettingsContainerScope)
+fun <T: Enum<T>> Subtitle(
     selected: Collection<T>,
     name: (T) -> String = { it.name }
 ) {

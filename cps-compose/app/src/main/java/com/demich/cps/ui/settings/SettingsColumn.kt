@@ -28,7 +28,7 @@ import com.demich.cps.utils.ProvideContentColor
 @Composable
 inline fun SettingsColumn(
     modifier: Modifier = Modifier,
-    content: @Composable SettingsContainerScope.() -> Unit
+    content: @Composable context(SettingsContainerScope) () -> Unit
 ) {
     val border: Dp = 10.dp
     //spaceBy adds space only between items but start + end required too
@@ -39,7 +39,9 @@ inline fun SettingsColumn(
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.fillMaxWidth())
-        SettingsColumnScopeInstance.content()
+        context(SettingsColumnScopeInstance) {
+            content()
+        }
         Spacer(modifier = Modifier.fillMaxWidth())
     }
 }
@@ -48,7 +50,7 @@ inline fun SettingsColumn(
 inline fun SettingsColumn(
     requiredNotificationsPermission: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable SettingsContainerScope.() -> Unit
+    content: @Composable context(SettingsContainerScope) () -> Unit
 ) {
     Column(modifier = modifier) {
         SettingsColumn(content = content, modifier = Modifier.weight(1f))
@@ -57,11 +59,12 @@ inline fun SettingsColumn(
 }
 
 @Composable
-inline fun SettingsContainerScope.SettingsSectionHeader(
+context(scope: SettingsContainerScope)
+inline fun SettingsSectionHeader(
     title: String,
     painter: Painter,
     modifier: Modifier = Modifier,
-    content: SettingsContainerScope.() -> Unit
+    content: context(SettingsContainerScope) () -> Unit
 ) {
     Row(
         modifier = modifier,

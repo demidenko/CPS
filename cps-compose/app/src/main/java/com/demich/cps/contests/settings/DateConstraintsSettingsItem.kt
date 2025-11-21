@@ -37,7 +37,8 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-internal fun SettingsContainerScope.DateConstraintsSettingsItem() {
+context(scope: SettingsContainerScope)
+internal fun DateConstraintsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 

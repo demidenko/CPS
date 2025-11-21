@@ -35,7 +35,8 @@ import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun SettingsContainerScope.ContestPlatformsSettingsItem() {
+context(scope: SettingsContainerScope)
+internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -69,7 +70,8 @@ internal fun SettingsContainerScope.ContestPlatformsSettingsItem() {
 }
 
 @Composable
-private fun SettingsContainerScope.EnabledPlatformsSubtitle(
+context(scope: SettingsContainerScope)
+private fun EnabledPlatformsSubtitle(
     enabledPlatforms: Set<Contest.Platform>,
     clistResources: List<ClistResource>
 ) {

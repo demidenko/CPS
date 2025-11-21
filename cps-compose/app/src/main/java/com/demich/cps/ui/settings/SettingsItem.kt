@@ -18,23 +18,27 @@ import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
-fun SettingsContainerScope.Item(
+context(scope: SettingsContainerScope)
+fun Item(
     modifier: Modifier = Modifier,
-    content: @Composable SettingsContainerScope.() -> Unit
+    content: @Composable context(SettingsContainerScope) () -> Unit
 ) {
-    append(modifier = modifier) {
+    scope.append(modifier = modifier) {
         ColumnSpaced(
             // TODO: bad glitch with animated content
             space = 10.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
-            SettingsItemScopeInstance.content()
+            context(SettingsItemScopeInstance) {
+                content()
+            }
         }
     }
 }
 
 @Composable
-fun SettingsContainerScope.Title(
+context(scope: SettingsContainerScope)
+fun Title(
     modifier: Modifier = Modifier,
     title: String
 ) {
@@ -47,7 +51,8 @@ fun SettingsContainerScope.Title(
 }
 
 @Composable
-fun SettingsContainerScope.ItemWithTrailer(
+context(scope: SettingsContainerScope)
+fun ItemWithTrailer(
     title: String,
     description: String = "",
     trailer: @Composable () -> Unit

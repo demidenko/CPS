@@ -22,7 +22,8 @@ import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.launch
 
 @Composable
-fun <T> SettingsContainerScope.Select(
+context(scope: SettingsContainerScope)
+fun <T> Select(
     title: String,
     description: String = "",
     item: DataStoreItem<T>,
@@ -60,7 +61,8 @@ fun <T> SettingsContainerScope.Select(
 }
 
 @Composable
-fun <T> SettingsContainerScope.SelectSubtitled(
+context(scope: SettingsContainerScope)
+fun <T> SelectSubtitled(
     title: String,
     item: DataStoreItem<T>,
     options: Iterable<T>,
@@ -97,7 +99,8 @@ fun <T> SettingsContainerScope.SelectSubtitled(
 }
 
 @Composable
-fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
+context(scope: SettingsContainerScope)
+fun <T: Enum<T>> SelectEnum(
     title: String,
     description: String = "",
     item: DataStoreItem<T>,
@@ -114,7 +117,8 @@ fun <T: Enum<T>> SettingsContainerScope.SelectEnum(
 }
 
 @Composable
-fun <T: Enum<T>> SettingsContainerScope.MultiSelectEnum(
+context(scope: SettingsContainerScope)
+fun <T: Enum<T>> MultiSelectEnum(
     title: String,
     item: DataStoreItem<Set<T>>,
     options: Iterable<T>,

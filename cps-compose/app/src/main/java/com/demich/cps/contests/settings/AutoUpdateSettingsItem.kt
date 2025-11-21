@@ -12,7 +12,8 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-internal fun SettingsContainerScope.AutoUpdateSettingsItem() {
+context(scope: SettingsContainerScope)
+internal fun AutoUpdateSettingsItem() {
     val context = context
 
     SelectSubtitled(

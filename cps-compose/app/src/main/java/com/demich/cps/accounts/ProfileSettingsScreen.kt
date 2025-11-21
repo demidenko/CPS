@@ -101,7 +101,8 @@ private fun <U: UserInfo> ProfileSettingsItems(
 }
 
 @Composable
-private fun SettingsContainerScope.UserIdSettingsItem(
+context(scope: SettingsContainerScope)
+private fun UserIdSettingsItem(
     userId: String,
     userIdTitle: String,
     modifier: Modifier = Modifier

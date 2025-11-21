@@ -109,7 +109,8 @@ private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolea
     }
 
 @Composable
-private fun SettingsContainerScope.DefaultTabSettingsItem() {
+context(scope: SettingsContainerScope)
+private fun DefaultTabSettingsItem() {
     val context = context
     SelectEnum(
         item = context.settingsCommunity.codeforcesDefaultTab,
@@ -123,7 +124,8 @@ private fun SettingsContainerScope.DefaultTabSettingsItem() {
 }
 
 @Composable
-private fun SettingsContainerScope.FollowSettingsItem() {
+context(scope: SettingsContainerScope)
+private fun FollowSettingsItem() {
     val context = context
     SwitchByWork(
         item = context.settingsCommunity.codeforcesFollowEnabled,
@@ -134,7 +136,8 @@ private fun SettingsContainerScope.FollowSettingsItem() {
 }
 
 @Composable
-private fun SettingsContainerScope.LostSettingsItem() {
+context(scope: SettingsContainerScope)
+private fun LostSettingsItem() {
     val context = context
     val settings = remember { context.settingsCommunity }
     val item = remember { settings.codeforcesLostEnabled }
@@ -158,7 +161,8 @@ private fun SettingsContainerScope.LostSettingsItem() {
 }
 
 @Composable
-private fun SettingsContainerScope.LostAuthorSettingsItem(
+context(scope: SettingsContainerScope)
+private fun LostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
     CodeforcesColorTag.entries
@@ -230,7 +234,8 @@ private val NewsFeed.link: String
 
 
 @Composable
-private fun SettingsContainerScope.NewsFeedsSettingsItem() {
+context(scope: SettingsContainerScope)
+private fun NewsFeedsSettingsItem() {
     val context = context
     val enabledItem = remember { context.settingsCommunity.enabledNewsFeeds }
 
