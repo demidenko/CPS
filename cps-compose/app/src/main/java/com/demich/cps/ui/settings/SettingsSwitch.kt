@@ -16,13 +16,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsContainerScope.Switch(
+context(scope: SettingsContainerScope)
+fun Switch(
     checked: Boolean,
     title: String,
     description: String = "",
     onCheckedChange: (Boolean) -> Unit
 ) {
-    ItemWithTrailer(
+    scope.ItemWithTrailer(
         title = title,
         description = description
     ) {
@@ -35,7 +36,8 @@ fun SettingsContainerScope.Switch(
 }
 
 @Composable
-private inline fun SettingsContainerScope.SwitchByItem(
+context(scope: SettingsContainerScope)
+private inline fun SwitchByItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
@@ -56,7 +58,8 @@ private inline fun SettingsContainerScope.SwitchByItem(
 }
 
 @Composable
-fun SettingsContainerScope.SwitchByItem(
+context(scope: SettingsContainerScope)
+fun SwitchByItem(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = ""
@@ -70,7 +73,8 @@ fun SettingsContainerScope.SwitchByItem(
 }
 
 @Composable
-fun SettingsContainerScope.SwitchByWork(
+context(scope: SettingsContainerScope)
+fun SwitchByWork(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = "",
@@ -91,7 +95,8 @@ fun SettingsContainerScope.SwitchByWork(
 }
 
 @Composable
-fun SettingsContainerScope.SwitchByProfilesWork(
+context(scope: SettingsContainerScope)
+fun SwitchByProfilesWork(
     item: DataStoreItem<Boolean>,
     title: String,
     description: String = ""

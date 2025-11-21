@@ -101,7 +101,7 @@ class AtCoderAccountManager :
     context(scope: SettingsContainerScope)
     override fun SettingsItems() {
         val settings = getSettings(context)
-        scope.SwitchByProfilesWork(
+        SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
         )

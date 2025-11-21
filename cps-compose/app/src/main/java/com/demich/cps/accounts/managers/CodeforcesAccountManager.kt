@@ -158,22 +158,22 @@ class CodeforcesAccountManager :
     context(scope: SettingsContainerScope)
     override fun SettingsItems() {
         val settings = getSettings(context)
-        scope.SwitchByProfilesWork(
+        SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
         )
-        scope.SwitchByWork(
+        SwitchByWork(
             item = settings.monitorEnabled,
             title = "Contest monitor",
             description = stringResource(id = R.string.cf_contest_watcher_description),
             workProvider = CodeforcesMonitorLauncherWorker
         )
-        scope.SwitchByWork(
+        SwitchByWork(
             item = settings.upsolvingSuggestionsEnabled,
             title = "Upsolving suggestions",
             workProvider = CodeforcesUpsolvingSuggestionsWorker
         )
-        scope.SwitchByProfilesWork(
+        SwitchByProfilesWork(
             item = settings.observeContribution,
             title = "Contribution changes observer"
         )

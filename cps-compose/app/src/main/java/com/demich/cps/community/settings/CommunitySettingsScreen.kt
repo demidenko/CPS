@@ -187,7 +187,8 @@ private fun SettingsContainerScope.LostAuthorSettingsItem(
 }
 
 @Composable
-private fun SettingsContainerScope.RuEnabledSettingsItem() {
+context(scope: SettingsContainerScope)
+private fun RuEnabledSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
@@ -261,7 +262,8 @@ private fun SettingsContainerScope.NewsFeedsSettingsItem() {
 }
 
 @Composable
-private fun SettingsContainerScope.RenderAllTabs() {
+context(scope: SettingsContainerScope)
+private fun RenderAllTabs() {
     val context = context
     SwitchByItem(
         item = context.settingsCommunity.renderAllTabs,
