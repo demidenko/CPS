@@ -35,6 +35,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.launch
 
 @Composable
@@ -117,8 +118,8 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
         ) {
             scope.launch {
                 context.settingsContests.edit {
-                    it[clistApiLogin] = login
-                    it[clistApiKey] = key
+                    clistApiLogin.value = login
+                    clistApiKey.value = key
                 }
                 onDismissRequest()
             }

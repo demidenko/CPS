@@ -156,12 +156,12 @@ private fun isOfficialChanged(
 private suspend fun CodeforcesMonitorDataStore.applyStandings(
     standings: CodeforcesContestStandings,
     onOfficialChanged: () -> Unit
-) = edit { prefs ->
-    prefs[contestInfo] = standings.contest
+) = edit {
+    contestInfo.value = standings.contest
 
     val row = standings.rows.find { row -> row.party.isContestParticipant() }
     val results = row?.problemResults
-    prefs[problemResults] = standings.problems.mapIndexed { index, problem ->
+    problemResults.value = standings.problems.mapIndexed { index, problem ->
         val result = results?.getOrNull(index)
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
@@ -172,14 +172,14 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
 
     row?.run {
         party.participantType.let {
-            val old = prefs[participationType]
-            prefs[participationType] = it
+            val old = participationType.value
+            participationType.value = it
             if (isOfficialChanged(old = old, new = it)) {
                 onOfficialChanged()
                 return@edit
             }
         }
-        prefs[contestantRank] = rank
+        contestantRank.value = rank
     }
 }
 

@@ -41,6 +41,10 @@ context(prefs: ItemizedPreferences)
 operator fun <K, V> DataStoreValue<Map<K, V>>.get(key: K): V? =
     prefs.get(item = this).get(key = key)
 
+context(prefs: ItemizedMutablePreferences)
+var <T> DataStoreItem<T>.value: T
+    get() = prefs.get(item = this)
+    set(value) = prefs.set(item = this, value = value)
 
 fun <D: ItemizedDataStore, R> D.flowOf(
     transform: context(ItemizedPreferences) D.() -> R
@@ -60,9 +64,11 @@ suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
 }
 
 suspend fun <D: ItemizedDataStore> D.edit(
-    block: D.(ItemizedMutablePreferences) -> Unit
+    block: context(ItemizedMutablePreferences) D.() -> Unit
 ) {
     dataStore.edit {
-        block(ItemizedMutablePreferences(it))
+        context(ItemizedMutablePreferences(it)) {
+            block()
+        }
     }
 }

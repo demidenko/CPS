@@ -13,6 +13,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.ItemizedMutablePreferences
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 
 abstract class ProfileDataStore<U: UserInfo>(
@@ -22,18 +23,19 @@ abstract class ProfileDataStore<U: UserInfo>(
     protected inline fun <reified T: UserInfo> makeProfileItem(): DataStoreItem<ProfileResult<T>?> =
         jsonProfile.itemNullable(name = "profile_result")
 
-    protected abstract fun onResetProfile(prefs: ItemizedMutablePreferences)
+    context(prefs: ItemizedMutablePreferences)
+    protected abstract fun onResetProfile()
 
     val profile: DataStoreValue<ProfileResult<U>?>
         get() = profileItem
 
     suspend fun setProfile(profileResult: ProfileResult<U>) {
         edit {
-            val oldUserId = it[profileItem]?.userId
+            val oldUserId = profileItem.value?.userId
             if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
-                onResetProfile(it)
+                onResetProfile()
             }
-            it[profileItem] = profileResult
+            profileItem.value = profileResult
         }
     }
 
@@ -45,7 +47,8 @@ abstract class ProfileDataStore<U: UserInfo>(
 abstract class ProfileUniqueDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ProfileDataStore<U>(dataStoreWrapper) {
-    final override fun onResetProfile(prefs: ItemizedMutablePreferences) {
+    context(prefs: ItemizedMutablePreferences)
+    final override fun onResetProfile() {
         prefs.clear()
     }
 }
@@ -56,7 +59,8 @@ internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataSto
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
 
-        override fun onResetProfile(prefs: ItemizedMutablePreferences) { }
+        context(prefs: ItemizedMutablePreferences)
+        override fun onResetProfile() { }
     }
 
 
