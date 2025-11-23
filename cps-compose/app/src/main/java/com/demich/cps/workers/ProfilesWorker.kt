@@ -1,8 +1,6 @@
 package com.demich.cps.workers
 
-import android.app.NotificationManager
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.os.bundleOf
 import androidx.work.WorkerParameters
 import com.demich.cps.R
@@ -11,6 +9,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.managers.toRatingChange
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
+import com.demich.cps.notifications.getActiveNotification
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
@@ -104,13 +103,9 @@ class ProfilesWorker(
         dataStore.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
     }
 
-    private fun getNotifiedCodeforcesContribution(): Int? {
-        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = notificationChannels.codeforces.contribution_changes.notificationId
-        return notificationManager.activeNotifications
-            .find { it.id == notificationId }
-            ?.notification?.extras?.getInt(KEY_CF_CONTRIBUTION)
-    }
+    private fun getNotifiedCodeforcesContribution(): Int? =
+        notificationChannels.codeforces.contribution_changes.getActiveNotification(context)
+            ?.extras?.getInt(KEY_CF_CONTRIBUTION)
 }
 
 private const val KEY_CF_CONTRIBUTION = "cf_contribution"
