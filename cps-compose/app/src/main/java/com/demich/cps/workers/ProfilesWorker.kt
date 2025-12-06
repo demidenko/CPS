@@ -34,13 +34,13 @@ class ProfilesWorker(
         }
     }
 
-    private val codeforcesAccountManager by lazy { CodeforcesAccountManager() }
-
     override suspend fun runWork(): Result {
         val jobs = buildList<suspend () -> Unit> {
-            with(codeforcesAccountManager.getSettings(context)) {
-                if (observeRating()) add(::codeforcesRating)
-                if (observeContribution()) add(::codeforcesContribution)
+            with(CodeforcesAccountManager()) {
+                with(getSettings(context)) {
+                    if (observeRating()) add { checkRating(context = context) }
+                    if (observeContribution()) add { checkContribution(context = context) }
+                }
             }
 
             with(AtCoderAccountManager()) {
@@ -54,51 +54,51 @@ class ProfilesWorker(
 
         return Result.success()
     }
+}
 
-    private suspend fun codeforcesRating() {
-        val userInfo = codeforcesAccountManager.dataStore(context).profile()
-            ?.userInfoOrNull() ?: return
+private suspend fun CodeforcesAccountManager.checkRating(context: Context) {
+    val userInfo = dataStore(context).profile()
+        ?.userInfoOrNull() ?: return
 
-        val lastRatingChange = CodeforcesClient.runCatching {
-            getUserRatingChanges(handle = userInfo.handle)
-        }.getOrNull()?.lastOrNull() ?: return
+    val lastRatingChange = CodeforcesClient.runCatching {
+        getUserRatingChanges(handle = userInfo.handle)
+    }.getOrNull()?.lastOrNull() ?: return
 
-        codeforcesAccountManager.applyRatingChange(lastRatingChange, context)
-    }
-
-    private suspend fun codeforcesContribution() {
-        val dataStore = codeforcesAccountManager.dataStore(context)
-        val userInfo = dataStore.profile()
-            ?.userInfoOrNull() ?: return
-
-        val handle = userInfo.handle
-        val newContribution = CodeforcesClient.getProfile(handle = handle, recoverHandle = false)
-            .userInfoOrNull()?.contribution ?: return
-
-        if (newContribution == userInfo.contribution) return
-
-        dataStore.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)))
-
-        val oldContribution = getNotifiedCodeforcesContribution() ?: userInfo.contribution
-
-        notificationChannels.codeforces.contribution_changes.notify(context) {
-            subText = handle
-            contentTitle = "Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}"
-            smallIcon = R.drawable.ic_person
-            silent = true
-            autoCancel = true
-            time = null
-            url = userInfo.userPageUrl
-            addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
-        }
-    }
-
-    private fun getNotifiedCodeforcesContribution(): Int? =
-        notificationChannels.codeforces.contribution_changes.getActiveNotification(context)
-            ?.extras?.getInt(KEY_CF_CONTRIBUTION)
+    applyRatingChange(lastRatingChange, context)
 }
 
 private const val KEY_CF_CONTRIBUTION = "cf_contribution"
+
+private fun getNotifiedCodeforcesContribution(context: Context): Int? =
+    notificationChannels.codeforces.contribution_changes.getActiveNotification(context)
+        ?.extras?.getInt(KEY_CF_CONTRIBUTION)
+
+private suspend fun CodeforcesAccountManager.checkContribution(context: Context) {
+    val dataStore = dataStore(context)
+    val userInfo = dataStore.profile()
+        ?.userInfoOrNull() ?: return
+
+    val handle = userInfo.handle
+    val newContribution = CodeforcesClient.getProfile(handle = handle, recoverHandle = false)
+        .userInfoOrNull()?.contribution ?: return
+
+    if (newContribution == userInfo.contribution) return
+
+    dataStore.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)))
+
+    val oldContribution = getNotifiedCodeforcesContribution(context) ?: userInfo.contribution
+
+    notificationChannels.codeforces.contribution_changes.notify(context) {
+        subText = handle
+        contentTitle = "Contribution change: ${oldContribution.toSignedString()} → ${newContribution.toSignedString()}"
+        smallIcon = R.drawable.ic_person
+        silent = true
+        autoCancel = true
+        time = null
+        url = userInfo.userPageUrl
+        addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
+    }
+}
 
 private suspend fun AtCoderAccountManager.checkRating(context: Context) {
     val dataStore = dataStore(context)
