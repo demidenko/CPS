@@ -35,16 +35,18 @@ class ProfilesWorker(
     }
 
     private val codeforcesAccountManager by lazy { CodeforcesAccountManager() }
-    private val atcoderAccountManager by lazy { AtCoderAccountManager() }
 
     override suspend fun runWork(): Result {
-        val jobs = buildList {
+        val jobs = buildList<suspend () -> Unit> {
             with(codeforcesAccountManager.getSettings(context)) {
                 if (observeRating()) add(::codeforcesRating)
                 if (observeContribution()) add(::codeforcesContribution)
             }
-            with(atcoderAccountManager.getSettings(context)) {
-                if (observeRating()) add(::atcoderRating)
+
+            with(AtCoderAccountManager()) {
+                with(getSettings(context)) {
+                    if (observeRating()) add { checkRating(context = context) }
+                }
             }
         }
 
@@ -91,21 +93,21 @@ class ProfilesWorker(
         }
     }
 
-    private suspend fun atcoderRating() {
-        val dataStore = atcoderAccountManager.dataStore(context)
-        val userInfo = dataStore.profile()
-            ?.userInfoOrNull() ?: return
-
-        val lastRatingChange = AtCoderClient.runCatching {
-            getRatingChanges(handle = userInfo.handle)
-        }.getOrNull()?.lastOrNull() ?: return
-
-        dataStore.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
-    }
-
     private fun getNotifiedCodeforcesContribution(): Int? =
         notificationChannels.codeforces.contribution_changes.getActiveNotification(context)
             ?.extras?.getInt(KEY_CF_CONTRIBUTION)
 }
 
 private const val KEY_CF_CONTRIBUTION = "cf_contribution"
+
+private suspend fun AtCoderAccountManager.checkRating(context: Context) {
+    val dataStore = dataStore(context)
+    val userInfo = dataStore.profile()
+        ?.userInfoOrNull() ?: return
+
+    val lastRatingChange = AtCoderClient.runCatching {
+        getRatingChanges(handle = userInfo.handle)
+    }.getOrNull()?.lastOrNull() ?: return
+
+    dataStore.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
+}
