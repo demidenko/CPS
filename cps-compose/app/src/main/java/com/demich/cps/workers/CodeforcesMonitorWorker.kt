@@ -65,7 +65,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
         val args = monitor.args() ?: return Result.failure()
 
-        val notificationBuilder = createNotificationBuilder(args.handle)
+        val notificationBuilder = createNotificationBuilder(handle = args.handle, context = context)
             .also { setForeground(it) }
 
         val notifier = CodeforcesMonitorNotifier(
@@ -100,16 +100,6 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
         return Result.success()
     }
 
-    private fun createNotificationBuilder(handle: String) =
-        notificationChannels.codeforces.contest_monitor.builder(context) {
-            smallIcon = R.drawable.ic_monitor
-            subText = handle
-            time = null
-            silent = true
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            //TODO intent open contest screen
-        }
-
     private fun notify(submission: CodeforcesSubmission) =
         notificationChannels.codeforces.submission_result(submission.id).notify(context) {
             if (submission.verdict == CodeforcesProblemVerdict.OK) {
@@ -128,6 +118,16 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             url = CodeforcesUrls.submission(submission)
         }
 }
+
+private fun createNotificationBuilder(handle: String, context: Context) =
+    notificationChannels.codeforces.contest_monitor.builder(context) {
+        smallIcon = R.drawable.ic_monitor
+        subText = handle
+        time = null
+        silent = true
+        setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        //TODO intent open contest screen
+    }
 
 private fun CodeforcesSubmission.verdictString() =
     if (verdict == CodeforcesProblemVerdict.OK) "OK"
