@@ -50,7 +50,11 @@ fun <D: ItemizedDataStore, R> D.flowOf(
     transform: context(ItemizedPreferences) D.() -> R
 ): Flow<R> =
     dataStore.data
-        .map { transform(ItemizedPreferences(it), this) }
+        .map {
+            with(ItemizedPreferences(it)) {
+                transform()
+            }
+        }
         .distinctUntilChanged()
 
 @OptIn(ExperimentalContracts::class)
@@ -60,14 +64,16 @@ suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return block(snapshot(), this)
+    with(snapshot()) {
+        return block()
+    }
 }
 
 suspend fun <D: ItemizedDataStore> D.edit(
     block: context(ItemizedMutablePreferences) D.() -> Unit
 ) {
     dataStore.edit {
-        context(ItemizedMutablePreferences(it)) {
+        with(ItemizedMutablePreferences(it)) {
             block()
         }
     }
