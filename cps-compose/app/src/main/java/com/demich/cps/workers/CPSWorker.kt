@@ -108,6 +108,12 @@ abstract class CPSWorker(
         }
     }
 
+    protected suspend inline fun joinAllWithProgress(
+        block: MutableList<suspend () -> Unit>.() -> Unit
+    ) {
+        buildList(block).joinAllWithProgress()
+    }
+
 
     enum class ResultType {
         SUCCESS, RETRY, FAILURE

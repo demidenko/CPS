@@ -37,7 +37,7 @@ class ProfilesWorker(
     }
 
     override suspend fun runWork(): Result {
-        val jobs = buildList<suspend () -> Unit> {
+        joinAllWithProgress {
             with(CodeforcesAccountManager()) {
                 getSettings(context).fromSnapshot {
                     if (observeRating.value) add { checkRating(context = context) }
@@ -51,8 +51,6 @@ class ProfilesWorker(
                 }
             }
         }
-
-        jobs.joinAllWithProgress()
 
         return Result.success()
     }
