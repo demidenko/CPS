@@ -16,6 +16,8 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.fromSnapshot
+import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.serialization.Serializable
@@ -66,15 +68,25 @@ class CodeforcesCommunityLostRecentWorker(
     }
 
     override suspend fun runWork(): Result {
-        val settings = context.settingsCommunity
+        context.settingsCommunity.fromSnapshot {
+            checkRecentActions(
+                locale = codeforcesLocale.value,
+                minRatingColorTag = codeforcesLostMinRatingTag.value,
+                dao = context.lostBlogEntriesDao
+            )
+        }
 
-        val locale = settings.codeforcesLocale()
-        val minRatingColorTag = settings.codeforcesLostMinRatingTag()
+        return Result.success()
+    }
 
+    private suspend fun checkRecentActions(
+        locale: CodeforcesLocale,
+        minRatingColorTag: CodeforcesColorTag,
+        dao: CodeforcesLostDao
+    ) {
         val recentBlogEntries = getRecentBlogEntries(locale = locale)
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
-        val dao = context.lostBlogEntriesDao
         //get current suspects with removing old ones
         val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
 
@@ -114,8 +126,6 @@ class CodeforcesCommunityLostRecentWorker(
                 ))
             }
         }
-
-        return Result.success()
     }
 }
 
