@@ -41,6 +41,8 @@ class CodeforcesMonitorLauncherWorker(
 
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
+        //TODO: optimize read / writes by snapshot
+
         with(dataStore) {
             val info = profile()?.userInfoOrNull() ?: return Result.success()
 
