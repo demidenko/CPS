@@ -39,10 +39,11 @@ suspend fun<A, B> awaitPair(
 }
 
 suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> Unit) {
+    block(0)
+    if (isEmpty()) return
     coroutineScope {
         val mutex = Mutex()
         var counter = 0
-        block(counter)
         forEach { job ->
             launch {
                 try {
