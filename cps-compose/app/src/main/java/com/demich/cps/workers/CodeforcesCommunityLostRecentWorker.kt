@@ -135,28 +135,29 @@ data class CodeforcesLostHint(
     val creationTime: Instant
 )
 
-private class CachedBlogEntriesCodeforcesApi(
-    private val originApi: CodeforcesApi,
-    val onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
-): CodeforcesApi by originApi {
-    private val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
+private fun CodeforcesApi.asCacheBlogEntriesApi(
+    onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
+): CodeforcesApi {
+    val origin = this
+    val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
+    return object : CodeforcesApi by origin {
+        override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale) =
+            cache.getOrPut(key = blogEntryId) {
+                origin.getBlogEntry(blogEntryId, locale)
+                    .also { onNewBlogEntry(it) }
+            }
 
-    override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale) =
-        cache.getOrPut(key = blogEntryId) {
-            originApi.getBlogEntry(blogEntryId, locale)
-                .also { onNewBlogEntry(it) }
-        }
-
-    override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int) =
-        originApi.getRecentActions(locale = locale, maxCount = maxCount).apply {
-            forEach {
-                it.blogEntry?.let { blogEntry ->
-                    if (cache.put(key = blogEntry.id, value = blogEntry) == null) {
-                        onNewBlogEntry(blogEntry)
+        override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int) =
+            origin.getRecentActions(locale = locale, maxCount = maxCount).apply {
+                forEach {
+                    it.blogEntry?.let { blogEntry ->
+                        if (cache.put(key = blogEntry.id, value = blogEntry) == null) {
+                            onNewBlogEntry(blogEntry)
+                        }
                     }
                 }
             }
-        }
+    }
 }
 
 private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
@@ -186,7 +187,7 @@ private suspend inline fun findSuspects(
     api: CodeforcesApi,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    val cachedApi = CachedBlogEntriesCodeforcesApi(api) { blogEntry ->
+    val api = api.asCacheBlogEntriesApi { blogEntry ->
         val time = blogEntry.creationTime
         if (!isNew(time)) {
             //save hint
@@ -223,11 +224,11 @@ private suspend inline fun findSuspects(
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag)
         .also {
-            if (it.size > 1) cachedApi.getRecentActions(locale = locale)
+            if (it.size > 1) api.getRecentActions(locale = locale)
         }
-        .filterNewEntries(isFinalFilter = true) { isNew(cachedApi.getBlogEntry(it.id, locale).creationTime) }
+        .filterNewEntries(isFinalFilter = true) { isNew(api.getBlogEntry(it.id, locale).creationTime) }
         .forEach {
-            val blogEntry = cachedApi.getBlogEntry(it.id, locale)
+            val blogEntry = api.getBlogEntry(it.id, locale)
             onSuspect(
                 blogEntry.copy(
                     authorColorTag = it.author.colorTag,
