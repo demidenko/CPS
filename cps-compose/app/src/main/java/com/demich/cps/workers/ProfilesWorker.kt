@@ -15,6 +15,8 @@ import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.utils.toSignedString
+import com.demich.datastore_itemized.fromSnapshot
+import com.demich.datastore_itemized.value
 import kotlin.time.Duration.Companion.minutes
 
 class ProfilesWorker(
@@ -37,15 +39,15 @@ class ProfilesWorker(
     override suspend fun runWork(): Result {
         val jobs = buildList<suspend () -> Unit> {
             with(CodeforcesAccountManager()) {
-                with(getSettings(context)) {
-                    if (observeRating()) add { checkRating(context = context) }
-                    if (observeContribution()) add { checkContribution(context = context) }
+                getSettings(context).fromSnapshot {
+                    if (observeRating.value) add { checkRating(context = context) }
+                    if (observeContribution.value) add { checkContribution(context = context) }
                 }
             }
 
             with(AtCoderAccountManager()) {
-                with(getSettings(context)) {
-                    if (observeRating()) add { checkRating(context = context) }
+                getSettings(context).fromSnapshot {
+                    if (observeRating.value) add { checkRating(context = context) }
                 }
             }
         }
