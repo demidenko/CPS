@@ -6,6 +6,7 @@ import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
@@ -40,12 +41,13 @@ class CodeforcesMonitorLauncherWorker(
 
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        val info = dataStore.profile()?.userInfoOrNull() ?: return Result.success()
-
         with(dataStore) {
-            val (firstParticipation, firstSubmission) = getFirstNewSubmissions(
+            val info = profile()?.userInfoOrNull() ?: return Result.success()
+
+            val (firstParticipation, firstSubmission) = CodeforcesClient.getFirstNewSubmissions(
                 handle = info.handle,
-                lastSubmissionId = monitorLastSubmissionId()
+                lastSubmissionId = monitorLastSubmissionId(),
+                isActual = ::isActual
             ) { submission ->
                 submission.author.isContestParticipant()
             }
@@ -72,31 +74,7 @@ class CodeforcesMonitorLauncherWorker(
         return Result.success()
     }
 
-    private suspend inline fun getFirstNewSubmissions(
-        handle: String,
-        lastSubmissionId: Long?,
-        predicate: (CodeforcesSubmission) -> Boolean
-    ): Pair<CodeforcesSubmission?, CodeforcesSubmission?> {
-        var first: CodeforcesSubmission? = null
-        var from = 1L
-        var step = 1L
-        loop@while (true) {
-            CodeforcesClient.getUserSubmissions(handle = handle, from = from, count = step)
-                .also { if (it.isEmpty()) break@loop }
-                .forEach {
-                    if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
-                        if (first == null) first = it
-                        if (predicate(it)) return Pair(it, first)
-                    } else {
-                        break@loop
-                    }
-                }
 
-            from += step
-            step += 10
-        }
-        return Pair(null, first)
-    }
 
     private suspend fun enqueueToCodeforcesContest() {
         context.contestsListDao.getContestsNotFinished(
@@ -115,4 +93,31 @@ class CodeforcesMonitorLauncherWorker(
             work.enqueueAtIfEarlier(time = it + 5.minutes)
         }
     }
+}
+
+private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
+    handle: String,
+    lastSubmissionId: Long?,
+    isActual: (Instant) -> Boolean,
+    predicate: (CodeforcesSubmission) -> Boolean
+): Pair<CodeforcesSubmission?, CodeforcesSubmission?> {
+    var first: CodeforcesSubmission? = null
+    var from = 1L
+    var step = 1L
+    loop@while (true) {
+        getUserSubmissions(handle = handle, from = from, count = step)
+            .also { if (it.isEmpty()) break@loop }
+            .forEach {
+                if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
+                    if (first == null) first = it
+                    if (predicate(it)) return Pair(it, first)
+                } else {
+                    break@loop
+                }
+            }
+
+        from += step
+        step += 10
+    }
+    return Pair(null, first)
 }
