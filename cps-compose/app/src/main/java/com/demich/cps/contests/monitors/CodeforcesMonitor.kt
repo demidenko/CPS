@@ -81,10 +81,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             }
         }
 
-        getDelay(
-            contest = contestInfo(),
-            ratingChangeWaiter = ratingChangeWaiter
-        ).let { duration ->
+        ratingChangeWaiter.getDelay(contest = contestInfo()).let { duration ->
             if (lastRequest() == false) duration.coerceAtMost(10.seconds)
             else duration
         }
@@ -183,22 +180,6 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
     }
 }
 
-private suspend fun getDelay(
-    contest: CodeforcesContest?,
-    ratingChangeWaiter: RatingChangeWaiter
-): Duration {
-    return when (contest?.phase) {
-        CodeforcesContestPhase.CODING -> 10.seconds
-        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
-        CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
-        CodeforcesContestPhase.FINISHED -> {
-            ratingChangeWaiter.getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
-        }
-        else -> 5.seconds
-    }
-}
-
-
 private class RatingChangeWaiter(
     val contestId: Int,
     val handle: String,
@@ -234,6 +215,17 @@ private class RatingChangeWaiter(
     }
 }
 
+private suspend fun RatingChangeWaiter.getDelay(contest: CodeforcesContest?): Duration {
+    return when (contest?.phase) {
+        CodeforcesContestPhase.CODING -> 10.seconds
+        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
+        CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
+        CodeforcesContestPhase.FINISHED -> {
+            getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
+        }
+        else -> 5.seconds
+    }
+}
 
 private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     contestId: Int,
