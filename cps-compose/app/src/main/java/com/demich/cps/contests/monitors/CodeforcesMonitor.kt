@@ -18,6 +18,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
+import com.demich.datastore_itemized.ItemizedMutablePreferences
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
@@ -130,12 +131,14 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             monitor.reset()
         }
     }.onSuccess { standings ->
-        monitor.lastRequest.setValue(true)
         var officialChanged = false
-        monitor.applyStandings(
-            standings = standings,
-            onOfficialChanged = { officialChanged = true }
-        )
+        monitor.edit {
+            lastRequest.value = true
+            applyStandings(
+                standings = standings,
+                onOfficialChanged = { officialChanged = true }
+            )
+        }
         if (officialChanged) {
             onOfficialChanged()
         }
@@ -150,10 +153,11 @@ private fun isOfficialChanged(
     new: CodeforcesParticipationType
 ): Boolean = new.isOfficial() != old.isOfficial()
 
-private suspend fun CodeforcesMonitorDataStore.applyStandings(
+context(_: ItemizedMutablePreferences)
+private inline fun CodeforcesMonitorDataStore.applyStandings(
     standings: CodeforcesContestStandings,
     onOfficialChanged: () -> Unit
-) = edit {
+) {
     contestInfo.value = standings.contest
 
     val row = standings.rows.find { row -> row.party.isContestParticipant() }
@@ -173,7 +177,7 @@ private suspend fun CodeforcesMonitorDataStore.applyStandings(
             participationType.value = it
             if (isOfficialChanged(old = old, new = it)) {
                 onOfficialChanged()
-                return@edit
+                return
             }
         }
         contestantRank.value = rank
