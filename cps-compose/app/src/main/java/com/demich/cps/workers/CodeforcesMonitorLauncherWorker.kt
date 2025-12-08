@@ -71,29 +71,9 @@ class CodeforcesMonitorLauncherWorker(
             monitorCanceledContests.removeOld { !isActual(it) }
         }
 
-        enqueueToCodeforcesContest()
+        work.enqueueToCodeforcesContest(workerStartTime)
 
         return Result.success()
-    }
-
-
-
-    private suspend fun enqueueToCodeforcesContest() {
-        context.contestsListDao.getContestsNotFinished(
-            platform = Contest.Platform.codeforces,
-            currentTime = workerStartTime
-        ).minOfNotNull {
-            when (it.getPhase(workerStartTime)) {
-                Contest.Phase.RUNNING -> {
-                    work.enqueueAsap()
-                    return
-                }
-                Contest.Phase.BEFORE -> it.startTime
-                else -> null
-            }
-        }?.let {
-            work.enqueueAtIfEarlier(time = it + 5.minutes)
-        }
     }
 }
 
@@ -122,4 +102,24 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
         step += 10
     }
     return Pair(null, first)
+}
+
+private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
+    workerStartTime: Instant
+) {
+    context.contestsListDao.getContestsNotFinished(
+        platform = Contest.Platform.codeforces,
+        currentTime = workerStartTime
+    ).minOfNotNull {
+        when (it.getPhase(workerStartTime)) {
+            Contest.Phase.RUNNING -> {
+                enqueueAsap()
+                return
+            }
+            Contest.Phase.BEFORE -> it.startTime
+            else -> null
+        }
+    }?.let {
+        enqueueAtIfEarlier(time = it + 5.minutes)
+    }
 }
