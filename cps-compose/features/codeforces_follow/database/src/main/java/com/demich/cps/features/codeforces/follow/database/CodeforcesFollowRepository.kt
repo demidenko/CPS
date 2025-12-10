@@ -29,30 +29,22 @@ abstract class CodeforcesFollowRepository(
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
 
-    //TODO: refactor this
     private suspend fun getAndReloadBlogEntries(
         handle: String,
         locale: CodeforcesLocale
     ): Result<List<CodeforcesBlogEntry>> {
-        return api.runCatching {
-            getUserBlogEntries(handle = handle, locale = locale)
-        }.recoverCatching {
-            if (it is CodeforcesApiNotAllowedReadBlogException) {
-                return@recoverCatching emptyList()
+        api.getBlogEntries(handle = handle, locale = locale).let { (newProfile, result) ->
+            newProfile?.let {
+                dao.applyProfileResult(handle = handle, result = newProfile)
             }
-            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
-                val profileResult = api.getProfile(handle = handle, recoverHandle = true)
-                dao.applyProfileResult(handle, profileResult)
-                if (profileResult is ProfileResult.Success) {
-                    return@recoverCatching getAndReloadBlogEntries(
-                        handle = profileResult.userInfo.handle,
-                        locale = locale
-                    ).getOrThrow()
-                }
+            result.onSuccess { blogEntries ->
+                dao.addBlogEntries(
+                    handle = newProfile?.handle ?: handle,
+                    blogEntries = blogEntries,
+                    onNewBlogEntry = ::notifyNewBlogEntry
+                )
             }
-            throw it
-        }.onSuccess { blogEntries ->
-            dao.addBlogEntries(handle, blogEntries, ::notifyNewBlogEntry)
+            return result
         }
     }
 
@@ -95,4 +87,29 @@ abstract class CodeforcesFollowRepository(
     protected abstract suspend fun getLocale(): CodeforcesLocale
 
     protected abstract fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry)
+}
+
+private suspend fun CodeforcesApi.getBlogEntries(
+    handle: String,
+    locale: CodeforcesLocale
+): Pair<ProfileResult<CodeforcesUserInfo>?, Result<List<CodeforcesBlogEntry>>> {
+    runCatching {
+        getUserBlogEntries(handle = handle, locale = locale)
+    }.recoverCatching {
+        when {
+            it is CodeforcesApiNotAllowedReadBlogException -> emptyList()
+            it is CodeforcesApiHandleNotFoundException && it.handle == handle -> {
+                val profileResult = getProfile(handle = handle, recoverHandle = true)
+                return Pair(
+                    profileResult,
+                    if (profileResult is ProfileResult.Success)
+                        runCatching { getUserBlogEntries(handle = profileResult.handle, locale = locale) }
+                    else Result.failure(it)
+                )
+            }
+            else -> throw it
+        }
+    }.also {
+        return Pair(null, it)
+    }
 }
