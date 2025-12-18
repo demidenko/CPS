@@ -10,6 +10,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
+import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -41,7 +43,7 @@ class CodeforcesMonitorLauncherWorker(
 
         val dataStore = CodeforcesAccountManager().dataStore(context)
 
-        //TODO: optimize read / writes by snapshot
+        //TODO: optimize read by snapshot
 
         with(dataStore) {
             val info = profile()?.userInfoOrNull() ?: return Result.success()
@@ -64,11 +66,10 @@ class CodeforcesMonitorLauncherWorker(
                 }
             }
 
-            firstSubmission?.let {
-                monitorLastSubmissionId.setValue(it.id)
+            edit {
+                firstSubmission?.let { monitorLastSubmissionId.value = it.id }
+                monitorCanceledContests.removeOld { !isActual(it) }
             }
-
-            monitorCanceledContests.removeOld { !isActual(it) }
         }
 
         work.enqueueToCodeforcesContest(workerStartTime)

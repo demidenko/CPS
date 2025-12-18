@@ -1,6 +1,8 @@
 package com.demich.cps.utils
 
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.ItemizedMutablePreferences
+import com.demich.datastore_itemized.value
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -27,10 +29,12 @@ suspend fun <T> DataStoreItem<TimedCollection<T>>.add(value: T, time: Instant) {
     update { it.plus(value, time) }
 }
 
-suspend fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
+context(prefs: ItemizedMutablePreferences)
+fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
     removeOld { it < time }
 }
 
-suspend inline fun <T> DataStoreItem<TimedCollection<T>>.removeOld(crossinline isOld: (Instant) -> Boolean) {
-    update { it.internalFilterByTime { time -> !isOld(time) } }
+context(prefs: ItemizedMutablePreferences)
+inline fun <T> DataStoreItem<TimedCollection<T>>.removeOld(crossinline isOld: (Instant) -> Boolean) {
+    value = value.internalFilterByTime { time -> !isOld(time) }
 }
