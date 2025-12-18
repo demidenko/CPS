@@ -18,7 +18,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.datastore_itemized.ItemizedMutablePreferences
+import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.coroutineScope
@@ -51,7 +51,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             } else {
                 replace = true
                 monitor.edit {
-                    contextOf<ItemizedMutablePreferences>().clear()
+                    contextOf<DataStoreEditScope>().clear()
                     args.value = startArgs
                 }
             }

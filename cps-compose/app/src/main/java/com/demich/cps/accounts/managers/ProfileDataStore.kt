@@ -6,11 +6,11 @@ import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.jsonProfile
 import com.demich.cps.ui.settings.SettingsContainerScope
+import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.DataStoreWrapper
 import com.demich.datastore_itemized.ItemizedDataStore
-import com.demich.datastore_itemized.ItemizedMutablePreferences
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
@@ -23,7 +23,7 @@ abstract class ProfileDataStore<U: UserInfo>(
     protected inline fun <reified T: UserInfo> makeProfileItem(): DataStoreItem<ProfileResult<T>?> =
         jsonProfile.itemNullable(name = "profile_result")
 
-    context(prefs: ItemizedMutablePreferences)
+    context(scope: DataStoreEditScope)
     protected abstract fun onResetProfile()
 
     val profile: DataStoreValue<ProfileResult<U>?>
@@ -47,9 +47,9 @@ abstract class ProfileDataStore<U: UserInfo>(
 abstract class ProfileUniqueDataStore<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ProfileDataStore<U>(dataStoreWrapper) {
-    context(prefs: ItemizedMutablePreferences)
+    context(scope: DataStoreEditScope)
     final override fun onResetProfile() {
-        prefs.clear()
+        scope.clear()
     }
 }
 
@@ -59,7 +59,7 @@ internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataSto
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
 
-        context(prefs: ItemizedMutablePreferences)
+        context(scope: DataStoreEditScope)
         override fun onResetProfile() { }
     }
 

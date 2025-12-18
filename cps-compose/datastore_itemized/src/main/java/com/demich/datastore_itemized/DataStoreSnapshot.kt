@@ -10,16 +10,16 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-open class ItemizedPreferences internal constructor(
+open class DataStoreSnapshot internal constructor(
     protected open val preferences: Preferences
 ) {
     operator fun <T> get(item: DataStoreValue<T>): T =
         item.reader.restore(preferences)
 }
 
-class ItemizedMutablePreferences internal constructor(
+class DataStoreEditScope internal constructor(
     override val preferences: MutablePreferences
-): ItemizedPreferences(preferences) {
+): DataStoreSnapshot(preferences) {
     operator fun <T> set(item: DataStoreItem<T>, value: T) =
         item.saver.save(preferences, value)
 
@@ -32,26 +32,25 @@ class ItemizedMutablePreferences internal constructor(
     }
 }
 
-// fun in prefs does not compile
-context(prefs: ItemizedPreferences)
+context(scope: DataStoreSnapshot)
 val <T> DataStoreValue<T>.value: T
-    get() = prefs.get(item = this)
+    get() = scope.get(item = this)
 
-context(prefs: ItemizedPreferences)
+context(scope: DataStoreSnapshot)
 operator fun <K, V> DataStoreValue<Map<K, V>>.get(key: K): V? =
-    prefs.get(item = this).get(key = key)
+    scope.get(item = this).get(key = key)
 
-context(prefs: ItemizedMutablePreferences)
+context(scope: DataStoreEditScope)
 var <T> DataStoreItem<T>.value: T
-    get() = prefs.get(item = this)
-    set(value) = prefs.set(item = this, value = value)
+    get() = scope.get(item = this)
+    set(value) = scope.set(item = this, value = value)
 
 fun <D: ItemizedDataStore, R> D.flowOf(
-    transform: context(ItemizedPreferences) D.() -> R
+    transform: context(DataStoreSnapshot) D.() -> R
 ): Flow<R> =
     dataStore.data
         .map {
-            with(ItemizedPreferences(it)) {
+            with(DataStoreSnapshot(it)) {
                 transform()
             }
         }
@@ -59,7 +58,7 @@ fun <D: ItemizedDataStore, R> D.flowOf(
 
 @OptIn(ExperimentalContracts::class)
 suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
-    block: context(ItemizedPreferences) D.() -> R
+    block: context(DataStoreSnapshot) D.() -> R
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -70,10 +69,10 @@ suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
 }
 
 suspend fun <D: ItemizedDataStore> D.edit(
-    block: context(ItemizedMutablePreferences) D.() -> Unit
+    block: context(DataStoreEditScope) D.() -> Unit
 ) {
     dataStore.edit {
-        with(ItemizedMutablePreferences(it)) {
+        with(DataStoreEditScope(it)) {
             block()
         }
     }
