@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "com.demich.cps"
 
-        versionCode = 473
+        versionCode = 474
         versionName = "1.9.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
