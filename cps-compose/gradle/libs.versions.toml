@@ -14,7 +14,7 @@ work = "2.11.0" # https://developer.android.com/jetpack/androidx/releases/work
 
 compose-bom = "2025.12.00" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 
-activity-compose = "1.12.1" # https://developer.android.com/jetpack/androidx/releases/activity
+activity-compose = "1.12.2" # https://developer.android.com/jetpack/androidx/releases/activity
 navigation-compose = "2.9.6" # https://developer.android.com/jetpack/androidx/releases/navigation
 lifecycle = "2.10.0"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
