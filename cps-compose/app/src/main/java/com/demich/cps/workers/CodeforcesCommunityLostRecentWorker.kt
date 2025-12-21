@@ -165,7 +165,7 @@ private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: In
 private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(
     minRatingColorTag: CodeforcesColorTag,
     api: CodeforcesApi
-) = fixedHandleColors(api).filter { it.author.colorTag >= minRatingColorTag }
+) = api.fixHandleColors(this).filter { it.author.colorTag >= minRatingColorTag }
 
 private inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
     isFinalFilter: Boolean = false,
@@ -243,11 +243,11 @@ private suspend inline fun findSuspects(
 }
 
 //Required against new year color chaos
-private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixedHandleColors(api: CodeforcesApi): List<CodeforcesRecentFeedBlogEntry> {
-    val profiles = api.getProfiles(handles = map { it.author.handle }, recoverHandle = false)
-    return map { blogEntry ->
+private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<CodeforcesRecentFeedBlogEntry>): List<CodeforcesRecentFeedBlogEntry> {
+    val profiles = getProfiles(handles = blogEntries.map { it.author.handle }, recoverHandle = false)
+    return blogEntries.map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
-        require(profile is ProfileResult.Success) { "fixedHandleColors: profile result is not success" }
+        require(profile is ProfileResult.Success) { "fixHandleColors: profile result is not success" }
         if (blogEntry.author.colorTag == CodeforcesColorTag.ADMIN) blogEntry
         else {
             val colorTag = CodeforcesUtils.colorTagFrom(profile.userInfo.rating)
