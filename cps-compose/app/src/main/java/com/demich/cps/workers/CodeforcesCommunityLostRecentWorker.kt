@@ -162,8 +162,10 @@ private fun CodeforcesApi.asCacheBlogEntriesApi(
 
 private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
 
-private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(minRatingColorTag: CodeforcesColorTag) =
-    fixedHandleColors().filter { it.author.colorTag >= minRatingColorTag }
+private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(
+    minRatingColorTag: CodeforcesColorTag,
+    api: CodeforcesApi
+) = fixedHandleColors(api).filter { it.author.colorTag >= minRatingColorTag }
 
 private inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
     isFinalFilter: Boolean = false,
@@ -222,7 +224,7 @@ private suspend inline fun findSuspects(
      */
     blogEntries
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
-        .fixAndFilterColorTag(minRatingColorTag)
+        .fixAndFilterColorTag(minRatingColorTag = minRatingColorTag, api = api)
         .also {
             if (it.size > 1) api.getRecentActions(locale = locale)
         }
@@ -241,8 +243,8 @@ private suspend inline fun findSuspects(
 }
 
 //Required against new year color chaos
-private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixedHandleColors(): List<CodeforcesRecentFeedBlogEntry> {
-    val profiles = CodeforcesClient.getProfiles(handles = map { it.author.handle }, recoverHandle = false)
+private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixedHandleColors(api: CodeforcesApi): List<CodeforcesRecentFeedBlogEntry> {
+    val profiles = api.getProfiles(handles = map { it.author.handle }, recoverHandle = false)
     return map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
         require(profile is ProfileResult.Success) { "fixedHandleColors: profile result is not success" }
