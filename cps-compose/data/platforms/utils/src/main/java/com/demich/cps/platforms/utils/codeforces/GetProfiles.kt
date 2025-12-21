@@ -34,8 +34,6 @@ suspend fun CodeforcesApi.getProfiles(
                 break
             }
         }
-    }.apply {
-        check(handles.all { it in this })
     }
 
 suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): ProfileResult<CodeforcesUserInfo> {
@@ -52,7 +50,7 @@ suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): Pr
     }
 }
 
-fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
+private fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
     CodeforcesUserInfo(
         handle = handle,
         rating = rating,
