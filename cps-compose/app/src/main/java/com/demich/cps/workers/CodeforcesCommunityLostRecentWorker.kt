@@ -8,6 +8,7 @@ import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -44,29 +45,6 @@ class CodeforcesCommunityLostRecentWorker(
         }
     }
 
-    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
-    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
-
-    private suspend fun CodeforcesLostDao.getSuspectsRemoveOld(minRatingColorTag: CodeforcesColorTag) =
-        getSuspects().partition {
-            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
-        }.let { (valid, invalid) ->
-            remove(invalid)
-            valid
-        }
-
-    private suspend fun getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesRecentFeedBlogEntry> {
-        suspend fun extractFrom(page: suspend () -> String) =
-            CodeforcesUtils.extractRecentBlogEntries(source = page())
-
-        // "/groups" has less size than "/recent" and hopefully will be cached by cf
-        return runCatching {
-            extractFrom { CodeforcesClient.getGroupsPage(locale) }
-        }.getOrElse {
-            extractFrom { CodeforcesClient.getRecentActionsPage(locale) }
-        }
-    }
-
     override suspend fun runWork(): Result {
         context.settingsCommunity.fromSnapshot {
             checkRecentActions(
@@ -79,16 +57,21 @@ class CodeforcesCommunityLostRecentWorker(
         return Result.success()
     }
 
+    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
+    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
+
     private suspend fun checkRecentActions(
         locale: CodeforcesLocale,
         minRatingColorTag: CodeforcesColorTag,
         dao: CodeforcesLostDao
     ) {
-        val recentBlogEntries = getRecentBlogEntries(locale = locale)
+        val recentBlogEntries = CodeforcesClient.getRecentBlogEntries(locale = locale)
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
         //get current suspects with removing old ones
-        val suspects = dao.getSuspectsRemoveOld(minRatingColorTag)
+        val suspects = dao.getSuspectsRemoveInvalid {
+            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
+        }
 
         //catch new suspects from recent actions
         findSuspects(
@@ -126,6 +109,28 @@ class CodeforcesCommunityLostRecentWorker(
                 ))
             }
         }
+    }
+}
+
+private suspend inline fun CodeforcesLostDao.getSuspectsRemoveInvalid(
+    isValid: (CodeforcesLostBlogEntry) -> Boolean
+): List<CodeforcesLostBlogEntry> =
+    getSuspects()
+        .partition(isValid)
+        .let { (valid, invalid) ->
+            remove(invalid)
+            valid
+        }
+
+private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesRecentFeedBlogEntry> {
+    suspend fun extractFrom(page: suspend () -> String) =
+        CodeforcesUtils.extractRecentBlogEntries(source = page())
+
+    // "/groups" has less size than "/recent" and hopefully will be cached by cf
+    return runCatching {
+        extractFrom { getGroupsPage(locale) }
+    }.getOrElse {
+        extractFrom { getRecentActionsPage(locale) }
     }
 }
 
