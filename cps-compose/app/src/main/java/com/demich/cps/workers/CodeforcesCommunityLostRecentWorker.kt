@@ -140,25 +140,27 @@ data class CodeforcesLostHint(
     val creationTime: Instant
 )
 
-private fun CodeforcesApi.asCacheBlogEntriesApi(
+private fun CodeforcesApi.withBlogEntriesCache(
     onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
 ): CodeforcesApi {
     val origin = this
     val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
     return object : CodeforcesApi by origin {
+        private suspend inline fun getOrPut(id: Int, blogEntry: () -> CodeforcesBlogEntry): CodeforcesBlogEntry =
+            cache.getOrPut(key = id) {
+                blogEntry().also { onNewBlogEntry(it) }
+            }
+
         override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale) =
-            cache.getOrPut(key = blogEntryId) {
+            getOrPut(id = blogEntryId) {
                 origin.getBlogEntry(blogEntryId, locale)
-                    .also { onNewBlogEntry(it) }
             }
 
         override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int) =
             origin.getRecentActions(locale = locale, maxCount = maxCount).apply {
                 forEach {
                     it.blogEntry?.let { blogEntry ->
-                        if (cache.put(key = blogEntry.id, value = blogEntry) == null) {
-                            onNewBlogEntry(blogEntry)
-                        }
+                        getOrPut(id = blogEntry.id) { blogEntry }
                     }
                 }
             }
@@ -194,7 +196,7 @@ private suspend inline fun findSuspects(
     api: CodeforcesApi,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
-    val api = api.asCacheBlogEntriesApi { blogEntry ->
+    val api = api.withBlogEntriesCache { blogEntry ->
         val time = blogEntry.creationTime
         if (!isNew(time)) {
             //save hint
