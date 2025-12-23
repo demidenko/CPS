@@ -80,7 +80,7 @@ class CodeforcesCommunityLostRecentWorker(
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
             api = CodeforcesClient,
-            lastNotNewIdItem = hintsDataStore.codeforcesLostHintNotNew
+            hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage()
         ) {
             dao.insert(
                 CodeforcesLostBlogEntry(
@@ -140,6 +140,36 @@ data class CodeforcesLostHint(
     val creationTime: Instant
 )
 
+private abstract class CodeforcesLostHintStorage {
+    abstract suspend fun getHint(): CodeforcesLostHint?
+
+    protected abstract suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint)
+
+    abstract suspend fun reset()
+
+    suspend fun update(blogEntryId: Int, time: Instant) {
+        update {
+            if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntryId, time)
+            else it
+        }
+    }
+}
+
+private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHintStorage =
+    object : CodeforcesLostHintStorage() {
+        override suspend fun getHint(): CodeforcesLostHint? {
+            return this@asHintStorage.invoke()
+        }
+
+        override suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint) {
+            this@asHintStorage.update(transform)
+        }
+
+        override suspend fun reset() {
+            this@asHintStorage.setValue(null)
+        }
+    }
+
 private fun CodeforcesApi.withBlogEntriesCache(
     onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
 ): CodeforcesApi {
@@ -192,7 +222,7 @@ private suspend inline fun findSuspects(
     locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
     crossinline isNew: (Instant) -> Boolean,
-    lastNotNewIdItem: DataStoreItem<CodeforcesLostHint?>,
+    hintStorage: CodeforcesLostHintStorage,
     api: CodeforcesApi,
     onSuspect: (CodeforcesBlogEntry) -> Unit
 ) {
@@ -200,19 +230,16 @@ private suspend inline fun findSuspects(
         val time = blogEntry.creationTime
         if (!isNew(time)) {
             //save hint
-            lastNotNewIdItem.update {
-                if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntry.id, time)
-                else it
-            }
+            hintStorage.update(blogEntry.id, time)
         }
     }
 
-    val hint = lastNotNewIdItem.let { item ->
+    val hint = hintStorage.run {
         // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
-        val hint = item.invoke()
+        val hint = getHint()
         //ensure hint in case isNew logic changes
         if (hint != null && isNew(hint.creationTime)) {
-            item.setValue(null)
+            reset()
             null
         } else {
             hint
