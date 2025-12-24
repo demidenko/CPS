@@ -22,6 +22,7 @@ import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -58,7 +59,6 @@ class CodeforcesCommunityLostRecentWorker(
     }
 
     private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
-    private fun isOldLost(blogCreationTime: Instant) = workerStartTime - blogCreationTime > 7.days
 
     private suspend fun checkRecentActions(
         locale: CodeforcesLocale,
@@ -91,24 +91,12 @@ class CodeforcesCommunityLostRecentWorker(
             )
         }
 
-        val recentIds = recentBlogEntries.mapToSet { it.id }
-
-        //remove from lost
-        dao.remove(
-            dao.getLost().filter {
-                isOldLost(it.blogEntry.creationTime) || it.blogEntry.id in recentIds
-            }
+        dao.checkSuspects(
+            recentBlogEntries = recentBlogEntries,
+            suspects = suspects,
+            currentTime = workerStartTime,
+            staleAfter = 7.days
         )
-
-        //suspect become lost
-        suspects.forEach { blogEntry ->
-            if (blogEntry.id !in recentIds) {
-                dao.insert(blogEntry.copy(
-                    isSuspect = false,
-                    timeStamp = workerStartTime
-                ))
-            }
-        }
     }
 }
 
@@ -121,6 +109,33 @@ private suspend inline fun CodeforcesLostDao.getSuspectsRemoveInvalid(
             remove(invalid)
             valid
         }
+
+private suspend fun CodeforcesLostDao.checkSuspects(
+    recentBlogEntries: List<CodeforcesRecentFeedBlogEntry>,
+    suspects: List<CodeforcesLostBlogEntry>,
+    currentTime: Instant,
+    staleAfter: Duration
+) {
+    val recentIds = recentBlogEntries.mapToSet { it.id }
+
+    //remove from lost
+    remove(
+        getLost().filter {
+            val it = it.blogEntry
+            currentTime - it.creationTime > staleAfter || it.id in recentIds
+        }
+    )
+
+    //suspect become lost
+    suspects.forEach { blogEntry ->
+        if (blogEntry.id !in recentIds) {
+            insert(blogEntry.copy(
+                isSuspect = false,
+                timeStamp = currentTime
+            ))
+        }
+    }
+}
 
 private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesRecentFeedBlogEntry> {
     suspend fun extractFrom(page: suspend () -> String) =
