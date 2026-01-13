@@ -70,15 +70,16 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                 handle = handle
             )?.let { submissions ->
                 val notified = notifiedSubmissionsIds()
-                submissions.filter {
+                val newResultSubmissions = submissions.filter {
                     it.testset == CodeforcesTestset.TESTS
                     && it.verdict.isResult()
                     && it.id !in notified
-                }.takeIf { it.isNotEmpty() }?.let { newSubmissions ->
-                    newSubmissions.forEach { onSubmissionFinalResult(it) }
-                    notifiedSubmissionsIds.edit { newSubmissions.forEach { add(it.id) } }
                 }
-                submissionsInfo.setValue(problemResults.makeMapWith(submissions))
+                newResultSubmissions.forEach { onSubmissionFinalResult(it) }
+                edit {
+                    notifiedSubmissionsIds.value += newResultSubmissions.map { it.id }
+                    submissionsInfo.value = problemResults.makeMapWith(submissions)
+                }
             }
         }
 
