@@ -38,10 +38,6 @@ android {
         buildConfig = true
     }
 
-    composeCompiler {
-        stabilityConfigurationFiles.add(project.layout.projectDirectory.file("compose_compiler_config.conf"))
-    }
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -54,6 +50,10 @@ android {
                 it.outputFileName = "cps-${versionCode}-${buildType.name}.apk"
             }
     }
+}
+
+composeCompiler {
+    stabilityConfigurationFiles.add(project.layout.projectDirectory.file("compose_compiler_config.conf"))
 }
 
 dependencies {
