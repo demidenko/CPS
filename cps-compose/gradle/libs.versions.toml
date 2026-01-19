@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "9.0.0"
 kotlin = "2.3.0"
-ksp = "2.3.2"
+ksp = "2.3.4"
 
 serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.7.1" # https://github.com/Kotlin/kotlinx-datetime/releases
@@ -78,7 +78,6 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
