@@ -30,7 +30,6 @@ fun BaseExtension.baseAndroidConfig() {
 
     defaultConfig.apply {
         minSdk = 26
-        targetSdk = apiLevel
     }
 
     compileOptions.apply {
