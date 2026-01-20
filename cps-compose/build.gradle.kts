@@ -1,7 +1,6 @@
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.tasks.asJavaVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -22,7 +21,7 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-private val javaVersion = JavaLanguageVersion.of(21).asJavaVersion()
+private val javaVersion = JavaVersion.toVersion(21)
 
 fun BaseExtension.baseAndroidConfig() {
     val apiLevel = 36
