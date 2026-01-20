@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
+import com.demich.cps.contests.ContestsListViewState.ContestsPage.Finished
+import com.demich.cps.contests.ContestsListViewState.ContestsPage.RunningOrFuture
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.loading.ContestsLoaderType
@@ -197,8 +199,8 @@ private fun ContestsPager(
 
 private fun SortedContests.sublist(page: ContestsListViewState.ContestsPage): List<Contest> =
     when (page) {
-        ContestsListViewState.ContestsPage.Finished -> finished
-        ContestsListViewState.ContestsPage.RunningOrFuture -> runningOrFuture
+        Finished -> finished
+        RunningOrFuture -> runningOrFuture
     }
 
 private fun List<Contest>.filterBy(state: FilterState) =
