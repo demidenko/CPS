@@ -63,13 +63,13 @@ private fun CPSContent() {
     val navigator = rememberCPSNavigator()
 
     val navBuilder: NavGraphBuilder.() -> Unit = {
-        navigator.navEntry<Screen.Profiles>(false) {
+        navigator.navEntry<Screen.Profiles> {
             NavContentProfilesScreen(
                 onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
             )
         }
 
-        navigator.navEntry<Screen.ProfileExpanded>(false) {
+        navigator.navEntry<Screen.ProfileExpanded> {
             val context = context
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
@@ -84,22 +84,22 @@ private fun CPSContent() {
             )
         }
 
-        navigator.navEntry<Screen.ProfileSettings>(false) {
+        navigator.navEntry<Screen.ProfileSettings> {
             NavContentProfilesSettingsScreen()
         }
 
-        navigator.navEntry<Screen.Community> {
+        navigator.navEntry<Screen.Community>(includeFontPadding = true) {
             NavContentCommunityScreen(
                 onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
                 onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
         }
 
-        navigator.navEntry<Screen.CommunitySettings>(false) {
+        navigator.navEntry<Screen.CommunitySettings> {
             NavContentCommunitySettingsScreen()
         }
 
-        navigator.navEntry<Screen.CommunityFollowList>(false) {
+        navigator.navEntry<Screen.CommunityFollowList> {
             NavContentCommunityFollowListScreen(
                 onShowBlogScreen = { handle ->
                     navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
@@ -107,21 +107,21 @@ private fun CPSContent() {
             )
         }
 
-        navigator.navEntry<Screen.CommunityCodeforcesBlog>(false) {
+        navigator.navEntry<Screen.CommunityCodeforcesBlog> {
             NavContentCodeforcesBlog()
         }
 
-        navigator.navEntry<Screen.Contests> {
+        navigator.navEntry<Screen.Contests>(includeFontPadding = true) {
             NavContentContestsScreen(
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }
 
-        navigator.navEntry<Screen.ContestsSettings>(false) {
+        navigator.navEntry<Screen.ContestsSettings> {
             NavContentContestsSettingsScreen()
         }
 
-        navigator.navEntry<Screen.Development>(false) {
+        navigator.navEntry<Screen.Development> {
             NavContentDevelopmentScreen()
         }
     }

@@ -170,7 +170,7 @@ class CPSNavigator(
 
 context(builder: NavGraphBuilder)
 inline fun <reified T: Screen> CPSNavigator.navEntry(
-    includeFontPadding: Boolean = true,
+    includeFontPadding: Boolean = false,
     crossinline content: @Composable CPSNavigator.ScreenScope<T>.() -> Unit
 ) {
     builder.composable<T> {
