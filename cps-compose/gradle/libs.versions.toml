@@ -3,7 +3,7 @@ androidGradlePlugin = "9.0.0"
 kotlin = "2.3.0"
 ksp = "2.3.4"
 
-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
+serialization = "1.10.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.7.1" # https://github.com/Kotlin/kotlinx-datetime/releases
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 
