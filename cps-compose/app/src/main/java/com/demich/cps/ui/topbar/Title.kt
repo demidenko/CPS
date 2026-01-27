@@ -20,7 +20,6 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.randomUuid
 import com.demich.kotlin_stdlib_boost.takeRandom
 import kotlin.math.max
-import kotlin.math.min
 
 @Composable
 internal fun Title(
@@ -120,11 +119,25 @@ private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit
     val gb = b.indices.groupBy { b[it] }
     ga.forEach { (char, va) ->
         val vb = gb.getOrElse(char) { return@forEach }
-        val n = min(va.size, vb.size)
-        val sa = va.takeRandom(n)
-        val sb = vb.takeRandom(n)
-        repeat(n) { block(sa[it], sb[it]) }
+//        val n = min(va.size, vb.size)
+//        val sa = va.takeRandom(n)
+//        val sb = vb.takeRandom(n)
+//        zip(a = sa, b = sb, block = block)
+        if (va.size < vb.size) {
+            zip(a = va, b = vb.takeRandom(va.size), block = block)
+        } else {
+            zip(a = va.takeRandom(vb.size), b = vb, block = block)
+        }
     }
+}
+
+private inline fun zip(
+    a: List<Int>,
+    b: List<Int>,
+    block: (Int, Int) -> Unit
+) {
+    require(a.size == b.size)
+    repeat(a.size) { block(a[it], b[it]) }
 }
 
 private fun longestCommonPrefix(a: String, b: String): Int {
