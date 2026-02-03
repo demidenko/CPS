@@ -116,9 +116,10 @@ private inline fun lcsIndices(a: String, b: String, block: (Int, Int) -> Unit) {
 private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit) {
     //TODO: speedup by not using maps
     val ga = a.indices.groupBy { a[it] }
-    val gb = b.indices.groupBy { b[it] }
+//    val gb = b.indices.groupBy { b[it] }
     ga.forEach { (char, va) ->
-        val vb = gb.getOrElse(char) { return@forEach }
+//        val vb = gb.getOrElse(char) { return@forEach }
+        val vb = b.indices.filter { b[it] == char }
 //        val n = min(va.size, vb.size)
 //        val sa = va.takeRandom(n)
 //        val sb = vb.takeRandom(n)
