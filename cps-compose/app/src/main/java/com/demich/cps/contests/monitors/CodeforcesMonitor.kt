@@ -9,7 +9,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -167,7 +166,7 @@ private inline fun CodeforcesMonitorDataStore.applyStandings(
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
             points = result?.points ?: 0.0,
-            type = result?.type ?: CodeforcesProblemStatus.FINAL
+            type = result?.type ?: FINAL
         )
     }
 
@@ -262,7 +261,7 @@ private fun needCheckSubmissions(
     problemResult: CodeforcesMonitorProblemResult,
     submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
 ): Boolean {
-    if (problemResult.type != CodeforcesProblemStatus.FINAL) return false
+    if (problemResult.type != FINAL) return false
     val list = submissionsInfo[problemResult.problemIndex] ?: return true
     return list.any { it.isPreliminary() }
 }

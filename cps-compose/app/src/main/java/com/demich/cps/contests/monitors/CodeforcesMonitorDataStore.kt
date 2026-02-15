@@ -106,12 +106,12 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
             CodeforcesMonitorData.ProblemInfo(
                 name = index,
                 result = when {
-                    contest.phase.isSystemTestOrFinished() && problem.type == CodeforcesProblemStatus.PRELIMINARY
+                    contest.phase.isSystemTestOrFinished() && problem.type == PRELIMINARY
                         -> CodeforcesMonitorData.ProblemResult.Pending
                     problem.points != 0.0
                         -> CodeforcesMonitorData.ProblemResult.Points(
                             points = problem.points,
-                            isFinal = problem.type == CodeforcesProblemStatus.FINAL
+                            isFinal = problem.type == FINAL
                         )
                     submissionsInfo[index]?.any { it.isFailedSystemTest() } == true
                         -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
