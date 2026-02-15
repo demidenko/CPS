@@ -66,16 +66,16 @@ internal data class CodeforcesMonitorSubmissionInfo(
     )
 
     fun isPreliminary(): Boolean {
-        if (verdict == CodeforcesProblemVerdict.WAITING) return true
-        if (verdict == CodeforcesProblemVerdict.TESTING) return true
+        if (verdict == WAITING) return true
+        if (verdict == TESTING) return true
         if (testset == CodeforcesTestset.PRETESTS) {
-            return verdict == CodeforcesProblemVerdict.OK
+            return verdict == OK
         }
         return false
     }
 
     fun isFailedSystemTest(): Boolean =
-        testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != CodeforcesProblemVerdict.OK
+        testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != OK
 }
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =

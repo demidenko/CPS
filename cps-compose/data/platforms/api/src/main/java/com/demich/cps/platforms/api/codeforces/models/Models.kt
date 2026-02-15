@@ -129,7 +129,7 @@ data class CodeforcesSubmission(
     val author: CodeforcesContestStandings.CodeforcesContestParticipant,
 
     // Can be absent.
-    val verdict: CodeforcesProblemVerdict = CodeforcesProblemVerdict.WAITING,
+    val verdict: CodeforcesProblemVerdict = WAITING,
 
     // Number of passed tests
     val passedTestCount: Int,

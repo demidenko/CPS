@@ -9,7 +9,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
@@ -286,7 +285,7 @@ private suspend fun CodeforcesApi.getSubmissionsOrNull(
     }.map { submissions ->
         submissions.filter {
                it.author.isContestParticipant()
-            && it.verdict != CodeforcesProblemVerdict.SKIPPED
+            && it.verdict != SKIPPED
         }
     }.getOrNull() //TODO: take this failure
 
