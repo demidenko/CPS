@@ -219,10 +219,10 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         }
 
     override suspend fun getUserPage(handle: String) =
-        getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = CodeforcesLocale.EN)
+        getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = EN)
 
     override suspend fun getContestPage(contestId: Int) =
-        getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = CodeforcesLocale.EN)
+        getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = EN)
 
     override suspend fun getMainPage(locale: CodeforcesLocale) =
         getCodeforcesPage(path = "", locale = locale)

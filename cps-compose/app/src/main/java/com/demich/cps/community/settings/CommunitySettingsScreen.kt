@@ -25,7 +25,6 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
@@ -211,11 +210,11 @@ private fun RuEnabledSettingsItem() {
 
     Switch(
         title = "Russian content",
-        checked = locale == CodeforcesLocale.RU,
+        checked = locale == RU,
         onCheckedChange = { checked ->
             context.settingsCommunity.codeforcesLocale.setValueIn(
                 scope = scope,
-                value = if (checked) CodeforcesLocale.RU else CodeforcesLocale.EN
+                value = if (checked) RU else EN
             )
         }
     )
