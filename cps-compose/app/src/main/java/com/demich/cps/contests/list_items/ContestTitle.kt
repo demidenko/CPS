@@ -62,7 +62,7 @@ internal fun ContestTitleExpanded(
 }
 
 fun CPSColors.colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
-    if (phase == Contest.Phase.RUNNING && !isVirtual) success
+    if (phase == RUNNING && !isVirtual) success
     else content
 
 @Composable

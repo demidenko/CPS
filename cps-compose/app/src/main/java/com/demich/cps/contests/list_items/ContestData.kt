@@ -15,7 +15,7 @@ internal inline fun Contest.counter(
     finished: () -> String = { "" }
 ): String =
     when (phase) {
-        Contest.Phase.BEFORE -> before(startTime - localCurrentTime)
-        Contest.Phase.RUNNING -> running(endTime - localCurrentTime)
-        Contest.Phase.FINISHED -> finished()
+        BEFORE -> before(startTime - localCurrentTime)
+        RUNNING -> running(endTime - localCurrentTime)
+        FINISHED -> finished()
     }

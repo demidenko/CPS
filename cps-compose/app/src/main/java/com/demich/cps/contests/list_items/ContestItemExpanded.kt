@@ -128,7 +128,7 @@ private fun ContestItemDatesAndMenuButton(
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = contest.dateRange(),
-                collisionType = if (phase == Contest.Phase.BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -176,7 +176,7 @@ private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
         return when (getPhase(currentTime = getCurrentTime())) {
-            Contest.Phase.BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
+            BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }
     }

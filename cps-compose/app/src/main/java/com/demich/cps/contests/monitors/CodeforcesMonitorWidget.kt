@@ -81,8 +81,8 @@ private fun CodeforcesMonitor(
             platform = Contest.Platform.codeforces,
             contestTitle = contestData.contestInfo.name,
             phase = when (contestData.contestPhase) {
-                is CodeforcesMonitorData.ContestPhase.Coding -> Contest.Phase.RUNNING
-                else -> Contest.Phase.BEFORE
+                is CodeforcesMonitorData.ContestPhase.Coding -> RUNNING
+                else -> BEFORE
             },
             isVirtual = false,
             modifier = Modifier.fillMaxWidth()

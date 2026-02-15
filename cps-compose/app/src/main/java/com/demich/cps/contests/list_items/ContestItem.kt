@@ -105,11 +105,11 @@ private fun ContestItemFooter(
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = when (phase) {
-                    Contest.Phase.BEFORE -> contest.dateBriefRange()
-                    Contest.Phase.RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
-                    Contest.Phase.FINISHED -> contest.dateRange()
+                    BEFORE -> contest.dateBriefRange()
+                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
+                    FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == Contest.Phase.BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(
