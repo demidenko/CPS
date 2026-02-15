@@ -69,7 +69,7 @@ fun CodeforcesReloadablePage(
     val context = context
     val loadingStatus by controller.loadingStatusState(title = title)
     CPSSwipeRefreshBox(
-        isRefreshing = { loadingStatus == LoadingStatus.LOADING },
+        isRefreshing = { loadingStatus == LOADING },
         onRefresh = { controller.reload(title = title, context = context) },
         content = content
     )
@@ -199,12 +199,12 @@ private fun CodeforcesCommunityTab(
     modifier: Modifier = Modifier
 ) {
     CommunityTab(
-        title = if (loadingStatus != LoadingStatus.LOADING) title.name else "...",
+        title = if (loadingStatus != LOADING) title.name else "...",
         index = index,
         badgeCount = badgeCount,
         pagerState = pagerState,
-        selectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.content else cpsColors.error,
-        unselectedTextColor = if (loadingStatus != LoadingStatus.FAILED) cpsColors.contentAdditional else cpsColors.error,
+        selectedTextColor = if (loadingStatus != FAILED) cpsColors.content else cpsColors.error,
+        unselectedTextColor = if (loadingStatus != FAILED) cpsColors.contentAdditional else cpsColors.error,
         modifier = modifier
     )
 }

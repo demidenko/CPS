@@ -319,7 +319,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     }
 
     val loadingStatus by combinedLoadingStatusState()
-    val isReloading = { loadingStatus == LoadingStatus.LOADING }
+    val isReloading = { loadingStatus == LOADING }
 
     menu = contestsMenuBuilder(
         onOpenSettings = onOpenSettings,
@@ -414,10 +414,10 @@ private fun combinedLoadingStatusState(): State<LoadingStatus> {
     return remember(viewModel) {
         viewModel.flowOfLoadingStatus()
             .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
-                if (workInfo.isRunning) LoadingStatus.LOADING
+                if (workInfo.isRunning) LOADING
                 else loadingStatus
             }
-    }.collectAsStateWithLifecycle(initialValue = LoadingStatus.PENDING)
+    }.collectAsStateWithLifecycle(initialValue = PENDING)
 }
 
 @Composable

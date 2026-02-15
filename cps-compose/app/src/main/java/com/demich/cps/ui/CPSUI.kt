@@ -151,11 +151,11 @@ fun CPSReloadingButton(
     onClick: () -> Unit
 ) {
     IconButton(
-        enabled = enabled && loadingStatus != LoadingStatus.LOADING,
+        enabled = enabled && loadingStatus != LOADING,
         modifier = modifier,
         onClick = onClick
     ) {
-        if (loadingStatus == LoadingStatus.LOADING) {
+        if (loadingStatus == LOADING) {
             LoadingIndicator(
                 modifier = Modifier.size(20.dp),
                 strokeWidth = 2.dp
@@ -163,7 +163,7 @@ fun CPSReloadingButton(
         } else {
             CPSIcon(
                 icon = CPSIcons.Reload,
-                color = if (loadingStatus == LoadingStatus.FAILED) cpsColors.error else cpsColors.content,
+                color = if (loadingStatus == FAILED) cpsColors.error else cpsColors.content,
                 onState = enabled,
                 modifier = Modifier.size(28.dp)
             )
