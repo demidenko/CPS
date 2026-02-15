@@ -14,15 +14,15 @@ internal fun DarkLightModeButton(
 ) {
     CPSIconButton(
         icon = when (mode) {
-            DarkLightMode.SYSTEM -> CPSIcons.DarkLightAuto
+            SYSTEM -> CPSIcons.DarkLightAuto
             else -> CPSIcons.DarkLight
         },
         onClick = {
             onModeChanged(
                 when (mode) {
-                    DarkLightMode.SYSTEM -> if (isSystemInDarkMode) DarkLightMode.LIGHT else DarkLightMode.DARK
-                    DarkLightMode.DARK -> DarkLightMode.LIGHT
-                    DarkLightMode.LIGHT -> DarkLightMode.DARK
+                    SYSTEM -> if (isSystemInDarkMode) LIGHT else DARK
+                    DARK -> LIGHT
+                    LIGHT -> DARK
                 }
             )
         }

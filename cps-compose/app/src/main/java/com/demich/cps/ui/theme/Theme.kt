@@ -29,7 +29,7 @@ enum class DarkLightMode {
 @Composable
 @ReadOnlyComposable
 private fun DarkLightMode.isDarkMode(): Boolean =
-    if (this == DarkLightMode.SYSTEM) isSystemInDarkTheme() else this == DarkLightMode.DARK
+    if (this == SYSTEM) isSystemInDarkTheme() else this == DARK
 
 private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
     if (context is ComponentActivity) {
