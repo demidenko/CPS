@@ -146,7 +146,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
 }
 
 private fun CodeforcesParticipationType.isOfficial(): Boolean =
-    this == CodeforcesParticipationType.CONTESTANT
+    this == CONTESTANT
 
 private fun isOfficialChanged(
     old: CodeforcesParticipationType,

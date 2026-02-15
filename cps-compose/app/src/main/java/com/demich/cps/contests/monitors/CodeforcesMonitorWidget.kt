@@ -28,7 +28,6 @@ import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -295,7 +294,7 @@ private fun Rank(
             )
 
             val rankText = buildString {
-                if (contestantRank.participationType != CodeforcesParticipationType.CONTESTANT) append('*')
+                if (contestantRank.participationType != CONTESTANT) append('*')
                 append(rank)
             }
 
