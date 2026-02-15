@@ -68,14 +68,14 @@ internal data class CodeforcesMonitorSubmissionInfo(
     fun isPreliminary(): Boolean {
         if (verdict == WAITING) return true
         if (verdict == TESTING) return true
-        if (testset == CodeforcesTestset.PRETESTS) {
+        if (testset == PRETESTS) {
             return verdict == OK
         }
         return false
     }
 
     fun isFailedSystemTest(): Boolean =
-        testset == CodeforcesTestset.TESTS && verdict.isResult() && verdict != OK
+        testset == TESTS && verdict.isResult() && verdict != OK
 }
 
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =

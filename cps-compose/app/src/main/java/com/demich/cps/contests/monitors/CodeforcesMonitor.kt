@@ -11,7 +11,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
@@ -68,7 +67,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
             )?.let { submissions ->
                 val notified = notifiedSubmissionsIds()
                 val newResultSubmissions = submissions.filter {
-                    it.testset == CodeforcesTestset.TESTS
+                    it.testset == TESTS
                     && it.verdict.isResult()
                     && it.id !in notified
                 }
