@@ -134,8 +134,7 @@ class CodeforcesMonitorNotifier(
                 }
                 is CodeforcesMonitorData.ProblemResult.Points -> {
                     bold {
-                        val text = if (contestType == CodeforcesContestType.ICPC) "+"
-                                    else problemResult.pointsToNiceString()
+                        val text = if (contestType == ICPC) "+" else problemResult.pointsToNiceString()
                         if (problemResult.isFinal) {
                             color(successColor) { append(text) }
                         } else {

@@ -8,7 +8,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
@@ -255,7 +254,7 @@ private fun needCheckSubmissions(
     participationType: CodeforcesParticipationType
 ): Boolean {
     if (!participationType.isContestParticipant()) return false
-    if (contestInfo.type == CodeforcesContestType.ICPC) return false
+    if (contestInfo.type == ICPC) return false
     return contestInfo.phase.isSystemTestOrFinished()
 }
 

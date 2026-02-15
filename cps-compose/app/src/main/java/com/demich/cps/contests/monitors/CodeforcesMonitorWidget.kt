@@ -254,9 +254,7 @@ private fun ProblemResultCell(
         }
         is CodeforcesMonitorData.ProblemResult.Points -> {
             ProblemResultCell(
-                text = if (contestType == CodeforcesContestType.ICPC) "+" else {
-                    problemResult.pointsToNiceString()
-                },
+                text = if (contestType == ICPC) "+" else problemResult.pointsToNiceString(),
                 color = if (problemResult.isFinal) cpsColors.success else cpsColors.content,
                 modifier = modifier
             )
@@ -317,37 +315,37 @@ private fun TestProblemColumns() {
             ProblemColumn(
                 problemName = "A",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(1.0, true),
-                contestType = CodeforcesContestType.ICPC,
+                contestType = ICPC,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "A1",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, false),
-                contestType = CodeforcesContestType.CF,
+                contestType = CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "A2",
                 problemResult = CodeforcesMonitorData.ProblemResult.Points(500.0, true),
-                contestType = CodeforcesContestType.CF,
+                contestType = CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "F",
                 problemResult = CodeforcesMonitorData.ProblemResult.FailedSystemTest,
-                contestType = CodeforcesContestType.CF,
+                contestType = CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "P",
                 problemResult = CodeforcesMonitorData.ProblemResult.Pending,
-                contestType = CodeforcesContestType.CF,
+                contestType = CF,
                 modifier = Modifier.weight(1f)
             )
             ProblemColumn(
                 problemName = "E",
                 problemResult = CodeforcesMonitorData.ProblemResult.Empty,
-                contestType = CodeforcesContestType.CF,
+                contestType = CF,
                 modifier = Modifier.weight(1f)
             )
         }
