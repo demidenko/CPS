@@ -113,11 +113,11 @@ class CodeforcesCommunityController internal constructor(
 
     fun flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
         when (tab) {
-            CodeforcesTitle.MAIN -> flowOfNewEntryCounters(
+            MAIN -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfMainBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
-            CodeforcesTitle.LOST -> flowOfNewEntryCounters(
+            LOST -> flowOfNewEntryCounters(
                 blogEntriesFlow = flowOfLostBlogEntries(context),
                 newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
             )
@@ -151,7 +151,7 @@ fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
 
 @Composable
 fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
-    if (title == CodeforcesTitle.LOST) {
+    if (title == LOST) {
         val context = context
         return remember {
             CodeforcesCommunityLostRecentWorker.getWork(context)
@@ -197,14 +197,14 @@ private fun flowOfNewEntryCounters(
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
     visitedTabs.forEach { tab ->
         when (tab) {
-            CodeforcesTitle.MAIN -> flowOfMainBlogEntries(context)
-            CodeforcesTitle.TOP -> {
+            MAIN -> flowOfMainBlogEntries(context)
+            TOP -> {
                 when (topPageType) {
                     CodeforcesCommunityController.TopPageType.BlogEntries -> flowOfTopBlogEntries(context)
                     CodeforcesCommunityController.TopPageType.Comments -> flowOfTopComments(context)
                 }
             }
-            CodeforcesTitle.RECENT -> flowOfRecent(context)
+            RECENT -> flowOfRecent(context)
             else -> { }
         }
     }

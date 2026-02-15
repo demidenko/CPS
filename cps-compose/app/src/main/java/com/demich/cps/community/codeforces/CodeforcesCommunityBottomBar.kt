@@ -11,13 +11,13 @@ fun CodeforcesCommunityBottomBar(
     controller: CodeforcesCommunityController,
 ) {
     when (controller.currentTab) {
-        CodeforcesTitle.TOP -> {
+        TOP -> {
             TopPageButton(
                 pageType = controller.topPageType,
                 onPageChange = { controller.topPageType = it }
             )
         }
-        CodeforcesTitle.RECENT -> {
+        RECENT -> {
             RecentPageButton(
                 pageType = controller.recentPageType,
                 onPageChange = { controller.recentPageType = it }

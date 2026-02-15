@@ -7,8 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.utils.context
 import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityTopPage(
@@ -17,7 +17,7 @@ fun CodeforcesCommunityTopPage(
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.TOP) {
+    CodeforcesReloadablePage(controller = controller, title = TOP) {
         when (val key = controller.topPageType) {
             CodeforcesCommunityController.TopPageType.BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
@@ -43,7 +43,7 @@ private fun CodeforcesCommunityTopBlogEntries(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfTopBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(CodeforcesTitle.TOP) },
+        isTabVisible = { controller.isTabVisible(tab = TOP) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = false

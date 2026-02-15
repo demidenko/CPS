@@ -26,7 +26,7 @@ fun CodeforcesCommunityLostPage(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfLostBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(CodeforcesTitle.LOST) },
+        isTabVisible = { controller.isTabVisible(tab = LOST) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true

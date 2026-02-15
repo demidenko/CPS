@@ -44,13 +44,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
-            CodeforcesTitle.MAIN -> mainBlogEntries.loadingStatusFlow
-            CodeforcesTitle.TOP -> {
+            MAIN -> mainBlogEntries.loadingStatusFlow
+            TOP -> {
                 listOf(topBlogEntries.loadingStatusFlow, topComments.loadingStatusFlow)
                     .combine()
             }
-            CodeforcesTitle.RECENT -> recentActions.loadingStatusFlow
-            CodeforcesTitle.LOST -> throw IllegalArgumentException(title.name)
+            RECENT -> recentActions.loadingStatusFlow
+            LOST -> throw IllegalArgumentException(title.name)
         }
     }
 
@@ -70,13 +70,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
         when (title) {
-            CodeforcesTitle.MAIN -> mainBlogEntries.launchLoadIfActive(locale)
-            CodeforcesTitle.TOP -> {
+            MAIN -> mainBlogEntries.launchLoadIfActive(locale)
+            TOP -> {
                 topBlogEntries.launchLoadIfActive(locale)
                 //TODO: set comments inactive after many reloads without showing them
                 topComments.launchLoadIfActive(locale)
             }
-            CodeforcesTitle.RECENT -> recentActions.launchLoadIfActive(locale)
+            RECENT -> recentActions.launchLoadIfActive(locale)
             else -> return
         }
     }

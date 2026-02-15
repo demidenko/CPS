@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.community.codeforces.CodeforcesTitle
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.navigation.CPSNavigator
@@ -116,9 +115,9 @@ private fun DefaultTabSettingsItem() {
         item = context.settingsCommunity.codeforcesDefaultTab,
         title = "Default tab",
         options = listOf(
-            CodeforcesTitle.MAIN,
-            CodeforcesTitle.TOP,
-            CodeforcesTitle.RECENT
+            MAIN,
+            TOP,
+            RECENT
         )
     )
 }

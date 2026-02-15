@@ -32,12 +32,12 @@ fun CodeforcesCommunityRecentPage(
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.RECENT) {
+    CodeforcesReloadablePage(controller = controller, title = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntry = type.blogEntry
                 BackHandler(
-                    enabled = { controller.isTabVisible(CodeforcesTitle.RECENT) },
+                    enabled = { controller.isTabVisible(tab = RECENT) },
                     onBackPressed = { controller.recentPageType = RecentPageType.RecentFeed }
                 ) {
                     RecentCommentsInBlogEntry(

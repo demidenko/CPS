@@ -30,11 +30,11 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
     val codeforcesTabs = codeforcesLostEnabled.transform { lostEnabled ->
-        buildList {
-            add(CodeforcesTitle.MAIN)
-            add(CodeforcesTitle.TOP)
-            add(CodeforcesTitle.RECENT)
-            if (lostEnabled) add(CodeforcesTitle.LOST)
+        buildList<CodeforcesTitle> {
+            add(MAIN)
+            add(TOP)
+            add(RECENT)
+            if (lostEnabled) add(LOST)
         }
     }
 

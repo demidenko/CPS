@@ -12,7 +12,7 @@ fun CodeforcesCommunityMainPage(
     controller: CodeforcesCommunityController,
     newEntriesState: NewEntriesState
 ) {
-    CodeforcesReloadablePage(controller = controller, title = CodeforcesTitle.MAIN) {
+    CodeforcesReloadablePage(controller = controller, title = MAIN) {
         CodeforcesCommunityMainList(controller, newEntriesState)
     }
 }
@@ -27,7 +27,7 @@ private fun CodeforcesCommunityMainList(
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
         blogEntriesFlow = controller.flowOfMainBlogEntries(context),
-        isTabVisible = { controller.isTabVisible(CodeforcesTitle.MAIN) },
+        isTabVisible = { controller.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true
