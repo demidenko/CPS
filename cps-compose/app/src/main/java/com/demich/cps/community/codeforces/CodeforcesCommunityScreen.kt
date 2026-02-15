@@ -92,10 +92,10 @@ private fun CodeforcesPager(
             modifier = modifier
         ) { index ->
             when (controller.tabs[index]) {
-                CodeforcesTitle.MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
-                CodeforcesTitle.TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
-                CodeforcesTitle.RECENT -> CodeforcesCommunityRecentPage(controller = controller)
-                CodeforcesTitle.LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
+                MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
+                TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
+                RECENT -> CodeforcesCommunityRecentPage(controller = controller)
+                LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
             }
         }
     }
