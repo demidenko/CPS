@@ -164,7 +164,7 @@ private fun PhaseTitle(
     info: String = ""
 ) {
     val title = when (phase) {
-        CodeforcesContestPhase.CODING -> "left"
+        CODING -> "left"
         else -> phase.title.lowercase()
     }
     Text(

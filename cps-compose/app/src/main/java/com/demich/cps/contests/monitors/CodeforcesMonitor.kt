@@ -126,7 +126,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
     }.onFailure { e ->
         monitor.lastRequest.setValue(false)
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
-            monitor.contestInfo.update { it?.copy(phase = CodeforcesContestPhase.BEFORE) }
+            monitor.contestInfo.update { it?.copy(phase = BEFORE) }
         }
         if (e is CodeforcesApiContestNotFoundException && e.contestId == contestId) {
             monitor.reset()
@@ -222,10 +222,10 @@ private class RatingChangeWaiter(
 
 private suspend fun RatingChangeWaiter.getDelay(contest: CodeforcesContest?): Duration {
     return when (contest?.phase) {
-        CodeforcesContestPhase.CODING -> 10.seconds
-        CodeforcesContestPhase.PENDING_SYSTEM_TEST -> 15.seconds
-        CodeforcesContestPhase.SYSTEM_TEST -> 3.seconds
-        CodeforcesContestPhase.FINISHED -> {
+        CODING -> 10.seconds
+        PENDING_SYSTEM_TEST -> 15.seconds
+        SYSTEM_TEST -> 3.seconds
+        FINISHED -> {
             getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
         }
         else -> 5.seconds
@@ -237,7 +237,7 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     delay: Duration,
     pageContentProvider: CodeforcesPageContentProvider
 ): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
-    if (phase == CodeforcesContestPhase.SYSTEM_TEST) {
+    if (phase == SYSTEM_TEST) {
         while (true) {
             pageContentProvider.runCatching { getContestPage(contestId) }
                 .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
