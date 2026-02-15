@@ -297,7 +297,7 @@ private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<Codefo
     return blogEntries.map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
         require(profile is ProfileResult.Success) { "fixHandleColors: profile result is not success" }
-        if (blogEntry.author.colorTag == CodeforcesColorTag.ADMIN) blogEntry
+        if (blogEntry.author.colorTag == ADMIN) blogEntry
         else {
             val colorTag = CodeforcesUtils.colorTagFrom(profile.userInfo.rating)
             blogEntry.copy(author = blogEntry.author.copy(colorTag = colorTag))

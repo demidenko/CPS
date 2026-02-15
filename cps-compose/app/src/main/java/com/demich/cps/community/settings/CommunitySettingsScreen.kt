@@ -164,30 +164,42 @@ context(scope: SettingsContainerScope)
 private fun LostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
-    CodeforcesColorTag.entries
-    val names = remember {
-        mapOf(
-            CodeforcesColorTag.BLACK to "Exists",
-            CodeforcesColorTag.GRAY to "Newbie",
-            CodeforcesColorTag.GREEN to "Pupil",
-            CodeforcesColorTag.CYAN to "Specialist",
-            CodeforcesColorTag.BLUE to "Expert",
-            CodeforcesColorTag.VIOLET to "Candidate Master",
-            CodeforcesColorTag.ORANGE to "Master",
-            CodeforcesColorTag.RED to "Grandmaster",
-            CodeforcesColorTag.LEGENDARY to "LGM"
-        )
-    }
     //TODO: restart worker on change?
     SelectEnum(
         item = item,
         title = "Author at least",
-        options = names.keys,
+        options = remember {
+            listOf(
+                BLACK,
+                GRAY,
+                GREEN,
+                CYAN,
+                BLUE,
+                VIOLET,
+                ORANGE,
+                RED,
+                LEGENDARY
+            )
+        },
         optionTitle = { tag ->
-            Text(text = CodeforcesHandle(handle = names.getValue(tag), colorTag = tag).toHandleSpan())
+            Text(text = CodeforcesHandle(handle = nameOf(tag), colorTag = tag).toHandleSpan())
         }
     )
 }
+
+private fun nameOf(tag: CodeforcesColorTag): String =
+    when (tag) {
+        BLACK -> "Exists"
+        GRAY -> "Newbie"
+        GREEN -> "Pupil"
+        CYAN -> "Specialist"
+        BLUE -> "Expert"
+        VIOLET -> "Candidate Master"
+        ORANGE -> "Master"
+        RED -> "Grandmaster"
+        LEGENDARY -> "LGM"
+        ADMIN -> "Admin"
+    }
 
 @Composable
 context(scope: SettingsContainerScope)

@@ -45,5 +45,5 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
 internal fun Element.extractRatedUser(): CodeforcesHandle =
     CodeforcesHandle(
         handle = text(),
-        colorTag = extractColorTag() ?: CodeforcesColorTag.BLACK
+        colorTag = extractColorTag() ?: BLACK
     )

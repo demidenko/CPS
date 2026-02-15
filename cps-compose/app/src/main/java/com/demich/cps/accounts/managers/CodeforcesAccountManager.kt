@@ -79,13 +79,13 @@ class CodeforcesAccountManager :
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
-        listOf(
-            CodeforcesColorTag.GRAY,
-            CodeforcesColorTag.GREEN,
-            CodeforcesColorTag.CYAN,
-            CodeforcesColorTag.BLUE,
-            CodeforcesColorTag.VIOLET,
-            CodeforcesColorTag.ORANGE
+        listOf<CodeforcesColorTag>(
+            GRAY,
+            GREEN,
+            CYAN,
+            BLUE,
+            VIOLET,
+            ORANGE
         ).map { colorTag ->
             //TODO: bs can be optimized if iterate from orange to gray
             val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
@@ -117,11 +117,11 @@ class CodeforcesAccountManager :
             tag.toHandleColor()?.let { handleColor ->
                 addStyle(
                     style = SpanStyle(color = cpsColors.colorFor(handleColor)),
-                    start = if (tag == CodeforcesColorTag.LEGENDARY) 1 else 0,
+                    start = if (tag == LEGENDARY) 1 else 0,
                     end = handle.length
                 )
             }
-            if (tag != CodeforcesColorTag.BLACK) {
+            if (tag != BLACK) {
                 addStyle(
                     style = SpanStyle(fontWeight = FontWeight.Bold),
                     start = 0,
@@ -232,14 +232,14 @@ class CodeforcesAccountManager :
 
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
     when (this) {
-        CodeforcesColorTag.GRAY -> GRAY
-        CodeforcesColorTag.GREEN -> GREEN
-        CodeforcesColorTag.CYAN -> CYAN
-        CodeforcesColorTag.BLUE -> BLUE
-        CodeforcesColorTag.VIOLET -> VIOLET
-        CodeforcesColorTag.ORANGE -> ORANGE
-        CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> RED
-        CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
+        GRAY -> GRAY
+        GREEN -> GREEN
+        CYAN -> CYAN
+        BLUE -> BLUE
+        VIOLET -> VIOLET
+        ORANGE -> ORANGE
+        RED, LEGENDARY -> RED
+        BLACK, ADMIN -> null
     }
 
 @Composable

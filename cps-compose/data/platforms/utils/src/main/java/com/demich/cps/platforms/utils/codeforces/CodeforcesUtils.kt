@@ -195,15 +195,15 @@ object CodeforcesUtils {
 
     fun colorTagFrom(rating: Int?): CodeforcesColorTag =
         when {
-            rating == null -> CodeforcesColorTag.BLACK
-            rating < 1200 -> CodeforcesColorTag.GRAY
-            rating < 1400 -> CodeforcesColorTag.GREEN
-            rating < 1600 -> CodeforcesColorTag.CYAN
-            rating < 1900 -> CodeforcesColorTag.BLUE
-            rating < 2100 -> CodeforcesColorTag.VIOLET
-            rating < 2400 -> CodeforcesColorTag.ORANGE
-            rating < 3000 -> CodeforcesColorTag.RED
-            else -> CodeforcesColorTag.LEGENDARY
+            rating == null -> BLACK
+            rating < 1200 -> GRAY
+            rating < 1400 -> GREEN
+            rating < 1600 -> CYAN
+            rating < 1900 -> BLUE
+            rating < 2100 -> VIOLET
+            rating < 2400 -> ORANGE
+            rating < 3000 -> RED
+            else -> LEGENDARY
         }
 }
 
