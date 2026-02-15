@@ -65,12 +65,12 @@ class DmojAccountManager :
 
     override fun originalColor(handleColor: HandleColor) =
         when (handleColor) {
-            HandleColor.GRAY -> Color(0xFF999999)
-            HandleColor.GREEN -> Color(0xff00a900)
-            HandleColor.BLUE -> Color(0xFF0000FF)
-            HandleColor.VIOLET -> Color(0xFF800080)
-            HandleColor.ORANGE -> Color(0xFFFFB100)
-            HandleColor.RED -> Color(0xFFEE0000)
+            GRAY -> Color(0xFF999999)
+            GREEN -> Color(0xff00a900)
+            BLUE -> Color(0xFF0000FF)
+            VIOLET -> Color(0xFF800080)
+            ORANGE -> Color(0xFFFFB100)
+            RED -> Color(0xFFEE0000)
             else -> illegalHandleColorError(handleColor)
         }
 

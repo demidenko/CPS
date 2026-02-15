@@ -65,15 +65,15 @@ internal fun lightCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     materialInitColors = ::lightColors
 ) {
     when (it) {
-        HandleColor.GRAY -> Color(0xFF808080)
-        HandleColor.BROWN -> Color(0xFF804000)
-        HandleColor.GREEN -> Color(0xFF008000)
-        HandleColor.CYAN -> Color(0xFF03A89E)
-        HandleColor.BLUE -> Color(0xFF0000FF)
-        HandleColor.VIOLET -> Color(0xFFAA00AA)
-        HandleColor.YELLOW -> Color(0xFFDDC000)
-        HandleColor.ORANGE -> Color(0xFFFF8000)
-        HandleColor.RED -> Color(0xFFFF0000)
+        GRAY -> Color(0xFF808080)
+        BROWN -> Color(0xFF804000)
+        GREEN -> Color(0xFF008000)
+        CYAN -> Color(0xFF03A89E)
+        BLUE -> Color(0xFF0000FF)
+        VIOLET -> Color(0xFFAA00AA)
+        YELLOW -> Color(0xFFDDC000)
+        ORANGE -> Color(0xFFFF8000)
+        RED -> Color(0xFFFF0000)
     }
 }
 
@@ -94,14 +94,14 @@ internal fun darkCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     materialInitColors = ::darkColors
 ) {
     when (it) {
-        HandleColor.GRAY -> Color(0xFF888888)
-        HandleColor.BROWN -> Color(0xFF80461B)
-        HandleColor.GREEN -> Color(0xFF009000)
-        HandleColor.CYAN -> Color(0xFF00A89E)
-        HandleColor.BLUE -> Color(0xFF0F68F0)
-        HandleColor.VIOLET -> Color(0xFFB04ECC)
-        HandleColor.YELLOW -> Color(0xFFCCCC00)
-        HandleColor.ORANGE -> Color(0xFFFB8000)
-        HandleColor.RED -> Color(0xFFED301D)
+        GRAY -> Color(0xFF888888)
+        BROWN -> Color(0xFF80461B)
+        GREEN -> Color(0xFF009000)
+        CYAN -> Color(0xFF00A89E)
+        BLUE -> Color(0xFF0F68F0)
+        VIOLET -> Color(0xFFB04ECC)
+        YELLOW -> Color(0xFFCCCC00)
+        ORANGE -> Color(0xFFFB8000)
+        RED -> Color(0xFFED301D)
     }
 }

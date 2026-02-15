@@ -100,14 +100,14 @@ class CodeforcesAccountManager :
 
     override fun originalColor(handleColor: HandleColor): Color =
         when (handleColor) {
-            HandleColor.GRAY -> Color(0xFF808080)
-            HandleColor.GREEN -> Color(0xFF008000)
-            HandleColor.CYAN -> Color(0xFF03A89E)
-            HandleColor.BLUE -> Color(0xFF0000FF)
-            HandleColor.VIOLET -> Color(0xFFAA00AA)
-            HandleColor.YELLOW -> Color(0xFFBBBB00)
-            HandleColor.ORANGE -> Color(0xFFFF8C00)
-            HandleColor.RED -> Color(0xFFFF0000)
+            GRAY -> Color(0xFF808080)
+            GREEN -> Color(0xFF008000)
+            CYAN -> Color(0xFF03A89E)
+            BLUE -> Color(0xFF0000FF)
+            VIOLET -> Color(0xFFAA00AA)
+            YELLOW -> Color(0xFFBBBB00)
+            ORANGE -> Color(0xFFFF8C00)
+            RED -> Color(0xFFFF0000)
             else -> illegalHandleColorError(handleColor)
         }
 
@@ -232,13 +232,13 @@ class CodeforcesAccountManager :
 
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
     when (this) {
-        CodeforcesColorTag.GRAY -> HandleColor.GRAY
-        CodeforcesColorTag.GREEN -> HandleColor.GREEN
-        CodeforcesColorTag.CYAN -> HandleColor.CYAN
-        CodeforcesColorTag.BLUE -> HandleColor.BLUE
-        CodeforcesColorTag.VIOLET -> HandleColor.VIOLET
-        CodeforcesColorTag.ORANGE -> HandleColor.ORANGE
-        CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> HandleColor.RED
+        CodeforcesColorTag.GRAY -> GRAY
+        CodeforcesColorTag.GREEN -> GREEN
+        CodeforcesColorTag.CYAN -> CYAN
+        CodeforcesColorTag.BLUE -> BLUE
+        CodeforcesColorTag.VIOLET -> VIOLET
+        CodeforcesColorTag.ORANGE -> ORANGE
+        CodeforcesColorTag.RED, CodeforcesColorTag.LEGENDARY -> RED
         CodeforcesColorTag.BLACK, CodeforcesColorTag.ADMIN -> null
     }
 
