@@ -201,16 +201,16 @@ private fun PeriodicWorkRequest.Builder.setNextScheduleTimeOverride(instant: Ins
     setNextScheduleTimeOverride(instant.toEpochMilliseconds())
 
 val WorkInfo?.stateOrCancelled: WorkInfo.State
-    get() = this?.state ?: WorkInfo.State.CANCELLED
+    get() = this?.state ?: CANCELLED
 
 val WorkInfo?.isRunning: Boolean
-    get() = this?.state == WorkInfo.State.RUNNING
+    get() = this?.state == RUNNING
 
 val WorkInfo.repeatInterval: Duration?
     get() = periodicityInfo?.repeatIntervalMillis?.milliseconds
 
 val WorkInfo.nextScheduleTime: Instant?
     get() = when (state) {
-        WorkInfo.State.ENQUEUED -> Instant.fromEpochMilliseconds(nextScheduleTimeMillis)
+        ENQUEUED -> Instant.fromEpochMilliseconds(nextScheduleTimeMillis)
         else -> null
     }

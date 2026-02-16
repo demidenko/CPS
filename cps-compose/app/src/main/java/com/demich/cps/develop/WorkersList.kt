@@ -362,7 +362,7 @@ private fun WorkerDialog(
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 when (val state = workInfo.stateOrCancelled) {
-                    WorkInfo.State.ENQUEUED -> {
+                    ENQUEUED -> {
                         workInfo?.nextScheduleTime?.let { nextTime ->
                             val d = nextTime - localCurrentTime
                             Text(text = "next: in ${d.toDropSecondsString()}")
@@ -463,10 +463,10 @@ private fun EventsTimeline(
 
 fun CPSColors.colorFor(workState: WorkInfo.State): Color =
     when (workState) {
-        WorkInfo.State.ENQUEUED, WorkInfo.State.SUCCEEDED -> content
-        WorkInfo.State.RUNNING -> success
-        WorkInfo.State.BLOCKED, WorkInfo.State.FAILED -> error
-        WorkInfo.State.CANCELLED -> contentAdditional
+        ENQUEUED, SUCCEEDED -> content
+        RUNNING -> success
+        BLOCKED, FAILED -> error
+        CANCELLED -> contentAdditional
     }
 
 fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
