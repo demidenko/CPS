@@ -50,7 +50,7 @@ abstract class CPSWorker(
             workersInfo.append(event)
             smartRunWork().also { result ->
                 workersInfo.append(event.copy(end = getCurrentTime(), resultType = result.toType()))
-                if (result.toType() != ResultType.SUCCESS) {
+                if (result.toType() != SUCCESS) {
                     work.enqueueAsap()
                 }
             }
@@ -64,7 +64,7 @@ abstract class CPSWorker(
         repeatUntilSuccessOrLast(
             times = 2,
             between = { delay(5.seconds) },
-            isSuccess = { it.toType() == ResultType.SUCCESS }
+            isSuccess = { it.toType() == SUCCESS }
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))
             timeHolder.reset()
@@ -122,9 +122,9 @@ abstract class CPSWorker(
     @SuppressLint("RestrictedApi")
     private fun Result.toType(): ResultType? {
         return when (this) {
-            is Result.Success -> ResultType.SUCCESS
-            is Result.Retry -> ResultType.RETRY
-            is Result.Failure -> ResultType.FAILURE
+            is Result.Success -> SUCCESS
+            is Result.Retry -> RETRY
+            is Result.Failure -> FAILURE
             else -> null
         }
     }

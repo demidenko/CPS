@@ -329,7 +329,7 @@ private fun ResultIcon(
     result: CPSWorker.ResultType,
     modifier: Modifier = Modifier
 ) {
-    if (result == CPSWorker.ResultType.SUCCESS) {
+    if (result == SUCCESS) {
         IconSp(
             imageVector = CPSIcons.Done,
             color = cpsColors.success,
@@ -338,7 +338,7 @@ private fun ResultIcon(
         )
     } else {
         AttentionIcon(
-            dangerType = if (result == CPSWorker.ResultType.RETRY) WARNING else DANGER,
+            dangerType = if (result == RETRY) WARNING else DANGER,
             modifier = modifier
         )
     }
@@ -382,7 +382,7 @@ private fun WorkerDialog(
                 ) {
                     Text(text = buildString {
                         append("events: ")
-                        append(events.count { it.resultType == CPSWorker.ResultType.SUCCESS })
+                        append(events.count { it.resultType == SUCCESS })
                         append(" / ")
                         append(events.size)
                     })
@@ -471,9 +471,9 @@ fun CPSColors.colorFor(workState: WorkInfo.State): Color =
 
 fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
     when (result) {
-        CPSWorker.ResultType.SUCCESS -> success
-        CPSWorker.ResultType.RETRY -> warning
-        CPSWorker.ResultType.FAILURE -> error
+        SUCCESS -> success
+        RETRY -> warning
+        FAILURE -> error
         null -> contentAdditional
     }
 
