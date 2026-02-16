@@ -19,12 +19,12 @@ fun CodeforcesCommunityTopPage(
 
     CodeforcesReloadablePage(controller = controller, title = TOP) {
         when (val key = controller.topPageType) {
-            CodeforcesCommunityController.TopPageType.BlogEntries -> {
+            BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
                     CodeforcesCommunityTopBlogEntries(controller, newEntriesState)
                 }
             }
-            CodeforcesCommunityController.TopPageType.Comments -> {
+            Comments -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
                     CodeforcesCommunityTopComments(controller = controller)
                 }

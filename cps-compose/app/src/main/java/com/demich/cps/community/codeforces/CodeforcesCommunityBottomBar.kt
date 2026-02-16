@@ -32,8 +32,8 @@ private fun TopPageButton(
     pageType: TopPageType,
     onPageChange: (TopPageType) -> Unit
 ) {
-    CommentsModeButton(isOn = pageType == TopPageType.Comments) { isOn ->
-        onPageChange(if (isOn) TopPageType.Comments else TopPageType.BlogEntries)
+    CommentsModeButton(isOn = pageType == Comments) { isOn ->
+        onPageChange(if (isOn) Comments else BlogEntries)
     }
 }
 

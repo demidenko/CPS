@@ -51,7 +51,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
             tabsState = tabsState,
             data = CodeforcesCommunityControllerData(
                 selectedTab = defaultTab,
-                topPageType = CodeforcesCommunityController.TopPageType.BlogEntries,
+                topPageType = BlogEntries,
                 recentPageType = CodeforcesCommunityController.RecentPageType.RecentFeed
             )
         )
@@ -200,8 +200,8 @@ private fun CodeforcesCommunityController.touchFlows(context: Context) {
             MAIN -> flowOfMainBlogEntries(context)
             TOP -> {
                 when (topPageType) {
-                    CodeforcesCommunityController.TopPageType.BlogEntries -> flowOfTopBlogEntries(context)
-                    CodeforcesCommunityController.TopPageType.Comments -> flowOfTopComments(context)
+                    BlogEntries -> flowOfTopBlogEntries(context)
+                    Comments -> flowOfTopComments(context)
                 }
             }
             RECENT -> flowOfRecent(context)
