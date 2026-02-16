@@ -9,7 +9,7 @@ enum class DangerType {
 
 fun CPSColors.colorFor(dangerType: DangerType): Color =
     when (dangerType) {
-        DangerType.SAFE -> Color.Unspecified
-        DangerType.WARNING -> warning
-        DangerType.DANGER -> error
+        SAFE -> Color.Unspecified
+        WARNING -> warning
+        DANGER -> error
     }

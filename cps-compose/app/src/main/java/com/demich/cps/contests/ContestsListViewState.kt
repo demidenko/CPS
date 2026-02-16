@@ -91,11 +91,11 @@ class ContestsListViewState(
                 it.isVirtual -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
-                else -> return DangerType.DANGER
+                else -> return DANGER
             }
         } ?: Duration.INFINITE
-        if (distance < safeMinDuration) return DangerType.WARNING
-        return DangerType.SAFE
+        if (distance < safeMinDuration) return WARNING
+        return SAFE
     }
 
     var contestsPage by contestsPageState

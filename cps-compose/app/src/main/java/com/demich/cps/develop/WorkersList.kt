@@ -57,7 +57,6 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.ProvideTimeEachMinute
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
@@ -339,7 +338,7 @@ private fun ResultIcon(
         )
     } else {
         AttentionIcon(
-            dangerType = if (result == CPSWorker.ResultType.RETRY) DangerType.WARNING else DangerType.DANGER,
+            dangerType = if (result == CPSWorker.ResultType.RETRY) WARNING else DANGER,
             modifier = modifier
         )
     }

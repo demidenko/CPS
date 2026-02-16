@@ -128,7 +128,7 @@ private fun ContestItemDatesAndMenuButton(
         ProvideTextStyle(contestSubtitleTextStyle()) {
             AttentionText(
                 text = contest.dateRange(),
-                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == BEFORE) collisionType(contest) else SAFE,
                 modifier = Modifier.align(Alignment.Center)
             )
         }

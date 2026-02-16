@@ -26,7 +26,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toTimeAgoString
 import kotlin.time.Duration.Companion.days
@@ -159,7 +158,7 @@ private fun UserOnlineInfo(
         Text(text = text)
         if (showWarning) {
             AttentionIcon(
-                dangerType = DangerType.WARNING,
+                dangerType = WARNING,
                 modifier = Modifier.padding(start = 3.dp)
             )
         }

@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -86,7 +85,7 @@ private fun PermissionPanel(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             AttentionIcon(
-                dangerType = DangerType.DANGER,
+                dangerType = DANGER,
                 size = 19.sp
             )
             Text(

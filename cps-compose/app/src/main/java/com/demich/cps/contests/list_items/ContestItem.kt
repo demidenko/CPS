@@ -109,7 +109,7 @@ private fun ContestItemFooter(
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
                     FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == BEFORE) collisionType(contest) else DangerType.SAFE,
+                collisionType = if (phase == BEFORE) collisionType(contest) else SAFE,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
             ContestCounter(

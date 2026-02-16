@@ -33,7 +33,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.currentTimeAsState
 import com.demich.cps.utils.rememberFrom
 import com.demich.cps.utils.timerShort
@@ -118,7 +117,7 @@ private fun Footer(
             )
             if (requestFailed) {
                 AttentionIcon(
-                    dangerType = DangerType.DANGER,
+                    dangerType = DANGER,
                     modifier = Modifier.padding(end = 4.dp)
                 )
             }

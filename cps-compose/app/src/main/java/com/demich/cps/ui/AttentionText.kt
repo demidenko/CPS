@@ -45,7 +45,7 @@ private fun AttentionWithMark(
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         Text(text = text)
-        if (collisionType != DangerType.SAFE) {
+        if (collisionType != SAFE) {
             AttentionIcon(dangerType = collisionType)
         }
     }
@@ -57,7 +57,7 @@ private fun AttentionBoxed(
     collisionType: DangerType,
     modifier: Modifier = Modifier
 ) {
-    if (collisionType == DangerType.SAFE) {
+    if (collisionType == SAFE) {
         Text(
             text = text,
             modifier = modifier,
