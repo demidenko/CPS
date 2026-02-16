@@ -3,13 +3,11 @@ package com.demich.cps.workers
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
@@ -62,7 +60,7 @@ abstract class CPSOneTimeWork(
     }
 
     fun enqueue(replace: Boolean) =
-        enqueueWork(policy = if (replace) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP)
+        enqueueWork(policy = if (replace) REPLACE else KEEP)
 }
 
 abstract class CPSPeriodicWork(
@@ -86,18 +84,18 @@ abstract class CPSPeriodicWork(
     }
 
     suspend fun startImmediate() {
-        enqueueWork(policy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE)
+        enqueueWork(policy = CANCEL_AND_REENQUEUE)
     }
 
     suspend fun enqueueIfEnabled() {
-        if (isEnabled()) enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) //TODO: KEEP sometimes?
+        if (isEnabled()) enqueueWork(policy = UPDATE) //TODO: KEEP sometimes?
     }
 
     private suspend fun getWorkInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
 
     private suspend fun enqueueAt(time: Instant) {
         if (!isEnabled()) return
-        enqueueWork(policy = ExistingPeriodicWorkPolicy.UPDATE) {
+        enqueueWork(policy = UPDATE) {
             //note: ignores default even if default closer
             setNextScheduleTimeOverride(time)
         }
@@ -141,13 +139,13 @@ internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
         flexTimeInterval = flex.toJavaDuration()
     ).setConstraints(
         Constraints(
-            requiredNetworkType = if (requireNetwork) NetworkType.CONNECTED else NetworkType.NOT_REQUIRED,
+            requiredNetworkType = if (requireNetwork) CONNECTED else NOT_REQUIRED,
             requiresBatteryNotLow = batteryNotLow,
             requiresCharging = requiresCharging
         )
     ).apply {
         setBackoffCriteria(
-            backoffPolicy = BackoffPolicy.LINEAR,
+            backoffPolicy = LINEAR,
             duration = PeriodicWorkRequest.minPeriodicInterval.toJavaDuration()
         )
     }
