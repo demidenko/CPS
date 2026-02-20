@@ -45,9 +45,7 @@ object AtCoderUtils {
                 val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
                 NewsPost(
                     title = titleElement.text(),
-                    time = timeElement.let {
-                        Instant.fromEpochSeconds(it.attr("title").toLong())
-                    },
+                    time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
                     id = id
                 )
             }

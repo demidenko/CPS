@@ -55,12 +55,12 @@ class NewsWorker(
             newsFeed = atcoder_news,
             posts = AtCoderUtils.extractNews(source = AtCoderClient.getMainPage())
         ) { post ->
-            notificationChannels.atcoder.news(post.id.toInt()).notify(context) {
+            notificationChannels.atcoder.news(post.id).notify(context) {
                 subText = "atcoder news"
                 bigContent = post.title.trim() //TODO: title + content html
                 smallIcon = R.drawable.ic_community
                 post.time?.let { time = it }
-                url = AtCoderUrls.post(post.id.toInt())
+                url = AtCoderUrls.post(post.id)
                 //setColor
                 autoCancel = true
             }
