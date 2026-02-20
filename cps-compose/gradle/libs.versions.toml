@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "9.0.1"
 kotlin = "2.3.10"
-ksp = "2.3.4"
+ksp = "2.3.6"
 
 serialization = "1.10.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.7.1" # https://github.com/Kotlin/kotlinx-datetime/releases
@@ -14,7 +14,7 @@ work = "2.11.1" # https://developer.android.com/jetpack/androidx/releases/work
 
 compose-bom = "2026.02.00" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 
-activity-compose = "1.12.3" # https://developer.android.com/jetpack/androidx/releases/activity
+activity-compose = "1.12.4" # https://developer.android.com/jetpack/androidx/releases/activity
 navigation-compose = "2.9.7" # https://developer.android.com/jetpack/androidx/releases/navigation
 lifecycle = "2.10.0"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
