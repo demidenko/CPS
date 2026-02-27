@@ -63,7 +63,7 @@ private interface ContestsSorter {
 }
 
 private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionIndex { it.getPhase(currentTime) != FINISHED }
+    partitionIndex { it.phaseAt(currentTime) != FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)

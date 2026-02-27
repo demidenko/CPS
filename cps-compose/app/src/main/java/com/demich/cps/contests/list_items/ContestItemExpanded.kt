@@ -39,7 +39,7 @@ internal fun ContestExpandedItemContent(
     collisionType: (Contest) -> DangerType,
     onDeleteRequest: (Contest) -> Unit
 ) {
-    val phase = contest.getPhase(localCurrentTime)
+    val phase = contest.phaseAt(localCurrentTime)
     ContestPlatform(
         platform = contest.platform,
         platformName = contest.platformName()
@@ -175,7 +175,7 @@ private fun ContestItemMenuButton(
 private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
-        return when (getPhase(currentTime = getCurrentTime())) {
+        return when (phaseAt(time = getCurrentTime())) {
             BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }

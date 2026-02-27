@@ -20,9 +20,9 @@ data class Contest (
 ) {
     val eventDuration: Duration get() = endTime - startTime
 
-    fun getPhase(currentTime: Instant): Phase = when {
-        currentTime >= endTime -> FINISHED
-        currentTime < startTime -> BEFORE
+    fun phaseAt(time: Instant): Phase = when {
+        time >= endTime -> FINISHED
+        time < startTime -> BEFORE
         else -> RUNNING
     }
 
@@ -84,9 +84,9 @@ data class Contest (
         val platforms: List<Platform> get() = Platform.entries
         val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
 
-        fun comparatorAt(currentTime: Instant) = Comparator<Contest> { c1, c2 ->
-            val phase1 = c1.getPhase(currentTime)
-            val phase2 = c2.getPhase(currentTime)
+        fun comparatorAt(time: Instant) = Comparator<Contest> { c1, c2 ->
+            val phase1 = c1.phaseAt(time)
+            val phase2 = c2.phaseAt(time)
             if (phase1 != phase2) {
                 compareValuesBy(phase1, phase2) {
                     when (it) {

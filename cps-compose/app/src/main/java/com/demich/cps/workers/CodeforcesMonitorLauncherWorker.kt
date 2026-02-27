@@ -112,7 +112,7 @@ private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
         platform = Contest.Platform.codeforces,
         currentTime = workerStartTime
     ).minOfNotNull {
-        when (it.getPhase(workerStartTime)) {
+        when (it.phaseAt(workerStartTime)) {
             RUNNING if it.duration < 24.hours -> {
                 enqueueAsap()
                 return

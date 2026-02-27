@@ -51,7 +51,7 @@ private fun ContestItemContent(
     collisionType: (Contest) -> DangerType
 ) {
     //TODO: call recomposes two times
-    val phase = contest.getPhase(localCurrentTime)
+    val phase = contest.phaseAt(localCurrentTime)
     ContestItemHeader(
         platform = contest.platform,
         contestTitle = contest.title,
