@@ -8,6 +8,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.isContestant
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.removeOld
 import com.demich.datastore_itemized.edit
@@ -53,7 +54,7 @@ class CodeforcesMonitorLauncherWorker(
                 lastSubmissionId = monitorLastSubmissionId(),
                 isActual = ::isActual
             ) { submission ->
-                submission.author.isContestParticipant()
+                submission.author.isContestant()
             }
 
             firstParticipation?.let { submission ->

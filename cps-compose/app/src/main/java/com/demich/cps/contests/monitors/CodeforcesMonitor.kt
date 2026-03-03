@@ -11,6 +11,10 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.isContestant
+import com.demich.cps.platforms.api.codeforces.models.isContestantType
+import com.demich.cps.platforms.api.codeforces.models.isResult
+import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
@@ -157,7 +161,7 @@ private inline fun CodeforcesMonitorDataStore.applyStandings(
 ) {
     contestInfo.value = standings.contest
 
-    val row = standings.rows.find { row -> row.party.isContestParticipant() }
+    val row = standings.rows.find { row -> row.party.isContestant() }
     val results = row?.problemResults
     problemResults.value = standings.problems.mapIndexed { index, problem ->
         val result = results?.getOrNull(index)
@@ -250,7 +254,7 @@ private fun needCheckSubmissions(
     contestInfo: CodeforcesContest,
     participationType: CodeforcesParticipationType
 ): Boolean {
-    if (!participationType.isContestParticipant()) return false
+    if (!participationType.isContestantType()) return false
     if (contestInfo.type == ICPC) return false
     return contestInfo.phase.isSystemTestOrFinished()
 }
@@ -283,7 +287,7 @@ private suspend fun CodeforcesApi.getSubmissionsOrNull(
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
         submissions.filter {
-               it.author.isContestParticipant()
+               it.author.isContestant()
             && it.verdict != SKIPPED
         }
     }.getOrNull() //TODO: take this failure

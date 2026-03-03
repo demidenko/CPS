@@ -92,9 +92,7 @@ data class CodeforcesContestStandings(
     @Serializable
     data class CodeforcesContestParticipant(
         val participantType: CodeforcesParticipationType
-    ) {
-        fun isContestParticipant() = participantType.isContestParticipant()
-    }
+    )
 }
 
 @Serializable
@@ -231,17 +229,7 @@ enum class CodeforcesContestPhase {
     CODING,
     PENDING_SYSTEM_TEST,
     SYSTEM_TEST,
-    FINISHED;
-
-    val title: String
-        get() = when (this) {
-            PENDING_SYSTEM_TEST -> "PENDING SYSTEM TESTING"
-            SYSTEM_TEST -> "SYSTEM TESTING"
-            else -> name
-        }
-
-    fun isSystemTestOrFinished() =
-        this == SYSTEM_TEST || this == FINISHED
+    FINISHED
 }
 
 enum class CodeforcesContestType {
@@ -251,10 +239,7 @@ enum class CodeforcesContestType {
 
 enum class CodeforcesParticipationType {
     NOT_PARTICIPATED,
-    CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION;
-
-    fun isContestParticipant(): Boolean =
-        this == CONTESTANT || this == OUT_OF_COMPETITION
+    CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION
 }
 
 enum class CodeforcesProblemStatus {
@@ -265,13 +250,6 @@ enum class CodeforcesProblemVerdict {
     WAITING,
     FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED,
     SKIPPED, TESTING, REJECTED
-    ;
-
-    fun isResult(): Boolean =
-        when (this) {
-            WAITING, TESTING, SKIPPED -> false
-            else -> true
-        }
 }
 
 enum class CodeforcesTestset {

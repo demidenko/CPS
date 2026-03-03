@@ -9,6 +9,7 @@ import androidx.core.text.color
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.models.title
 import com.demich.cps.utils.getCurrentTime
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
@@ -74,7 +75,7 @@ class CodeforcesMonitorNotifier(
     private var phase: CodeforcesMonitorData.ContestPhase by delegateWithOld(
         initialValue = CodeforcesMonitorData.ContestPhase.Other(phase = UNDEFINED)
     ) { oldPhase, phase ->
-        views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
+        views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title()) }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
             val remaining = phase.endTime - getCurrentTime()
             val elapsed = SystemClock.elapsedRealtime().milliseconds

@@ -28,6 +28,7 @@ import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
+import com.demich.cps.platforms.api.codeforces.models.title
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -163,7 +164,7 @@ private fun PhaseTitle(
 ) {
     val title = when (phase) {
         CODING -> "left"
-        else -> phase.title.lowercase()
+        else -> phase.title().lowercase()
     }
     Text(
         text = if (info.isEmpty()) title else "$title $info",
