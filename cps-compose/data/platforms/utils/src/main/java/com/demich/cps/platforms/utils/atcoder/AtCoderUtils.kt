@@ -4,6 +4,7 @@ import com.demich.cps.accounts.userinfo.AtCoderUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.utils.NewsPostEntry
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
 object AtCoderUtils {
@@ -38,16 +39,18 @@ object AtCoderUtils {
 
     fun extractNews(source: String): List<NewsPost?> =
         Jsoup.parse(source).select("div.panel.panel-default, div.panel.panel-info")
-            .mapNotNull { panel ->
-                val header = panel.expectFirst("div.panel-heading")
-                val titleElement = header.expectFirst("h3.panel-title")
-                val timeElement = header.selectFirst("span.tooltip-unix") ?: return@mapNotNull null
-                val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
-                NewsPost(
-                    title = titleElement.text(),
-                    time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
-                    id = id
-                )
-            }
+            .mapNotNull { it.extractNewsFromPanel() }
             .sortedByDescending { it.id }
+
+    private fun Element.extractNewsFromPanel(): NewsPost? {
+        val header = selectFirst("div.panel-heading") ?: return null
+        val titleElement = header.expectFirst("h3.panel-title")
+        val timeElement = header.selectFirst("span.tooltip-unix") ?: return null
+        val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
+        return NewsPost(
+            title = titleElement.text(),
+            time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
+            id = id
+        )
+    }
 }
