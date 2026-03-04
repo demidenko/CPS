@@ -9,8 +9,8 @@ fun CodeforcesContestStandings.CodeforcesContestParticipant.isContestant(): Bool
 fun CodeforcesContestPhase.isSystemTestOrFinished() =
     this == SYSTEM_TEST || this == FINISHED
 
-fun CodeforcesContestPhase.title() =
-    when (this) {
+val CodeforcesContestPhase.title
+    get() = when (this) {
         PENDING_SYSTEM_TEST -> "PENDING SYSTEM TESTING"
         SYSTEM_TEST -> "SYSTEM TESTING"
         else -> name

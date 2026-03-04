@@ -164,7 +164,7 @@ private fun PhaseTitle(
 ) {
     val title = when (phase) {
         CODING -> "left"
-        else -> phase.title().lowercase()
+        else -> phase.title.lowercase()
     }
     Text(
         text = if (info.isEmpty()) title else "$title $info",
