@@ -105,9 +105,7 @@ data class CodeforcesProblem(
 
     // Id of the contest, containing the problem. Can be absent.
     val contestId: Int = -1
-) {
-    val problemId: String get() = "$contestId$index"
-}
+)
 
 @Serializable
 data class CodeforcesProblemResult(

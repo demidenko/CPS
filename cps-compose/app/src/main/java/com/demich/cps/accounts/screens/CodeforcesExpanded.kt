@@ -26,6 +26,7 @@ import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons

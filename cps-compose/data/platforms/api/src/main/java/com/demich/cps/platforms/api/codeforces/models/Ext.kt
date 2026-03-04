@@ -21,3 +21,6 @@ fun CodeforcesProblemVerdict.isResult(): Boolean =
         WAITING, TESTING, SKIPPED -> false
         else -> true
     }
+
+val CodeforcesProblem.problemId: String
+    get() = "$contestId$index"
