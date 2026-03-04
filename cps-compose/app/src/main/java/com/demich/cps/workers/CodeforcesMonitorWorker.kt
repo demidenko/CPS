@@ -16,6 +16,7 @@ import com.demich.cps.contests.monitors.launchIn
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
@@ -108,9 +109,9 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 smallIcon = R.drawable.ic_problem_fail
                 colorResId = R.color.fail
             }
-            val problemName = "${submission.contestId}${submission.problem.index}"
+            val problemId = submission.problem.problemId
             val result = submission.verdictString()
-            contentTitle = "Problem $problemName: $result"
+            contentTitle = "Problem $problemId: $result"
             subText = "Codeforces system testing result"
             time = null
             autoCancel = true
