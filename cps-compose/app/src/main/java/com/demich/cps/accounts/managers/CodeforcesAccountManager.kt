@@ -70,8 +70,8 @@ class CodeforcesAccountManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         buildList {
-            CodeforcesClient.getHandleSuggestions(str = str) { handle ->
-                add(UserSuggestion(title = handle, userId = handle))
+            CodeforcesClient.getHandleSuggestions(str = str).forEach { user ->
+                add(UserSuggestion(title = user.handle, userId = user.handle))
             }
         }.asReversed()
 

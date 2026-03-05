@@ -216,12 +216,13 @@ suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String):
         ?.colorTag
 }
 
-suspend inline fun CodeforcesPageContentProvider.getHandleSuggestions(
-    str: String,
-    block: (String) -> Unit
-) {
-    getHandleSuggestionsPage(str).splitToSequence('\n').filter { !it.contains('=') }.forEach {
-        val i = it.indexOf('|')
-        if (i != -1) block(it.substring(i + 1))
-    }
-}
+suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Sequence<CodeforcesHandle> =
+    getHandleSuggestionsPage(str)
+        .splitToSequence('\n')
+        .filter { it.isNotEmpty() }
+        .mapNotNull {
+            val i = it.lastIndexOf('|')
+            Jsoup.parse(it.substring(i + 1))
+                .selectFirst("span")
+                ?.extractRatedUser()
+        }
