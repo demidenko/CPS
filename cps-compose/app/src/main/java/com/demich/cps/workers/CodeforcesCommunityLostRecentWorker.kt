@@ -2,7 +2,7 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
@@ -296,7 +296,7 @@ private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<Codefo
     val profiles = getProfiles(handles = blogEntries.map { it.author.handle }, recoverHandle = false)
     return blogEntries.map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
-        require(profile is ProfileResult.Success) { "fixHandleColors: profile result is not success" }
+        require(profile is Success) { "fixHandleColors: profile result is not success" }
         if (blogEntry.author.colorTag == ADMIN) blogEntry
         else {
             val colorTag = CodeforcesUtils.colorTagFrom(profile.userInfo.rating)

@@ -32,6 +32,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.managers.makeHandleSpan
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.ratingToString
@@ -242,7 +243,7 @@ fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
         )
     },
     additionalTitle: @Composable () -> Unit = {
-        if (profileResult is ProfileResult.Success) {
+        if (profileResult is Success) {
             val userInfo = profileResult.userInfo
             Text(
                 text = userInfo.ratingToString(),

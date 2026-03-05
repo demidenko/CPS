@@ -7,6 +7,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import kotlinx.coroutines.flow.Flow
 
@@ -80,9 +81,9 @@ internal interface CodeforcesFollowDao {
 
     suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
         when (result) {
-            is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
-            is ProfileResult.NotFound -> remove(handle)
-            is ProfileResult.Failed -> { }
+            is Success -> setUserInfo(handle, result.userInfo)
+            is NotFound -> remove(handle)
+            is Failed -> { }
         }
     }
 

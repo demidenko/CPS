@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.timus.TimusUrls
@@ -46,7 +47,7 @@ class TimusAccountManager :
 
     @Composable
     override fun PanelContent(profileResult: ProfileResult<TimusUserInfo>) {
-        if (profileResult is ProfileResult.Success) {
+        if (profileResult is Success) {
             val userInfo = profileResult.userInfo
             SmallAccountPanelTypeArchive(
                 title = userInfo.userName,

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.managers.CodeChefAccountManager
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -26,7 +27,7 @@ fun CodeChefUserInfoExpandedContent(
     Box(modifier = modifier) {
         manager.PanelContent(profileResult)
 
-        if (profileResult is ProfileResult.Success) {
+        if (profileResult is Success) {
             val userInfo = profileResult.userInfo
             var showRatingGraph by rememberSaveable { mutableStateOf(false) }
 

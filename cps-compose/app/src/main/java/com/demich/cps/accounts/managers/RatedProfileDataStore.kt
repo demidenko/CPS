@@ -3,6 +3,7 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import com.demich.cps.R
 import com.demich.cps.accounts.userinfo.ProfileResult
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.notifications.NotificationChannelSingleId
@@ -41,8 +42,8 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
         val profile = profile() ?: return
 
         val newProfile = manager.fetchProfile(data = profile.handle)
-        if (newProfile is ProfileResult.Failed) {
-            if (profile is ProfileResult.Success) {
+        if (newProfile is Failed) {
+            if (profile is Success) {
                 val newUserInfo = profile.userInfo.copyRating(rating = ratingChange.rating)
                 profileItem.setValue(ProfileResult(newUserInfo))
             } else {

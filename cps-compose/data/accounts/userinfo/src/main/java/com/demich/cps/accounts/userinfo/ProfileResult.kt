@@ -1,5 +1,6 @@
 package com.demich.cps.accounts.userinfo
 
+import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -26,7 +27,7 @@ sealed interface ProfileResult<out U: UserInfo> {
 fun <U: UserInfo> ProfileResult(userInfo: U) = ProfileResult.Success(userInfo)
 
 fun <U: UserInfo> ProfileResult<U>.userInfoOrNull(): U? =
-    if (this is ProfileResult.Success) userInfo else null
+    if (this is Success) userInfo else null
 
 val <U: RatedUserInfo> ProfileResult<U>.handle: String
     get() = userId
