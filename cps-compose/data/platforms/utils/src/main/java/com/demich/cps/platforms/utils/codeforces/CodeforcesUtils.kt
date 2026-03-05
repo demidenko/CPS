@@ -21,7 +21,7 @@ private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
 private fun Element.expectDivInfo(): Element = expectFirst("div.info")
 
-private fun Element.selectRatedUser(): Element? = selectFirst("a.rated-user")
+private fun Element.selectRatedUser(): Element? = selectFirst(".rated-user")
 private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
 
 private fun Element.expectHumanTimeTitle(): String = expectFirst(".format-humantime").attr("title")
@@ -223,6 +223,6 @@ suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Seq
         .mapNotNull {
             val i = it.lastIndexOf('|')
             Jsoup.parse(it.substring(i + 1))
-                .selectFirst("span")
+                .selectRatedUser()
                 ?.extractRatedUser()
         }
