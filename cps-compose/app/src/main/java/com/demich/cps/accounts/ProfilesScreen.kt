@@ -27,7 +27,6 @@ import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.managers.flowWithProfileResult
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -269,7 +268,7 @@ private fun CListImportDialog(
         initial = null,
         onDismissRequest = onDismissRequest,
         onResult = {
-            if (it is Success) {
+            if (it is ProfileResult.Success) {
                 profilesViewModel.runClistImport(
                     cListUserInfo = it.userInfo,
                     progressBarsViewModel = progressBarsViewModel,

@@ -236,7 +236,7 @@ private fun<U: UserInfo> UserIdTextField(
     onDoneRequest: (ProfileResult<U>) -> Unit
 ) {
     val onDoneRequestWithCheck = {
-        if (profileResult != null && profileResult !is NotFound && !loadingInProgress) {
+        if (profileResult != null && profileResult !is ProfileResult.NotFound && !loadingInProgress) {
             onDoneRequest(profileResult)
         }
     }
@@ -269,7 +269,7 @@ private fun<U: UserInfo> UserIdTextField(
         trailingIcon = {
             TextFieldMainIcon(
                 loadingInProgress = loadingInProgress,
-                profileNotFound = profileResult == null || profileResult is NotFound,
+                profileNotFound = profileResult == null || profileResult is ProfileResult.NotFound,
                 iconSize = 32.dp,
                 onDoneClick = onDoneRequestWithCheck
             )
@@ -408,9 +408,9 @@ private fun <U: UserInfo> AccountManager<U>.makeSpan(profileResult: ProfileResul
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {
             when (profileResult) {
-                is Success<U> -> append(makeUserInfoSpan(profileResult.userInfo, cpsColors))
-                is NotFound -> append(text = "User not found", fontStyle = FontStyle.Italic)
-                is Failed -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
+                is ProfileResult.Success<U> -> append(makeUserInfoSpan(profileResult.userInfo, cpsColors))
+                is ProfileResult.NotFound -> append(text = "User not found", fontStyle = FontStyle.Italic)
+                is ProfileResult.Failed -> append(text = "Loading failed", fontStyle = FontStyle.Italic)
             }
         }
     }

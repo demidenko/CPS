@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.problemId
@@ -58,7 +57,7 @@ fun CodeforcesUserInfoExpandedContent(
     Box(modifier = modifier) {
         Column {
             manager.PanelContent(profileResult)
-            if (profileResult is Success) {
+            if (profileResult is ProfileResult.Success) {
                 val userInfo = profileResult.userInfo
                 if (userInfo.contribution != 0) {
                     Contribution(contribution = userInfo.contribution)
@@ -69,7 +68,7 @@ fun CodeforcesUserInfoExpandedContent(
             //TODO: saveables as pager
             when (showItem) {
                 ItemType.RATING -> {
-                    if (profileResult is Success) {
+                    if (profileResult is ProfileResult.Success) {
                         RatingGraphItem(
                             manager = manager,
                             handle = profileResult.userInfo.handle

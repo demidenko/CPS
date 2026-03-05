@@ -3,7 +3,6 @@ package com.demich.cps.features.codeforces.follow.database
 import android.content.Context
 import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.accounts.userinfo.userInfoOrNull
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -50,7 +49,7 @@ abstract class CodeforcesFollowRepository(
     }
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
-        if (result is NotFound) return
+        if (result is ProfileResult.NotFound) return
 
         val handle = result.handle
         if (dao.getUserBlog(handle) != null) return
@@ -103,7 +102,7 @@ private suspend fun CodeforcesApi.getBlogEntries(
                 val profileResult = getProfile(handle = handle, recoverHandle = true)
                 return Pair(
                     profileResult,
-                    if (profileResult is Success)
+                    if (profileResult is ProfileResult.Success)
                         runCatching { getUserBlogEntries(handle = profileResult.handle, locale = locale) }
                     else Result.failure(it)
                 )

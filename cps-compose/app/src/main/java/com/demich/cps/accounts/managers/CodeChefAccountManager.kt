@@ -26,7 +26,6 @@ import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.accounts.userinfo.ratingToString
@@ -176,7 +175,7 @@ class CodeChefAccountManager :
             },
             additionalTitle = {
                 //TODO: code copied from default (except rated color)
-                if (profileResult is Success) {
+                if (profileResult is ProfileResult.Success) {
                     val userInfo = profileResult.userInfo
                     Text(
                         text = userInfo.ratingToString(),

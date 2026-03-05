@@ -7,7 +7,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.accounts.SmallAccountPanelTypeArchive
 import com.demich.cps.accounts.userinfo.ACMPUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.api.acmp.ACMPUrls
 import com.demich.cps.platforms.clients.ACMPClient
@@ -64,7 +63,7 @@ class ACMPAccountManager :
 
     @Composable
     override fun PanelContent(profileResult: ProfileResult<ACMPUserInfo>) {
-        if (profileResult is Success) {
+        if (profileResult is ProfileResult.Success) {
             val userInfo = profileResult.userInfo
             SmallAccountPanelTypeArchive(
                 title = userInfo.userName,

@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
@@ -30,7 +29,7 @@ fun RatedAccountManager<*>.colorFor(handleColor: HandleColor): Color =
 @Composable
 @ReadOnlyComposable
 fun <U: RatedUserInfo> RatedAccountManager<U>.makeHandleSpan(profileResult: ProfileResult<U>): AnnotatedString =
-    if (profileResult is Success) {
+    if (profileResult is ProfileResult.Success) {
         val userInfo = profileResult.userInfo
         makeOKSpan(
             text = userInfo.handle,

@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.accounts.managers.DmojAccountManager
 import com.demich.cps.accounts.userinfo.DmojUserInfo
 import com.demich.cps.accounts.userinfo.ProfileResult
-import com.demich.cps.accounts.userinfo.ProfileResult.Success
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -27,7 +26,7 @@ fun DmojUserInfoExpandedContent(
     Box(modifier = modifier) {
         manager.PanelContent(profileResult)
 
-        if (profileResult is Success) {
+        if (profileResult is ProfileResult.Success) {
             val userInfo = profileResult.userInfo
             var showRatingGraph by rememberSaveable { mutableStateOf(false) }
 
