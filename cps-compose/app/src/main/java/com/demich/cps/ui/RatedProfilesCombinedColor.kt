@@ -114,8 +114,8 @@ private class RankGetter(
     private val rank: RatedRank? =
         validRanks.filter { it.manager.type !in disabledManagers }.run {
             when (rankSelector) {
-                UISettingsDataStore.StatusBarRankSelector.Min -> minByOrNull { it.rank }
-                UISettingsDataStore.StatusBarRankSelector.Max -> maxByOrNull { it.rank }
+                Min -> minByOrNull { it.rank }
+                Max -> maxByOrNull { it.rank }
             }
         }
 

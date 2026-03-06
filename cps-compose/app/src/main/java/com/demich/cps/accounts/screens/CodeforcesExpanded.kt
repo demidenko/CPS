@@ -67,7 +67,7 @@ fun CodeforcesUserInfoExpandedContent(
         Box(modifier = Modifier.align(Alignment.BottomCenter)) {
             //TODO: saveables as pager
             when (showItem) {
-                ItemType.RATING -> {
+                RATING -> {
                     if (profileResult is ProfileResult.Success) {
                         RatingGraphItem(
                             manager = manager,
@@ -75,7 +75,7 @@ fun CodeforcesUserInfoExpandedContent(
                         )
                     }
                 }
-                ItemType.UPSOLVING -> {
+                UPSOLVING -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         ListTitle(text = "upsolving suggestions:")
                         UpsolvingSuggestionsList(
@@ -100,15 +100,15 @@ fun CodeforcesUserInfoExpandedContent(
         if (upsolvingSuggestionsEnabled) {
             CPSIconButton(
                 icon = CPSIcons.Upsolving,
-                enabled = showItem != ItemType.UPSOLVING,
-                onClick = { showItem = ItemType.UPSOLVING }
+                enabled = showItem != UPSOLVING,
+                onClick = { showItem = UPSOLVING }
             )
         }
         if (profileResult.userInfoOrNull()?.rating != null) {
             CPSIconButton(
                 icon = CPSIcons.RatingGraph,
-                enabled = showItem != ItemType.RATING,
-                onClick = { showItem = ItemType.RATING }
+                enabled = showItem != RATING,
+                onClick = { showItem = RATING }
             )
         }
     }

@@ -132,8 +132,8 @@ private fun StatusBarAccountsPopup(
             selectedValue = rankSelector,
             text = { value ->
                 when (value) {
-                    UISettingsDataStore.StatusBarRankSelector.Min -> "worst"
-                    UISettingsDataStore.StatusBarRankSelector.Max -> "best"
+                    Min -> "worst"
+                    Max -> "best"
                 }
             },
             onSelect = onSetRankSelector,

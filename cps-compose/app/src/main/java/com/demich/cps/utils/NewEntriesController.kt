@@ -26,7 +26,7 @@ data class NewEntryInfo(
 typealias NewEntriesMap = Map<Int, NewEntryInfo>
 
 fun NewEntriesMap.getType(id: Int): NewEntryType =
-    this[id]?.type ?: NewEntryType.UNSEEN
+    this[id]?.type ?: UNSEEN
 
 private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
     id: Int,
@@ -68,7 +68,7 @@ data class NewEntryTypeCounters(
 fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesMap>) =
     combine(flowOfIds, flowOfTypes) { ids, types ->
         NewEntryTypeCounters(
-            unseenCount = ids.count { types.getType(it) == NewEntryType.UNSEEN },
-            seenCount = ids.count { types.getType(it) == NewEntryType.SEEN }
+            unseenCount = ids.count { types.getType(it) == UNSEEN },
+            seenCount = ids.count { types.getType(it) == SEEN }
         )
     }.distinctUntilChanged()
