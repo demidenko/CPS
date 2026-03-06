@@ -95,7 +95,7 @@ private fun RatingGraphWithHeader(
     val currentTime = remember { getCurrentTime() }
     var filterType by rememberSaveable {
         viewPortState.setViewPort(
-            createBounds(ratingChanges = ratingChanges, filterType = RatingFilterType.ALL, now = currentTime)
+            createBounds(ratingChanges = ratingChanges, filterType = ALL, now = currentTime)
         )
         mutableStateOf(RatingFilterType.ALL)
     }
@@ -201,17 +201,17 @@ private fun RatingGraphHeader(
     }
 }
 
-private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Instant) =
+private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Instant): List<RatingFilterType> =
     buildList {
-        if (ratingChanges.size > 10) add(RatingFilterType.LAST_10)
+        if (ratingChanges.size > 10) add(LAST_10)
         val firstInMonth = ratingChanges.partitionIndex { it.date < currentTime - 30.days }
         val firstInYear = ratingChanges.partitionIndex { it.date < currentTime - 365.days }
         if (firstInMonth < ratingChanges.size && firstInMonth > 0) {
-            add(RatingFilterType.LAST_MONTH)
+            add(LAST_MONTH)
         }
         if (firstInYear < ratingChanges.size && firstInYear > 0 && firstInYear != firstInMonth) {
-            add(RatingFilterType.LAST_YEAR)
+            add(LAST_YEAR)
         }
-        if (isNotEmpty()) add(index = 0, RatingFilterType.ALL)
+        if (isNotEmpty()) add(index = 0, ALL)
     }
 

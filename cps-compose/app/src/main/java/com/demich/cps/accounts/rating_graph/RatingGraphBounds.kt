@@ -32,10 +32,10 @@ internal fun createBounds(
     filterType: RatingFilterType,
     now: Instant
 ) = when (filterType) {
-    RatingFilterType.ALL -> createBounds(ratingChanges)
-    RatingFilterType.LAST_10 -> createBounds(ratingChanges.takeLast(10))
-    RatingFilterType.LAST_MONTH, RatingFilterType.LAST_YEAR -> {
-        val startTime = now - (if (filterType == RatingFilterType.LAST_MONTH) 30.days else 365.days)
+    ALL -> createBounds(ratingChanges)
+    LAST_10 -> createBounds(ratingChanges.takeLast(10))
+    LAST_MONTH, LAST_YEAR -> {
+        val startTime = now - (if (filterType == LAST_MONTH) 30.days else 365.days)
         createBounds(
             ratingChanges = ratingChanges.filter { it.date >= startTime },
             startTime = startTime,
