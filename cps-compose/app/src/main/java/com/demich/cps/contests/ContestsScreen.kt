@@ -84,16 +84,13 @@ import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
 @Composable
-fun ContestsScreen(
+private fun ContestsScreen(
     viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
-    val context = context
-    val contestsViewModel = contestsViewModel()
-
     Column {
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
         if (anyPlatformEnabled) {
@@ -111,11 +108,6 @@ fun ContestsScreen(
         } else {
             NoneEnabledMessage(modifier = Modifier.fillMaxSize())
         }
-    }
-
-    DisposableEffect(contestsViewModel) {
-        contestsViewModel.applyChangedSettings(context)
-        onDispose { }
     }
 }
 
@@ -318,7 +310,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         }
     }
 
-    val loadingStatus by combinedLoadingStatusState()
+    val loadingStatus by contestsViewModel.combinedLoadingStatusState()
     val isReloading = { loadingStatus == LOADING }
 
     menu = contestsMenuBuilder(
@@ -347,6 +339,11 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         loadingStatus = { loadingStatus },
         onReloadClick = onReload
     )
+
+    DisposableEffect(contestsViewModel) {
+        contestsViewModel.applyChangedSettings(context)
+        onDispose { }
+    }
 }
 
 private fun contestsMenuBuilder(
@@ -408,11 +405,10 @@ private fun ContestsPageSwitchButton(
 
 
 @Composable
-private fun combinedLoadingStatusState(): State<LoadingStatus> {
+private fun ContestsViewModel.combinedLoadingStatusState(): State<LoadingStatus> {
     val context = context
-    val viewModel = contestsViewModel()
-    return remember(viewModel) {
-        viewModel.flowOfLoadingStatus()
+    return remember(this) {
+        flowOfLoadingStatus()
             .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
                 if (workInfo.isRunning) LOADING
                 else loadingStatus
