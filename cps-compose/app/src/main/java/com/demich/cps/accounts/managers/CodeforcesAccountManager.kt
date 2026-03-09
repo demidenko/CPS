@@ -69,11 +69,10 @@ class CodeforcesAccountManager :
         CodeforcesClient.getProfile(handle = data, recoverHandle = true)
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        buildList {
-            CodeforcesClient.getHandleSuggestions(str = str).forEach { user ->
-                add(UserSuggestion(title = user.handle, userId = user.handle))
-            }
-        }.asReversed()
+        CodeforcesClient.getHandleSuggestions(str = str)
+            .map { UserSuggestion(title = it.handle, userId = it.handle) }
+            .toList()
+            .asReversed()
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
