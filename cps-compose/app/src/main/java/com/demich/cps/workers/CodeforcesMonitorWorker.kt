@@ -24,7 +24,6 @@ import com.demich.datastore_itemized.value
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -44,7 +43,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
             val replace: Boolean
             if (monitor.args() == startArgs) {
-                if (getWork(context).flowOfWorkInfo().first().isRunning)
+                if (getWork(context).workInfo().isRunning)
                     replace = false
                 else
                     replace = true

@@ -79,9 +79,8 @@ import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
-import com.demich.cps.workers.stateOrCancelled
+import com.demich.cps.workers.state
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
@@ -475,11 +474,10 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         )
 
         LaunchedEffect(Unit) {
-            val args = monitor.args() ?: return@LaunchedEffect
-            val state = CodeforcesMonitorWorker.getWork(context).flowOfWorkInfo().first().stateOrCancelled
-            if (state == FAILED) {
+            if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
+                val args = monitor.args() ?: return@LaunchedEffect
                 CodeforcesMonitorWorker.start(
-                    contestId = contestId,
+                    contestId = args.contestId,
                     handle = args.handle,
                     context = context
                 )

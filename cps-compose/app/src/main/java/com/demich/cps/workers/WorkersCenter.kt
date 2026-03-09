@@ -91,8 +91,6 @@ abstract class CPSPeriodicWork(
         if (isEnabled()) enqueueWork(policy = UPDATE) //TODO: KEEP sometimes?
     }
 
-    private suspend fun getWorkInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
-
     private suspend fun enqueueAt(time: Instant) {
         if (!isEnabled()) return
         enqueueWork(policy = UPDATE) {
@@ -102,7 +100,7 @@ abstract class CPSPeriodicWork(
     }
 
     suspend fun enqueueAtIfEarlier(time: Instant) {
-        getWorkInfo()?.repeatInterval?.let {
+        workInfo()?.repeatInterval?.let {
             if (getCurrentTime() + it < time) return
         }
         enqueueAt(time)
@@ -113,19 +111,23 @@ abstract class CPSPeriodicWork(
     }
 
     suspend fun enqueueInRepeatInterval() {
-        getWorkInfo()?.repeatInterval?.let {
+        workInfo()?.repeatInterval?.let {
             enqueueAt(time = getCurrentTime() + it)
         }
     }
 
     suspend fun enqueueAsap() {
         val time = getCurrentTime() + PeriodicWorkRequest.minPeriodicInterval
-        getWorkInfo()?.nextScheduleTime?.let {
+        workInfo()?.nextScheduleTime?.let {
             if (it < time) return
         }
         enqueueAt(time = time)
     }
 }
+
+suspend fun CPSWork.workInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
+
+suspend fun CPSWork.state(): WorkInfo.State = workInfo().stateOrCancelled
 
 internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,
