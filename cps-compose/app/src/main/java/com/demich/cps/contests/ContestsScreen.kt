@@ -76,9 +76,12 @@ import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
+import com.demich.cps.workers.stateOrCancelled
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
@@ -445,8 +448,6 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         monitor.flowOfContestData()
     }
 
-    //TODO: restart killed worker if data not null
-
     val requestFailed by collectAsStateWithLifecycle {
         monitor.lastRequest.asFlow().map { it == false }
     }
@@ -455,10 +456,10 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         value = { contestDataState.value },
         enter = enterInColumn(),
         exit = exitInColumn()
-    ) {
-        val contestId by rememberUpdatedState(it.contestId)
+    ) { contestData ->
+        val contestId by rememberUpdatedState(contestData.contestId)
         CodeforcesMonitorWidget(
-            contestData = it,
+            contestData = contestData,
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
@@ -472,6 +473,18 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
                 }
             }
         )
+
+        LaunchedEffect(Unit) {
+            val args = monitor.args() ?: return@LaunchedEffect
+            val state = CodeforcesMonitorWorker.getWork(context).flowOfWorkInfo().first().stateOrCancelled
+            if (state == FAILED) {
+                CodeforcesMonitorWorker.start(
+                    contestId = contestId,
+                    handle = args.handle,
+                    context = context
+                )
+            }
+        }
     }
 }
 
