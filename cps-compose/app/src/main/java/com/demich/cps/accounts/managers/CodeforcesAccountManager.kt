@@ -77,22 +77,8 @@ class CodeforcesAccountManager :
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
-    override val ratingsUpperBounds by lazy {
-        listOf<CodeforcesColorTag>(
-            GRAY,
-            GREEN,
-            CYAN,
-            BLUE,
-            VIOLET,
-            ORANGE
-        ).map { colorTag ->
-            //TODO: bs can be optimized if iterate from orange to gray
-            val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
-                CodeforcesUtils.colorTagFrom(rating) <= colorTag
-            }
-            val handleColor = requireNotNull(colorTag.toHandleColor())
-            handleColor until rating
-        }
+    override val ratingsUpperBounds by lazy(mode = NONE) {
+        CodeforcesUtils.ratingUpperBounds()
     }
 
     override val rankedHandleColors = HandleColor.rankedCodeforces
@@ -282,3 +268,20 @@ class CodeforcesProfileSettingsDataStore(context: Context):
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
 
 }
+
+private fun CodeforcesUtils.ratingUpperBounds() =
+    listOf<CodeforcesColorTag>(
+        GRAY,
+        GREEN,
+        CYAN,
+        BLUE,
+        VIOLET,
+        ORANGE
+    ).map { colorTag ->
+        //TODO: bs can be optimized if iterate from orange to gray
+        val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
+            colorTagFrom(rating) <= colorTag
+        }
+        val handleColor = requireNotNull(colorTag.toHandleColor())
+        handleColor until rating
+    }
