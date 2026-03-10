@@ -440,15 +440,10 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val context = context
-    val scope = rememberCoroutineScope()
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = collectAsStateWithLifecycle {
         monitor.flowOfContestData()
-    }
-
-    val requestFailed by collectAsStateWithLifecycle {
-        monitor.lastRequest.asFlow().map { it == false }
     }
 
     AnimatedVisibleByNotNull(
@@ -457,6 +452,12 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         exit = exitInColumn()
     ) { contestData ->
         val contestId by rememberUpdatedState(contestData.contestId)
+        val scope = rememberCoroutineScope()
+
+        val requestFailed by collectAsStateWithLifecycle {
+            monitor.lastRequest.asFlow().map { it == false }
+        }
+
         CodeforcesMonitorWidget(
             contestData = contestData,
             requestFailed = requestFailed,
@@ -473,6 +474,8 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             }
         )
 
+        // restart failed monitor
+        // TODO: check args instead of contestData?
         LaunchedEffect(Unit) {
             if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
                 val args = monitor.args() ?: return@LaunchedEffect
