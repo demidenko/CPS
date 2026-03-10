@@ -108,13 +108,13 @@ object CPSIcons {
 
 @Composable
 fun platformIconPainter(platform: Contest.Platform): Painter {
+    if (platform == unknown) return rememberVectorPainter(CPSIcons.Contest)
     val iconId = when (platform) {
-        Contest.Platform.unknown -> return rememberVectorPainter(CPSIcons.Contest)
-        Contest.Platform.codeforces -> R.drawable.ic_logo_codeforces
-        Contest.Platform.atcoder -> R.drawable.ic_logo_atcoder
-        Contest.Platform.topcoder -> R.drawable.ic_logo_topcoder
-        Contest.Platform.codechef -> R.drawable.ic_logo_codechef
-        Contest.Platform.dmoj -> R.drawable.ic_logo_dmoj
+        codeforces -> R.drawable.ic_logo_codeforces
+        atcoder -> R.drawable.ic_logo_atcoder
+        topcoder -> R.drawable.ic_logo_topcoder
+        codechef -> R.drawable.ic_logo_codechef
+        dmoj -> R.drawable.ic_logo_dmoj
     }
     return painterResource(iconId)
 }

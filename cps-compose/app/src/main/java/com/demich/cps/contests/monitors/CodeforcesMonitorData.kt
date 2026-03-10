@@ -41,8 +41,7 @@ data class CodeforcesMonitorData(
         data object Empty: ProblemResult
         data object Pending: ProblemResult
         data object FailedSystemTest: ProblemResult
-        data class Points(val points: Double, val isFinal: Boolean): ProblemResult {
-        }
+        data class Points(val points: Double, val isFinal: Boolean): ProblemResult
 
         companion object {
             const val failedSystemTestSymbol = "⨯" //alternatives: × ✖
