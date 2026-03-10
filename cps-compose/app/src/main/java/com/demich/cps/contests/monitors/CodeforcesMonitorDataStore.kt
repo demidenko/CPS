@@ -10,6 +10,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
 import com.demich.cps.platforms.api.codeforces.models.isResult
 import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.DataStoreSnapshot
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
@@ -80,55 +81,59 @@ internal data class CodeforcesMonitorSubmissionInfo(
         testset == TESTS && verdict.isResult() && verdict != OK
 }
 
+context(scope: DataStoreSnapshot)
+private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
+    val contest = contestInfo.value ?: return null
+    if (contest.phase == UNDEFINED) return null
+
+    // args can be changed before contestInfo reset
+    args.value.let { if (it?.contestId != contest.id) return null }
+
+    val phase = when (contest.phase) {
+        CODING ->
+            CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
+        SYSTEM_TEST ->
+            CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
+        else ->
+            CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
+    }
+
+    val contestantRank = CodeforcesMonitorData.ContestRank(
+        rank = contestantRank.value,
+        participationType = participationType.value
+    )
+
+    val problems = problemResults.value.map { problem ->
+        val index = problem.problemIndex
+        CodeforcesMonitorData.ProblemInfo(
+            name = index,
+            result = when {
+                contest.phase.isSystemTestOrFinished() && problem.type == PRELIMINARY ->
+                    CodeforcesMonitorData.ProblemResult.Pending
+                problem.points != 0.0 ->
+                    CodeforcesMonitorData.ProblemResult.Points(
+                        points = problem.points,
+                        isFinal = problem.type == FINAL
+                    )
+                submissionsInfo[index]?.any { it.isFailedSystemTest() } == true ->
+                    CodeforcesMonitorData.ProblemResult.FailedSystemTest
+                else ->
+                    CodeforcesMonitorData.ProblemResult.Empty
+            }
+        )
+    }
+
+    return CodeforcesMonitorData(
+        contestInfo = contest,
+        contestPhase = phase,
+        contestantRank = contestantRank,
+        problems = problems
+    )
+}
+
 fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?> =
     flowOf {
-        val contest = contestInfo.value ?: return@flowOf null
-        args.value.let { if (it?.contestId != contest.id) return@flowOf null }
-        if (contest.phase == UNDEFINED) return@flowOf null
-
-        val phase = when (contest.phase) {
-            CODING -> {
-                CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
-            }
-            SYSTEM_TEST -> {
-                CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
-            }
-            else -> {
-                CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
-            }
-        }
-
-        val contestantRank = CodeforcesMonitorData.ContestRank(
-            rank = contestantRank.value,
-            participationType = participationType.value
-        )
-
-        val problems = problemResults.value.map { problem ->
-            val index = problem.problemIndex
-            CodeforcesMonitorData.ProblemInfo(
-                name = index,
-                result = when {
-                    contest.phase.isSystemTestOrFinished() && problem.type == PRELIMINARY
-                        -> CodeforcesMonitorData.ProblemResult.Pending
-                    problem.points != 0.0
-                        -> CodeforcesMonitorData.ProblemResult.Points(
-                            points = problem.points,
-                            isFinal = problem.type == FINAL
-                        )
-                    submissionsInfo[index]?.any { it.isFailedSystemTest() } == true
-                        -> CodeforcesMonitorData.ProblemResult.FailedSystemTest
-                    else
-                        -> CodeforcesMonitorData.ProblemResult.Empty
-                }
-            )
-        }
-
-        CodeforcesMonitorData(
-            contestInfo = contest,
-            contestPhase = phase,
-            contestantRank = contestantRank,
-            problems = problems
-        )
+        contestData()
     }
 
 // shortcut for flowOfContestData().map { it?.contestId }
