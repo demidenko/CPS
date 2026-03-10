@@ -7,6 +7,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesTestset
+import com.demich.cps.platforms.api.codeforces.models.endTime
 import com.demich.cps.platforms.api.codeforces.models.isResult
 import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.utils.jsonCPS
@@ -91,7 +92,7 @@ private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
 
     val phase = when (contest.phase) {
         CODING ->
-            CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.startTime + contest.duration)
+            CodeforcesMonitorData.ContestPhase.Coding(endTime = contest.endTime)
         SYSTEM_TEST ->
             CodeforcesMonitorData.ContestPhase.SystemTesting(percentage = sysTestPercentage.value)
         else ->

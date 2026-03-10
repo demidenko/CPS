@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.api.codeforces.models
 
+import kotlin.time.Instant
+
 fun CodeforcesParticipationType.isContestantType(): Boolean =
     this == CONTESTANT || this == OUT_OF_COMPETITION
 
@@ -24,3 +26,6 @@ fun CodeforcesProblemVerdict.isResult(): Boolean =
 
 val CodeforcesProblem.problemId: String
     get() = "$contestId$index"
+
+val CodeforcesContest.endTime: Instant
+    get() = startTime + duration

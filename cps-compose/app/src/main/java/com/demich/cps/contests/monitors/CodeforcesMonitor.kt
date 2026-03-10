@@ -11,6 +11,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
+import com.demich.cps.platforms.api.codeforces.models.endTime
 import com.demich.cps.platforms.api.codeforces.models.isContestant
 import com.demich.cps.platforms.api.codeforces.models.isContestantType
 import com.demich.cps.platforms.api.codeforces.models.isResult
@@ -226,7 +227,7 @@ private suspend fun RatingChangeWaiter.getDelay(contest: CodeforcesContest?): Du
         PENDING_SYSTEM_TEST -> 15.seconds
         SYSTEM_TEST -> 3.seconds
         FINISHED -> {
-            getDelayOnFinished(contestEnd = contest.startTime + contest.duration)
+            getDelayOnFinished(contestEnd = contest.endTime)
         }
         else -> 5.seconds
     }
