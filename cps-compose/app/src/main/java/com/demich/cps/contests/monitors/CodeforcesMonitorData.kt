@@ -13,8 +13,6 @@ data class CodeforcesMonitorData(
     val contestantRank: ContestRank,
     val problems: List<ProblemInfo>
 ) {
-    val contestId: Int get() = contestInfo.id
-
     sealed interface ContestPhase {
         val phase: CodeforcesContestPhase
 
@@ -44,7 +42,6 @@ data class CodeforcesMonitorData(
         data object Pending: ProblemResult
         data object FailedSystemTest: ProblemResult
         data class Points(val points: Double, val isFinal: Boolean): ProblemResult {
-            fun pointsToNiceString() = points.toString().removeSuffix(".0")
         }
 
         companion object {
@@ -52,3 +49,9 @@ data class CodeforcesMonitorData(
         }
     }
 }
+
+val CodeforcesMonitorData.contestId: Int
+    get() = contestInfo.id
+
+fun CodeforcesMonitorData.ProblemResult.Points.pointsToNiceString() =
+    points.toString().removeSuffix(".0")

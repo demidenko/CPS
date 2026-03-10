@@ -39,6 +39,7 @@ import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
+import com.demich.cps.contests.monitors.contestId
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
