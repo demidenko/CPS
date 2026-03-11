@@ -33,7 +33,7 @@ fun ContestItem(
     isExpanded: (Contest) -> Boolean,
     collisionType: () -> DangerType,
     modifier: Modifier = Modifier,
-    onDeleteRequest: (Contest) -> Unit
+    onDeleteRequest: () -> Unit
 ) {
     val expanded = isExpanded(contest)
     Column(

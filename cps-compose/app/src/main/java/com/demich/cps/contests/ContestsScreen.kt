@@ -256,7 +256,7 @@ private fun ContestsColumn(
                 contest = contest,
                 isExpanded = viewState::isExpanded,
                 collisionType = { viewState.collisionType(contest) },
-                onDeleteRequest = onDeleteRequest,
+                onDeleteRequest = { onDeleteRequest(contest) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickableNoRipple { viewState.toggleExpanded(contest) }
