@@ -114,7 +114,6 @@ private fun ContestItemFooter(
             )
             ContestCounter(
                 contest = contest,
-                phase = phase,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
@@ -124,13 +123,11 @@ private fun ContestItemFooter(
 @Composable
 private fun ContestCounter(
     contest: Contest,
-    phase: Contest.Phase,
     modifier: Modifier = Modifier
 ) {
     Text(
         modifier = modifier,
-        text = contest.counter(
-            phase = phase,
+        text = contest.localCurrentCounter(
             before = { "in ${it.timerShort()}" },
             running = { "left ${it.timerShort()}" }
         )

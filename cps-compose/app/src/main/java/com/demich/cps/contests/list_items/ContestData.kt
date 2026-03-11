@@ -5,17 +5,30 @@ import androidx.compose.runtime.ReadOnlyComposable
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.localCurrentTime
 import kotlin.time.Duration
+import kotlin.time.Instant
+
+internal inline fun Contest.counterAt(
+    time: Instant,
+    before: (Duration) -> String,
+    running: (Duration) -> String,
+    finished: () -> String
+): String =
+    when (phaseAt(time)) {
+        BEFORE -> before(startTime - time)
+        RUNNING -> running(endTime - time)
+        FINISHED -> finished()
+    }
 
 @Composable
 @ReadOnlyComposable
-internal inline fun Contest.counter(
-    phase: Contest.Phase,
+internal inline fun Contest.localCurrentCounter(
     before: (Duration) -> String,
     running: (Duration) -> String,
     finished: () -> String = { "" }
 ): String =
-    when (phase) {
-        BEFORE -> before(startTime - localCurrentTime)
-        RUNNING -> running(endTime - localCurrentTime)
-        FINISHED -> finished()
-    }
+    counterAt(
+        time = localCurrentTime,
+        before = before,
+        running = running,
+        finished = finished
+    )

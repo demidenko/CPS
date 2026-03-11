@@ -55,8 +55,7 @@ internal fun ContestExpandedItemContent(
         onDeleteRequest = onDeleteRequest
     )
     ContestCounter(
-        contest = contest,
-        phase = phase
+        contest = contest
     )
 }
 
@@ -102,13 +101,11 @@ private fun ContestTitle(
 
 @Composable
 private fun ContestCounter(
-    contest: Contest,
-    phase: Contest.Phase
+    contest: Contest
 ) {
     ProvideTextStyle(contestSubtitleTextStyle()) {
         Text(
-            text = contest.counter(
-                phase = phase,
+            text = contest.localCurrentCounter(
                 before = { "starts in ${it.timerFull()}" },
                 running = { "ends in ${it.timerFull()}" },
                 finished = { "finished" }
