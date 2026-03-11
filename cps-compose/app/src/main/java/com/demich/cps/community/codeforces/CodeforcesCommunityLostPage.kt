@@ -1,5 +1,6 @@
 package com.demich.cps.community.codeforces
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
+import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -49,6 +51,12 @@ fun CodeforcesCommunityLostPage(
         }
     )
 }
+
+fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context) =
+    context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
+        blogEntries.sortedByDescending { it.timeStamp }
+            .map { it.blogEntry }
+    }
 
 @Composable
 private fun TopLabel() {

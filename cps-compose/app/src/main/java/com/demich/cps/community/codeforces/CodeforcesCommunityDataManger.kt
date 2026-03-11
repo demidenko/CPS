@@ -13,9 +13,6 @@ interface CodeforcesCommunityDataManger {
     fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus>
 
     fun reload(titles: List<CodeforcesTitle>, context: Context)
-    fun reload(title: CodeforcesTitle, context: Context) {
-        reload(titles = listOf(title), context = context)
-    }
 
     fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesBlogEntry>>
     fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesBlogEntry>>
@@ -24,4 +21,8 @@ interface CodeforcesCommunityDataManger {
 
     fun addToFollowList(handle: String, context: Context)
     fun updateFollowUsersInfo(context: Context)
+}
+
+fun CodeforcesCommunityDataManger.reload(title: CodeforcesTitle, context: Context) {
+    reload(titles = listOf(title), context = context)
 }

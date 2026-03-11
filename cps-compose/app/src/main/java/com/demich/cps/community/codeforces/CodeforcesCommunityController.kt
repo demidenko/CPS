@@ -16,7 +16,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
@@ -111,25 +110,6 @@ class CodeforcesCommunityController internal constructor(
     var topPageType by mutableStateOf(data.topPageType)
     var recentPageType by mutableStateOf(data.recentPageType)
 
-    fun flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
-        when (tab) {
-            MAIN -> flowOfNewEntryCounters(
-                blogEntriesFlow = flowOfMainBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
-            )
-            LOST -> flowOfNewEntryCounters(
-                blogEntriesFlow = flowOfLostBlogEntries(context),
-                newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
-            )
-            else -> null
-        }
-
-    fun flowOfLostBlogEntries(context: Context) =
-        context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
-            blogEntries.sortedByDescending { it.timeStamp }
-                .map { it.blogEntry }
-        }
-
     enum class TopPageType {
         BlogEntries, Comments
     }
@@ -146,11 +126,11 @@ class CodeforcesCommunityController internal constructor(
 }
 
 @Composable
-fun CodeforcesCommunityController.loadingStatusState(): State<LoadingStatus> =
+fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus> =
     collectAsState { flowOfLoadingStatus() }
 
 @Composable
-fun CodeforcesCommunityController.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
+fun CodeforcesCommunityDataManger.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
     if (title == LOST) {
         val context = context
         return remember {
@@ -184,6 +164,19 @@ private fun controllerSaver(
         )
     }
 )
+
+fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
+    when (tab) {
+        MAIN -> flowOfNewEntryCounters(
+            blogEntriesFlow = flowOfMainBlogEntries(context),
+            newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
+        )
+        LOST -> flowOfNewEntryCounters(
+            blogEntriesFlow = flowOfLostBlogEntries(context),
+            newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
+        )
+        else -> null
+    }
 
 private fun flowOfNewEntryCounters(
     blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
