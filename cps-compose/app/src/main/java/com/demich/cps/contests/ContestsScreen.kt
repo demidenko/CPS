@@ -254,7 +254,7 @@ private fun ContestsColumn(
         ) {
             ContestItem(
                 contest = contest,
-                isExpanded = viewState::isExpanded,
+                isExpanded = { viewState.isExpanded(contest) },
                 collisionType = { viewState.collisionType(contest) },
                 onDeleteRequest = { onDeleteRequest(contest) },
                 modifier = Modifier

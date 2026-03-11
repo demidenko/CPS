@@ -30,12 +30,12 @@ import com.demich.cps.utils.toSystemDateTime
 @Composable
 fun ContestItem(
     contest: Contest,
-    isExpanded: (Contest) -> Boolean,
+    isExpanded: () -> Boolean,
     collisionType: () -> DangerType,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    val expanded = isExpanded(contest)
+    val expanded = isExpanded()
     Column(
         modifier = modifier,
         horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
