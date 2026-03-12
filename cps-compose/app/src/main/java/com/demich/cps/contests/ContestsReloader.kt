@@ -1,10 +1,10 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.ContestsReceiver
-import com.demich.cps.contests.loading_engine.contestsLoadingFlows
+import com.demich.cps.contests.loading_engine.contestsFetchFlows
 import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
@@ -45,7 +45,7 @@ interface ContestsReloader {
         }
 
         coroutineScope {
-            settings.contestsLoadingFlows(platforms = platforms.toEnumSet())
+            settings.contestsFetchFlows(platforms = platforms.toEnumSet())
                 .forEach { (platform, resultsFlow) ->
                     launch {
                         val last = transform(platform, resultsFlow).last()
@@ -57,16 +57,16 @@ interface ContestsReloader {
 
     fun transform(
         platform: Contest.Platform,
-        flow: Flow<ContestsLoadingResult>
-    ): Flow<ContestsLoadingResult> {
+        flow: Flow<ContestsFetchResult>
+    ): Flow<ContestsFetchResult> {
         return flow
     }
 }
 
 
-private suspend fun ContestsSettingsDataStore.contestsLoadingFlows(platforms: Set<Contest.Platform>) =
+private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<Contest.Platform>) =
     fromSnapshot {
-        contestsLoadingFlows(
+        contestsFetchFlows(
             setup = contestsLoadersPriorityLists.value.filterKeys { it in platforms },
             dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
         ) { loaderType ->

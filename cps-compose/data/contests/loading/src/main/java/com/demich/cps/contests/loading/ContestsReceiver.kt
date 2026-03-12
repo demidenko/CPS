@@ -7,7 +7,7 @@ fun interface ContestsReceiver {
     suspend fun save(platform: Contest.Platform, contests: List<Contest>)
 }
 
-data class ContestsLoadingResult(
+data class ContestsFetchResult(
     val platform: Contest.Platform,
     val loaderType: ContestsLoaderType,
     val result: Result<List<Contest>>

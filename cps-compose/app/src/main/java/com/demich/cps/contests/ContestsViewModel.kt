@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsLoaderType
-import com.demich.cps.contests.loading.ContestsLoadingResult
 import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
@@ -57,7 +57,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
 
     override fun transform(
         platform: Contest.Platform,
-        flow: Flow<ContestsLoadingResult>
+        flow: Flow<ContestsFetchResult>
     ) = flow.run {
         var lastStatus: LoadingStatus = PENDING
         onStart {
