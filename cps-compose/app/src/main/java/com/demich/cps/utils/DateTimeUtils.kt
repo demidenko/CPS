@@ -24,23 +24,23 @@ fun Instant.truncateBySeconds(seconds: Long): Instant {
 private fun Duration.dropSeconds(): Duration = inWholeMinutes.minutes
 
 
-private fun Duration.toDHHMMSS(): String = toComponents { days, hours, minutes, seconds, _ ->
+private fun Duration.formatDHHMMSS(): String = toComponents { days, hours, minutes, seconds, _ ->
     String.format(null, "%d days %02d:%02d:%02d", days, hours, minutes, seconds)
 }
 
-private fun Duration.toHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
+private fun Duration.formatHHMMSS(): String = toComponents { hours, minutes, seconds, _ ->
     String.format(null, "%02d:%02d:%02d", hours, minutes, seconds)
 }
 
-fun Duration.toExecTimeString(): String {
+fun Duration.formatExecTime(): String {
     if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
     return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
 }
 
-fun Duration.toDropSecondsString(): String =
+fun Duration.formatDropSeconds(): String =
     1.minutes.let { if (this < it) "<$it" else dropSeconds().toString() }
 
-fun Duration.toRoundedTimeString(): String =
+fun Duration.formatRoundedTime(): String =
     when {
         this < 2.minutes -> "minute"
         this < 2.hours -> "$inWholeMinutes minutes"
@@ -50,11 +50,11 @@ fun Duration.toRoundedTimeString(): String =
         else -> "${inWholeDays / 365} years"
     }
 
-fun Duration.timerShort(): String =
-    if (this < 48.hours) toHHMMSS() else toRoundedTimeString()
+fun Duration.formatTimerShort(): String =
+    if (this < 48.hours) formatHHMMSS() else formatRoundedTime()
 
-fun Duration.timerFull(): String =
-    if (this < 48.hours) toHHMMSS() else toDHHMMSS()
+fun Duration.formatTimerFull(): String =
+    if (this < 48.hours) formatHHMMSS() else formatDHHMMSS()
 
 val DayOfWeekNames.Companion.RUSSIAN_ABBREVIATED: DayOfWeekNames
     get() = DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс"))

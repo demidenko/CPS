@@ -69,5 +69,5 @@ fun ProvideTimeEachMinute(content: @Composable () -> Unit) =
 
 @Composable
 @ReadOnlyComposable
-fun Instant.toTimeAgoString(): String =
-    (localCurrentTime - this).toRoundedTimeString() + " ago"
+fun Instant.formatTimeAgo(): String =
+    (localCurrentTime - this).formatRoundedTime() + " ago"

@@ -23,7 +23,7 @@ import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.RatedUserInfo
-import com.demich.cps.contests.ratingChangeDate
+import com.demich.cps.contests.formatRatingChangeDate
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
@@ -73,7 +73,7 @@ private fun ContestResult(
             )
             Text(
                 text = with(ratingChange) {
-                    date.ratingChangeDate() + "  rank: $rank"
+                    date.formatRatingChangeDate() + "  rank: $rank"
                 },
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional

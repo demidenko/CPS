@@ -28,10 +28,10 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.context
+import com.demich.cps.utils.formatTimerFull
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.timerFull
 
 @Composable
 internal fun ContestExpandedItemContent(
@@ -106,8 +106,8 @@ private fun ContestCounter(
     ProvideTextStyle(contestSubtitleTextStyle()) {
         Text(
             text = contest.localCurrentCounter(
-                before = { "starts in ${it.timerFull()}" },
-                running = { "ends in ${it.timerFull()}" },
+                before = { "starts in ${it.formatTimerFull()}" },
+                running = { "ends in ${it.formatTimerFull()}" },
                 finished = { "finished" }
             )
         )

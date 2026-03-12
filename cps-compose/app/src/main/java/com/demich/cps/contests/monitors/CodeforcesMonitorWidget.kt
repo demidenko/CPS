@@ -35,7 +35,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.currentTimeAsState
-import com.demich.cps.utils.timerShort
+import com.demich.cps.utils.formatTimerShort
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -142,7 +142,7 @@ private fun PhaseTitle(
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).timerShort()
+                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).formatTimerShort()
             )
         }
         is CodeforcesMonitorData.ContestPhase.SystemTesting -> {

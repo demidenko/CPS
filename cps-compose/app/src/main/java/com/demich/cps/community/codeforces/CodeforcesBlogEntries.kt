@@ -33,8 +33,8 @@ import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.context
+import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.plusIf
-import com.demich.cps.utils.toTimeAgoString
 
 
 @Composable
@@ -99,7 +99,7 @@ private fun BlogEntryInfo(
             authorHandle = blogEntry.author.toHandleSpan(),
             rating = blogEntry.rating,
             commentsCount = blogEntry.commentsCount ?: 0,
-            timeAgo = blogEntry.creationTime.toTimeAgoString(),
+            timeAgo = blogEntry.creationTime.formatTimeAgo(),
             markNew = markNew,
             label = label,
             modifier = modifier

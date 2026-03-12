@@ -14,17 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
-import com.demich.cps.contests.contestDate
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateBriefRange
 import com.demich.cps.contests.dateRange
+import com.demich.cps.contests.formatContestDate
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.timerShort
 import com.demich.cps.utils.toSystemDateTime
 
 @Composable
@@ -106,7 +106,7 @@ private fun ContestItemFooter(
             AttentionText(
                 text = when (phase) {
                     BEFORE -> contest.dateBriefRange()
-                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().contestDate()
+                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
                 collisionType = if (phase == BEFORE) collisionType() else SAFE,
@@ -128,8 +128,8 @@ private fun ContestCounter(
     Text(
         modifier = modifier,
         text = contest.localCurrentCounter(
-            before = { "in ${it.timerShort()}" },
-            running = { "left ${it.timerShort()}" }
+            before = { "in ${it.formatTimerShort()}" },
+            running = { "left ${it.formatTimerShort()}" }
         )
     )
 }

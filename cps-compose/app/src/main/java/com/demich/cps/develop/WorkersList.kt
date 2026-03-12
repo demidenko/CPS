@@ -64,10 +64,10 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.drawRoundRectWithBorderInside
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
+import com.demich.cps.utils.formatDropSeconds
+import com.demich.cps.utils.formatExecTime
 import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.toDropSecondsString
-import com.demich.cps.utils.toExecTimeString
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -256,12 +256,12 @@ private fun WorkerItem(
 
             Text(
                 text = lastExecTime?.let {
-                    (localCurrentTime - it).toDropSecondsString() + " ago"
+                    (localCurrentTime - it).formatDropSeconds() + " ago"
                 } ?: "never"
             )
 
             if (lastDuration != null) {
-                Text(text = "(${lastDuration.toExecTimeString()})")
+                Text(text = "(${lastDuration.formatExecTime()})")
             }
         }
     }
@@ -365,7 +365,7 @@ private fun WorkerDialog(
                     ENQUEUED -> {
                         workInfo?.nextScheduleTime?.let { nextTime ->
                             val d = nextTime - localCurrentTime
-                            Text(text = "next: in ${d.toDropSecondsString()}")
+                            Text(text = "next: in ${d.formatDropSeconds()}")
                         }
                     }
                     else -> {

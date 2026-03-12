@@ -48,13 +48,13 @@ private object Formats {
 private fun LocalDateTime.formatDate() = date.format(Formats.ddMME)
 private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 
-fun LocalDateTime.contestDate() = "${formatDate()} ${formatTime()}"
+fun LocalDateTime.formatContestDate() = "${formatDate()} ${formatTime()}"
 
 fun Contest.dateBriefRange(): String {
     require(startTime <= endTime)
 
     val startLocalDateTime = startTime.toSystemDateTime()
-    val start = startLocalDateTime.contestDate()
+    val start = startLocalDateTime.formatContestDate()
     if (startTime == endTime) return start
 
     val endLocalDateTime = endTime.toSystemDateTime()
@@ -68,18 +68,18 @@ fun Contest.dateRange(): String {
 
     //TODO: show year
     val startLocalDateTime = startTime.toSystemDateTime()
-    val start = startLocalDateTime.contestDate()
+    val start = startLocalDateTime.formatContestDate()
     if (startTime == endTime) return start
 
     val endLocalDateTime = endTime.toSystemDateTime()
     val end = endLocalDateTime.run {
-        if (date == startLocalDateTime.date) formatTime() else contestDate()
+        if (date == startLocalDateTime.date) formatTime() else formatContestDate()
     }
 
     return "$start - $end"
 }
 
-fun Instant.ratingChangeDate(): String =
+fun Instant.formatRatingChangeDate(): String =
     toSystemDateTime().format(LocalDateTime.Format {
         date(Formats.ddMMYYYY)
         char(' ')

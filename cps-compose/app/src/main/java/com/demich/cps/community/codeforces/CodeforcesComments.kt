@@ -42,9 +42,9 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.htmlToAnnotatedString
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.toTimeAgoString
 import kotlin.math.roundToInt
 
 @Composable
@@ -92,7 +92,7 @@ private fun Comment(
         authorHandle = comment.commentator.toHandleSpan(),
         blogEntryTitle = blogEntryTitle,
         rating = comment.rating,
-        timeAgo = comment.creationTime.toTimeAgoString(),
+        timeAgo = comment.creationTime.formatTimeAgo(),
         commentHtml = comment.html
     )
 }
