@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagerType
 import com.demich.cps.accounts.managers.CListAccountManager
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.managers.allAccountManagers
@@ -50,13 +50,13 @@ import kotlinx.coroutines.launch
 @Composable
 private fun ProfilesScreen(
     profiles: List<ProfileResultWithManager<out UserInfo>>,
-    onExpandProfile: (AccountManagerType) -> Unit,
+    onExpandProfile: (ProfilePlatform) -> Unit,
     reorderEnabled: Boolean,
 ) {
     val context = context
     val viewModel = profilesViewModel()
 
-    val profilesTypes = if (reorderEnabled) profiles.map { it.type } else null
+    val profilePlatforms = if (reorderEnabled) profiles.map { it.platform } else null
 
     LazyColumn(
         horizontalAlignment = Alignment.Start,
@@ -67,14 +67,14 @@ private fun ProfilesScreen(
     ) {
         itemsNotEmpty(
             items = profiles,
-            key = { it.type },
+            key = { it.platform },
             onEmptyMessage = { Text(text = "Profiles are not defined") }
         ) { profileResultWithManager ->
             ProfilePanel(
                 profileResultWithManager = profileResultWithManager,
                 onReloadRequest = { viewModel.reload(profileResultWithManager.manager, context) },
-                onExpandRequest = { onExpandProfile(profileResultWithManager.type) },
-                visibleOrder = profilesTypes,
+                onExpandRequest = { onExpandProfile(profileResultWithManager.platform) },
+                visibleOrder = profilePlatforms,
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .animateItem()
@@ -85,7 +85,7 @@ private fun ProfilesScreen(
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
-    onExpandProfile: (AccountManagerType) -> Unit
+    onExpandProfile: (ProfilePlatform) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
     val profilesOrder by profilesOrderState()
@@ -126,8 +126,8 @@ private fun profilesOrderState() = with(context) {
         ) {
             it.filterNotNull()
         }.combine(settingsUI.profilesOrder.asFlow()) { profiles, order ->
-            order.mapNotNull { type ->
-                profiles.find { it.type == type }
+            order.mapNotNull { platform ->
+                profiles.find { it.platform == platform }
             }
         }
     }
@@ -170,14 +170,14 @@ private fun ReloadProfilesButton(
 }
 
 @Composable
-private fun AddProfileMenuItem(type: AccountManagerType, onSelect: () -> Unit) {
+private fun AddProfileMenuItem(platform: ProfilePlatform, onSelect: () -> Unit) {
     DropdownMenuItem(
         onClick = onSelect,
         content = {
             Text(
-                text = when (type) {
-                    AccountManagerType.clist -> "import from clist.by"
-                    else -> type.name
+                text = when (platform) {
+                    ProfilePlatform.clist -> "import from clist.by"
+                    else -> platform.name
                 },
                 style = CPSDefaults.MonospaceTextStyle
             )
@@ -190,7 +190,7 @@ private fun AddProfileButton(
     availableProfiles: List<ProfileResultWithManager<out UserInfo>>
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var selectedType: AccountManagerType? by remember { mutableStateOf(null) }
+    var selectedPlatform: ProfilePlatform? by remember { mutableStateOf(null) }
 
     val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
@@ -208,32 +208,32 @@ private fun AddProfileButton(
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            val types = remember(availableProfiles) {
-                val allTypes = allAccountManagers.map { it.type }
-                val availableTypes = availableProfiles.map { it.type }
-                allTypes - availableTypes + AccountManagerType.clist
+            val platforms = remember(availableProfiles) {
+                val all = allAccountManagers.map { it.platform }
+                val available = availableProfiles.map { it.platform }
+                all - available + ProfilePlatform.clist
             }
 
-            types.forEach { type ->
-                AddProfileMenuItem(type = type) {
+            platforms.forEach { platform ->
+                AddProfileMenuItem(platform = platform) {
                     showMenu = false
-                    selectedType = type
+                    selectedPlatform = platform
                 }
             }
         }
     }
 
-    selectedType?.let { type ->
-        if (type == AccountManagerType.clist) {
+    selectedPlatform?.let { platform ->
+        if (platform == ProfilePlatform.clist) {
             CListImportDialog(
-                onDismissRequest = { selectedType = null }
+                onDismissRequest = { selectedPlatform = null }
             )
         } else {
             ChangeSavedProfileDialog(
-                manager = accountManagerOf(type),
+                manager = accountManagerOf(platform),
                 initial = null,
                 scope = scope,
-                onDismissRequest = { selectedType = null }
+                onDismissRequest = { selectedPlatform = null }
             )
         }
     }

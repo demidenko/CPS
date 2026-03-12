@@ -17,7 +17,7 @@ class TimusAccountManager :
     AccountManager<TimusUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val type get() = AccountManagerType.timus
+    override val platform get() = ProfilePlatform.timus
     override val userIdTitle get() = "id"
     override val urlHomePage get() = TimusUrls.main
 

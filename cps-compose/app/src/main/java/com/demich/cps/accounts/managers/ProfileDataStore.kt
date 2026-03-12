@@ -57,7 +57,7 @@ internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multi
 
 internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
-        override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${type}_profile_result")
+        override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${platform}_profile_result")
 
         context(scope: DataStoreEditScope)
         override fun onResetProfile() { }
@@ -74,8 +74,8 @@ interface ProfileSettingsProvider {
     fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
 
-fun profileDataStoreWrapper(type: AccountManagerType) =
-    dataStoreWrapper(name = type.name + "_profile_datastore")
+fun profileDataStoreWrapper(platform: ProfilePlatform) =
+    dataStoreWrapper(name = platform.name + "_profile_datastore")
 
-fun profileSettingsDataStoreWrapper(type: AccountManagerType) =
-    dataStoreWrapper(name = type.name + "_profile_settings")
+fun profileSettingsDataStoreWrapper(platform: ProfilePlatform) =
+    dataStoreWrapper(name = platform.name + "_profile_settings")

@@ -16,7 +16,7 @@ class CListAccountManager :
     AccountManager<ClistUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val type get() = AccountManagerType.clist
+    override val platform get() = ProfilePlatform.clist
     override val userIdTitle = "login"
     override val urlHomePage = ClistUrls.main
 

@@ -19,7 +19,7 @@ class ACMPAccountManager :
     AccountManager<ACMPUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val type get() = AccountManagerType.acmp
+    override val platform get() = ProfilePlatform.acmp
     override val userIdTitle get() = "id"
     override val urlHomePage get() = ACMPUrls.main
 

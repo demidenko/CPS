@@ -14,7 +14,7 @@ import com.demich.cps.ui.theme.CPSColors
 import kotlinx.coroutines.flow.map
 
 @androidx.annotation.Keep //navigation agr type
-enum class AccountManagerType {
+enum class ProfilePlatform {
     codeforces,
     atcoder,
     codechef,
@@ -37,17 +37,17 @@ val allAccountManagers: List<AccountManager<out UserInfo>>
 val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
     get() = allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
 
-fun accountManagerOf(type: AccountManagerType) =
-    allAccountManagers.first { it.type == type }
+fun accountManagerOf(platform: ProfilePlatform) =
+    allAccountManagers.first { it.platform == platform }
 
 abstract class AccountManager<U: UserInfo> {
-    abstract val type: AccountManagerType
+    abstract val platform: ProfilePlatform
 
     override fun equals(other: Any?): Boolean {
-        return other is AccountManager<U> && type == other.type
+        return other is AccountManager<U> && platform == other.platform
     }
 
-    override fun hashCode() = type.hashCode()
+    override fun hashCode() = platform.hashCode()
 
     abstract val userIdTitle: String
     abstract val urlHomePage: String
@@ -79,7 +79,7 @@ data class ProfileResultWithManager<U: UserInfo>(
     val profileResult: ProfileResult<U>,
     val manager: AccountManager<U>
 ) {
-    val type: AccountManagerType get() = manager.type
+    val platform: ProfilePlatform get() = manager.platform
 }
 
 fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =

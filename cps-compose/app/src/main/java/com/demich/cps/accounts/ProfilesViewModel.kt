@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.RatingChange
 import com.demich.cps.accounts.managers.accountManagerOf
@@ -31,22 +31,22 @@ import kotlinx.coroutines.launch
 fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 
 class ProfilesViewModel: ViewModel() {
-    private val loadingStatuses = MutableStateFlow(emptyMap<AccountManagerType, LoadingStatus>())
+    private val loadingStatuses = MutableStateFlow(emptyMap<ProfilePlatform, LoadingStatus>())
 
     fun flowOfLoadingStatus(manager: AccountManager<out UserInfo>): Flow<LoadingStatus> =
-        loadingStatuses.map { it[manager.type] ?: PENDING }
+        loadingStatuses.map { it[manager.platform] ?: PENDING }
 
     fun flowOfLoadingStatus(managers: Collection<AccountManager<out UserInfo>>): Flow<LoadingStatus> =
-        loadingStatuses.map { map -> managers.mapNotNull { map[it.type] }.combine() }
+        loadingStatuses.map { map -> managers.mapNotNull { map[it.platform] }.combine() }
 
     private fun setLoadingStatus(manager: AccountManager<out UserInfo>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
-            if (loadingStatus == PENDING) remove(manager.type)
-            else this[manager.type] = loadingStatus
+            if (loadingStatus == PENDING) remove(manager.platform)
+            else this[manager.platform] = loadingStatus
         }
 
     fun <U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
-        if (loadingStatuses.value[manager.type] == LOADING) return
+        if (loadingStatuses.value[manager.platform] == LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val dataStore = manager.dataStore(context)
             val savedProfile = dataStore.profile() ?: return@launch
@@ -79,11 +79,11 @@ class ProfilesViewModel: ViewModel() {
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 getManager(resource, userData.first, userData.second)
             }
-            supported.map { (type, userId) ->
+            supported.map { (platform, userId) ->
                 suspend {
-                    val manager = accountManagerOf(type)
+                    val manager = accountManagerOf(platform)
                     //wait for loading stops
-                    loadingStatuses.takeWhile { it[type] == LOADING }.collect()
+                    loadingStatuses.takeWhile { it[platform] == LOADING }.collect()
                     val savedUserId = manager.dataStore(context).profile()?.userId
                     if (userId.equals(savedUserId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
@@ -109,15 +109,15 @@ class ProfilesViewModel: ViewModel() {
         ratingLoader.execute(id = "$userId#$key") { manager.getRatingChangeHistory(userId) }
 }
 
-private fun getManager(resource: String, userName: String, link: String): Pair<AccountManagerType, String>? =
+private fun getManager(resource: String, userName: String, link: String): Pair<ProfilePlatform, String>? =
     when (resource) {
-        "codeforces.com" -> AccountManagerType.codeforces to userName
-        "atcoder.jp" -> AccountManagerType.atcoder to userName
-        "codechef.com" -> AccountManagerType.codechef to userName
-        "dmoj.ca" -> AccountManagerType.dmoj to userName
+        "codeforces.com" -> ProfilePlatform.codeforces to userName
+        "atcoder.jp" -> ProfilePlatform.atcoder to userName
+        "codechef.com" -> ProfilePlatform.codechef to userName
+        "dmoj.ca" -> ProfilePlatform.dmoj to userName
         "acm.timus.ru", "timus.online" -> {
             val userId = link.substring(link.lastIndexOf('=')+1)
-            AccountManagerType.timus to userId
+            ProfilePlatform.timus to userId
         }
         else -> null
     }

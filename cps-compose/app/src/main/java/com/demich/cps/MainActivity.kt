@@ -74,8 +74,8 @@ private fun CPSContent() {
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
                 onOpenSettings = {
-                    val type = screen.managerType
-                    navigator.navigateTo(Screen.ProfileSettings(type))
+                    val platform = screen.profilePlatform
+                    navigator.navigateTo(Screen.ProfileSettings(platform))
                 },
                 onDeleteRequest = { manager ->
                     profilesViewModel.delete(manager, context)

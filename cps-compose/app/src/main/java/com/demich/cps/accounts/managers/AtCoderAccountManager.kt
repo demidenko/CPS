@@ -29,7 +29,7 @@ class AtCoderAccountManager :
     ProfileSettingsProvider,
     ProfileSuggestionsProvider
 {
-    override val type get() = AccountManagerType.atcoder
+    override val platform get() = ProfilePlatform.atcoder
     override val urlHomePage get() = AtCoderUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
@@ -116,7 +116,7 @@ class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
     RatedProfileDataStore<AtCoderUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileDataStoreWrapper(type = AccountManagerType.atcoder)
+        private val Context.dataStore by profileDataStoreWrapper(platform = ProfilePlatform.atcoder)
     }
 
     override val profileItem = makeProfileItem<AtCoderUserInfo>()
@@ -131,7 +131,7 @@ class AtCoderProfileSettingsDataStore(context: Context):
     ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileSettingsDataStoreWrapper(AccountManagerType.atcoder)
+        private val Context.dataStore by profileSettingsDataStoreWrapper(ProfilePlatform.atcoder)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

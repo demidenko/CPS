@@ -8,7 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
@@ -108,11 +108,11 @@ private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
 
 private class RankGetter(
     private val validRanks: List<RatedRank>,
-    disabledManagers: Set<AccountManagerType>,
+    disabledPlatforms: Set<ProfilePlatform>,
     rankSelector: UISettingsDataStore.StatusBarRankSelector
 ) {
     private val rank: RatedRank? =
-        validRanks.filter { it.manager.type !in disabledManagers }.run {
+        validRanks.filter { it.manager.platform !in disabledPlatforms }.run {
             when (rankSelector) {
                 Min -> minByOrNull { it.rank }
                 Max -> maxByOrNull { it.rank }
@@ -121,14 +121,14 @@ private class RankGetter(
 
     operator fun get(screen: Screen?): RatedRank? =
         when (screen) {
-            is Screen.ProfileScreen -> validRanks.find { it.manager.type == screen.managerType }
+            is Screen.ProfileScreen -> validRanks.find { it.manager.platform == screen.profilePlatform }
             else -> rank
         }
 }
 
 private data class Settings(
     val enabled: Boolean,
-    val disabledManagers: Set<AccountManagerType>,
+    val disabledPlatforms: Set<ProfilePlatform>,
     val rankSelector: UISettingsDataStore.StatusBarRankSelector
 )
 
@@ -138,14 +138,14 @@ private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
         flow2 = context.settingsUI.flowOf {
             Settings(
                 enabled = coloredStatusBar.value,
-                disabledManagers = statusBarDisabledManagers.value,
+                disabledPlatforms = statusBarDisabledPlatforms.value,
                 rankSelector = statusBarRankSelector.value
             )
         }
     ) { validRanks, settings ->
         RankGetter(
             validRanks = if (settings.enabled) validRanks else emptyList(),
-            disabledManagers = settings.disabledManagers,
+            disabledPlatforms = settings.disabledPlatforms,
             rankSelector = settings.rankSelector
         )
     }

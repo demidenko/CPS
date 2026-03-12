@@ -55,7 +55,7 @@ class CodeforcesAccountManager :
     ProfileSuggestionsProvider,
     RatingRevolutionsProvider
 {
-    override val type get() = AccountManagerType.codeforces
+    override val platform get() = ProfilePlatform.codeforces
     override val urlHomePage get() = CodeforcesUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
@@ -238,7 +238,7 @@ class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Con
     RatedProfileDataStore<CodeforcesUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileDataStoreWrapper(AccountManagerType.codeforces)
+        private val Context.dataStore by profileDataStoreWrapper(ProfilePlatform.codeforces)
     }
 
     override val profileItem = makeProfileItem<CodeforcesUserInfo>()
@@ -259,7 +259,7 @@ class CodeforcesProfileSettingsDataStore(context: Context):
     ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileSettingsDataStoreWrapper(AccountManagerType.codeforces)
+        private val Context.dataStore by profileSettingsDataStoreWrapper(ProfilePlatform.codeforces)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

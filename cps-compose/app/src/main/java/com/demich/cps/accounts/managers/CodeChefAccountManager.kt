@@ -50,7 +50,7 @@ class CodeChefAccountManager :
         private const val star = "★"
     }
 
-    override val type get() = AccountManagerType.codechef
+    override val platform get() = ProfilePlatform.codechef
     override val urlHomePage get() = CodeChefUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)

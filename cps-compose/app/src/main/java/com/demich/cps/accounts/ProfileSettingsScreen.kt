@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.ProfileSettingsProvider
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.ProfileResult
@@ -32,19 +32,19 @@ import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 private fun ProfileSettingsScreen(
-    type: AccountManagerType
+    platform: ProfilePlatform
 ) {
-    val manager = remember(type) { accountManagerOf(type) }
+    val manager = remember(platform) { accountManagerOf(platform) }
     ProfileSettingsScreen(manager = manager)
 }
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsScreen() {
-    val type = screen.managerType
+    val platform = screen.profilePlatform
     
-    screenTitle = ScreenStaticTitleState("profiles", type.name, "settings")
+    screenTitle = ScreenStaticTitleState("profiles", platform.name, "settings")
     
-    ProfileSettingsScreen(type)
+    ProfileSettingsScreen(platform)
 }
 
 @Composable

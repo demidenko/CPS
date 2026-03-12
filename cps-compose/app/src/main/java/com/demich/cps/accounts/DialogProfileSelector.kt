@@ -86,7 +86,7 @@ fun <U: UserInfo> DialogProfileSelector(
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
         ProfileHeader(
-            text = "getUser(${manager.type.name}):",
+            text = "getUser(${manager.platform.name}):",
             color = cpsColors.contentAdditional
         ) {
             Icon(imageVector = CPSIcons.Profile, contentDescription = null)

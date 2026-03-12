@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo
@@ -119,13 +119,13 @@ private fun TestHandles(
 ) {
     val managers = remember { allRatedAccountManagers }
 
-    var selectedType by rememberSaveable {
-        mutableStateOf(AccountManagerType.codeforces)
+    var selectedPlatform by rememberSaveable {
+        mutableStateOf(ProfilePlatform.codeforces)
     }
 
     Row(modifier = modifier) {
         HandlesList(
-            manager = managers.first { it.type == selectedType },
+            manager = managers.first { it.platform == selectedPlatform },
             modifier = Modifier.weight(1f)
         )
         Column(
@@ -133,10 +133,10 @@ private fun TestHandles(
         ) {
             managers.forEach { manager ->
                 CPSRadioButtonTitled(
-                    title = { Text(text = manager.type.name) },
-                    selected = selectedType == manager.type
+                    title = { Text(text = manager.platform.name) },
+                    selected = selectedPlatform == manager.platform
                 ) {
-                    selectedType = manager.type
+                    selectedPlatform = manager.platform
                 }
             }
         }

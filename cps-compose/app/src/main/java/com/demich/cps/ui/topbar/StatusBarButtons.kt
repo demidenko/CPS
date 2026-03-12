@@ -17,7 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.flowWithProfileResult
 import com.demich.cps.ui.CPSCheckBox
@@ -46,25 +46,25 @@ internal fun StatusBarButtons() {
 
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
 
-    val recordedAccountManagers by collectAsState {
+    val recordedPlatforms by collectAsState {
         combine(allRatedAccountManagers.map { it.flowWithProfileResult(context) }) { array ->
-            array.mapNotNull { it?.manager?.type }
-        }.combine(settingsUI.profilesOrder.asFlow()) { managers, order ->
-            managers.sortedBy { order.indexOf(it) }
+            array.mapNotNull { it?.manager?.platform }
+        }.combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
+            platforms.sortedBy { order.indexOf(it) }
         }
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }
     val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
-    val disabledManagers by collectItemAsState { settingsUI.statusBarDisabledManagers }
+    val disabledPlatforms by collectItemAsState { settingsUI.statusBarDisabledPlatforms }
 
     val noneEnabled by remember {
         derivedStateOf {
-            recordedAccountManagers.all { it in disabledManagers }
+            recordedPlatforms.all { it in disabledPlatforms }
         }
     }
 
-    if (recordedAccountManagers.isNotEmpty()) {
+    if (recordedPlatforms.isNotEmpty()) {
         CPSIconButton(
             icon = CPSIcons.StatusBar,
             onState = coloredStatusBar && !noneEnabled,
@@ -86,15 +86,15 @@ internal fun StatusBarButtons() {
                 onSetRankSelector = {
                     settingsUI.statusBarRankSelector.setValueIn(scope, it)
                 },
-                disabledManagers = disabledManagers,
-                onCheckedChange = { type, checked ->
+                disabledPlatforms = disabledPlatforms,
+                onCheckedChange = { platform, checked ->
                     scope.launch {
-                        settingsUI.statusBarDisabledManagers.edit {
-                            if (checked) remove(type) else add(type)
+                        settingsUI.statusBarDisabledPlatforms.edit {
+                            if (checked) remove(platform) else add(platform)
                         }
                     }
                 },
-                accountManagers = recordedAccountManagers,
+                platforms = recordedPlatforms,
                 onDismissRequest = { showPopup = false }
             )
         }
@@ -108,9 +108,9 @@ private fun StatusBarAccountsPopup(
     expanded: Boolean,
     rankSelector: UISettingsDataStore.StatusBarRankSelector,
     onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
-    disabledManagers: Set<AccountManagerType>,
-    onCheckedChange: (AccountManagerType, Boolean) -> Unit,
-    accountManagers: List<AccountManagerType>,
+    disabledPlatforms: Set<ProfilePlatform>,
+    onCheckedChange: (ProfilePlatform, Boolean) -> Unit,
+    platforms: List<ProfilePlatform>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(
@@ -118,13 +118,13 @@ private fun StatusBarAccountsPopup(
         onDismissRequest = onDismissRequest,
         modifier = Modifier.background(cpsColors.backgroundAdditional)
     ) {
-        accountManagers.forEach { type ->
+        platforms.forEach { platform ->
             Row(modifier = Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 CPSCheckBox(
-                    checked = type !in disabledManagers,
-                    onCheckedChange = { checked -> onCheckedChange(type, checked) }
+                    checked = platform !in disabledPlatforms,
+                    onCheckedChange = { checked -> onCheckedChange(platform, checked) }
                 )
-                Text(text = type.name, style = CPSDefaults.MonospaceTextStyle)
+                Text(text = platform.name, style = CPSDefaults.MonospaceTextStyle)
             }
         }
         TextButtonsSelectRow(

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.RatedAccountManager
 import com.demich.cps.accounts.managers.colorFor
@@ -57,7 +57,7 @@ import kotlin.time.Instant
 fun <U: UserInfo> ProfilePanel(
     profileResultWithManager: ProfileResultWithManager<U>,
     modifier: Modifier = Modifier,
-    visibleOrder: List<AccountManagerType>? = null,
+    visibleOrder: List<ProfilePlatform>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
@@ -105,7 +105,7 @@ fun <U: UserInfo> ProfilePanel(
             )
         } else {
             PanelMovingButtons(
-                type = manager.type,
+                platform = manager.platform,
                 visibleOrder = visibleOrder,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
@@ -143,8 +143,8 @@ private fun PanelUIButtons(
 
 @Composable
 private fun PanelMovingButtons(
-    type: AccountManagerType,
-    visibleOrder: List<AccountManagerType>,
+    platform: ProfilePlatform,
+    visibleOrder: List<ProfilePlatform>,
     modifier: Modifier = Modifier
 ) {
     val context = context
@@ -155,7 +155,7 @@ private fun PanelMovingButtons(
             value = visibleOrder.toMutableList().apply { swap(i, j) }
         )
     }
-    val index = visibleOrder.indexOf(type)
+    val index = visibleOrder.indexOf(platform)
     PanelMovingButtons(
         modifier = modifier,
         onUpClick = {

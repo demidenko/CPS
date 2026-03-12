@@ -25,7 +25,7 @@ class DmojAccountManager :
     RatedAccountManager<DmojUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val type get() = AccountManagerType.dmoj
+    override val platform get() = ProfilePlatform.dmoj
     override val urlHomePage get() = DmojUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {

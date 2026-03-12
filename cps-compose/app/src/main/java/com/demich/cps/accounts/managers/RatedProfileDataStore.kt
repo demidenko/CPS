@@ -64,7 +64,7 @@ abstract class RatedProfileDataStore<U: RatedUserInfo>(
             smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
             contentTitle = "$handle new rating: ${ratingChange.rating}"
             contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
-            subText = "${manager.type} rating changes"
+            subText = "${manager.platform} rating changes"
             color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
             ratingChange.url?.let { url = it }
             time = ratingChange.date

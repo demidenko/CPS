@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.AccountManagerType
+import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.accountManagerOf
 import com.demich.cps.accounts.userinfo.UserInfo
 import com.demich.cps.accounts.userinfo.userInfoOrNull
@@ -48,7 +48,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
 }
 
 private fun profileExpandedMenuBuilder(
-    type: AccountManagerType,
+    platform: ProfilePlatform,
     onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
@@ -59,7 +59,7 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings, onClick = onOpenSettings)
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
-            accountManagerOf(type)
+            accountManagerOf(platform)
                 .dataStore(context).profile()
                 ?.userInfoOrNull()
                 ?.userPageUrl
@@ -73,14 +73,14 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
-    val type = screen.managerType
-    val manager = remember(type) { accountManagerOf(type) }
+    val platform = screen.profilePlatform
+    val manager = remember(platform) { accountManagerOf(platform) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    screenTitle = ScreenStaticTitleState("profiles", type.name)
+    screenTitle = ScreenStaticTitleState("profiles", platform.name)
 
     menu = profileExpandedMenuBuilder(
-        type = type,
+        platform = platform,
         onShowDeleteDialog = { showDeleteDialog = true },
         onOpenSettings = onOpenSettings
     )
@@ -92,7 +92,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
 
     if (showDeleteDialog) {
         CPSDeleteDialog(
-            title = "Delete $type profile?",
+            title = "Delete $platform profile?",
             onConfirmRequest = { onDeleteRequest(manager) },
             onDismissRequest = { showDeleteDialog = false }
         )
