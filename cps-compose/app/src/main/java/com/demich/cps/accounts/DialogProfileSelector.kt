@@ -120,7 +120,7 @@ private fun<U: UserInfo> DialogContent(
     }
     var textFieldValue by textFieldValueState
 
-    val profileLoading by profileState(
+    val profileLoading by profileFetchState(
         textState = textFieldValueState,
         manager = manager,
         initial = initial
@@ -199,28 +199,28 @@ private fun<U: UserInfo> DialogContent(
 }
 
 
-private data class ProfileLoadingResult<U: UserInfo>(
+private data class ProfileFetchResult<U: UserInfo>(
     val profile: ProfileResult<U>?,
     val isLoading: Boolean
 )
 
 @Composable
-private fun <U: UserInfo> profileState(
+private fun <U: UserInfo> profileFetchState(
     textState: State<TextFieldValue>,
     manager: AccountManager<U>,
     initial: ProfileResult<U>?
-): State<ProfileLoadingResult<U>> =
+): State<ProfileFetchResult<U>> =
     remember(textState, manager) {
         snapshotFlow { textState.value.text }
             .drop(1)
             .transformLatest { userId ->
-                emit(ProfileLoadingResult<U>(null, false))
+                emit(ProfileFetchResult(null, false))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                emit(ProfileLoadingResult<U>(null, true))
-                emit(ProfileLoadingResult(manager.fetchProfile(userId), false))
+                emit(ProfileFetchResult(null, true))
+                emit(ProfileFetchResult(manager.fetchProfile(userId), false))
             }
-    }.collectAsState(initial = ProfileLoadingResult(initial, false))
+    }.collectAsState(initial = ProfileFetchResult(initial, false))
 
 
 @Composable
