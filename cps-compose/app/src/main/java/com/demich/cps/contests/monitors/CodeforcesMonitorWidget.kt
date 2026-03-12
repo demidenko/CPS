@@ -86,12 +86,14 @@ private fun CodeforcesMonitor(
             modifier = Modifier.fillMaxWidth()
         )
         Footer(
-            contestData = contestData,
+            contestantRank = contestData.contestantRank,
+            contestPhase = contestData.contestPhase,
             requestFailed = requestFailed,
             modifier = Modifier.fillMaxWidth()
         )
         StandingsRow(
-            contestData = contestData,
+            problems = contestData.problems,
+            contestType = contestData.contestInfo.type,
             modifier = Modifier
                 .padding(top = 2.dp)
                 .clip(RoundedCornerShape(6.dp))
@@ -105,14 +107,15 @@ private fun CodeforcesMonitor(
 
 @Composable
 private fun Footer(
-    contestData: CodeforcesMonitorData,
+    contestantRank: CodeforcesMonitorData.ContestRank,
+    contestPhase: CodeforcesMonitorData.ContestPhase,
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
     ProvideTextStyle(contestSubtitleTextStyle()) {
         Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
             Rank(
-                contestantRank = contestData.contestantRank,
+                contestantRank = contestantRank,
                 modifier = Modifier.weight(1f)
             )
             if (requestFailed) {
@@ -122,7 +125,7 @@ private fun Footer(
                 )
             }
             PhaseTitle(
-                contestPhase = contestData.contestPhase
+                contestPhase = contestPhase
             )
         }
     }
@@ -174,10 +177,10 @@ private fun PhaseTitle(
 
 @Composable
 private fun StandingsRow(
-    contestData: CodeforcesMonitorData,
+    problems: List<CodeforcesMonitorData.ProblemInfo>,
+    contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
-    val problems = contestData.problems
     if (problems.isNotEmpty()) {
         ProvideTextStyle(value = TextStyle(
             fontSize = when {
@@ -192,7 +195,7 @@ private fun StandingsRow(
                     ProblemColumn(
                         problemName = it.name,
                         problemResult = it.result,
-                        contestType = contestData.contestInfo.type,
+                        contestType = contestType,
                         modifier = Modifier.weight(1f)
                     )
                 }
