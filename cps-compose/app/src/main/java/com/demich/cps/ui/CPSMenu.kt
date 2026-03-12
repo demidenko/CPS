@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.rememberFrom
 
 typealias CPSMenuBuilder = @Composable CPSDropdownMenuScope.() -> Unit
 
@@ -127,12 +126,13 @@ fun rememberMenuState(): CPSMenuState {
     val expanded = remember { mutableStateOf(false) }
     val menuOffset = remember { mutableStateOf(DpOffset.Zero) }
     val componentSize = remember { mutableStateOf(IntSize.Zero) }
-    return rememberFrom(LocalDensity.current) {
+    val density = LocalDensity.current
+    return remember(density) {
         CPSMenuState(
             expandedState = expanded,
             menuOffsetState = menuOffset,
             componentSizeState = componentSize,
-            density = it
+            density = density
         )
     }
 }

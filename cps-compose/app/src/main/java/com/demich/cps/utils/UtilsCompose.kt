@@ -17,7 +17,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.ReadOnlyComposable
@@ -109,15 +108,6 @@ fun rectSaver() = listSaver(
         )
     }
 )
-
-@Composable
-inline fun <T, K> rememberFrom(
-    key: K,
-    crossinline calculation: @DisallowComposableCalls (K) -> T
-): T = remember(key1 = key) {
-    key.let(calculation)
-}
-
 
 inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =
     if (condition) this + value() else this

@@ -35,7 +35,6 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.currentTimeAsState
-import com.demich.cps.utils.rememberFrom
 import com.demich.cps.utils.timerShort
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -178,21 +177,18 @@ private fun StandingsRow(
     contestData: CodeforcesMonitorData,
     modifier: Modifier = Modifier
 ) {
-    val textStyle = rememberFrom(contestData.problems.size) {
-        //TODO: horizontal scroll??
-        TextStyle.Default.copy(
+    val problems = contestData.problems
+    if (problems.isNotEmpty()) {
+        ProvideTextStyle(value = TextStyle(
             fontSize = when {
-                it < 9 -> 16.sp
-                it < 10 -> 15.sp
+                problems.size < 9 -> 16.sp
+                problems.size < 10 -> 15.sp
                 else -> 14.sp
             }
-        )
-    }
-
-    ProvideTextStyle(value = textStyle) {
-        if (contestData.problems.isNotEmpty()) {
+        )) {
+            //TODO: horizontal scroll??
             Row(modifier = modifier) {
-                contestData.problems.forEach {
+                problems.forEach {
                     ProblemColumn(
                         problemName = it.name,
                         problemResult = it.result,

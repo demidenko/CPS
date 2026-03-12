@@ -28,7 +28,6 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberFrom
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
@@ -82,9 +81,10 @@ private fun <U: UserInfo> ProfileSettingsItems(
     profileResult: ProfileResult<U>,
     onUserIdClick: () -> Unit
 ) {
-    val requiredPermission by rememberFrom(context) {
+    val context = context
+    val requiredPermission by remember(manager) {
         (manager as? ProfileSettingsProvider)
-            ?.flowOfRequiredNotificationsPermission(it)
+            ?.flowOfRequiredNotificationsPermission(context)
             ?: emptyFlow()
     }.collectAsState(initial = false)
 
