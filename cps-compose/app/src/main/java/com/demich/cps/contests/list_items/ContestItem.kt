@@ -95,29 +95,46 @@ fun ContestItemHeader(
 }
 
 @Composable
+fun ContestItemFooter(
+    modifier: Modifier = Modifier,
+    left: @Composable () -> Unit,
+    right: @Composable () -> Unit
+) {
+    ProvideTextStyle(contestSubtitleTextStyle()) {
+        Box(modifier = modifier) {
+            Box(modifier = Modifier.align(Alignment.CenterStart)) {
+                left()
+            }
+            Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                right()
+            }
+        }
+    }
+}
+
+@Composable
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
     collisionType: () -> DangerType,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        ProvideTextStyle(contestSubtitleTextStyle()) {
+    ContestItemFooter(
+        modifier = modifier,
+        left = {
             AttentionText(
                 text = when (phase) {
                     BEFORE -> contest.dateBriefRange()
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == BEFORE) collisionType() else SAFE,
-                modifier = Modifier.align(Alignment.CenterStart)
+                collisionType = if (phase == BEFORE) collisionType() else SAFE
             )
-            ContestCounter(
-                contest = contest,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
+        },
+        right = {
+            ContestCounter(contest = contest)
         }
-    }
+    )
 }
 
 @Composable
@@ -136,7 +153,7 @@ private fun ContestCounter(
 
 @Composable
 @ReadOnlyComposable
-internal fun contestSubtitleTextStyle() =
+fun contestSubtitleTextStyle() =
     CPSDefaults.MonospaceTextStyle.copy(
         fontSize = 15.sp,
         color = cpsColors.contentAdditional

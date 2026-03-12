@@ -23,9 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.contestItemPaddings
-import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.list_items.ContestItemFooter
 import com.demich.cps.contests.list_items.ContestItemHeader
-import com.demich.cps.contests.list_items.contestSubtitleTextStyle
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.title
@@ -75,14 +74,9 @@ private fun CodeforcesMonitor(
     modifier: Modifier
 ) {
     Column(modifier) {
-        ContestItemHeader(
-            platform = Contest.Platform.codeforces,
+        Header(
             contestTitle = contestData.contestInfo.name,
-            phase = when (contestData.contestPhase) {
-                is CodeforcesMonitorData.ContestPhase.Coding -> RUNNING
-                else -> BEFORE
-            },
-            isVirtual = false,
+            contestPhase = contestData.contestPhase,
             modifier = Modifier.fillMaxWidth()
         )
         Footer(
@@ -106,29 +100,47 @@ private fun CodeforcesMonitor(
 }
 
 @Composable
+private fun Header(
+    contestTitle: String,
+    contestPhase: CodeforcesMonitorData.ContestPhase,
+    modifier: Modifier = Modifier
+) {
+    ContestItemHeader(
+        platform = codeforces,
+        contestTitle = contestTitle,
+        phase = when (contestPhase) {
+            is CodeforcesMonitorData.ContestPhase.Coding -> RUNNING
+            else -> BEFORE
+        },
+        isVirtual = false,
+        modifier = modifier
+    )
+}
+
+@Composable
 private fun Footer(
     contestantRank: CodeforcesMonitorData.ContestRank,
     contestPhase: CodeforcesMonitorData.ContestPhase,
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
-    ProvideTextStyle(contestSubtitleTextStyle()) {
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-            Rank(
-                contestantRank = contestantRank,
-                modifier = Modifier.weight(1f)
-            )
-            if (requestFailed) {
-                AttentionIcon(
-                    dangerType = DANGER,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
+    ContestItemFooter(
+        modifier = modifier,
+        left = {
+            Rank(contestantRank = contestantRank)
+        },
+        right = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (requestFailed) {
+                    AttentionIcon(
+                        dangerType = DANGER,
+                        modifier = Modifier.padding(end = 4.dp)
+                    )
+                }
+                PhaseTitle(contestPhase = contestPhase)
             }
-            PhaseTitle(
-                contestPhase = contestPhase
-            )
         }
-    }
+    )
 }
 
 @Composable
@@ -277,7 +289,7 @@ private fun ProblemResultCell(
 @Composable
 private fun Rank(
     contestantRank: CodeforcesMonitorData.ContestRank,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     when (contestantRank.rank) {
         null -> {
