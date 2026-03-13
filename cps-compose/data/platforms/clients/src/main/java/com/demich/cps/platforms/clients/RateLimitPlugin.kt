@@ -10,7 +10,7 @@ import kotlin.time.Instant
 
 
 internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::RateLimitPluginConfig) {
-    val limits = removeUseless(pluginConfig.limits)
+    val limits = pluginConfig.removeUseless()
     require(limits.isNotEmpty()) { "No limits specified" }
 
     val maxWindow = limits.maxOf { it.window }
@@ -52,17 +52,19 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
 }
 
 internal class RateLimitPluginConfig {
-    internal val limits = mutableListOf<RateLimit>()
+    private val limits = mutableListOf<RateLimit>()
 
     infix fun Int.per(window: Duration) {
         limits.add(RateLimit(count = this, window = window))
     }
+
+    fun removeUseless() = removeUseless(limits)
 }
 
 internal class RateLimit(val count: Int, val window: Duration) {
     init {
-        require(count > 0) { "count must be positive"}
-        require(window.isPositive()) { "window must be positive"}
+        require(count > 0) { "count must be positive" }
+        require(window.isPositive()) { "window must be positive" }
     }
 }
 
@@ -70,12 +72,24 @@ private fun RateLimit.isUselessIf(other: RateLimit): Boolean {
     if (window <= other.window && count >= other.count) {
         return true
     }
+
     if (count % other.count == 0) {
         // [10 per minute] is useless if there are [1 per 7 seconds]
         val k = count / other.count
         return window <= other.window * k
     }
+
     // TODO: if (window % other.window == 0)
+    if (window.nanosComponent() == 0 && other.window.nanosComponent() == 0) {
+        val s1 = window.inWholeSeconds
+        val s2 = other.window.inWholeSeconds
+        if (s1 % s2 == 0L) {
+            // [100 per minute] is useless if there are [3 per 2 seconds]
+            val k = s1 / s2
+            return count >= other.count * k
+        }
+    }
+
     return false
 }
 
@@ -90,3 +104,5 @@ private fun removeUseless(limits: List<RateLimit>) =
             }
         }
     }
+
+private fun Duration.nanosComponent() = toComponents { seconds, nanoseconds -> nanoseconds }
