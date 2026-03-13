@@ -42,7 +42,7 @@ fun FetchPriorityListDialog(
 
     val settings = remember { context.settingsContests }
     val priorityList by collectAsState {
-        settings.contestsLoadersPriorityLists.asFlow().map { it.getValue(platform) }
+        settings.fetchPriorityLists.asFlow().map { it.getValue(platform) }
     }
 
     CPSDialog(
@@ -56,7 +56,7 @@ fun FetchPriorityListDialog(
             availableOptions = availableOptions,
             onListChange = { newList ->
                 scope.launch {
-                    settings.contestsLoadersPriorityLists.edit {
+                    settings.fetchPriorityLists.edit {
                         this[platform] = newList
                     }
                 }

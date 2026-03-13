@@ -66,7 +66,7 @@ interface ContestsReloader {
 private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<Contest.Platform>) =
     fromSnapshot {
         contestsFetchFlows(
-            setup = contestsLoadersPriorityLists.value.filterKeys { it in platforms },
+            setup = fetchPriorityLists.value.filterKeys { it in platforms },
             dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
         ) { fetchSource ->
             when (fetchSource) {

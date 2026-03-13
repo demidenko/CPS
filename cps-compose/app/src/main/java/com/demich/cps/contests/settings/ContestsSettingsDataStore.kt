@@ -63,7 +63,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         )
     }
 
-    val contestsLoadersPriorityLists = jsonCPS.itemMap(name = "loading_priorities") {
+    val fetchPriorityLists = jsonCPS.itemMap(name = "loading_priorities") {
         ContestsFetchSource.entries.sortedWith(
             compareByDescending<ContestsFetchSource> { it.supportedPlatforms.size }.thenBy { it.ordinal }
         ).let { sources ->
