@@ -51,7 +51,7 @@ private fun contestsFetchFlow(
                 }
             } else {
                 loader.runCatching {
-                    getContests(platform = platform, dateConstraints = dateConstraints)
+                    fetchContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
 
@@ -97,7 +97,7 @@ private class MultipleLoadersMemoizer(
             if (type in loaderTypes) platform else null
         }
         return runCatching {
-            getContests(
+            fetchContests(
                 platforms = platforms,
                 dateConstraints = dateConstraints
             ).groupBy { it.platform }

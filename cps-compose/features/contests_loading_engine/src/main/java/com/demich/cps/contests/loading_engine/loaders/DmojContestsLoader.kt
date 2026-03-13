@@ -9,7 +9,7 @@ import kotlin.time.Instant
 class DmojContestsLoader(val api: DmojApi): ContestsLoader() {
     override val type get() = ContestsLoaderType.dmoj_api
 
-    override suspend fun loadContests(platform: Contest.Platform) =
+    override suspend fun getContests(platform: Contest.Platform) =
         api.getContests().map { contest ->
             val startTime = Instant.parse(contest.start_time)
             val endTime = Instant.parse(contest.end_time)

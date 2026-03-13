@@ -9,28 +9,28 @@ import com.demich.kotlin_stdlib_boost.toEnumSet
 abstract class ContestsLoader {
     abstract val type: ContestsLoaderType
 
-    protected open suspend fun loadContests(
+    protected open suspend fun getContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        return loadContests(platform = platform).filterBy(dateConstraints)
+        return getContests(platform = platform).filterBy(dateConstraints)
     }
 
-    protected open suspend fun loadContests(
+    protected open suspend fun getContests(
         platform: Contest.Platform
     ): List<Contest> {
-        return loadContests(
+        return getContests(
             platform = platform,
             dateConstraints = ContestDateConstraints()
         )
     }
 
-    suspend fun getContests(
+    suspend fun fetchContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         require(platform in type.supportedPlatforms)
-        return loadContests(
+        return getContests(
             platform = platform,
             dateConstraints = dateConstraints
         ).apply {
@@ -40,31 +40,30 @@ abstract class ContestsLoader {
 }
 
 abstract class ContestsLoaderMultiple: ContestsLoader() {
-
-    protected open suspend fun loadContests(
+    protected open suspend fun getContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        return loadContests(platforms = platforms).filterBy(dateConstraints)
+        return getContests(platforms = platforms).filterBy(dateConstraints)
     }
 
-    protected open suspend fun loadContests(
+    protected open suspend fun getContests(
         platforms: Set<Contest.Platform>
     ): List<Contest> {
-        return loadContests(
+        return getContests(
             platforms = platforms,
             dateConstraints = ContestDateConstraints()
         )
     }
 
-    suspend fun getContests(
+    suspend fun fetchContests(
         platforms: Collection<Contest.Platform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
         require(type.supportedPlatforms.containsAll(platforms))
         val platforms = platforms.toEnumSet()
-        return loadContests(
+        return getContests(
             platforms = platforms,
             dateConstraints = dateConstraints
         ).apply {
@@ -72,10 +71,10 @@ abstract class ContestsLoaderMultiple: ContestsLoader() {
         }
     }
 
-    final override suspend fun loadContests(
+    final override suspend fun getContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
-    ) = loadContests(platforms = setOf(platform), dateConstraints = dateConstraints)
+    ) = getContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }
 
 internal fun ContestDateConstraints.check(contest: Contest): Boolean =

@@ -9,7 +9,7 @@ import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 class AtCoderContestsLoader(val api: AtCoderApi): ContestsLoader() {
     override val type get() = ContestsLoaderType.atcoder_parse
 
-    override suspend fun loadContests(platform: Contest.Platform): List<Contest> =
+    override suspend fun getContests(platform: Contest.Platform): List<Contest> =
         api.getContests()
 }
 

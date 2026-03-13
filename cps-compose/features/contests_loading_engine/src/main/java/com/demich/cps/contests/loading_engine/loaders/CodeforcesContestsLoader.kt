@@ -9,7 +9,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
     override val type get() = ContestsLoaderType.codeforces_api
 
-    override suspend fun loadContests(
+    override suspend fun getContests(
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ) = api.getContests()

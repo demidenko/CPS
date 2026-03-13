@@ -16,7 +16,7 @@ class ClistContestsLoader(
 ): ContestsLoaderMultiple() {
     override val type get() = ContestsLoaderType.clist_api
 
-    override suspend fun loadContests(
+    override suspend fun getContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints
     ) = api.getContests(
