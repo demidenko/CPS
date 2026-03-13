@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.list_items.ContestItem
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.contestId
@@ -499,7 +499,7 @@ private fun loadingErrorsMessageState(): State<String> {
         combine(
             flow = viewModel.flowOfLoadingErrors(),
             flow2 = context.settingsUI.devModeEnabled.asFlow(),
-        ) { errors: List<Pair<ContestsLoaderType, Throwable>>, exposeAll: Boolean ->
+        ) { errors: List<Pair<ContestsFetchSource, Throwable>>, exposeAll: Boolean ->
             when {
                 errors.isEmpty() -> ""
                 else -> errors.groupBy(

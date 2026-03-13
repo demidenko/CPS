@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
@@ -97,7 +97,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
         Contest.platformsExceptUnknown.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableLoaders = ContestsLoaderType.entries.filter { platform in it.supportedPlatforms }.toEnumSet(),
+                availableSources = ContestsFetchSource.entries.filter { platform in it.supportedPlatforms }.toEnumSet(),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
@@ -109,7 +109,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
 @Composable
 private fun PlatformCheckRow(
     platform: Contest.Platform,
-    availableLoaders: Set<ContestsLoaderType>,
+    availableSources: Set<ContestsFetchSource>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -120,10 +120,10 @@ private fun PlatformCheckRow(
             style = CPSDefaults.MonospaceTextStyle,
             modifier = Modifier.weight(1f)
         )
-        if (isChecked && availableLoaders.size > 1) {
-            LoadersSetupButton(
+        if (isChecked && availableSources.size > 1) {
+            FetchSourcesSetupButton(
                 platform = platform,
-                availableLoaders = availableLoaders
+                fetchSources = availableSources
             )
         }
         CPSCheckBox(
@@ -134,18 +134,18 @@ private fun PlatformCheckRow(
 }
 
 @Composable
-private fun LoadersSetupButton(
+private fun FetchSourcesSetupButton(
     platform: Contest.Platform,
-    availableLoaders: Set<ContestsLoaderType>
+    fetchSources: Set<ContestsFetchSource>
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    CPSIconButton(icon = CPSIcons.SetupLoaders) {
+    CPSIconButton(icon = CPSIcons.SetupFetchSources) {
         showDialog = true
     }
     if (showDialog) {
-        LoadersPriorityListDialog(
+        FetchPriorityListDialog(
             platform = platform,
-            availableOptions = availableLoaders,
+            availableOptions = fetchSources,
             onDismissRequest = { showDialog = false }
         )
     }

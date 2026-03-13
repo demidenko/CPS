@@ -9,7 +9,7 @@ fun interface ContestsReceiver {
 
 data class ContestsFetchResult(
     val platform: Contest.Platform,
-    val loaderType: ContestsLoaderType,
+    val fetchSource: ContestsFetchSource,
     val result: Result<List<Contest>>
 )
 

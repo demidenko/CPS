@@ -3,7 +3,7 @@ package com.demich.cps.contests.settings
 import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.utils.jsonCPS
@@ -64,11 +64,11 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     }
 
     val contestsLoadersPriorityLists = jsonCPS.itemMap(name = "loading_priorities") {
-        ContestsLoaderType.entries.sortedWith(
-            compareByDescending<ContestsLoaderType> { it.supportedPlatforms.size }.thenBy { it.ordinal }
-        ).let { loaders ->
+        ContestsFetchSource.entries.sortedWith(
+            compareByDescending<ContestsFetchSource> { it.supportedPlatforms.size }.thenBy { it.ordinal }
+        ).let { sources ->
             Contest.platforms.associateWith { platform ->
-                loaders.filter { platform in it.supportedPlatforms }
+                sources.filter { platform in it.supportedPlatforms }
             }
         }
     }

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsListDao
 import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
@@ -37,7 +37,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }
 
-    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsLoaderType,Throwable>>> =
+    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource,Throwable>>> =
         combine(loadingStatuses, errors) { loadingStatuses, errors ->
             loadingStatuses
                 .filter { it.value == FAILED }
@@ -46,7 +46,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
         }
 
     private val loadingStatuses = MutableStateFlow(emptyMap<Contest.Platform, LoadingStatus>())
-    private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsLoaderType,Throwable>>>())
+    private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsFetchSource,Throwable>>>())
 
     private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
@@ -63,9 +63,9 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
         onStart {
             setLoadingStatus(platform, LOADING)
             errors.edit { remove(platform) }
-        }.onEach { (platform, loaderType, result) ->
+        }.onEach { (platform, source, result) ->
             result.onFailure { error ->
-                errors.edit { edit(platform) { add(loaderType to error) } }
+                errors.edit { edit(platform) { add(source to error) } }
             }
             lastStatus = result.toLoadingStatus()
         }.onCompletion {

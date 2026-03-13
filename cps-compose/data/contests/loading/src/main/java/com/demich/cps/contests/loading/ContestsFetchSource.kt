@@ -4,7 +4,7 @@ import com.demich.cps.contests.database.Contest
 import com.demich.kotlin_stdlib_boost.toEnumSet
 
 //TODO: proper name
-enum class ContestsLoaderType(val supportedPlatforms: Set<Contest.Platform>) {
+enum class ContestsFetchSource(val supportedPlatforms: Set<Contest.Platform>) {
     clist_api(Contest.platforms.toEnumSet()),
     codeforces_api(Contest.Platform.codeforces),
     atcoder_parse(Contest.Platform.atcoder),

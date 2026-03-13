@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -32,9 +32,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoadersPriorityListDialog(
+fun FetchPriorityListDialog(
     platform: Contest.Platform,
-    availableOptions: Set<ContestsLoaderType>,
+    availableOptions: Set<ContestsFetchSource>,
     onDismissRequest: () -> Unit
 ) {
     val context = context
@@ -50,7 +50,7 @@ fun LoadersPriorityListDialog(
         onDismissRequest = onDismissRequest
     ) {
         Text(text = "$platform fetch priority list = ")
-        LoadersPriorityList(
+        FetchPriorityList(
             modifier = Modifier.padding(vertical = 4.dp),
             priorityList = priorityList,
             availableOptions = availableOptions,
@@ -79,17 +79,17 @@ fun LoadersPriorityListDialog(
 }
 
 @Composable
-fun LoadersPriorityList(
+fun FetchPriorityList(
     modifier: Modifier = Modifier,
-    priorityList: List<ContestsLoaderType>,
-    availableOptions: Set<ContestsLoaderType>,
-    onListChange: (List<ContestsLoaderType>) -> Unit
+    priorityList: List<ContestsFetchSource>,
+    availableOptions: Set<ContestsFetchSource>,
+    onListChange: (List<ContestsFetchSource>) -> Unit
 ) {
     require(priorityList.isNotEmpty())
     Column(modifier = modifier) {
-        priorityList.forEachIndexed { index, loaderType ->
-            PriorityListItemLoader(
-                loaderType = loaderType,
+        priorityList.forEachIndexed { index, source ->
+            PriorityListItem(
+                fetchSource = source,
                 index = index + 1,
                 deleteEnabled = priorityList.size > 1,
                 onDeleteRequest = {
@@ -98,12 +98,12 @@ fun LoadersPriorityList(
                     onListChange(newList)
                 },
                 availableOptions = availableOptions,
-                onOptionSelected = { newType ->
-                    check(newType != loaderType)
+                onOptionSelected = { newSource ->
+                    check(newSource != source)
                     val newList = priorityList.toMutableList()
-                    val i = newList.indexOf(newType)
-                    val j = newList.indexOf(loaderType)
-                    if (i == -1) newList[j] = newType
+                    val i = newList.indexOf(newSource)
+                    val j = newList.indexOf(source)
+                    if (i == -1) newList[j] = newSource
                     else newList.swap(i, j)
                     onListChange(newList)
                 }
@@ -112,9 +112,9 @@ fun LoadersPriorityList(
         if (!priorityList.containsAll(availableOptions)) {
             PriorityListItemAdd(
                 availableOptions = availableOptions - priorityList,
-                onOptionSelected = { loaderType ->
-                    check(loaderType !in priorityList)
-                    onListChange(priorityList + loaderType)
+                onOptionSelected = { fetchSource ->
+                    check(fetchSource !in priorityList)
+                    onListChange(priorityList + fetchSource)
                 }
             )
         }
@@ -122,19 +122,19 @@ fun LoadersPriorityList(
 }
 
 @Composable
-private fun PriorityListItemLoader(
+private fun PriorityListItem(
     modifier: Modifier = Modifier,
-    loaderType: ContestsLoaderType,
+    fetchSource: ContestsFetchSource,
     index: Int,
     deleteEnabled: Boolean,
     onDeleteRequest: () -> Unit,
-    availableOptions: Set<ContestsLoaderType>,
-    onOptionSelected: (ContestsLoaderType) -> Unit
+    availableOptions: Set<ContestsFetchSource>,
+    onOptionSelected: (ContestsFetchSource) -> Unit
 ) {
     PriorityListItem(
         modifier = modifier,
-        text = "$index. $loaderType",
-        options = availableOptions - loaderType,
+        text = "$index. $fetchSource",
+        options = availableOptions - fetchSource,
         onOptionSelected = onOptionSelected,
         onDeleteRequest = onDeleteRequest.takeIf { deleteEnabled }
     )
@@ -143,8 +143,8 @@ private fun PriorityListItemLoader(
 @Composable
 private fun PriorityListItemAdd(
     modifier: Modifier = Modifier,
-    availableOptions: Set<ContestsLoaderType>,
-    onOptionSelected: (ContestsLoaderType) -> Unit
+    availableOptions: Set<ContestsFetchSource>,
+    onOptionSelected: (ContestsFetchSource) -> Unit
 ) {
     PriorityListItem(
         modifier = modifier,
@@ -158,8 +158,8 @@ private fun PriorityListItemAdd(
 private fun PriorityListItem(
     modifier: Modifier = Modifier,
     text: String,
-    options: Set<ContestsLoaderType>,
-    onOptionSelected: (ContestsLoaderType) -> Unit,
+    options: Set<ContestsFetchSource>,
+    onOptionSelected: (ContestsFetchSource) -> Unit,
     onDeleteRequest: (() -> Unit)? = null
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -171,7 +171,7 @@ private fun PriorityListItem(
         onDismissRequest = { showMenu = false },
         content = { Text(text = text) }
     ) {
-        LoadersMenu(
+        FetchSourcesMenu(
             options = options,
             onDeleteRequest = onDeleteRequest,
             onOptionSelected = onOptionSelected
@@ -180,10 +180,10 @@ private fun PriorityListItem(
 }
 
 @Composable
-private fun CPSDropdownMenuScope.LoadersMenu(
-    options: Set<ContestsLoaderType>,
+private fun CPSDropdownMenuScope.FetchSourcesMenu(
+    options: Set<ContestsFetchSource>,
     onDeleteRequest: (() -> Unit)?,
-    onOptionSelected: (ContestsLoaderType) -> Unit
+    onOptionSelected: (ContestsFetchSource) -> Unit
 ) {
     options.forEach { option ->
         CPSDropdownMenuItem(

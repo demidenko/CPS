@@ -2,12 +2,12 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.kotlin_stdlib_boost.toEnumSet
 
 
 abstract class ContestsLoader {
-    abstract val type: ContestsLoaderType
+    abstract val fetchSource: ContestsFetchSource
 
     protected open suspend fun getContests(
         platform: Contest.Platform,
@@ -29,7 +29,7 @@ abstract class ContestsLoader {
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        require(platform in type.supportedPlatforms)
+        require(platform in fetchSource.supportedPlatforms)
         return getContests(
             platform = platform,
             dateConstraints = dateConstraints
@@ -61,7 +61,7 @@ abstract class ContestsLoaderMultiple: ContestsLoader() {
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
-        require(type.supportedPlatforms.containsAll(platforms))
+        require(fetchSource.supportedPlatforms.containsAll(platforms))
         val platforms = platforms.toEnumSet()
         return getContests(
             platforms = platforms,

@@ -90,7 +90,7 @@ object CPSIcons {
     val RatingDown get() = Icons.AutoMirrored.Filled.TrendingDown
     val Insert get() = Icons.AutoMirrored.Rounded.ReadMore
     val EditList get() = Icons.Default.EditNote
-    val SetupLoaders get() = Icons.Default.PermDataSetting
+    val SetupFetchSources get() = Icons.Default.PermDataSetting
     val Star get() = Icons.Default.Star
     val Comments get() = Icons.Rounded.Forum
     val CommentSingle get() = Icons.Rounded.ChatBubble
