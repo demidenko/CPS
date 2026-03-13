@@ -9,11 +9,11 @@ import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
 import kotlin.time.Duration.Companion.seconds
 
-class ClistContestsLoader(
+class ClistContestsFetcher(
     val api: ClistApi,
     val apiAccess: ClistApi.ApiAccess,
     val resources: Collection<ClistResource>
-): ContestsLoaderMultiple() {
+): ContestsMultiplatformFetcher() {
     override val fetchSource get() = ContestsFetchSource.clist_api
 
     override suspend fun getContests(

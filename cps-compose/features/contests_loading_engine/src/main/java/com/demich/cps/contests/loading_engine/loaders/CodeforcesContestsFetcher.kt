@@ -6,7 +6,7 @@ import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 
-class CodeforcesContestsLoader(val api: CodeforcesApi): ContestsLoader() {
+class CodeforcesContestsFetcher(val api: CodeforcesApi): ContestsFetcher() {
     override val fetchSource get() = ContestsFetchSource.codeforces_api
 
     override suspend fun getContests(

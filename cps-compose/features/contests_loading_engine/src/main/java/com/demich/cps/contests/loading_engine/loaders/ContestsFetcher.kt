@@ -6,7 +6,7 @@ import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.kotlin_stdlib_boost.toEnumSet
 
 
-abstract class ContestsLoader {
+abstract class ContestsFetcher {
     abstract val fetchSource: ContestsFetchSource
 
     protected open suspend fun getContests(
@@ -39,7 +39,7 @@ abstract class ContestsLoader {
     }
 }
 
-abstract class ContestsLoaderMultiple: ContestsLoader() {
+abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
     protected open suspend fun getContests(
         platforms: Set<Contest.Platform>,
         dateConstraints: ContestDateConstraints

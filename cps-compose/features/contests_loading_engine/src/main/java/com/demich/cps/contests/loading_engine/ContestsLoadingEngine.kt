@@ -4,8 +4,8 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
-import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
-import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
+import com.demich.cps.contests.loading_engine.loaders.ContestsFetcher
+import com.demich.cps.contests.loading_engine.loaders.ContestsMultiplatformFetcher
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -18,11 +18,11 @@ import kotlinx.coroutines.sync.withLock
 fun contestsFetchFlows(
     setup: Map<Contest.Platform, List<ContestsFetchSource>>,
     dateConstraints: ContestDateConstraints,
-    createLoader: (ContestsFetchSource) -> ContestsLoader
+    createFetcher: (ContestsFetchSource) -> ContestsFetcher
 ): Map<Contest.Platform, Flow<ContestsFetchResult>> {
-    val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
+    val memoizer = MultiplatformMemoizer(setup, dateConstraints)
 
-    val loaders = mutableMapOf<ContestsFetchSource, ContestsLoader>()
+    val fetchers = mutableMapOf<ContestsFetchSource, ContestsFetcher>()
 
     return setup.mapValues { (platform, priorities) ->
         contestsFetchFlow(
@@ -30,7 +30,7 @@ fun contestsFetchFlows(
             priorities = priorities,
             dateConstraints = dateConstraints,
             memoizer = memoizer,
-            getLoader = { loaders.getOrPut(it) { createLoader(it) } }
+            getFetcher = { fetchers.getOrPut(it) { createFetcher(it) } }
         )
     }
 }
@@ -39,18 +39,18 @@ private fun contestsFetchFlow(
     platform: Contest.Platform,
     priorities: List<ContestsFetchSource>,
     dateConstraints: ContestDateConstraints,
-    memoizer: MultipleLoadersMemoizer,
-    getLoader: (ContestsFetchSource) -> ContestsLoader
+    memoizer: MultiplatformMemoizer,
+    getFetcher: (ContestsFetchSource) -> ContestsFetcher
 ) = flow {
     for (fetchSource in priorities) {
-        val loader = getLoader(fetchSource)
+        val fetcher = getFetcher(fetchSource)
         val result: Result<List<Contest>> =
-            if (loader is ContestsLoaderMultiple) {
-                memoizer.getContestsResult(loader).map {
+            if (fetcher is ContestsMultiplatformFetcher) {
+                memoizer.getContestsResult(fetcher).map {
                     it.getOrElse(platform) { emptyList() }
                 }
             } else {
-                loader.runCatching {
+                fetcher.runCatching {
                     fetchContests(platform = platform, dateConstraints = dateConstraints)
                 }
             }
@@ -76,23 +76,23 @@ private fun Contest.correctTitle(): Contest {
 
 private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
 
-private class MultipleLoadersMemoizer(
+private class MultiplatformMemoizer(
     private val setup: Map<Contest.Platform, List<ContestsFetchSource>>,
     private val dateConstraints: ContestDateConstraints
 ) {
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
-    suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsResult {
+    suspend fun getContestsResult(fetcher: ContestsMultiplatformFetcher): ContestsResult {
         return mutex.withLock {
-            results.getOrPut(loader.fetchSource) {
+            results.getOrPut(fetcher.fetchSource) {
                 coroutineScope {
-                    async { loader.getContests() }
+                    async { fetcher.getContests() }
                 }
             }
         }.await()
     }
 
-    private suspend fun ContestsLoaderMultiple.getContests(): ContestsResult {
+    private suspend fun ContestsMultiplatformFetcher.getContests(): ContestsResult {
         val platforms = setup.mapNotNull { (platform, sources) ->
             if (fetchSource in sources) platform else null
         }

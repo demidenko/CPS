@@ -6,7 +6,7 @@ import com.demich.cps.platforms.api.dmoj.DmojApi
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
-class DmojContestsLoader(val api: DmojApi): ContestsLoader() {
+class DmojContestsFetcher(val api: DmojApi): ContestsFetcher() {
     override val fetchSource get() = ContestsFetchSource.dmoj_api
 
     override suspend fun getContests(platform: Contest.Platform) =

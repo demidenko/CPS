@@ -4,10 +4,10 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
-import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
-import com.demich.cps.contests.loading_engine.loaders.ClistContestsLoader
-import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsLoader
-import com.demich.cps.contests.loading_engine.loaders.DmojContestsLoader
+import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsFetcher
+import com.demich.cps.contests.loading_engine.loaders.ClistContestsFetcher
+import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsFetcher
+import com.demich.cps.contests.loading_engine.loaders.DmojContestsFetcher
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient
@@ -68,16 +68,16 @@ private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<
         contestsFetchFlows(
             setup = contestsLoadersPriorityLists.value.filterKeys { it in platforms },
             dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
-        ) { loaderType ->
-            when (loaderType) {
-                clist_api -> ClistContestsLoader(
+        ) { fetchSource ->
+            when (fetchSource) {
+                clist_api -> ClistContestsFetcher(
                     api = ClistClient,
                     apiAccess = clistApiAccess.value,
                     resources = clistAdditionalResources.value
                 )
-                codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
-                atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
-                dmoj_api -> DmojContestsLoader(api = DmojClient)
+                codeforces_api -> CodeforcesContestsFetcher(api = CodeforcesClient)
+                atcoder_parse -> AtCoderContestsFetcher(api = AtCoderClient)
+                dmoj_api -> DmojContestsFetcher(api = DmojClient)
             }
         }
     }
