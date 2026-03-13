@@ -3,7 +3,7 @@ package com.demich.cps.contests.loading_engine
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoader
 import com.demich.cps.contests.loading_engine.loaders.ContestsLoaderMultiple
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
@@ -16,13 +16,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 fun contestsFetchFlows(
-    setup: Map<Contest.Platform, List<ContestsLoaderType>>,
+    setup: Map<Contest.Platform, List<ContestsFetchSource>>,
     dateConstraints: ContestDateConstraints,
-    createLoader: (ContestsLoaderType) -> ContestsLoader
+    createLoader: (ContestsFetchSource) -> ContestsLoader
 ): Map<Contest.Platform, Flow<ContestsFetchResult>> {
     val memoizer = MultipleLoadersMemoizer(setup, dateConstraints)
 
-    val loaders = mutableMapOf<ContestsLoaderType, ContestsLoader>()
+    val loaders = mutableMapOf<ContestsFetchSource, ContestsLoader>()
 
     return setup.mapValues { (platform, priorities) ->
         contestsFetchFlow(
@@ -37,13 +37,13 @@ fun contestsFetchFlows(
 
 private fun contestsFetchFlow(
     platform: Contest.Platform,
-    priorities: List<ContestsLoaderType>,
+    priorities: List<ContestsFetchSource>,
     dateConstraints: ContestDateConstraints,
     memoizer: MultipleLoadersMemoizer,
-    getLoader: (ContestsLoaderType) -> ContestsLoader
+    getLoader: (ContestsFetchSource) -> ContestsLoader
 ) = flow {
-    for (loaderType in priorities) {
-        val loader = getLoader(loaderType)
+    for (fetchSource in priorities) {
+        val loader = getLoader(fetchSource)
         val result: Result<List<Contest>> =
             if (loader is ContestsLoaderMultiple) {
                 memoizer.getContestsResult(loader).map {
@@ -57,7 +57,7 @@ private fun contestsFetchFlow(
 
         emit(ContestsFetchResult(
             platform = platform,
-            loaderType = loaderType,
+            fetchSource = fetchSource,
             result = result.map { it.map { it.correctTitle() } }
         ))
 
@@ -77,14 +77,14 @@ private fun Contest.correctTitle(): Contest {
 private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
 
 private class MultipleLoadersMemoizer(
-    private val setup: Map<Contest.Platform, List<ContestsLoaderType>>,
+    private val setup: Map<Contest.Platform, List<ContestsFetchSource>>,
     private val dateConstraints: ContestDateConstraints
 ) {
     private val mutex = Mutex()
-    private val results = mutableMapOf<ContestsLoaderType, Deferred<ContestsResult>>()
+    private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
     suspend fun getContestsResult(loader: ContestsLoaderMultiple): ContestsResult {
         return mutex.withLock {
-            results.getOrPut(loader.type) {
+            results.getOrPut(loader.fetchSource) {
                 coroutineScope {
                     async { loader.getContests() }
                 }
@@ -93,8 +93,8 @@ private class MultipleLoadersMemoizer(
     }
 
     private suspend fun ContestsLoaderMultiple.getContests(): ContestsResult {
-        val platforms = setup.mapNotNull { (platform, loaderTypes) ->
-            if (type in loaderTypes) platform else null
+        val platforms = setup.mapNotNull { (platform, sources) ->
+            if (fetchSource in sources) platform else null
         }
         return runCatching {
             fetchContests(

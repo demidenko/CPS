@@ -2,7 +2,7 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsLoaderType
+import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -14,7 +14,7 @@ class ClistContestsLoader(
     val apiAccess: ClistApi.ApiAccess,
     val resources: Collection<ClistResource>
 ): ContestsLoaderMultiple() {
-    override val type get() = ContestsLoaderType.clist_api
+    override val fetchSource get() = ContestsFetchSource.clist_api
 
     override suspend fun getContests(
         platforms: Set<Contest.Platform>,

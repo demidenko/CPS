@@ -2,7 +2,6 @@ package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsLoaderType
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
 import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsLoader
@@ -71,14 +70,14 @@ private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<
             dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
         ) { loaderType ->
             when (loaderType) {
-                ContestsLoaderType.clist_api -> ClistContestsLoader(
+                clist_api -> ClistContestsLoader(
                     api = ClistClient,
                     apiAccess = clistApiAccess.value,
                     resources = clistAdditionalResources.value
                 )
-                ContestsLoaderType.codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
-                ContestsLoaderType.atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
-                ContestsLoaderType.dmoj_api -> DmojContestsLoader(api = DmojClient)
+                codeforces_api -> CodeforcesContestsLoader(api = CodeforcesClient)
+                atcoder_parse -> AtCoderContestsLoader(api = AtCoderClient)
+                dmoj_api -> DmojContestsLoader(api = DmojClient)
             }
         }
     }
