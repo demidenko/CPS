@@ -46,7 +46,7 @@ private fun contestsFetchFlow(
         val fetcher = getFetcher(fetchSource)
         val result: Result<List<Contest>> =
             if (fetcher is ContestsMultiplatformFetcher) {
-                memoizer.getContestsResult(fetcher).map {
+                memoizer.getContests(fetcher).map {
                     it.getOrElse(platform) { emptyList() }
                 }
             } else {
@@ -82,17 +82,17 @@ private class MultiplatformMemoizer(
 ) {
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
-    suspend fun getContestsResult(fetcher: ContestsMultiplatformFetcher): ContestsResult {
+    suspend fun getContests(fetcher: ContestsMultiplatformFetcher): ContestsResult {
         return mutex.withLock {
             results.getOrPut(fetcher.fetchSource) {
                 coroutineScope {
-                    async { fetcher.getContests() }
+                    async { fetcher.fetchAllPlatforms() }
                 }
             }
         }.await()
     }
 
-    private suspend fun ContestsMultiplatformFetcher.getContests(): ContestsResult {
+    private suspend fun ContestsMultiplatformFetcher.fetchAllPlatforms(): ContestsResult {
         val platforms = setup.mapNotNull { (platform, sources) ->
             if (fetchSource in sources) platform else null
         }
