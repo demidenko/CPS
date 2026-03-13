@@ -29,7 +29,7 @@ abstract class ContestsFetcher {
         platform: Contest.Platform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        require(platform in fetchSource.supportedPlatforms)
+        require(platform in fetchSource.platforms)
         return getContests(
             platform = platform,
             dateConstraints = dateConstraints
@@ -61,7 +61,7 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
-        require(fetchSource.supportedPlatforms.containsAll(platforms))
+        require(fetchSource.platforms.containsAll(platforms))
         val platforms = platforms.toEnumSet()
         return getContests(
             platforms = platforms,

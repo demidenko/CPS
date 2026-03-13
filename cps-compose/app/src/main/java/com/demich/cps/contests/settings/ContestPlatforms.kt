@@ -97,7 +97,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
         Contest.platformsExceptUnknown.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableSources = ContestsFetchSource.entries.filter { platform in it.supportedPlatforms }.toEnumSet(),
+                availableSources = ContestsFetchSource.entries.filter { platform in it.platforms }.toEnumSet(),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )

@@ -65,10 +65,10 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     val fetchPriorityLists = jsonCPS.itemMap(name = "loading_priorities") {
         ContestsFetchSource.entries.sortedWith(
-            compareByDescending<ContestsFetchSource> { it.supportedPlatforms.size }.thenBy { it.ordinal }
+            compareByDescending<ContestsFetchSource> { it.platforms.size }.thenBy { it.ordinal }
         ).let { sources ->
             Contest.platforms.associateWith { platform ->
-                sources.filter { platform in it.supportedPlatforms }
+                sources.filter { platform in it.platforms }
             }
         }
     }
