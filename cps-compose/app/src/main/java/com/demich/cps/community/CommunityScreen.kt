@@ -12,7 +12,7 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
-import com.demich.cps.navigation.cpsScreenTitle
+import com.demich.cps.navigation.cpsScreenTitleOf
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
@@ -75,7 +75,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
 
     screenTitle = remember(controller) {
         ScreenTitleState {
-            cpsScreenTitle("community", "codeforces", controller.currentTab.name)
+            cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
         }
     }
 

@@ -7,13 +7,13 @@ fun interface ScreenTitleState {
     fun title(): String
 }
 
-private fun Iterable<String>.makeScreenTitle(): String =
+private fun Iterable<String>.joinToScreenTitle(): String =
     joinToString(prefix = "::", separator = ".", transform = String::lowercase)
 
-fun cpsScreenTitle(vararg strings: String) = strings.asIterable().makeScreenTitle()
+fun cpsScreenTitleOf(vararg strings: String) = strings.asIterable().joinToScreenTitle()
 
 data class ScreenStaticTitleState(private val tokens: List<String>): ScreenTitleState {
     constructor(vararg strings: String): this(strings.asList())
 
-    override fun title() = tokens.makeScreenTitle()
+    override fun title() = tokens.joinToScreenTitle()
 }

@@ -45,7 +45,7 @@ import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
-import com.demich.cps.navigation.cpsScreenTitle
+import com.demich.cps.navigation.cpsScreenTitleOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.AnimatedVisibleByNotNull
@@ -307,8 +307,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     screenTitle = remember(viewState) {
         ScreenTitleState {
             when (viewState.contestsPage) {
-                Finished -> cpsScreenTitle("contests", "finished")
-                RunningOrFuture -> cpsScreenTitle("contests")
+                Finished -> cpsScreenTitleOf("contests", "finished")
+                RunningOrFuture -> cpsScreenTitleOf("contests")
             }
         }
     }
