@@ -17,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
 import com.demich.cps.navigation.CPSNavigator
@@ -117,7 +117,7 @@ fun ContentLoadingButton(
 private fun TestHandles(
     modifier: Modifier = Modifier
 ) {
-    val managers = remember { allRatedAccountManagers }
+    val managers = remember { AccountManager.ratedEntries() }
 
     var selectedPlatform by rememberSaveable {
         mutableStateOf(ProfilePlatform.codeforces)

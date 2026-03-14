@@ -24,7 +24,6 @@ import com.demich.cps.accounts.managers.CListAccountManager
 import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.ProfileResultWithManager
 import com.demich.cps.accounts.managers.accountManagerOf
-import com.demich.cps.accounts.managers.allAccountManagers
 import com.demich.cps.accounts.managers.flowWithProfileResult
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.UserInfo
@@ -122,7 +121,7 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
 private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
-            flows = allAccountManagers.map { it.flowWithProfileResult(this) }
+            flows = AccountManager.entries().map { it.flowWithProfileResult(this) }
         ) {
             it.filterNotNull()
         }.combine(settingsUI.profilesOrder.asFlow()) { profiles, order ->
@@ -157,14 +156,14 @@ private fun ReloadProfilesButton(
     val viewModel = profilesViewModel()
 
     val loadingStatus by collectAsState {
-        viewModel.flowOfLoadingStatus(allAccountManagers)
+        viewModel.flowOfLoadingStatus(AccountManager.entries())
     }
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
         enabled = profiles.isNotEmpty(),
         onClick = {
-            allAccountManagers.forEach { viewModel.reload(it, context) }
+            AccountManager.entries().forEach { viewModel.reload(it, context) }
         }
     )
 }
@@ -209,7 +208,7 @@ private fun AddProfileButton(
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
             val platforms = remember(availableProfiles) {
-                val all = allAccountManagers.map { it.platform }
+                val all = AccountManager.entries().map { it.platform }
                 val available = availableProfiles.map { it.platform }
                 all - available + ProfilePlatform.clist
             }

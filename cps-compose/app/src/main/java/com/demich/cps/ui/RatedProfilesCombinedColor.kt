@@ -8,9 +8,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.accounts.HandleColor
+import com.demich.cps.accounts.managers.AccountManager
 import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.accounts.managers.RatedAccountManager
-import com.demich.cps.accounts.managers.allRatedAccountManagers
 import com.demich.cps.accounts.managers.colorFor
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
@@ -104,7 +104,7 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: C
     dataStore(context).profile.asFlow().map { getRank(it) }
 
 private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
-    combine(allRatedAccountManagers.map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
+    combine(AccountManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
 
 private class RankGetter(
     private val validRanks: List<RatedRank>,

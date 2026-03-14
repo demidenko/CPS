@@ -24,22 +24,6 @@ enum class ProfilePlatform {
     clist
 }
 
-val allAccountManagers: List<AccountManager<out UserInfo>>
-    get() = listOf(
-        CodeforcesAccountManager(),
-        AtCoderAccountManager(),
-        CodeChefAccountManager(),
-        DmojAccountManager(),
-        ACMPAccountManager(),
-        TimusAccountManager()
-    )
-
-val allRatedAccountManagers: List<RatedAccountManager<out RatedUserInfo>>
-    get() = allAccountManagers.filterIsInstance<RatedAccountManager<*>>()
-
-fun accountManagerOf(platform: ProfilePlatform) =
-    allAccountManagers.first { it.platform == platform }
-
 abstract class AccountManager<U: UserInfo> {
     abstract val platform: ProfilePlatform
 
@@ -73,7 +57,25 @@ abstract class AccountManager<U: UserInfo> {
             PanelContent(profileResult)
         }
     }
+
+    companion object {
+        fun entries(): List<AccountManager<out UserInfo>> =
+            listOf(
+                CodeforcesAccountManager(),
+                AtCoderAccountManager(),
+                CodeChefAccountManager(),
+                DmojAccountManager(),
+                ACMPAccountManager(),
+                TimusAccountManager()
+            )
+
+        fun ratedEntries(): List<RatedAccountManager<out RatedUserInfo>> =
+            entries().filterIsInstance<RatedAccountManager<*>>()
+    }
 }
+
+fun accountManagerOf(platform: ProfilePlatform) =
+    AccountManager.entries().first { it.platform == platform }
 
 data class ProfileResultWithManager<U: UserInfo>(
     val profileResult: ProfileResult<U>,
