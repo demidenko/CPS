@@ -14,6 +14,7 @@ import com.demich.cps.profiles.managers.AccountManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.RatedAccountManager
 import com.demich.cps.profiles.managers.colorFor
+import com.demich.cps.profiles.managers.getHandleColor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull

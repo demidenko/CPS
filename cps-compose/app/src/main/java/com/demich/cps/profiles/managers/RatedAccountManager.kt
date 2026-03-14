@@ -14,14 +14,10 @@ import com.demich.cps.profiles.userinfo.ratingToString
 import com.demich.cps.ui.theme.CPSColors
 import kotlin.time.Instant
 
-abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
+abstract class RatedAccountManager<U: RatedUserInfo>: AccountManager<U>() {
     override val userIdTitle get() = "handle"
 
     abstract val ratingsUpperBounds: List<HandleColorBound>
-    fun getHandleColor(rating: Int): HandleColor =
-        ratingsUpperBounds
-            .firstOrNull { rating < it.ratingUpperBound }?.handleColor
-            ?: HandleColor.RED
 
     abstract fun originalColor(handleColor: HandleColor): Color
 
@@ -33,10 +29,6 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
                 fontWeight = FontWeight.Bold
             )
         )
-
-    fun makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
-        if (rating == null) AnnotatedString(text = text)
-        else makeRatedSpan(text, rating, cpsColors)
 
     final override fun makeUserInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString =
         with(userInfo) {

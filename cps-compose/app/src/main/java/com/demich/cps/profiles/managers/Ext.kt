@@ -11,6 +11,10 @@ import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
+fun RatedAccountManager<*>.getHandleColor(rating: Int): HandleColor =
+    ratingsUpperBounds
+        .firstOrNull { rating < it.ratingUpperBound }
+        ?.handleColor ?: RED
 
 context(manager: RatedAccountManager<*>)
 fun CPSColors.colorFor(handleColor: HandleColor): Color =
@@ -25,6 +29,10 @@ fun CPSColors.colorFor(rating: Int): Color =
 @ReadOnlyComposable
 fun RatedAccountManager<*>.colorFor(handleColor: HandleColor): Color =
     cpsColors.colorFor(handleColor = handleColor)
+
+fun RatedAccountManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
+    if (rating == null) AnnotatedString(text = text)
+    else makeRatedSpan(text, rating, cpsColors)
 
 @Composable
 @ReadOnlyComposable
