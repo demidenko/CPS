@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,13 +30,14 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundColor
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.utils.writeOnlyProperty
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun rememberCPSNavigator(
@@ -44,7 +46,8 @@ fun rememberCPSNavigator(
     val subtitleState = remember { mutableStateOf<ScreenTitleState>(ScreenStaticTitleState()) }
 
     val currentScreenState: State<Screen?> =
-        collectAsState { navController.flowOfCurrentScreen() }
+        remember { navController.currentScreenFlow }
+            .collectAsState(initial = null)
 
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
@@ -58,13 +61,8 @@ fun rememberCPSNavigator(
     )
 }
 
-private fun NavController.flowOfCurrentScreen(): Flow<Screen?> =
-    flow {
-        emit(null)
-        currentBackStackEntryFlow.collect {
-            emit(it.getScreen())
-        }
-    }
+private val NavController.currentScreenFlow: Flow<Screen>
+    get() = currentBackStackEntryFlow.map { it.getScreen() }
 
 @Stable
 class CPSNavigator(
@@ -76,7 +74,11 @@ class CPSNavigator(
 ) {
     val currentScreen by currentScreenState
 
-    fun flowOfCurrentScreen(): Flow<Screen?> = navController.flowOfCurrentScreen()
+    fun flowOfCurrentScreen(): Flow<Screen?> =
+        flow {
+            emit(null)
+            emitAll(navController.currentScreenFlow)
+        }
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen !is Screen.NoBottomBarScreen
