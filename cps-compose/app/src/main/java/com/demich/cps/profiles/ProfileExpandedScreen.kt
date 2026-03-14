@@ -28,6 +28,42 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
 
+@Composable
+fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedScreen(
+    onOpenSettings: () -> Unit,
+    navigateBack: () -> Unit
+) {
+    val platform = screen.platform
+    val manager = remember(platform) { accountManagerOf(platform) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+
+    screenTitle = ScreenStaticTitleState("profiles", platform.name)
+
+    menu = profileExpandedMenuBuilder(
+        platform = platform,
+        onShowDeleteDialog = { showDeleteDialog = true },
+        onOpenSettings = onOpenSettings
+    )
+
+    ProfileExpandedContent(
+        manager = manager,
+        setBottomBarContent = { bottomBar = it }
+    )
+
+    if (showDeleteDialog) {
+        val context = context
+        val viewModel = profilesViewModel()
+
+        CPSDeleteDialog(
+            title = "Delete $platform profile?",
+            onConfirmRequest = {
+                viewModel.delete(manager, context)
+                navigateBack()
+            },
+            onDismissRequest = { showDeleteDialog = false }
+        )
+    }
+}
 
 @Composable
 private fun <U: UserInfo> ProfileExpandedContent(
@@ -65,36 +101,5 @@ private fun profileExpandedMenuBuilder(
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }
         }
-    }
-}
-
-@Composable
-fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedScreen(
-    onOpenSettings: () -> Unit,
-    onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
-) {
-    val platform = screen.platform
-    val manager = remember(platform) { accountManagerOf(platform) }
-    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-
-    screenTitle = ScreenStaticTitleState("profiles", platform.name)
-
-    menu = profileExpandedMenuBuilder(
-        platform = platform,
-        onShowDeleteDialog = { showDeleteDialog = true },
-        onOpenSettings = onOpenSettings
-    )
-
-    ProfileExpandedContent(
-        manager = manager,
-        setBottomBarContent = { bottomBar = it }
-    )
-
-    if (showDeleteDialog) {
-        CPSDeleteDialog(
-            title = "Delete $platform profile?",
-            onConfirmRequest = { onDeleteRequest(manager) },
-            onDismissRequest = { showDeleteDialog = false }
-        )
     }
 }

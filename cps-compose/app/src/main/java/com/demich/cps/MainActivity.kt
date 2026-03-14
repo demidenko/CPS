@@ -27,10 +27,8 @@ import com.demich.cps.profiles.NavContentProfilesExpandedScreen
 import com.demich.cps.profiles.NavContentProfilesScreen
 import com.demich.cps.profiles.NavContentProfilesSettingsScreen
 import com.demich.cps.profiles.managers.CodeforcesAccountManager
-import com.demich.cps.profiles.profilesViewModel
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
-import com.demich.cps.utils.context
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,15 +70,12 @@ private fun CPSContent() {
         }
 
         navigator.navEntry<Screen.ProfileExpanded> {
-            val context = context
-            val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
                 onOpenSettings = {
                     val platform = screen.platform
                     navigator.navigateTo(Screen.ProfileSettings(platform))
                 },
-                onDeleteRequest = { manager ->
-                    profilesViewModel.delete(manager, context)
+                navigateBack = {
                     navigator.popBack()
                 }
             )
