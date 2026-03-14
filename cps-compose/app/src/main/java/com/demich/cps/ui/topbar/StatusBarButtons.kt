@@ -80,7 +80,7 @@ internal fun StatusBarButtons() {
                 icon = CPSIcons.MoveDown,
                 onClick = { showPopup = true }
             )
-            StatusBarAccountsPopup(
+            StatusBarPlatformsPopup(
                 expanded = showPopup,
                 rankSelector = rankSelector,
                 onSetRankSelector = {
@@ -104,7 +104,7 @@ internal fun StatusBarButtons() {
 
 
 @Composable
-private fun StatusBarAccountsPopup(
+private fun StatusBarPlatformsPopup(
     expanded: Boolean,
     rankSelector: UISettingsDataStore.StatusBarRankSelector,
     onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
