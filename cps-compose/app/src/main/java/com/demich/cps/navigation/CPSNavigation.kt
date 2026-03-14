@@ -112,16 +112,16 @@ class CPSNavigator(
                 if (screen == currentScreen) block(it)
             }
 
+        var screenTitle: ScreenTitleState by screenScopeProperty {
+            titleState.value = it
+        }
+
         var menu: CPSMenuBuilder? by screenScopeProperty {
             menuBuilderState.value = it
         }
 
         var bottomBar: AdditionalBottomBarBuilder? by screenScopeProperty {
             bottomBarBuilderState.value = it
-        }
-
-        var screenTitle: ScreenTitleState by screenScopeProperty {
-            titleState.value = it
         }
     }
 
