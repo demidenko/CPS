@@ -218,7 +218,7 @@ private fun hidingState(
 }
 
 @Composable
-fun SmallAccountPanelTwoLines(
+fun SmallProfilePanelTwoLines(
     title: @Composable () -> Unit,
     additionalTitle: @Composable () -> Unit
 ) {
@@ -231,7 +231,7 @@ fun SmallAccountPanelTwoLines(
 }
 
 @Composable
-fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
+fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedProfilePanel(
     profileResult: ProfileResult<U>,
     title: @Composable () -> Unit = {
         Text(
@@ -254,18 +254,18 @@ fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedAccountPanel(
         }
     }
 ) {
-    SmallAccountPanelTwoLines(
+    SmallProfilePanelTwoLines(
         title = title,
         additionalTitle = additionalTitle
     )
 }
 
 @Composable
-fun SmallAccountPanelTypeArchive(
+fun SmallProfilePanelTypeArchive(
     title: String,
     infoArgs: List<Pair<String, String>>
 ) {
-    SmallAccountPanelTwoLines(
+    SmallProfilePanelTwoLines(
         title = {
             Text(
                 text = title,

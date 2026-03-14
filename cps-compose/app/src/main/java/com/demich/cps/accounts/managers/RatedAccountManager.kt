@@ -7,7 +7,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.accounts.HandleColor
 import com.demich.cps.accounts.HandleColorBound
-import com.demich.cps.accounts.SmallRatedAccountPanel
+import com.demich.cps.accounts.SmallRatedProfilePanel
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.RatedUserInfo
 import com.demich.cps.accounts.userinfo.ratingToString
@@ -49,7 +49,7 @@ abstract class RatedAccountManager<U: RatedUserInfo>(): AccountManager<U>() {
 
     @Composable
     override fun PanelContent(profileResult: ProfileResult<U>) =
-        SmallRatedAccountPanel(profileResult)
+        SmallRatedProfilePanel(profileResult)
 
     abstract val rankedHandleColors: Array<HandleColor>
 

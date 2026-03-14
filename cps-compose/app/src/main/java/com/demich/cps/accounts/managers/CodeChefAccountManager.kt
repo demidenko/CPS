@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.accounts.HandleColor
-import com.demich.cps.accounts.SmallAccountPanelTwoLines
+import com.demich.cps.accounts.SmallProfilePanelTwoLines
 import com.demich.cps.accounts.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.accounts.until
 import com.demich.cps.accounts.userinfo.CodeChefUserInfo
@@ -156,7 +156,7 @@ class CodeChefAccountManager :
 
     @Composable
     override fun PanelContent(profileResult: ProfileResult<CodeChefUserInfo>) {
-        SmallAccountPanelTwoLines(
+        SmallProfilePanelTwoLines(
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     profileResult.userInfoOrNull()?.rating?.let {

@@ -3,7 +3,7 @@ package com.demich.cps.accounts.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.demich.cps.accounts.SmallAccountPanelTypeArchive
+import com.demich.cps.accounts.SmallProfilePanelTypeArchive
 import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.accounts.userinfo.TimusUserInfo
 import com.demich.cps.accounts.userinfo.UserSuggestion
@@ -48,7 +48,7 @@ class TimusAccountManager :
     override fun PanelContent(profileResult: ProfileResult<TimusUserInfo>) {
         if (profileResult is ProfileResult.Success) {
             val userInfo = profileResult.userInfo
-            SmallAccountPanelTypeArchive(
+            SmallProfilePanelTypeArchive(
                 title = userInfo.userName,
                 infoArgs = listOf(
                     "solved" to userInfo.solvedTasks.toString(),
@@ -56,7 +56,7 @@ class TimusAccountManager :
                 )
             )
         } else {
-            SmallAccountPanelTypeArchive(
+            SmallProfilePanelTypeArchive(
                 title = profileResult.userId,
                 infoArgs = emptyList()
             )
