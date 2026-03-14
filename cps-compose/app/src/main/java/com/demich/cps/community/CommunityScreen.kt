@@ -44,7 +44,6 @@ private fun communityBottomBarBuilder(
 }
 
 private fun communityMenuBuilder(
-    controller: CodeforcesCommunityController,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ): CPSMenuBuilder = {
@@ -58,10 +57,11 @@ private fun communityMenuBuilder(
 
     val followEnabled by collectItemAsState { context.settingsCommunity.codeforcesFollowEnabled }
     if (followEnabled) {
-        CPSDropdownMenuItem(title = "Follow List", icon = CPSIcons.Profiles) {
-            controller.updateFollowUsersInfo(context)
-            onOpenFollowList()
-        }
+        CPSDropdownMenuItem(
+            title = "Follow List",
+            icon = CPSIcons.Profiles,
+            onClick = onOpenFollowList
+        )
     }
 }
 
@@ -70,6 +70,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ) {
+    val context = context
     val controller = rememberCodeforcesCommunityController()
 
     screenTitle = remember(controller) {
@@ -79,9 +80,11 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     }
 
     menu = communityMenuBuilder(
-        controller = controller,
         onOpenSettings = onOpenSettings,
-        onOpenFollowList = onOpenFollowList
+        onOpenFollowList = {
+            controller.updateFollowUsersInfo(context)
+            onOpenFollowList()
+        }
     )
 
     CommunityScreen(controller = controller)
