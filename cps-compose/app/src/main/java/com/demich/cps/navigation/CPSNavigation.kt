@@ -40,22 +40,21 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun rememberCPSNavigator(
-    navController: NavHostController = rememberNavController()
-): CPSNavigator {
-    val subtitleState = remember { mutableStateOf<ScreenTitleState>(ScreenStaticTitleState()) }
+fun rememberCPSNavigator(): CPSNavigator {
+    val navController: NavHostController = rememberNavController()
 
     val currentScreenState: State<Screen?> =
         remember { navController.currentScreenFlow }
             .collectAsState(initial = null)
 
+    val titleState = remember { mutableStateOf<ScreenTitleState>(ScreenStaticTitleState()) }
     val menuBuilderState = remember { mutableStateOf<CPSMenuBuilder?>(null) }
     val bottomBarBuilderState = remember { mutableStateOf<AdditionalBottomBarBuilder?>(null) }
 
     return CPSNavigator(
         navController = navController,
         currentScreenState = currentScreenState,
-        titleState = subtitleState,
+        titleState = titleState,
         menuBuilderState = menuBuilderState,
         bottomBarBuilderState = bottomBarBuilderState
     )
