@@ -23,17 +23,17 @@ sealed interface Screen {
     data object Profiles: RootScreen
 
     interface ProfileScreen {
-        val profilePlatform: ProfilePlatform
+        val platform: ProfilePlatform
     }
 
     @Serializable
-    data class ProfileExpanded(override val profilePlatform: ProfilePlatform): Screen, ProfileScreen {
+    data class ProfileExpanded(override val platform: ProfilePlatform): Screen, ProfileScreen {
         override val rootScreen: RootScreen
             get() = Profiles
     }
 
     @Serializable
-    data class ProfileSettings(override val profilePlatform: ProfilePlatform): Screen, ProfileScreen, NoBottomBarScreen {
+    data class ProfileSettings(override val platform: ProfilePlatform): Screen, ProfileScreen, NoBottomBarScreen {
         override val rootScreen: RootScreen
             get() = Profiles
     }

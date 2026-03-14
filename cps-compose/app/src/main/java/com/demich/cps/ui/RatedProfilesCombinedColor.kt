@@ -121,7 +121,7 @@ private class RankGetter(
 
     operator fun get(screen: Screen?): RatedRank? =
         when (screen) {
-            is Screen.ProfileScreen -> validRanks.find { it.manager.platform == screen.profilePlatform }
+            is Screen.ProfileScreen -> validRanks.find { it.manager.platform == screen.platform }
             else -> rank
         }
 }

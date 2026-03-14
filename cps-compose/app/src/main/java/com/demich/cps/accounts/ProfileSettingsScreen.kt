@@ -40,7 +40,7 @@ private fun ProfileSettingsScreen(
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsScreen() {
-    val platform = screen.profilePlatform
+    val platform = screen.platform
     
     screenTitle = ScreenStaticTitleState("profiles", platform.name, "settings")
     

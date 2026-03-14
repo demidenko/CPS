@@ -73,7 +73,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     onOpenSettings: () -> Unit,
     onDeleteRequest: (AccountManager<out UserInfo>) -> Unit
 ) {
-    val platform = screen.profilePlatform
+    val platform = screen.platform
     val manager = remember(platform) { accountManagerOf(platform) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 

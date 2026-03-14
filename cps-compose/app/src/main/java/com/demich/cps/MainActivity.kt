@@ -65,7 +65,9 @@ private fun CPSContent() {
     val navBuilder: NavGraphBuilder.() -> Unit = {
         navigator.navEntry<Screen.Profiles> {
             NavContentProfilesScreen(
-                onExpandProfile = { type -> navigator.navigateTo(Screen.ProfileExpanded(type)) }
+                onExpandProfile = { platform ->
+                    navigator.navigateTo(Screen.ProfileExpanded(platform))
+                }
             )
         }
 
@@ -74,7 +76,7 @@ private fun CPSContent() {
             val profilesViewModel = profilesViewModel()
             NavContentProfilesExpandedScreen(
                 onOpenSettings = {
-                    val platform = screen.profilePlatform
+                    val platform = screen.platform
                     navigator.navigateTo(Screen.ProfileSettings(platform))
                 },
                 onDeleteRequest = { manager ->
