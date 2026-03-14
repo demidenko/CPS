@@ -247,9 +247,8 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
 
 
-val rememberUUIDState: MutableLongState
-    @Composable
-    inline get() = rememberSaveable { mutableLongStateOf(randomUuid()) }
+@Composable
+fun rememberUUIDState(): MutableLongState = rememberSaveable { mutableLongStateOf(randomUuid()) }
 
 fun randomUuid(): Long = Random.nextLong()
 

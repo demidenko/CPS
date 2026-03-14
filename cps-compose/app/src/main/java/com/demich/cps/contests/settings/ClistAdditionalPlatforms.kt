@@ -62,7 +62,7 @@ private fun ColumnScope.DialogContent() {
     val dataLoader = remember(scope) { BackgroundDataLoader<List<ClistResource>>(scope = scope) }
     val resourcesResult by dataLoader.flowOfResult().collectAsState()
 
-    var dataKey by rememberUUIDState
+    var dataKey by rememberUUIDState()
     LaunchedEffect(dataLoader, dataKey) {
         dataLoader.execute(id = dataKey) {
             val settings = context.settingsContests

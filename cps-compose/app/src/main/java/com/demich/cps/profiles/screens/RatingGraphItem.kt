@@ -19,7 +19,7 @@ internal fun RatingGraphItem(
     modifier: Modifier = Modifier
 ) {
     val viewModel = profilesViewModel()
-    var dataKey by rememberUUIDState
+    var dataKey by rememberUUIDState()
 
     val ratingChangesResult by viewModel
         .flowOfRatingResult(manager = manager, userId = handle, key = dataKey)

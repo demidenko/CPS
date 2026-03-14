@@ -46,7 +46,7 @@ private fun CodeforcesUserBlogScreen(
     handle: String,
     filterState: FilterState
 ) {
-    var dataKey by rememberUUIDState
+    var dataKey by rememberUUIDState()
     val blogEntriesResult by codeforcesCommunityViewModel()
         .flowOfBlogEntriesResult(handle, context, key = dataKey)
         .collectAsState()
