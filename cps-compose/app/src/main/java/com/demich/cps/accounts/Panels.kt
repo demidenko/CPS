@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,6 +44,7 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.ifThen
 import com.demich.datastore_itemized.setValueIn
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
@@ -64,12 +64,12 @@ fun <U: UserInfo> ProfilePanel(
     val profilesViewModel = profilesViewModel()
     val (result, manager) = profileResultWithManager
 
-    var lastClick by remember { mutableStateOf(Instant.DISTANT_PAST) }
+    val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
 
     val loadingStatus by collectAsState {
         profilesViewModel.flowOfLoadingStatus(manager)
             .onEach {
-                if (it == LOADING) lastClick = Instant.DISTANT_PAST
+                if (it == LOADING) lastClickState.value = Instant.DISTANT_PAST
             }
     }
 
@@ -78,12 +78,12 @@ fun <U: UserInfo> ProfilePanel(
     Box(modifier = modifier
         .fillMaxWidth()
         .heightIn(min = 48.dp)
-        .pointerInput(clickEnabled) {
-            if (clickEnabled) {
+        .ifThen(clickEnabled) {
+            pointerInput(lastClickState, onExpandRequest) {
                 detectTapGestures(
                     onPress = {
                         if (tryAwaitRelease()) {
-                            lastClick = getCurrentTime()
+                            lastClickState.value = getCurrentTime()
                         }
                     },
                     onDoubleTap = {
@@ -98,7 +98,7 @@ fun <U: UserInfo> ProfilePanel(
         if (visibleOrder == null) {
             PanelUIButtons(
                 loadingStatus = loadingStatus,
-                lastClick = lastClick,
+                lastClick = lastClickState.value,
                 onReloadRequest = onReloadRequest,
                 onExpandRequest = onExpandRequest,
                 modifier = Modifier.align(Alignment.CenterEnd)
