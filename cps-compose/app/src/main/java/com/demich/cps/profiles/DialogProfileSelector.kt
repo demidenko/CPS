@@ -325,7 +325,7 @@ private fun SuggestionsList(
     if (suggestions.isNotEmpty() || isLoading || isError) {
         Column(modifier = modifier) {
             ProfileHeader(
-                text = if (isError) "suggestions load failed" else "suggestions:",
+                text = if (isError) "suggestions fetch failed" else "suggestions:",
                 color = if (isError) cpsColors.error else cpsColors.contentAdditional
             ) {
                 if (isLoading) {
