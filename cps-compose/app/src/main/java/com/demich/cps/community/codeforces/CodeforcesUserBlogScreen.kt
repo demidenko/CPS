@@ -27,7 +27,39 @@ import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 
 @Composable
-fun CodeforcesUserBlogScreen(
+fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
+    screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
+
+    val filterState = rememberFilterState()
+    CodeforcesUserBlogScreen(
+        handle = screen.handle,
+        filterState = filterState
+    )
+
+    bottomBar = {
+        FilterIconButton(filterState = filterState)
+    }
+}
+
+@Composable
+private fun CodeforcesUserBlogScreen(
+    handle: String,
+    filterState: FilterState
+) {
+    var dataKey by rememberUUIDState
+    val blogEntriesResult by codeforcesCommunityViewModel()
+        .flowOfBlogEntriesResult(handle, context, key = dataKey)
+        .collectAsState()
+
+    CodeforcesUserBlogScreen(
+        blogEntriesResult = { blogEntriesResult },
+        onRetry = { dataKey = randomUuid() },
+        filterState = filterState
+    )
+}
+
+@Composable
+private fun CodeforcesUserBlogScreen(
     blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
     onRetry: () -> Unit,
     filterState: FilterState
@@ -77,30 +109,6 @@ private fun CodeforcesUserBlogContent(
                 modifier = Modifier.fillMaxSize()
             )
         }
-    }
-}
-
-@Composable
-fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
-    val handle = screen.handle
-
-    screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
-
-    var dataKey by rememberUUIDState
-    val blogEntriesResult by codeforcesCommunityViewModel()
-        .flowOfBlogEntriesResult(handle, context, key = dataKey)
-        .collectAsState()
-
-    val filterState = rememberFilterState()
-
-    CodeforcesUserBlogScreen(
-        blogEntriesResult = { blogEntriesResult },
-        onRetry = { dataKey = randomUuid() },
-        filterState = filterState
-    )
-
-    bottomBar = {
-        FilterIconButton(filterState = filterState)
     }
 }
 
