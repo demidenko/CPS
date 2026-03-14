@@ -112,8 +112,9 @@ fun rectSaver() = listSaver(
 inline fun Dp.plusIf(condition: Boolean, value: () -> Dp): Dp =
     if (condition) this + value() else this
 
+// TODO: rename? its not `then` actually
 inline fun Modifier.ifThen(condition: Boolean, block: Modifier.() -> Modifier): Modifier =
-    if (condition) then(block()) else this
+    if (condition) block() else this
 
 fun AnnotatedString.Builder.append(
     text: String,
