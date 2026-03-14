@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.core.os.bundleOf
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.accounts.managers.AtCoderAccountManager
@@ -96,7 +95,7 @@ private suspend fun CodeforcesAccountManager.checkContribution(context: Context)
         autoCancel = true
         time = null
         url = userInfo.userPageUrl
-        addExtras(bundleOf(KEY_CF_CONTRIBUTION to oldContribution))
+        addExtras(KEY_CF_CONTRIBUTION, oldContribution)
     }
 }
 

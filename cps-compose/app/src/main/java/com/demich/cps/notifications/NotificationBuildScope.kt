@@ -5,6 +5,7 @@ import android.widget.RemoteViews
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
+import androidx.core.os.bundleOf
 import com.demich.cps.utils.getValue
 import com.demich.cps.utils.makePendingIntentOpenUrl
 import com.demich.cps.utils.writeOnlyProperty
@@ -72,7 +73,7 @@ class NotificationBuildScope(
         builder.setCustomBigContentView(view)
     }
 
-    fun addExtras(extras: android.os.Bundle) {
-        builder.addExtras(extras)
+    fun addExtras(key: String, value: Any?) {
+        builder.addExtras(bundleOf(key to value))
     }
 }
