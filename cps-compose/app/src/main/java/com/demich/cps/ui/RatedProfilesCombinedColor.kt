@@ -26,6 +26,7 @@ import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transformLatest
 
 @Composable
 fun ratedProfilesColorState(
@@ -107,11 +108,15 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: C
 private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
     combine(AccountManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
 
-private class RankGetter(
+private fun interface RankGetter {
+    operator fun get(screen: Screen?): RatedRank?
+}
+
+private class EnabledRankGetter(
     private val validRanks: List<RatedRank>,
     disabledPlatforms: Set<ProfilePlatform>,
     rankSelector: UISettingsDataStore.StatusBarRankSelector
-) {
+): RankGetter {
     private val rank: RatedRank? =
         validRanks.filter { it.manager.platform !in disabledPlatforms }.run {
             when (rankSelector) {
@@ -120,7 +125,7 @@ private class RankGetter(
             }
         }
 
-    operator fun get(screen: Screen?): RatedRank? =
+    override operator fun get(screen: Screen?): RatedRank? =
         when (screen) {
             is Screen.ProfileScreen -> validRanks.find { it.manager.platform == screen.platform }
             else -> rank
@@ -128,27 +133,31 @@ private class RankGetter(
 }
 
 private data class Settings(
-    val enabled: Boolean,
     val disabledPlatforms: Set<ProfilePlatform>,
     val rankSelector: UISettingsDataStore.StatusBarRankSelector
 )
 
 private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
-    combine(
-        flow = flowOfValidRanks(context),
-        flow2 = context.settingsUI.flowOf {
+    context.settingsUI.flowOf {
+        if (coloredStatusBar.value) {
             Settings(
-                enabled = coloredStatusBar.value,
                 disabledPlatforms = statusBarDisabledPlatforms.value,
                 rankSelector = statusBarRankSelector.value
             )
+        } else {
+            null
         }
-    ) { validRanks, settings ->
-        RankGetter(
-            validRanks = if (settings.enabled) validRanks else emptyList(),
-            disabledPlatforms = settings.disabledPlatforms,
-            rankSelector = settings.rankSelector
-        )
+    }.transformLatest { settings ->
+        if (settings == null) {
+            emit(RankGetter { null })
+        } else {
+            flowOfValidRanks(context).collect { validRanks ->
+                val getter = EnabledRankGetter(
+                    validRanks = validRanks,
+                    disabledPlatforms = settings.disabledPlatforms,
+                    rankSelector = settings.rankSelector
+                )
+                emit(getter)
+            }
+        }
     }
-
-
