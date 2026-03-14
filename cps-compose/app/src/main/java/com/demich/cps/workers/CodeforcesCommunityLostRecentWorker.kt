@@ -2,7 +2,6 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
@@ -16,6 +15,7 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getProfiles
+import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value

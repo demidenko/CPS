@@ -1,7 +1,7 @@
 package com.demich.cps.platforms.utils
 
-import com.demich.cps.accounts.userinfo.ACMPUserInfo
-import com.demich.cps.accounts.userinfo.UserSuggestion
+import com.demich.cps.profiles.userinfo.ACMPUserInfo
+import com.demich.cps.profiles.userinfo.UserSuggestion
 import org.jsoup.Jsoup
 
 object ACMPUtils {

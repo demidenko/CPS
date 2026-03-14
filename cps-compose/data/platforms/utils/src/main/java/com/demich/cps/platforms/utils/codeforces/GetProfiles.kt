@@ -1,10 +1,10 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
+import com.demich.cps.profiles.userinfo.ProfileResult
 
 suspend fun CodeforcesApi.getProfiles(
     handles: Collection<String>,

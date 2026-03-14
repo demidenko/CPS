@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.demich.cps.accounts.userinfo"
+    namespace = "com.demich.cps.profiles.userinfo"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

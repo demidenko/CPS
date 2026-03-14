@@ -5,9 +5,9 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
-import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
+import com.demich.cps.profiles.userinfo.ProfileResult
 import kotlinx.coroutines.flow.Flow
 
 internal const val cfFollowTableName = "FollowList"

@@ -17,14 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesAccountManager
-import com.demich.cps.accounts.DialogProfileSelector
-import com.demich.cps.accounts.managers.makeHandleSpan
-import com.demich.cps.accounts.userinfo.ProfileResult
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.profiles.DialogProfileSelector
+import com.demich.cps.profiles.managers.makeHandleSpan
+import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu

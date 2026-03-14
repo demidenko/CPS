@@ -9,12 +9,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.community.codeforces.CodeforcesBlogEntries
 import com.demich.cps.community.codeforces.CodeforcesBlogEntriesState
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.withVibration
 import com.demich.cps.utils.context

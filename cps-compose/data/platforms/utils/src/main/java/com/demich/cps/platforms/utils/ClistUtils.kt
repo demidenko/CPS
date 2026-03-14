@@ -1,9 +1,9 @@
 package com.demich.cps.platforms.utils
 
-import com.demich.cps.accounts.userinfo.ClistUserInfo
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
+import com.demich.cps.profiles.userinfo.ClistUserInfo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents

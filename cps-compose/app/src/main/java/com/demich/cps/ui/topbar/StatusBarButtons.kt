@@ -17,9 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.demich.cps.accounts.managers.AccountManager
-import com.demich.cps.accounts.managers.ProfilePlatform
-import com.demich.cps.accounts.managers.flowWithProfileResult
+import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfilePlatform
+import com.demich.cps.profiles.managers.flowWithProfileResult
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton

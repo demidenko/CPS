@@ -12,11 +12,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
-import com.demich.cps.accounts.NavContentProfilesExpandedScreen
-import com.demich.cps.accounts.NavContentProfilesScreen
-import com.demich.cps.accounts.NavContentProfilesSettingsScreen
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.profilesViewModel
 import com.demich.cps.community.NavContentCommunityScreen
 import com.demich.cps.community.codeforces.NavContentCodeforcesBlog
 import com.demich.cps.community.follow.NavContentCommunityFollowListScreen
@@ -28,6 +23,11 @@ import com.demich.cps.develop.NavContentDevelopmentScreen
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.navEntry
 import com.demich.cps.navigation.rememberCPSNavigator
+import com.demich.cps.profiles.NavContentProfilesExpandedScreen
+import com.demich.cps.profiles.NavContentProfilesScreen
+import com.demich.cps.profiles.NavContentProfilesSettingsScreen
+import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.profilesViewModel
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.context

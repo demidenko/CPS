@@ -1,8 +1,8 @@
 package com.demich.cps.ui
 
 import android.content.Context
-import com.demich.cps.accounts.managers.ProfilePlatform
 import com.demich.cps.navigation.Screen
+import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS

@@ -7,7 +7,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.demich.cps.R
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
 import com.demich.cps.contests.monitors.CodeforcesMonitorArgs
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorNotifier
@@ -18,6 +17,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
+import com.demich.cps.profiles.managers.CodeforcesAccountManager
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value

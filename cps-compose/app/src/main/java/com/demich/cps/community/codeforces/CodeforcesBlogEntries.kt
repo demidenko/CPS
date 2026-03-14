@@ -21,9 +21,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.toHandleSpan
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.VotedRating

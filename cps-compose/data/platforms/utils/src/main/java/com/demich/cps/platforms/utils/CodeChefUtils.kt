@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.utils
 
-import com.demich.cps.accounts.userinfo.CodeChefUserInfo
+import com.demich.cps.profiles.userinfo.CodeChefUserInfo
 import org.jsoup.Jsoup
 
 object CodeChefUtils {

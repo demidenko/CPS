@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkInfo
-import com.demich.cps.accounts.managers.CodeforcesAccountManager
-import com.demich.cps.accounts.userinfo.handle
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
+import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSDefaults

@@ -2,7 +2,7 @@ package com.demich.cps.features.codeforces.follow.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 
 @Entity(tableName = cfFollowTableName)
 data class CodeforcesUserBlog(

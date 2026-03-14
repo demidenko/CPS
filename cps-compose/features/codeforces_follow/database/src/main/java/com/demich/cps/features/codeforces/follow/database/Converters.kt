@@ -1,9 +1,9 @@
 package com.demich.cps.features.codeforces.follow.database
 
 import androidx.room.TypeConverter
-import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.jsonRoom
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import kotlinx.serialization.SerializationException
 
 

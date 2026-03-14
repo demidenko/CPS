@@ -3,7 +3,7 @@ package com.demich.cps.navigation
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
-import com.demich.cps.accounts.managers.ProfilePlatform
+import com.demich.cps.profiles.managers.ProfilePlatform
 import kotlinx.serialization.Serializable
 
 

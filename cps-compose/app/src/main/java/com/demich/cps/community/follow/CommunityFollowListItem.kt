@@ -16,10 +16,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.accounts.managers.toHandleSpan
-import com.demich.cps.accounts.userinfo.CodeforcesUserInfo
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.profiles.managers.toHandleSpan
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons

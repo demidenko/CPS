@@ -1,8 +1,8 @@
 package com.demich.cps.platforms.utils.atcoder
 
-import com.demich.cps.accounts.userinfo.AtCoderUserInfo
-import com.demich.cps.accounts.userinfo.UserSuggestion
 import com.demich.cps.platforms.utils.NewsPostEntry
+import com.demich.cps.profiles.userinfo.AtCoderUserInfo
+import com.demich.cps.profiles.userinfo.UserSuggestion
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
