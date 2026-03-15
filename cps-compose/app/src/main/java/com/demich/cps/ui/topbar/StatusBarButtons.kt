@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.flowOfExisted
+import com.demich.cps.profiles.managers.platform
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -39,33 +39,62 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-internal fun StatusBarButtons() {
-    val scope = rememberCoroutineScope()
-
+internal fun StatusBarButtons(
+    modifier: Modifier = Modifier
+) {
     val context = context
     val settingsUI = remember { context.settingsUI }
 
+    val disabledPlatforms by collectItemAsState { settingsUI.statusBarDisabledPlatforms }
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
+    val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
 
     val recordedPlatforms by collectAsState {
         ProfileManager.ratedEntries().flowOfExisted(context)
-            .map { it.map { it.manager.platform } }
+            .map { it.map { it.platform } }
             .combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
                 platforms.sortedBy { order.indexOf(it) }
             }
     }
 
-    var showPopup by rememberSaveable { mutableStateOf(false) }
-    val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
-    val disabledPlatforms by collectItemAsState { settingsUI.statusBarDisabledPlatforms }
-
-    val noneEnabled by remember {
-        derivedStateOf {
-            recordedPlatforms.all { it in disabledPlatforms }
+    val scope = rememberCoroutineScope()
+    recordedPlatforms.let { platforms ->
+        if (platforms.isNotEmpty()) {
+            StatusBarButtons(
+                modifier = modifier,
+                coloredStatusBar = coloredStatusBar,
+                rankSelector = rankSelector,
+                platforms = platforms,
+                disabledPlatforms = disabledPlatforms,
+                onSetEnabled = { settingsUI.coloredStatusBar.setValueIn(scope, it) },
+                onSetRankSelector = { settingsUI.statusBarRankSelector.setValueIn(scope, it) },
+                onCheckedChange = { platform, checked ->
+                    scope.launch {
+                        settingsUI.statusBarDisabledPlatforms.edit {
+                            if (checked) remove(platform) else add(platform)
+                        }
+                    }
+                }
+            )
         }
     }
+}
 
-    if (recordedPlatforms.isNotEmpty()) {
+@Composable
+private fun StatusBarButtons(
+    modifier: Modifier = Modifier,
+    coloredStatusBar: Boolean,
+    rankSelector: UISettingsDataStore.StatusBarRankSelector,
+    platforms: List<ProfilePlatform>,
+    disabledPlatforms: Set<ProfilePlatform>,
+    onSetEnabled: (Boolean) -> Unit,
+    onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
+    onCheckedChange: (ProfilePlatform, Boolean) -> Unit
+) {
+    var showPopup by rememberSaveable { mutableStateOf(false) }
+    val noneEnabled = platforms.all { it in disabledPlatforms }
+
+    Row(modifier = modifier) {
         CPSIconButton(
             icon = CPSIcons.StatusBar,
             onState = coloredStatusBar && !noneEnabled,
@@ -73,9 +102,10 @@ internal fun StatusBarButtons() {
             if (noneEnabled) {
                 showPopup = true
             } else {
-                settingsUI.coloredStatusBar.setValueIn(scope, !coloredStatusBar)
+                onSetEnabled(!coloredStatusBar)
             }
         }
+
         if (coloredStatusBar) Box {
             CPSIconButton(
                 icon = CPSIcons.MoveDown,
@@ -84,23 +114,14 @@ internal fun StatusBarButtons() {
             StatusBarPlatformsPopup(
                 expanded = showPopup,
                 rankSelector = rankSelector,
-                onSetRankSelector = {
-                    settingsUI.statusBarRankSelector.setValueIn(scope, it)
-                },
+                onSetRankSelector = onSetRankSelector,
                 disabledPlatforms = disabledPlatforms,
-                onCheckedChange = { platform, checked ->
-                    scope.launch {
-                        settingsUI.statusBarDisabledPlatforms.edit {
-                            if (checked) remove(platform) else add(platform)
-                        }
-                    }
-                },
-                platforms = recordedPlatforms,
+                onCheckedChange = onCheckedChange,
+                platforms = platforms,
                 onDismissRequest = { showPopup = false }
             )
         }
     }
-
 }
 
 
