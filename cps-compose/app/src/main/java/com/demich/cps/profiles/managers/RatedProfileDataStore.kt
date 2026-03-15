@@ -12,7 +12,7 @@ import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 
 abstract class RatedProfileDataStore<U: RatedUserInfo>(
-    private val manager: RatedAccountManager<U>,
+    private val manager: RatedProfileManager<U>,
     private val context: Context,
     dataStoreWrapper: DataStoreWrapper
 ):

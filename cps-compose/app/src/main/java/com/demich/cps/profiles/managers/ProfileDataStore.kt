@@ -55,7 +55,7 @@ abstract class ProfileUniqueDataStore<U: UserInfo>(
 
 internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multiple_profiles")
 
-internal inline fun <reified U: UserInfo> AccountManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
+internal inline fun <reified U: UserInfo> ProfileManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
     object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${platform}_profile_result")
 

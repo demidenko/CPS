@@ -17,7 +17,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
@@ -85,7 +85,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 api = CodeforcesClient,
                 pageContentProvider = CodeforcesClient,
                 onRatingChange = { ratingChange ->
-                    launch { CodeforcesAccountManager().applyRatingChange(ratingChange, context) }
+                    launch { CodeforcesProfileManager().applyRatingChange(ratingChange, context) }
                 },
                 onSubmissionFinalResult = { submission ->
                     launch { notify(submission) }

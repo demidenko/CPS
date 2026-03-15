@@ -16,7 +16,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.navigation.CPSNavigator
@@ -167,7 +167,7 @@ private fun CodeforcesFollowList(
                     else ProfileResult(userInfo = it)
                 }
                 append("Delete ")
-                append(LocalCodeforcesAccountManager.current.makeHandleSpan(profileResult = result))
+                append(LocalCodeforcesProfileManager.current.makeHandleSpan(profileResult = result))
                 append(" from follow list?")
             },
             onDismissRequest = { showDeleteDialogForBlog = null },
@@ -188,7 +188,7 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
 
     if (showChooseDialog) {
         DialogProfileSelector(
-            manager = LocalCodeforcesAccountManager.current,
+            manager = LocalCodeforcesProfileManager.current,
             initial = null,
             onDismissRequest = { showChooseDialog = false },
             onResult = { communityViewModel.addToFollowList(result = it, context = context) }

@@ -8,7 +8,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.isContestant
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.removeOld
 import com.demich.datastore_itemized.edit
@@ -28,7 +28,7 @@ class CodeforcesMonitorLauncherWorker(
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_monitor_launcher", context = context) {
             override suspend fun isEnabled() =
-                CodeforcesAccountManager().getSettings(context).monitorEnabled()
+                CodeforcesProfileManager().getSettings(context).monitorEnabled()
 
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
@@ -42,7 +42,7 @@ class CodeforcesMonitorLauncherWorker(
     override suspend fun runWork(): Result {
         //TODO: restart failed monitor
 
-        val dataStore = CodeforcesAccountManager().dataStore(context)
+        val dataStore = CodeforcesProfileManager().dataStore(context)
 
         //TODO: optimize read by snapshot
 

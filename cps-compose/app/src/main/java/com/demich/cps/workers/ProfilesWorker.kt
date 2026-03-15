@@ -8,8 +8,8 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getProfile
-import com.demich.cps.profiles.managers.AtCoderAccountManager
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.AtCoderProfileManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.managers.toRatingChange
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -37,14 +37,14 @@ class ProfilesWorker(
 
     override suspend fun runWork(): Result {
         joinAllWithProgress {
-            with(CodeforcesAccountManager()) {
+            with(CodeforcesProfileManager()) {
                 getSettings(context).fromSnapshot {
                     if (observeRating.value) add { checkRating(context = context) }
                     if (observeContribution.value) add { checkContribution(context = context) }
                 }
             }
 
-            with(AtCoderAccountManager()) {
+            with(AtCoderProfileManager()) {
                 getSettings(context).fromSnapshot {
                     if (observeRating.value) add { checkRating(context = context) }
                 }
@@ -55,7 +55,7 @@ class ProfilesWorker(
     }
 }
 
-private suspend fun CodeforcesAccountManager.checkRating(context: Context) {
+private suspend fun CodeforcesProfileManager.checkRating(context: Context) {
     val userInfo = dataStore(context).profile()
         ?.userInfoOrNull() ?: return
 
@@ -72,7 +72,7 @@ private fun getNotifiedCodeforcesContribution(context: Context): Int? =
     notificationChannels.codeforces.contribution_changes.getActiveNotification(context)
         ?.extras?.getInt(KEY_CF_CONTRIBUTION)
 
-private suspend fun CodeforcesAccountManager.checkContribution(context: Context) {
+private suspend fun CodeforcesProfileManager.checkContribution(context: Context) {
     val dataStore = dataStore(context)
     val userInfo = dataStore.profile()
         ?.userInfoOrNull() ?: return
@@ -99,7 +99,7 @@ private suspend fun CodeforcesAccountManager.checkContribution(context: Context)
     }
 }
 
-private suspend fun AtCoderAccountManager.checkRating(context: Context) {
+private suspend fun AtCoderProfileManager.checkRating(context: Context) {
     val dataStore = dataStore(context)
     val userInfo = dataStore.profile()
         ?.userInfoOrNull() ?: return

@@ -47,7 +47,7 @@ import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.clients.niceMessage
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -468,7 +468,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             },
             onStop = {
                 scope.launch {
-                    CodeforcesAccountManager().dataStore(context)
+                    CodeforcesProfileManager().dataStore(context)
                         .monitorCanceledContests.add(contestId, getCurrentTime())
                     monitor.reset()
                 }

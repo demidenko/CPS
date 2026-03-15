@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSuggestionsProvider
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -79,7 +79,7 @@ private const val requestDebounceDelay: Long = 300
 
 @Composable
 fun <U: UserInfo> DialogProfileSelector(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
     onResult: (ProfileResult<U>) -> Unit
@@ -107,7 +107,7 @@ fun <U: UserInfo> DialogProfileSelector(
 
 @Composable
 private fun<U: UserInfo> DialogContent(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
     onResult: (ProfileResult<U>) -> Unit,
@@ -207,7 +207,7 @@ private data class ProfileFetchResult<U: UserInfo>(
 @Composable
 private fun <U: UserInfo> profileFetchState(
     textState: State<TextFieldValue>,
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     initial: ProfileResult<U>?
 ): State<ProfileFetchResult<U>> =
     remember(textState, manager) {
@@ -225,7 +225,7 @@ private fun <U: UserInfo> profileFetchState(
 
 @Composable
 private fun<U: UserInfo> UserIdTextField(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     profileResult: ProfileResult<U>?,
     loadingInProgress: Boolean,
     textFieldValue: TextFieldValue,
@@ -403,7 +403,7 @@ private fun ProfileHeader(
 
 @Composable
 @ReadOnlyComposable
-private fun <U: UserInfo> AccountManager<U>.makeSpan(profileResult: ProfileResult<U>?): AnnotatedString {
+private fun <U: UserInfo> ProfileManager<U>.makeSpan(profileResult: ProfileResult<U>?): AnnotatedString {
     if (profileResult == null) return AnnotatedString("")
     return buildAnnotatedString {
         withStyle(SpanStyle(color = cpsColors.content)) {

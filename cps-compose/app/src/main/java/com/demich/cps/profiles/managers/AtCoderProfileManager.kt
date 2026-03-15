@@ -24,8 +24,8 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import kotlinx.coroutines.flow.Flow
 
 
-class AtCoderAccountManager :
-    RatedAccountManager<AtCoderUserInfo>(),
+class AtCoderProfileManager :
+    RatedProfileManager<AtCoderUserInfo>(),
     ProfileSettingsProvider,
     ProfileSuggestionsProvider
 {
@@ -112,7 +112,7 @@ class AtCoderAccountManager :
 
 }
 
-class AtCoderProfileDataStore(manager: AtCoderAccountManager, context: Context):
+class AtCoderProfileDataStore(manager: AtCoderProfileManager, context: Context):
     RatedProfileDataStore<AtCoderUserInfo>(manager, context, context.dataStore)
 {
     companion object {

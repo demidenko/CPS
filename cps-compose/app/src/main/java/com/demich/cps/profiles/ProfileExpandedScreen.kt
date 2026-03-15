@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.accountManagerOf
+import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.ui.CPSIcons
@@ -34,7 +34,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     navigateBack: () -> Unit
 ) {
     val platform = screen.platform
-    val manager = remember(platform) { accountManagerOf(platform) }
+    val manager = remember(platform) { profileManagerOf(platform) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     screenTitle = ScreenStaticTitleState("profiles", platform.name)
@@ -67,7 +67,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
 
 @Composable
 private fun <U: UserInfo> ProfileExpandedContent(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
@@ -95,7 +95,7 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings, onClick = onOpenSettings)
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
-            accountManagerOf(platform)
+            profileManagerOf(platform)
                 .dataStore(context).profile()
                 ?.userInfoOrNull()
                 ?.userPageUrl

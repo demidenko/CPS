@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.map
 
 data class ProfileResultWithManager<U: UserInfo>(
     val profileResult: ProfileResult<U>,
-    val manager: AccountManager<U>
+    val manager: ProfileManager<U>
 ) {
 }
 
 val ProfileResultWithManager<*>.platform: ProfilePlatform
     get() = manager.platform
 
-fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
+fun <U: UserInfo> ProfileManager<U>.flowWithProfileResult(context: Context) =
     dataStore(context).profile.asFlow().map { result ->
         result?.let { ProfileResultWithManager(it, this) }
     }
 
-fun Collection<AccountManager<*>>.flowOfExisted(context: Context) =
+fun Collection<ProfileManager<*>>.flowOfExisted(context: Context) =
     combine(flows = map { it.flowWithProfileResult(context) }) { it.filterNotNull() }

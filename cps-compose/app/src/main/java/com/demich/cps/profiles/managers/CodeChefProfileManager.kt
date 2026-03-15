@@ -42,8 +42,8 @@ import com.demich.cps.utils.append
 import com.demich.kotlin_stdlib_boost.partitionIndex
 
 
-class CodeChefAccountManager :
-    RatedAccountManager<CodeChefUserInfo>(),
+class CodeChefProfileManager :
+    RatedProfileManager<CodeChefUserInfo>(),
     ProfileSuggestionsProvider
 {
     companion object {

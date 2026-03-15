@@ -14,7 +14,7 @@ import com.demich.cps.profiles.userinfo.ratingToString
 import com.demich.cps.ui.theme.CPSColors
 import kotlin.time.Instant
 
-abstract class RatedAccountManager<U: RatedUserInfo>: AccountManager<U>() {
+abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override val userIdTitle get() = "handle"
 
     abstract val ratingsUpperBounds: List<HandleColorBound>
@@ -52,10 +52,10 @@ abstract class RatedAccountManager<U: RatedUserInfo>: AccountManager<U>() {
 }
 
 
-fun RatedAccountManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
+fun RatedProfileManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
     throw IllegalArgumentException("Manager ${platform.name} does not support color ${handleColor.name}")
 
-fun RatedAccountManager<*>.availableHandleColors(): List<HandleColor> =
+fun RatedProfileManager<*>.availableHandleColors(): List<HandleColor> =
     HandleColor.entries.filter { runCatching { originalColor(it) }.isSuccess }
 
 interface RatingRevolutionsProvider {

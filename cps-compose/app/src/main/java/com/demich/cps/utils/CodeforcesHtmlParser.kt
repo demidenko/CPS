@@ -8,12 +8,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
 import com.demich.cps.platforms.utils.codeforces.parseCodeforcesHtml
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
@@ -27,7 +27,7 @@ fun htmlToAnnotatedString(html: String): AnnotatedString {
             builder = CodeforcesHtmlStringBuilderImpl(
                 builder = builder,
                 cpsColors = cpsColors,
-                manager = LocalCodeforcesAccountManager.current
+                manager = LocalCodeforcesProfileManager.current
             )
         )
     )
@@ -38,7 +38,7 @@ fun htmlToAnnotatedString(html: String): AnnotatedString {
 private class CodeforcesHtmlStringBuilderImpl(
     val builder: AnnotatedString.Builder,
     val cpsColors: CPSColors,
-    val manager: CodeforcesAccountManager
+    val manager: CodeforcesProfileManager
 ): CodeforcesHtmlStringBuilder {
     val quoteColor get() = cpsColors.contentAdditional
 

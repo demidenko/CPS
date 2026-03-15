@@ -15,8 +15,8 @@ import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.theme.CPSColors
 
 
-class ACMPAccountManager :
-    AccountManager<ACMPUserInfo>(),
+class ACMPProfileManager :
+    ProfileManager<ACMPUserInfo>(),
     ProfileSuggestionsProvider
 {
     override val platform get() = ProfilePlatform.acmp

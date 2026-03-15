@@ -10,7 +10,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getContestAcceptedStatistics
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.add
 import com.demich.cps.utils.awaitPair
@@ -32,7 +32,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_upsolving", context = context) {
             override suspend fun isEnabled() =
-                CodeforcesAccountManager().getSettings(context).upsolvingSuggestionsEnabled()
+                CodeforcesProfileManager().getSettings(context).upsolvingSuggestionsEnabled()
 
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
@@ -43,7 +43,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork(): Result {
-        val dataStore = CodeforcesAccountManager().dataStore(context)
+        val dataStore = CodeforcesProfileManager().dataStore(context)
 
         val handle = dataStore.profile()
             ?.userInfoOrNull()

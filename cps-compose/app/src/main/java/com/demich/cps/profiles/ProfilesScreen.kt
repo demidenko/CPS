@@ -22,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.profiles.managers.AccountManager
-import com.demich.cps.profiles.managers.CListAccountManager
+import com.demich.cps.profiles.managers.ProfileManager
+import com.demich.cps.profiles.managers.CListProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
-import com.demich.cps.profiles.managers.accountManagerOf
+import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -122,7 +122,7 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
 private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
-            flow = AccountManager.entries().flowOfExisted(this),
+            flow = ProfileManager.entries().flowOfExisted(this),
             flow2 = settingsUI.profilesOrder.asFlow()
         ) { profiles, order ->
             order.mapNotNull { platform ->
@@ -156,14 +156,14 @@ private fun ReloadProfilesButton(
     val viewModel = profilesViewModel()
 
     val loadingStatus by collectAsState {
-        viewModel.flowOfLoadingStatus(AccountManager.entries())
+        viewModel.flowOfLoadingStatus(ProfileManager.entries())
     }
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
         enabled = profiles.isNotEmpty(),
         onClick = {
-            AccountManager.entries().forEach { viewModel.reload(it, context) }
+            ProfileManager.entries().forEach { viewModel.reload(it, context) }
         }
     )
 }
@@ -208,7 +208,7 @@ private fun AddProfileButton(
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
             val platforms = remember(availableProfiles) {
-                val all = AccountManager.entries().map { it.platform }
+                val all = ProfileManager.entries().map { it.platform }
                 val available = availableProfiles.map { it.platform }
                 all - available + ProfilePlatform.clist
             }
@@ -229,7 +229,7 @@ private fun AddProfileButton(
             )
         } else {
             ChangeSavedProfileDialog(
-                manager = accountManagerOf(platform),
+                manager = profileManagerOf(platform),
                 initial = null,
                 scope = scope,
                 onDismissRequest = { selectedPlatform = null }
@@ -240,7 +240,7 @@ private fun AddProfileButton(
 
 @Composable
 internal fun <U: UserInfo> ChangeSavedProfileDialog(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     initial: ProfileResult<U>?,
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
@@ -261,9 +261,8 @@ private fun CListImportDialog(
     val context = context
     val profilesViewModel = profilesViewModel()
     val progressBarsViewModel = progressBarsViewModel()
-    val cListAccountManager = remember { CListAccountManager() }
     DialogProfileSelector(
-        manager = cListAccountManager,
+        manager = CListProfileManager(),
         initial = null,
         onDismissRequest = onDismissRequest,
         onResult = {

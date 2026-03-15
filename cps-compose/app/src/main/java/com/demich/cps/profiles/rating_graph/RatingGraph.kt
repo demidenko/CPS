@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.ui.LoadingContentBox
@@ -52,7 +52,7 @@ internal enum class RatingFilterType {
 fun RatingGraph(
     ratingChangesResult: () -> Result<List<RatingChange>>?,
     onRetry: () -> Unit,
-    manager: RatedAccountManager<out RatedUserInfo>,
+    manager: RatedProfileManager<out RatedUserInfo>,
     modifier: Modifier = Modifier,
     graphHeight: Dp = 240.dp,
     shape: Shape = RoundedCornerShape(5.dp)
@@ -83,7 +83,7 @@ fun RatingGraph(
 @Composable
 private fun RatingGraphWithHeader(
     ratingChanges: List<RatingChange>,
-    manager: RatedAccountManager<out RatedUserInfo>,
+    manager: RatedProfileManager<out RatedUserInfo>,
     shape: Shape,
     graphHeight: Dp
 ) {
@@ -168,7 +168,7 @@ private data class FilterHeader(
 
 @Composable
 private fun RatingGraphHeader(
-    manager: RatedAccountManager<out RatedUserInfo>,
+    manager: RatedProfileManager<out RatedUserInfo>,
     header: Header,
     onHeaderChange: (Header) -> Unit,
     shape: Shape

@@ -11,32 +11,32 @@ import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
-fun RatedAccountManager<*>.getHandleColor(rating: Int): HandleColor =
+fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
     ratingsUpperBounds
         .firstOrNull { rating < it.ratingUpperBound }
         ?.handleColor ?: RED
 
-context(manager: RatedAccountManager<*>)
+context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(handleColor: HandleColor): Color =
     if (useOriginalHandleColors) manager.originalColor(handleColor)
     else handleColor(handleColor)
 
-context(manager: RatedAccountManager<*>)
+context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(rating: Int): Color =
     colorFor(handleColor = manager.getHandleColor(rating))
 
 @Composable
 @ReadOnlyComposable
-fun RatedAccountManager<*>.colorFor(handleColor: HandleColor): Color =
+fun RatedProfileManager<*>.colorFor(handleColor: HandleColor): Color =
     cpsColors.colorFor(handleColor = handleColor)
 
-fun RatedAccountManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
+fun RatedProfileManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
     if (rating == null) AnnotatedString(text = text)
     else makeRatedSpan(text, rating, cpsColors)
 
 @Composable
 @ReadOnlyComposable
-fun <U: RatedUserInfo> RatedAccountManager<U>.makeHandleSpan(profileResult: ProfileResult<U>): AnnotatedString =
+fun <U: RatedUserInfo> RatedProfileManager<U>.makeHandleSpan(profileResult: ProfileResult<U>): AnnotatedString =
     if (profileResult is ProfileResult.Success) {
         val userInfo = profileResult.userInfo
         makeOKSpan(

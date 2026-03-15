@@ -12,8 +12,8 @@ import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.theme.CPSColors
 
 
-class CListAccountManager :
-    AccountManager<ClistUserInfo>(),
+class CListProfileManager :
+    ProfileManager<ClistUserInfo>(),
     ProfileSuggestionsProvider
 {
     override val platform get() = ProfilePlatform.clist
@@ -43,7 +43,7 @@ class CListAccountManager :
         }
 
     override fun dataStore(context: Context): ProfileDataStore<ClistUserInfo> {
-        error("CList account manager can not provide data store")
+        error("CList profile manager can not provide data store")
     }
 
 }

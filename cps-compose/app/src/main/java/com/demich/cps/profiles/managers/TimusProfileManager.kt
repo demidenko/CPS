@@ -13,8 +13,8 @@ import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.theme.CPSColors
 
 
-class TimusAccountManager :
-    AccountManager<TimusUserInfo>(),
+class TimusProfileManager :
+    ProfileManager<TimusUserInfo>(),
     ProfileSuggestionsProvider
 {
     override val platform get() = ProfilePlatform.timus

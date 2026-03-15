@@ -26,7 +26,7 @@ import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.profiles.NavContentProfilesExpandedScreen
 import com.demich.cps.profiles.NavContentProfilesScreen
 import com.demich.cps.profiles.NavContentProfilesSettingsScreen
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.workers.enqueueEnabledWorkers
@@ -46,7 +46,7 @@ class MainActivity: ComponentActivity() {
         }
 
         setContent {
-            CompositionLocalProvider(LocalCodeforcesAccountManager provides CodeforcesAccountManager()) {
+            CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
                 CPSTheme {
                     CPSContent()
                 }
@@ -131,7 +131,7 @@ private fun CPSContent() {
 
 }
 
-val LocalCodeforcesAccountManager = staticCompositionLocalOf<CodeforcesAccountManager> {
+val LocalCodeforcesProfileManager = staticCompositionLocalOf<CodeforcesProfileManager> {
     throw IllegalAccessException()
 }
 

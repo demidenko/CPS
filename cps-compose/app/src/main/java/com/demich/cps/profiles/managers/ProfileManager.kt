@@ -23,11 +23,12 @@ enum class ProfilePlatform {
     clist
 }
 
-abstract class AccountManager<U: UserInfo> {
+// TODO: rename manager to smth better
+abstract class ProfileManager<U: UserInfo> {
     abstract val platform: ProfilePlatform
 
     override fun equals(other: Any?): Boolean {
-        return other is AccountManager<U> && platform == other.platform
+        return other is ProfileManager<U> && platform == other.platform
     }
 
     override fun hashCode() = platform.hashCode()
@@ -58,23 +59,23 @@ abstract class AccountManager<U: UserInfo> {
     }
 
     companion object {
-        fun entries(): List<AccountManager<out UserInfo>> =
+        fun entries(): List<ProfileManager<out UserInfo>> =
             listOf(
-                CodeforcesAccountManager(),
-                AtCoderAccountManager(),
-                CodeChefAccountManager(),
-                DmojAccountManager(),
-                ACMPAccountManager(),
-                TimusAccountManager()
+                CodeforcesProfileManager(),
+                AtCoderProfileManager(),
+                CodeChefProfileManager(),
+                DmojProfileManager(),
+                ACMPProfileManager(),
+                TimusProfileManager()
             )
 
-        fun ratedEntries(): List<RatedAccountManager<out RatedUserInfo>> =
-            entries().filterIsInstance<RatedAccountManager<*>>()
+        fun ratedEntries(): List<RatedProfileManager<out RatedUserInfo>> =
+            entries().filterIsInstance<RatedProfileManager<*>>()
     }
 }
 
-fun accountManagerOf(platform: ProfilePlatform) =
-    AccountManager.entries().first { it.platform == platform }
+fun profileManagerOf(platform: ProfilePlatform) =
+    ProfileManager.entries().first { it.platform == platform }
 
 interface ProfileSuggestionsProvider {
     suspend fun fetchSuggestions(str: String): List<UserSuggestion>

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -231,7 +231,7 @@ fun SmallProfilePanelTwoLines(
 }
 
 @Composable
-fun <U: RatedUserInfo> RatedAccountManager<U>.SmallRatedProfilePanel(
+fun <U: RatedUserInfo> RatedProfileManager<U>.SmallRatedProfilePanel(
     profileResult: ProfileResult<U>,
     title: @Composable () -> Unit = {
         Text(

@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.profiles.HandleColor
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.managers.getHandleColor
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -75,10 +75,10 @@ private fun colorState(
 private data class RatedRank(
     val rank: Double,
     val handleColor: HandleColor,
-    val manager: RatedAccountManager<out RatedUserInfo>
+    val manager: RatedProfileManager<out RatedUserInfo>
 )
 
-private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
+private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
     val rating = profile?.userInfoOrNull()?.rating ?: return null
     val handleColor = getHandleColor(rating)
     val rank = when (handleColor) {
@@ -102,11 +102,11 @@ private fun <U: RatedUserInfo> RatedAccountManager<U>.getRank(profile: ProfileRe
 }
 
 
-private fun <U: RatedUserInfo> RatedAccountManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
+private fun <U: RatedUserInfo> RatedProfileManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
     dataStore(context).profile.asFlow().map { getRank(it) }
 
 private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
-    combine(AccountManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
+    combine(ProfileManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
 
 private fun interface RankGetter {
     operator fun get(screen: Screen?): RatedRank?

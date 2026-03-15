@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.problemId
-import com.demich.cps.profiles.managers.CodeforcesAccountManager
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -44,7 +44,7 @@ import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
 
 @Composable
-context(manager: CodeforcesAccountManager)
+context(manager: CodeforcesProfileManager)
 fun CodeforcesUserInfoExpandedContent(
     profileResult: ProfileResult<CodeforcesUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
@@ -142,7 +142,7 @@ private fun UpsolvingSuggestionsList(
 ) {
     val context = context
     val problems by collectAsState {
-        CodeforcesAccountManager().dataStore(context)
+        CodeforcesProfileManager().dataStore(context)
             .upsolvingSuggestedProblems.asFlow()
             .map { it.valuesSortedByTime().asReversed() }
     }

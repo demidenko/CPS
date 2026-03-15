@@ -10,7 +10,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.LocalCodeforcesAccountManager
+import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
@@ -49,8 +49,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
 
-class CodeforcesAccountManager :
-    RatedAccountManager<CodeforcesUserInfo>(),
+class CodeforcesProfileManager :
+    RatedProfileManager<CodeforcesUserInfo>(),
     ProfileSettingsProvider,
     ProfileSuggestionsProvider,
     RatingRevolutionsProvider
@@ -230,11 +230,11 @@ private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
 @Composable
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
-    LocalCodeforcesAccountManager.current
+    LocalCodeforcesProfileManager.current
         .makeHandleSpan(handle = handle, tag = colorTag, cpsColors = cpsColors)
 
 
-class CodeforcesProfileDataStore(manager: CodeforcesAccountManager, context: Context):
+class CodeforcesProfileDataStore(manager: CodeforcesProfileManager, context: Context):
     RatedProfileDataStore<CodeforcesUserInfo>(manager, context, context.dataStore)
 {
     companion object {

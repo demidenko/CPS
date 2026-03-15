@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.HandleColor
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
@@ -35,7 +35,7 @@ import kotlin.time.Instant
 @Composable
 internal fun RatingGraphCanvas(
     ratingChanges: List<RatingChange>,
-    manager: RatedAccountManager<out RatedUserInfo>,
+    manager: RatedProfileManager<out RatedUserInfo>,
     rectangles: RatingGraphRectangles,
     viewPortState: GraphViewPortState,
     currentTime: Instant,

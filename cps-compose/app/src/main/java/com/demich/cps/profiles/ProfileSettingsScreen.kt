@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileSettingsProvider
-import com.demich.cps.profiles.managers.accountManagerOf
+import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.settings.Item
@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.emptyFlow
 private fun ProfileSettingsScreen(
     platform: ProfilePlatform
 ) {
-    val manager = remember(platform) { accountManagerOf(platform) }
+    val manager = remember(platform) { profileManagerOf(platform) }
     ProfileSettingsScreen(manager = manager)
 }
 
@@ -49,7 +49,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsS
 
 @Composable
 private fun <U: UserInfo> ProfileSettingsScreen(
-    manager: AccountManager<U>
+    manager: ProfileManager<U>
 ) {
     val context = context
     val scope = rememberCoroutineScope()
@@ -77,7 +77,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
 
 @Composable
 private fun <U: UserInfo> ProfileSettingsItems(
-    manager: AccountManager<U>,
+    manager: ProfileManager<U>,
     profileResult: ProfileResult<U>,
     onUserIdClick: () -> Unit
 ) {

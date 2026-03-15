@@ -9,7 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.demich.cps.profiles.managers.DmojAccountManager
+import com.demich.cps.profiles.managers.DmojProfileManager
 import com.demich.cps.profiles.userinfo.DmojUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.ui.CPSIconButton
@@ -17,7 +17,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 
 @Composable
-context(manager: DmojAccountManager)
+context(manager: DmojProfileManager)
 fun DmojUserInfoExpandedContent(
     profileResult: ProfileResult<DmojUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,

@@ -9,7 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.demich.cps.profiles.managers.CodeChefAccountManager
+import com.demich.cps.profiles.managers.CodeChefProfileManager
 import com.demich.cps.profiles.userinfo.CodeChefUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.ui.CPSIconButton
@@ -17,7 +17,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 
 @Composable
-context(manager: CodeChefAccountManager)
+context(manager: CodeChefProfileManager)
 fun CodeChefUserInfoExpandedContent(
     profileResult: ProfileResult<CodeChefUserInfo>,
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,

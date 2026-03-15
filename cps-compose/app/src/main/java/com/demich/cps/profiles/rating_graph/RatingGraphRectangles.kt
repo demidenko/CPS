@@ -3,7 +3,7 @@ package com.demich.cps.profiles.rating_graph
 import androidx.compose.runtime.Immutable
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.HandleColorBound
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.utils.forEachRangeEqualBy
@@ -11,7 +11,7 @@ import com.demich.kotlin_stdlib_boost.isSortedWith
 
 @Immutable
 internal class RatingGraphRectangles(
-    manager: RatedAccountManager<out RatedUserInfo>
+    manager: RatedProfileManager<out RatedUserInfo>
 ) {
     //point is upperBound (endTime, ratingUpperBound)
     private val rectangles: List<Pair<GraphPoint, HandleColor>> = buildList {

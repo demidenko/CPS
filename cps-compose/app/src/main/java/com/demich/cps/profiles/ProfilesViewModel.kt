@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
-import com.demich.cps.profiles.managers.accountManagerOf
+import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -33,19 +33,19 @@ fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<ProfilePlatform, LoadingStatus>())
 
-    fun flowOfLoadingStatus(manager: AccountManager<out UserInfo>): Flow<LoadingStatus> =
+    fun flowOfLoadingStatus(manager: ProfileManager<out UserInfo>): Flow<LoadingStatus> =
         loadingStatuses.map { it[manager.platform] ?: PENDING }
 
-    fun flowOfLoadingStatus(managers: Collection<AccountManager<out UserInfo>>): Flow<LoadingStatus> =
+    fun flowOfLoadingStatus(managers: Collection<ProfileManager<out UserInfo>>): Flow<LoadingStatus> =
         loadingStatuses.map { map -> managers.mapNotNull { map[it.platform] }.combine() }
 
-    private fun setLoadingStatus(manager: AccountManager<out UserInfo>, loadingStatus: LoadingStatus) =
+    private fun setLoadingStatus(manager: ProfileManager<out UserInfo>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
             if (loadingStatus == PENDING) remove(manager.platform)
             else this[manager.platform] = loadingStatus
         }
 
-    fun <U: UserInfo> reload(manager: AccountManager<U>, context: Context) {
+    fun <U: UserInfo> reload(manager: ProfileManager<U>, context: Context) {
         if (loadingStatuses.value[manager.platform] == LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val dataStore = manager.dataStore(context)
@@ -63,7 +63,7 @@ class ProfilesViewModel: ViewModel() {
         }
     }
 
-    fun <U: UserInfo> delete(manager: AccountManager<U>, context: Context) {
+    fun <U: UserInfo> delete(manager: ProfileManager<U>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             setLoadingStatus(manager, PENDING)
             manager.dataStore(context).deleteProfile()
@@ -81,7 +81,7 @@ class ProfilesViewModel: ViewModel() {
             }
             supported.map { (platform, userId) ->
                 suspend {
-                    val manager = accountManagerOf(platform)
+                    val manager = profileManagerOf(platform)
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[platform] == LOADING }.collect()
                     val savedUserId = manager.dataStore(context).profile()?.userId
@@ -100,12 +100,12 @@ class ProfilesViewModel: ViewModel() {
         }
     }
 
-    private suspend fun <U: UserInfo> getAndSave(manager: AccountManager<U>, userId: String, context: Context) {
+    private suspend fun <U: UserInfo> getAndSave(manager: ProfileManager<U>, userId: String, context: Context) {
         manager.dataStore(context).setProfile(manager.fetchProfile(userId))
     }
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()
-    fun flowOfRatingResult(manager: RatedAccountManager<*>, userId: String, key: Long) =
+    fun flowOfRatingResult(manager: RatedProfileManager<*>, userId: String, key: Long) =
         ratingLoader.execute(id = "$userId#$key") { manager.getRatingChangeHistory(userId) }
 }
 

@@ -21,8 +21,8 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.utils.append
 
 
-class DmojAccountManager :
-    RatedAccountManager<DmojUserInfo>(),
+class DmojProfileManager :
+    RatedProfileManager<DmojUserInfo>(),
     ProfileSuggestionsProvider
 {
     override val platform get() = ProfilePlatform.dmoj

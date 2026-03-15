@@ -21,9 +21,9 @@ import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.profiles.managers.AccountManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.RatedAccountManager
+import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -117,7 +117,7 @@ fun ContentLoadingButton(
 private fun TestHandles(
     modifier: Modifier = Modifier
 ) {
-    val managers = remember { AccountManager.ratedEntries() }
+    val managers = remember { ProfileManager.ratedEntries() }
 
     var selectedPlatform by rememberSaveable {
         mutableStateOf(ProfilePlatform.codeforces)
@@ -145,7 +145,7 @@ private fun TestHandles(
 
 @Composable
 private fun HandlesList(
-    manager: RatedAccountManager<out RatedUserInfo>,
+    manager: RatedProfileManager<out RatedUserInfo>,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(
