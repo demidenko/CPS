@@ -22,13 +22,13 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.CListProfileManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
-import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.profiles.managers.platform
+import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.CPSDefaults
@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 private fun ProfilesScreen(
-    profiles: List<ProfileResultWithManager<out UserInfo>>,
+    profiles: List<ProfileResultWithManager<*>>,
     onExpandProfile: (ProfilePlatform) -> Unit,
     reorderEnabled: Boolean,
 ) {
@@ -133,7 +133,7 @@ private fun profilesOrderState() = with(context) {
 }
 
 private fun profilesBottomBarBuilder(
-    profiles: List<ProfileResultWithManager<out UserInfo>>,
+    profiles: List<ProfileResultWithManager<*>>,
     reorderEnabled: Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -150,7 +150,7 @@ private fun profilesBottomBarBuilder(
 
 @Composable
 private fun ReloadProfilesButton(
-    profiles: List<ProfileResultWithManager<out UserInfo>>
+    profiles: List<ProfileResultWithManager<*>>
 ) {
     val context = context
     val viewModel = profilesViewModel()
@@ -186,7 +186,7 @@ private fun AddProfileMenuItem(platform: ProfilePlatform, onSelect: () -> Unit) 
 
 @Composable
 private fun AddProfileButton(
-    availableProfiles: List<ProfileResultWithManager<out UserInfo>>
+    availableProfiles: List<ProfileResultWithManager<*>>
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var selectedPlatform: ProfilePlatform? by remember { mutableStateOf(null) }

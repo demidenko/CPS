@@ -33,13 +33,13 @@ fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<ProfilePlatform, LoadingStatus>())
 
-    fun flowOfLoadingStatus(manager: ProfileManager<out UserInfo>): Flow<LoadingStatus> =
+    fun flowOfLoadingStatus(manager: ProfileManager<*>): Flow<LoadingStatus> =
         loadingStatuses.map { it[manager.platform] ?: PENDING }
 
-    fun flowOfLoadingStatus(managers: Collection<ProfileManager<out UserInfo>>): Flow<LoadingStatus> =
+    fun flowOfLoadingStatus(managers: Collection<ProfileManager<*>>): Flow<LoadingStatus> =
         loadingStatuses.map { map -> managers.mapNotNull { map[it.platform] }.combine() }
 
-    private fun setLoadingStatus(manager: ProfileManager<out UserInfo>, loadingStatus: LoadingStatus) =
+    private fun setLoadingStatus(manager: ProfileManager<*>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
             if (loadingStatus == PENDING) remove(manager.platform)
             else this[manager.platform] = loadingStatus
