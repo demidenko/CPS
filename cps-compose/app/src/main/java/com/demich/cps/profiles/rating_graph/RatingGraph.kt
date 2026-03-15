@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
@@ -32,6 +33,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
@@ -151,6 +153,35 @@ private fun RatingGraphWithHeader(
         )
     }
 }
+
+private fun GraphViewPortState.setViewPort(bounds: RatingGraphBounds) {
+    setViewPort(rect = bounds.toGraphViewPortRect())
+}
+
+private suspend fun GraphViewPortState.animateToViewPort(bounds: RatingGraphBounds) {
+    animateToViewPort(rect = bounds.toGraphViewPortRect())
+}
+
+private fun RatingGraphBounds.toGraphViewPortRect(): Rect =
+    fixTimeWidth(border = 1.days).addRatingBorder(border = 100)
+        .apply { require(startTime < endTime) }
+        .toRect()
+
+private fun RatingGraphBounds.fixTimeWidth(border: Duration) =
+    if (startTime == endTime) {
+        copy(
+            startTime = startTime - border,
+            endTime = endTime + border
+        )
+    } else {
+        this
+    }
+
+private fun RatingGraphBounds.addRatingBorder(border: Int) =
+    copy(
+        minRating = minRating - border,
+        maxRating = maxRating + border
+    )
 
 private sealed interface Header
 

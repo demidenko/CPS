@@ -1,5 +1,6 @@
 package com.demich.cps.profiles.rating_graph
 
+import androidx.compose.ui.geometry.Rect
 import com.demich.cps.profiles.managers.RatingChange
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
@@ -15,6 +16,14 @@ internal data class RatingGraphBounds(
         require(startTime <= endTime)
     }
 }
+
+internal fun RatingGraphBounds.toRect(): Rect =
+    Rect(
+        left = startTime.epochSeconds.toFloat(),
+        right = endTime.epochSeconds.toFloat(),
+        top = maxRating.toFloat(),
+        bottom = minRating.toFloat()
+    )
 
 private fun createBounds(
     ratingChanges: List<RatingChange>,
@@ -32,8 +41,8 @@ internal fun createBounds(
     filterType: RatingFilterType,
     now: Instant
 ) = when (filterType) {
-    ALL -> createBounds(ratingChanges)
-    LAST_10 -> createBounds(ratingChanges.takeLast(10))
+    ALL -> createBounds(ratingChanges = ratingChanges)
+    LAST_10 -> createBounds(ratingChanges = ratingChanges.takeLast(10))
     LAST_MONTH, LAST_YEAR -> {
         val startTime = now - (if (filterType == LAST_MONTH) 30.days else 365.days)
         createBounds(

@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -34,7 +33,6 @@ import com.demich.cps.utils.transformY
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
@@ -45,38 +43,23 @@ internal fun rememberGraphViewPortState(): GraphViewPortState  {
 
 @Stable
 internal class GraphViewPortState(
-    rectState: MutableState<Rect>,
-    val borderX: Dp
+    private val rectState: MutableState<Rect>,
+    private val borderX: Dp
 ) {
     //x is seconds, y is rating
-    private var rect: Rect by rectState
+    private val rect: Rect by rectState
 
-    private fun RatingGraphBounds.toRect(): Rect {
-        require(startTime < endTime)
-
-        val ratingBorder = 100
-
-        return Rect(
-            left = startTime.epochSeconds.toFloat(),
-            right = endTime.epochSeconds.toFloat(),
-            top = (maxRating + ratingBorder).toFloat(),
-            bottom = (minRating - ratingBorder).toFloat()
-        )
-    }
-
-    fun setViewPort(bounds: RatingGraphBounds) {
-        rect = bounds.fixTimeWidth().toRect()
+    fun setViewPort(rect: Rect) {
+        rectState.value = rect
     }
 
     // TODO:
     // cancel ongoing
     // cancel on gesture
-    suspend fun animateToViewPort(bounds: RatingGraphBounds) {
+    suspend fun animateToViewPort(rect: Rect) {
         val anim = Animatable(typeConverter = Rect.VectorConverter, initialValue = rect)
-        anim.animateTo(
-            targetValue = bounds.fixTimeWidth().toRect(),
-        ) {
-            rect = value
+        anim.animateTo(targetValue = rect) {
+            setViewPort(rect = value)
         }
     }
 
@@ -116,9 +99,11 @@ internal class GraphViewPortState(
             val pan = pan.transformVector(from = canvasRect, to = rect)
             val centroid = centroid.transform(from = canvasRect, to = rect)
 
-            this.rect = rect
-                .translate(-pan)
-                .coercedScale(scale = zoom, center = centroid, minSize = minSize)
+            setViewPort(
+                rect = rect
+                    .translate(-pan)
+                    .coercedScale(scale = zoom, center = centroid, minSize = minSize)
+            )
         }
     }
 }
@@ -184,17 +169,6 @@ internal fun GraphViewPortState.getNearestRatingChange(
     if (pos == 0 || res.oldRating != null) return res
     return res.copy(oldRating = ratingChanges[pos-1].rating)
 }
-
-
-private fun RatingGraphBounds.fixTimeWidth() =
-    if (startTime == endTime) {
-        copy(
-            startTime = startTime - 1.days,
-            endTime = endTime + 1.days
-        )
-    } else {
-        this
-    }
 
 private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
     require(minWidth > 0)

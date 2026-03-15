@@ -461,7 +461,7 @@ private fun EventsTimeline(
     }
 }
 
-fun CPSColors.colorFor(workState: WorkInfo.State): Color =
+private fun CPSColors.colorFor(workState: WorkInfo.State): Color =
     when (workState) {
         ENQUEUED, SUCCEEDED -> content
         RUNNING -> success
@@ -469,7 +469,7 @@ fun CPSColors.colorFor(workState: WorkInfo.State): Color =
         CANCELLED -> contentAdditional
     }
 
-fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
+private fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
     when (result) {
         SUCCESS -> success
         RETRY -> warning
