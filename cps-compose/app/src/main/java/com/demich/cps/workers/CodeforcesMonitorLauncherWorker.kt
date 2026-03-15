@@ -42,11 +42,11 @@ class CodeforcesMonitorLauncherWorker(
     override suspend fun runWork(): Result {
         //TODO: restart failed monitor
 
-        val dataStore = CodeforcesProfileManager().dataStore(context)
+        val storage = CodeforcesProfileManager().profileStorage(context)
 
         //TODO: optimize read by snapshot
 
-        with(dataStore) {
+        with(storage) {
             val info = profile()?.userInfoOrNull() ?: return Result.success()
 
             val (firstParticipation, firstSubmission) = CodeforcesClient.getFirstNewSubmissions(

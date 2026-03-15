@@ -16,7 +16,7 @@ val ProfileResultWithManager<*>.platform: ProfilePlatform
     get() = manager.platform
 
 fun <U: UserInfo> ProfileManager<U>.flowWithProfileResult(context: Context) =
-    dataStore(context).profile.asFlow().map { result ->
+    profileStorage(context).profile.asFlow().map { result ->
         result?.let { ProfileResultWithManager(it, this) }
     }
 

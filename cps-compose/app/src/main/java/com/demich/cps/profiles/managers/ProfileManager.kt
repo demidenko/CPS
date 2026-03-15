@@ -36,7 +36,7 @@ abstract class ProfileManager<U: UserInfo> {
     abstract val userIdTitle: String
     abstract val urlHomePage: String
 
-    abstract fun dataStore(context: Context): ProfileDataStore<U>
+    abstract fun profileStorage(context: Context): ProfileStorage<U>
 
     open fun isValidForUserId(char: Char): Boolean = true
 

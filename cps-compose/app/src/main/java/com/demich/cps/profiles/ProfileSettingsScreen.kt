@@ -55,7 +55,7 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     val scope = rememberCoroutineScope()
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    val profileResult by collectItemAsState { manager.dataStore(context).profile }
+    val profileResult by collectItemAsState { manager.profileStorage(context).profile }
 
     profileResult?.let {
         ProfileSettingsItems(

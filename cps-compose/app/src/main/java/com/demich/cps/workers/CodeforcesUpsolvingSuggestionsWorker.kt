@@ -43,9 +43,9 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork(): Result {
-        val dataStore = CodeforcesProfileManager().dataStore(context)
+        val storage = CodeforcesProfileManager().profileStorage(context)
 
-        val handle = dataStore.profile()
+        val handle = storage.profile()
             ?.userInfoOrNull()
             ?.takeIf { it.rating != null }
             ?.handle
@@ -53,11 +53,11 @@ class CodeforcesUpsolvingSuggestionsWorker(
 
         val dateThreshold = workerStartTime - 90.days
 
-        dataStore.edit {
+        storage.edit {
             upsolvingSuggestedProblems.removeOlderThan(dateThreshold)
         }
 
-        val suggestedItem = dataStore.upsolvingSuggestedProblems
+        val suggestedItem = storage.upsolvingSuggestedProblems
         val suggestedProblems = suggestedItem()
 
         CodeforcesClient.getUserRatingChanges(handle)

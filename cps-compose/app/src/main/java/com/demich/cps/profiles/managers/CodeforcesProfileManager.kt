@@ -136,7 +136,7 @@ class CodeforcesProfileManager :
         )
     }
 
-    override fun dataStore(context: Context) = CodeforcesProfileDataStore(this, context)
+    override fun profileStorage(context: Context) = CodeforcesProfileStorage(this, context)
     override fun settingsStorage(context: Context) = CodeforcesProfileSettingsDataStore(context)
 
     @Composable
@@ -173,7 +173,7 @@ class CodeforcesProfileManager :
         }
 
     suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
-        dataStore(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
+        profileStorage(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
     }
 
     override val ratingUpperBoundRevolutions
@@ -234,8 +234,8 @@ fun CodeforcesHandle.toHandleSpan() =
         .makeHandleSpan(handle = handle, tag = colorTag, cpsColors = cpsColors)
 
 
-class CodeforcesProfileDataStore(manager: CodeforcesProfileManager, context: Context):
-    RatedProfileDataStore<CodeforcesUserInfo>(manager, context, context.dataStore)
+class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Context):
+    RatedProfileStorage<CodeforcesUserInfo>(manager, context, context.dataStore)
 {
     companion object {
         private val Context.dataStore by profileDataStoreWrapper(ProfilePlatform.codeforces)

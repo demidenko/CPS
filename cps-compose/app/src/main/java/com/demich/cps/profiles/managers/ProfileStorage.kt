@@ -16,7 +16,7 @@ import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 
-abstract class ProfileDataStore<U: UserInfo>(
+abstract class ProfileStorage<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
 ): ItemizedDataStore(dataStoreWrapper) {
     protected abstract val profileItem: DataStoreItem<ProfileResult<U>?>
@@ -44,9 +44,9 @@ abstract class ProfileDataStore<U: UserInfo>(
     }
 }
 
-abstract class ProfileUniqueDataStore<U: UserInfo>(
+abstract class ProfileUniqueStorage<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
-): ProfileDataStore<U>(dataStoreWrapper) {
+): ProfileStorage<U>(dataStoreWrapper) {
     context(scope: DataStoreEditScope)
     final override fun onResetProfile() {
         scope.clear()
@@ -55,8 +55,8 @@ abstract class ProfileUniqueDataStore<U: UserInfo>(
 
 internal val Context.multipleProfilesDataStoreWrapper by dataStoreWrapper("multiple_profiles")
 
-internal inline fun <reified U: UserInfo> ProfileManager<U>.simpleProfileDataStore(context: Context): ProfileDataStore<U> =
-    object : ProfileDataStore<U>(context.multipleProfilesDataStoreWrapper) {
+internal inline fun <reified U: UserInfo> ProfileManager<U>.simpleProfileStorage(context: Context): ProfileStorage<U> =
+    object : ProfileStorage<U>(context.multipleProfilesDataStoreWrapper) {
         override val profileItem = jsonProfile.itemNullable<ProfileResult<U>>(name = "${platform}_profile_result")
 
         context(scope: DataStoreEditScope)

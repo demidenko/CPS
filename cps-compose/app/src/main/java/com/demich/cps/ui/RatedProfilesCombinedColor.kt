@@ -103,7 +103,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
 
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
-    dataStore(context).profile.asFlow().map { getRank(it) }
+    profileStorage(context).profile.asFlow().map { getRank(it) }
 
 private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
     combine(ProfileManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }

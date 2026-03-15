@@ -202,6 +202,6 @@ class CodeChefProfileManager :
         )
     }
 
-    override fun dataStore(context: Context) = simpleProfileDataStore(context)
+    override fun profileStorage(context: Context) = simpleProfileStorage(context)
 
 }

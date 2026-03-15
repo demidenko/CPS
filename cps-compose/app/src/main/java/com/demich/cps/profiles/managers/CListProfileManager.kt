@@ -42,7 +42,7 @@ class CListProfileManager :
             AnnotatedString("$login (${accounts.size})")
         }
 
-    override fun dataStore(context: Context): ProfileDataStore<ClistUserInfo> {
+    override fun profileStorage(context: Context): ProfileStorage<ClistUserInfo> {
         error("CList profile manager can not provide data store")
     }
 

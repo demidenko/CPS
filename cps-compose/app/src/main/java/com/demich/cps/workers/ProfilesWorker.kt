@@ -56,7 +56,7 @@ class ProfilesWorker(
 }
 
 private suspend fun CodeforcesProfileManager.checkRating(context: Context) {
-    val userInfo = dataStore(context).profile()
+    val userInfo = profileStorage(context).profile()
         ?.userInfoOrNull() ?: return
 
     val lastRatingChange = CodeforcesClient.runCatching {
@@ -73,8 +73,8 @@ private fun getNotifiedCodeforcesContribution(context: Context): Int? =
         ?.extras?.getInt(KEY_CF_CONTRIBUTION)
 
 private suspend fun CodeforcesProfileManager.checkContribution(context: Context) {
-    val dataStore = dataStore(context)
-    val userInfo = dataStore.profile()
+    val storage = profileStorage(context)
+    val userInfo = storage.profile()
         ?.userInfoOrNull() ?: return
 
     val handle = userInfo.handle
@@ -83,7 +83,7 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
 
     if (newContribution == userInfo.contribution) return
 
-    dataStore.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)))
+    storage.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)))
 
     val oldContribution = getNotifiedCodeforcesContribution(context) ?: userInfo.contribution
 
@@ -100,13 +100,13 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
 }
 
 private suspend fun AtCoderProfileManager.checkRating(context: Context) {
-    val dataStore = dataStore(context)
-    val userInfo = dataStore.profile()
+    val storage = profileStorage(context)
+    val userInfo = storage.profile()
         ?.userInfoOrNull() ?: return
 
     val lastRatingChange = AtCoderClient.runCatching {
         getRatingChanges(handle = userInfo.handle)
     }.getOrNull()?.lastOrNull() ?: return
 
-    dataStore.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
+    storage.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
 }

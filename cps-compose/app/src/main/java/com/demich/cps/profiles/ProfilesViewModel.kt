@@ -48,8 +48,8 @@ class ProfilesViewModel: ViewModel() {
     fun <U: UserInfo> reload(manager: ProfileManager<U>, context: Context) {
         if (loadingStatuses.value[manager.platform] == LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
-            val dataStore = manager.dataStore(context)
-            val savedProfile = dataStore.profile() ?: return@launch
+            val storage = manager.profileStorage(context)
+            val savedProfile = storage.profile() ?: return@launch
 
             setLoadingStatus(manager, LOADING)
             val profileResult = manager.fetchProfile(savedProfile.userId)
@@ -58,7 +58,7 @@ class ProfilesViewModel: ViewModel() {
                 setLoadingStatus(manager, FAILED)
             } else {
                 setLoadingStatus(manager, PENDING)
-                dataStore.setProfile(profileResult)
+                storage.setProfile(profileResult)
             }
         }
     }
@@ -66,7 +66,7 @@ class ProfilesViewModel: ViewModel() {
     fun <U: UserInfo> delete(manager: ProfileManager<U>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             setLoadingStatus(manager, PENDING)
-            manager.dataStore(context).deleteProfile()
+            manager.profileStorage(context).deleteProfile()
         }
     }
 
@@ -84,7 +84,7 @@ class ProfilesViewModel: ViewModel() {
                     val manager = profileManagerOf(platform)
                     //wait for loading stops
                     loadingStatuses.takeWhile { it[platform] == LOADING }.collect()
-                    val savedUserId = manager.dataStore(context).profile()?.userId
+                    val savedUserId = manager.profileStorage(context).profile()?.userId
                     if (userId.equals(savedUserId, ignoreCase = true)) {
                         //if userId is same just reload to prevent replace by FAILED
                         reload(manager, context)
@@ -101,7 +101,7 @@ class ProfilesViewModel: ViewModel() {
     }
 
     private suspend fun <U: UserInfo> getAndSave(manager: ProfileManager<U>, userId: String, context: Context) {
-        manager.dataStore(context).setProfile(manager.fetchProfile(userId))
+        manager.profileStorage(context).setProfile(manager.fetchProfile(userId))
     }
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()

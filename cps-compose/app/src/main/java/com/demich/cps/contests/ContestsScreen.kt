@@ -468,7 +468,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             },
             onStop = {
                 scope.launch {
-                    CodeforcesProfileManager().dataStore(context)
+                    CodeforcesProfileManager().profileStorage(context)
                         .monitorCanceledContests.add(contestId, getCurrentTime())
                     monitor.reset()
                 }

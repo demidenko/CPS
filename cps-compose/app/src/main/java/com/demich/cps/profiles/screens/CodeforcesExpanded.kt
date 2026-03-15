@@ -142,7 +142,7 @@ private fun UpsolvingSuggestionsList(
 ) {
     val context = context
     val problems by collectAsState {
-        CodeforcesProfileManager().dataStore(context)
+        CodeforcesProfileManager().profileStorage(context)
             .upsolvingSuggestedProblems.asFlow()
             .map { it.valuesSortedByTime().asReversed() }
     }

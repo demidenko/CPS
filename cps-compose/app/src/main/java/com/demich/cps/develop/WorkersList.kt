@@ -122,7 +122,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
 private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context: Context) {
     doJob(id = "run_cf_monitor $contestId") { progress ->
         val handle = CodeforcesProfileManager()
-            .dataStore(context)
+            .profileStorage(context)
             .profile()?.handle ?: return@doJob
         var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
         progress(progressInfo)

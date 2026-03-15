@@ -71,7 +71,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
-    val profileResult by collectItemAsState { manager.dataStore(context).profile }
+    val profileResult by collectItemAsState { manager.profileStorage(context).profile }
     profileResult?.let {
         manager.ExpandedContent(
             profileResult = it,
@@ -96,7 +96,7 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
             profileManagerOf(platform)
-                .dataStore(context).profile()
+                .profileStorage(context).profile()
                 ?.userInfoOrNull()
                 ?.userPageUrl
                 ?.let { url -> context.openUrlInBrowser(url) }

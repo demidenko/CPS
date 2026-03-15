@@ -94,7 +94,7 @@ class AtCoderProfileManager :
         )
     }
 
-    override fun dataStore(context: Context) = AtCoderProfileDataStore(this, context)
+    override fun profileStorage(context: Context) = AtCoderProfileStorage(this, context)
     override fun settingsStorage(context: Context) = AtCoderProfileSettingsDataStore(context)
 
     @Composable
@@ -112,8 +112,8 @@ class AtCoderProfileManager :
 
 }
 
-class AtCoderProfileDataStore(manager: AtCoderProfileManager, context: Context):
-    RatedProfileDataStore<AtCoderUserInfo>(manager, context, context.dataStore)
+class AtCoderProfileStorage(manager: AtCoderProfileManager, context: Context):
+    RatedProfileStorage<AtCoderUserInfo>(manager, context, context.dataStore)
 {
     companion object {
         private val Context.dataStore by profileDataStoreWrapper(platform = ProfilePlatform.atcoder)

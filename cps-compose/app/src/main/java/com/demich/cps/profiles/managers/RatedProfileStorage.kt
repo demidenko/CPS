@@ -11,12 +11,12 @@ import com.demich.cps.utils.toSignedString
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreWrapper
 
-abstract class RatedProfileDataStore<U: RatedUserInfo>(
+abstract class RatedProfileStorage<U: RatedUserInfo>(
     private val manager: RatedProfileManager<U>,
     private val context: Context,
     dataStoreWrapper: DataStoreWrapper
 ):
-    ProfileUniqueDataStore<U>(dataStoreWrapper)
+    ProfileUniqueStorage<U>(dataStoreWrapper)
 {
     private val lastRatingChange: DataStoreItem<RatingChange?> =
         jsonCPS.itemNullable(name = "last_rating_change")
