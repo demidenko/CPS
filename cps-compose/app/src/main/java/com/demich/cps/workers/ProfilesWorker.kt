@@ -38,14 +38,14 @@ class ProfilesWorker(
     override suspend fun runWork(): Result {
         joinAllWithProgress {
             with(CodeforcesProfileManager()) {
-                getSettings(context).fromSnapshot {
+                settingsStorage(context).fromSnapshot {
                     if (observeRating.value) add { checkRating(context = context) }
                     if (observeContribution.value) add { checkContribution(context = context) }
                 }
             }
 
             with(AtCoderProfileManager()) {
-                getSettings(context).fromSnapshot {
+                settingsStorage(context).fromSnapshot {
                     if (observeRating.value) add { checkRating(context = context) }
                 }
             }

@@ -137,12 +137,12 @@ class CodeforcesProfileManager :
     }
 
     override fun dataStore(context: Context) = CodeforcesProfileDataStore(this, context)
-    override fun getSettings(context: Context) = CodeforcesProfileSettingsDataStore(context)
+    override fun settingsStorage(context: Context) = CodeforcesProfileSettingsDataStore(context)
 
     @Composable
     context(scope: SettingsContainerScope)
     override fun SettingsItems() {
-        val settings = getSettings(context)
+        val settings = settingsStorage(context)
         SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
@@ -165,7 +165,7 @@ class CodeforcesProfileManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        getSettings(context).flowOf {
+        settingsStorage(context).flowOf {
             observeRating.value or
             monitorEnabled.value or
             upsolvingSuggestionsEnabled.value or

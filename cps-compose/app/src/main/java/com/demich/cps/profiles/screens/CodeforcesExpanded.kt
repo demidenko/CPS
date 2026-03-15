@@ -93,7 +93,7 @@ fun CodeforcesUserInfoExpandedContent(
 
     val context = context
     val upsolvingSuggestionsEnabled by collectItemAsState {
-        manager.getSettings(context).upsolvingSuggestionsEnabled
+        manager.settingsStorage(context).upsolvingSuggestionsEnabled
     }
 
     setBottomBarContent {

@@ -65,7 +65,7 @@ internal inline fun <reified U: UserInfo> ProfileManager<U>.simpleProfileDataSto
 
 
 interface ProfileSettingsProvider {
-    fun getSettings(context: Context): ItemizedDataStore
+    fun settingsStorage(context: Context): ItemizedDataStore
 
     @Composable
     context(scope: SettingsContainerScope)

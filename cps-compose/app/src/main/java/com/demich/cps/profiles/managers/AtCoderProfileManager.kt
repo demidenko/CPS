@@ -95,12 +95,12 @@ class AtCoderProfileManager :
     }
 
     override fun dataStore(context: Context) = AtCoderProfileDataStore(this, context)
-    override fun getSettings(context: Context) = AtCoderProfileSettingsDataStore(context)
+    override fun settingsStorage(context: Context) = AtCoderProfileSettingsDataStore(context)
 
     @Composable
     context(scope: SettingsContainerScope)
     override fun SettingsItems() {
-        val settings = getSettings(context)
+        val settings = settingsStorage(context)
         SwitchByProfilesWork(
             item = settings.observeRating,
             title = "Rating changes observer"
