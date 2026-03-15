@@ -24,7 +24,6 @@ import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -145,7 +144,7 @@ private fun TestHandles(
 
 @Composable
 private fun HandlesList(
-    manager: RatedProfileManager<out RatedUserInfo>,
+    manager: RatedProfileManager<*>,
     modifier: Modifier = Modifier
 ) {
     LazyColumnWithScrollBar(

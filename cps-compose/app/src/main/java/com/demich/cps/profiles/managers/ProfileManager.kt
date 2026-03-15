@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.profiles.userinfo.ProfileResult
-import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
@@ -59,7 +58,7 @@ abstract class ProfileManager<U: UserInfo> {
     }
 
     companion object {
-        fun entries(): List<ProfileManager<out UserInfo>> =
+        fun entries(): List<ProfileManager<*>> =
             listOf(
                 CodeforcesProfileManager(),
                 AtCoderProfileManager(),
@@ -69,7 +68,7 @@ abstract class ProfileManager<U: UserInfo> {
                 TimusProfileManager()
             )
 
-        fun ratedEntries(): List<RatedProfileManager<out RatedUserInfo>> =
+        fun ratedEntries(): List<RatedProfileManager<*>> =
             entries().filterIsInstance<RatedProfileManager<*>>()
     }
 }

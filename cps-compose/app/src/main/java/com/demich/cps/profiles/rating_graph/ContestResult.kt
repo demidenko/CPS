@@ -23,7 +23,6 @@ import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.colorFor
-import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
@@ -35,7 +34,7 @@ import kotlin.time.Instant
 @Composable
 internal fun ContestResult(
     ratingChange: RatingChange,
-    manager: RatedProfileManager<out RatedUserInfo>,
+    manager: RatedProfileManager<*>,
     rectangles: RatingGraphRectangles,
     modifier: Modifier = Modifier
 ) {

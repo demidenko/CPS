@@ -26,7 +26,6 @@ import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
-import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.spawnDpState
 import com.demich.cps.utils.toOffset
@@ -35,7 +34,7 @@ import kotlin.time.Instant
 @Composable
 internal fun RatingGraphCanvas(
     ratingChanges: List<RatingChange>,
-    manager: RatedProfileManager<out RatedUserInfo>,
+    manager: RatedProfileManager<*>,
     rectangles: RatingGraphRectangles,
     viewPortState: GraphViewPortState,
     currentTime: Instant,

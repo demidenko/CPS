@@ -75,7 +75,7 @@ private fun colorState(
 private data class RatedRank(
     val rank: Double,
     val handleColor: HandleColor,
-    val manager: RatedProfileManager<out RatedUserInfo>
+    val manager: RatedProfileManager<*>
 )
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {

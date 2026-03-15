@@ -8,13 +8,12 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.profilesViewModel
 import com.demich.cps.profiles.rating_graph.RatingGraph
-import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 
 @Composable
 internal fun RatingGraphItem(
-    manager: RatedProfileManager<out RatedUserInfo>,
+    manager: RatedProfileManager<*>,
     handle: String,
     modifier: Modifier = Modifier
 ) {
