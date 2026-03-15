@@ -5,6 +5,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundExcep
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.getContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings

@@ -2,6 +2,7 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult

@@ -30,14 +30,6 @@ interface CodeforcesApi {
         //TODO: participantTypes: Collection<CodeforcesParticipationType>
     ): CodeforcesContestStandings
 
-    suspend fun getContestStandings(
-        contestId: Int,
-        handle: String,
-        includeUnofficial: Boolean
-    ): CodeforcesContestStandings {
-        return getContestStandings(contestId, listOf(handle), includeUnofficial)
-    }
-
     suspend fun getContestSubmissions(
         contestId: Int,
         handle: String
@@ -58,13 +50,6 @@ interface CodeforcesApi {
         checkHistoricHandles: Boolean = false
     ): List<CodeforcesUser>
 
-    suspend fun getUser(
-        handle: String,
-        checkHistoricHandles: Boolean = false
-    ): CodeforcesUser {
-        return getUsers(listOf(handle), checkHistoricHandles).first()
-    }
-
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange>
 
     suspend fun getUserSubmissions(
@@ -73,3 +58,23 @@ interface CodeforcesApi {
         from: Long
     ): List<CodeforcesSubmission>
 }
+
+suspend fun CodeforcesApi.getContestStandings(
+    contestId: Int,
+    handle: String,
+    includeUnofficial: Boolean
+): CodeforcesContestStandings =
+    getContestStandings(
+        contestId = contestId,
+        handles = listOf(handle),
+        includeUnofficial = includeUnofficial
+    )
+
+suspend fun CodeforcesApi.getUser(
+    handle: String,
+    checkHistoricHandles: Boolean = false
+): CodeforcesUser =
+    getUsers(
+        handles = listOf(handle),
+        checkHistoricHandles = checkHistoricHandles
+    ).first()
