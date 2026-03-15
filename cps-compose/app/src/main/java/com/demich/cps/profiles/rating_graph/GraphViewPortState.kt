@@ -38,16 +38,21 @@ import kotlin.time.Duration.Companion.hours
 @Composable
 internal fun rememberGraphViewPortState(): GraphViewPortState  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
-    return remember(rectState) { GraphViewPortState(rectState = rectState, borderX = 10.dp) }
+    return remember(rectState) {
+        GraphViewPortState(
+            rectState = rectState,
+            borderHorizontal = 10.dp
+        )
+    }
 }
 
 @Stable
 internal class GraphViewPortState(
     private val rectState: MutableState<Rect>,
-    private val borderX: Dp
+    private val borderHorizontal: Dp
 ) {
     //x is seconds, y is rating
-    private val rect: Rect by rectState
+    val rect: Rect by rectState
 
     fun setViewPort(rect: Rect) {
         rectState.value = rect
@@ -65,47 +70,13 @@ internal class GraphViewPortState(
 
     context(density: Density)
     private fun Size.toBorderedRect(): Rect =
-        toRect().inflate(horizontal = density.run { borderX.toPx() }, vertical = 0f)
+        toRect().inflate(horizontal = density.run { borderHorizontal.toPx() }, vertical = 0f)
 
     context(scope: DrawScope)
     fun canvasRect(): Rect = scope.size.toBorderedRect()
 
     context(scope: PointerInputScope)
     fun canvasRect(): Rect = scope.size.toSize().toBorderedRect()
-
-    context(scope: DrawScope)
-    fun translator() = GraphPointTranslator(
-        viewPortRect = rect,
-        canvasRect = canvasRect()
-    )
-
-    context(scope: PointerInputScope)
-    fun translator() = GraphPointTranslator(
-        viewPortRect = rect,
-        canvasRect = canvasRect()
-    )
-
-    context(scope: PointerInputScope)
-    suspend fun detectTransformGestures() {
-        val minSize = Size(
-            width = 1.hours.inWholeSeconds.toFloat(),
-            height = 1f
-        )
-
-        scope.detectTransformGestures { centroid, pan, zoom, _ ->
-            val canvasRect = canvasRect()
-
-            val rect = rect
-            val pan = pan.transformVector(from = canvasRect, to = rect)
-            val centroid = centroid.transform(from = canvasRect, to = rect)
-
-            setViewPort(
-                rect = rect
-                    .translate(-pan)
-                    .coercedScale(scale = zoom, center = centroid, minSize = minSize)
-            )
-        }
-    }
 }
 
 internal class GraphPointTranslator(
@@ -125,6 +96,18 @@ internal class GraphPointTranslator(
         )
 
 }
+
+context(scope: DrawScope)
+internal fun GraphViewPortState.translator() = GraphPointTranslator(
+    viewPortRect = rect,
+    canvasRect = canvasRect()
+)
+
+context(scope: PointerInputScope)
+internal fun GraphViewPortState.translator() = GraphPointTranslator(
+    viewPortRect = rect,
+    canvasRect = canvasRect()
+)
 
 internal fun GraphPointTranslator.pointsToCanvasPath(points: List<GraphPoint>): Path {
     return Path().apply {
@@ -151,6 +134,28 @@ internal inline fun GraphPointTranslator.pointRectToCanvasRect(
 
     if (left <= right && top <= bottom) {
         block(Rect(left = left, top = top, right = right, bottom = bottom))
+    }
+}
+
+context(scope: PointerInputScope)
+internal suspend fun GraphViewPortState.detectTransformGestures() {
+    val minSize = Size(
+        width = 1.hours.inWholeSeconds.toFloat(),
+        height = 1f
+    )
+
+    scope.detectTransformGestures { centroid, pan, zoom, _ ->
+        val canvasRect = canvasRect()
+
+        val rect = rect
+        val pan = pan.transformVector(from = canvasRect, to = rect)
+        val centroid = centroid.transform(from = canvasRect, to = rect)
+
+        setViewPort(
+            rect = rect
+                .translate(-pan)
+                .coercedScale(scale = zoom, center = centroid, minSize = minSize)
+        )
     }
 }
 
