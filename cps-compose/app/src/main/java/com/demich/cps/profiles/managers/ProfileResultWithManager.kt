@@ -10,8 +10,10 @@ data class ProfileResultWithManager<U: UserInfo>(
     val profileResult: ProfileResult<U>,
     val manager: AccountManager<U>
 ) {
-    val platform: ProfilePlatform get() = manager.platform
 }
+
+val ProfileResultWithManager<*>.platform: ProfilePlatform
+    get() = manager.platform
 
 fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
     dataStore(context).profile.asFlow().map { result ->
