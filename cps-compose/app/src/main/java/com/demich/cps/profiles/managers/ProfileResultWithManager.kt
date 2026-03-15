@@ -1,0 +1,22 @@
+package com.demich.cps.profiles.managers
+
+import android.content.Context
+import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.profiles.userinfo.UserInfo
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+
+data class ProfileResultWithManager<U: UserInfo>(
+    val profileResult: ProfileResult<U>,
+    val manager: AccountManager<U>
+) {
+    val platform: ProfilePlatform get() = manager.platform
+}
+
+fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
+    dataStore(context).profile.asFlow().map { result ->
+        result?.let { ProfileResultWithManager(it, this) }
+    }
+
+fun Collection<AccountManager<*>>.flowOfExisted(context: Context) =
+    combine(flows = map { it.flowWithProfileResult(context) }) { it.filterNotNull() }

@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.managers.AccountManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.flowWithProfileResult
+import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -34,6 +34,7 @@ import com.demich.cps.utils.context
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
@@ -47,11 +48,11 @@ internal fun StatusBarButtons() {
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
 
     val recordedPlatforms by collectAsState {
-        combine(AccountManager.ratedEntries().map { it.flowWithProfileResult(context) }) { array ->
-            array.mapNotNull { it?.manager?.platform }
-        }.combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
-            platforms.sortedBy { order.indexOf(it) }
-        }
+        AccountManager.ratedEntries().flowOfExisted(context)
+            .map { it.map { it.manager.platform } }
+            .combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
+                platforms.sortedBy { order.indexOf(it) }
+            }
     }
 
     var showPopup by rememberSaveable { mutableStateOf(false) }

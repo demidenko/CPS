@@ -11,7 +11,6 @@ import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
-import kotlinx.coroutines.flow.map
 
 @androidx.annotation.Keep //navigation agr type
 enum class ProfilePlatform {
@@ -76,18 +75,6 @@ abstract class AccountManager<U: UserInfo> {
 
 fun accountManagerOf(platform: ProfilePlatform) =
     AccountManager.entries().first { it.platform == platform }
-
-data class ProfileResultWithManager<U: UserInfo>(
-    val profileResult: ProfileResult<U>,
-    val manager: AccountManager<U>
-) {
-    val platform: ProfilePlatform get() = manager.platform
-}
-
-fun <U: UserInfo> AccountManager<U>.flowWithProfileResult(context: Context) =
-    dataStore(context).profile.asFlow().map { result ->
-        result?.let { ProfileResultWithManager(it, this) }
-    }
 
 interface ProfileSuggestionsProvider {
     suspend fun fetchSuggestions(str: String): List<UserSuggestion>
