@@ -159,7 +159,7 @@ private fun GraphViewPortState.setViewPort(bounds: RatingGraphBounds) {
 }
 
 private suspend fun GraphViewPortState.animateToViewPort(bounds: RatingGraphBounds) {
-    animateToViewPort(rect = bounds.toGraphViewPortRect())
+    animateToViewPort(targetRect = bounds.toGraphViewPortRect())
 }
 
 private fun RatingGraphBounds.toGraphViewPortRect(): Rect =
