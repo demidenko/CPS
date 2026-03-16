@@ -123,15 +123,25 @@ internal fun GraphViewPortState.translator() = GraphPointTranslator(
     canvasRect = canvasRect()
 )
 
-context(scope: PointerInputScope)
 internal inline fun <R> GraphViewPortState.withTranslator(
+    canvasRect: Rect,
     block: GraphPointTranslator.() -> R
 ): R {
     return GraphPointTranslator(
         viewPortRect = rect,
-        canvasRect = canvasRect()
+        canvasRect = canvasRect
     ).block()
 }
+
+context(scope: DrawScope)
+internal inline fun <R> GraphViewPortState.withTranslator(
+    block: GraphPointTranslator.() -> R
+): R = withTranslator(canvasRect = canvasRect(), block = block)
+
+context(scope: PointerInputScope)
+internal inline fun <R> GraphViewPortState.withTranslator(
+    block: GraphPointTranslator.() -> R
+): R = withTranslator(canvasRect = canvasRect(), block = block)
 
 internal fun GraphPointTranslator.pointsToCanvasPath(points: List<GraphPoint>): Path {
     return Path().apply {
