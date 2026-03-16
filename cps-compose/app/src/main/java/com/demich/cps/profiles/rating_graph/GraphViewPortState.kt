@@ -36,20 +36,27 @@ import kotlin.math.floor
 import kotlin.time.Duration
 
 @Composable
-internal fun rememberGraphViewPortState(): GraphViewPortState  {
+internal fun rememberGraphViewPortState(
+    inflateHorizontal: Dp = 0.dp,
+    inflateVertical: Dp = 0.dp,
+): GraphViewPortState  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
     return remember(rectState) {
         GraphViewPortState(
             rectState = rectState,
-            borderHorizontal = 10.dp
+            inflateHorizontal = inflateHorizontal,
+            inflateVertical = inflateVertical
         )
     }
 }
 
+//TODO: make inflate as inner state with set method
+
 @Stable
 internal class GraphViewPortState(
     private val rectState: MutableState<Rect>,
-    private val borderHorizontal: Dp
+    private val inflateHorizontal: Dp,
+    private val inflateVertical: Dp,
 ) {
 
     //TODO: precision loss (make DoubleRect?)
@@ -72,7 +79,12 @@ internal class GraphViewPortState(
 
     context(density: Density)
     private fun Size.toBorderedRect(): Rect =
-        toRect().inflate(horizontal = density.run { borderHorizontal.toPx() }, vertical = 0f)
+        with(density) {
+            toRect().inflate(
+                horizontal = inflateHorizontal.toPx(),
+                vertical = inflateVertical.toPx()
+            )
+        }
 
     context(scope: DrawScope)
     fun canvasRect(): Rect = scope.size.toBorderedRect()
