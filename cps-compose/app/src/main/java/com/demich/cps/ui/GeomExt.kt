@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
