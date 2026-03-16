@@ -61,9 +61,9 @@ internal class GraphViewPortState(
     // TODO:
     // cancel ongoing
     // cancel on gesture
-    suspend fun animateToViewPort(rect: Rect) {
+    suspend fun animateToViewPort(targetRect: Rect) {
         val anim = Animatable(typeConverter = Rect.VectorConverter, initialValue = rect)
-        anim.animateTo(targetValue = rect) {
+        anim.animateTo(targetValue = targetRect) {
             setViewPort(rect = value)
         }
     }
