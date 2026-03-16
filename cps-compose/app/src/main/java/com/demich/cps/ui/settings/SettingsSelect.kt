@@ -17,6 +17,7 @@ import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.launch
@@ -127,7 +128,6 @@ fun <T: Enum<T>> MultiSelectEnum(
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }
 ) {
     val scope = rememberCoroutineScope()
-    val selectedOptions by collectItemAsState { item }
 
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -137,22 +137,23 @@ fun <T: Enum<T>> MultiSelectEnum(
         modifier = Modifier.clickable { showChangeDialog = true }
     ) { newsFeeds ->
         Subtitle(
-            selected = selectedOptions,
+            selected = newsFeeds,
             name = optionName
         )
     }
 
     if (showChangeDialog) {
+        val selected = rememberFirstValue { item }
         CPSDialogMultiSelectEnum(
             title = title,
             options = options,
-            selectedOptions = selectedOptions,
+            initSelected = selected,
             optionContent = optionContent,
             onDismissRequest = { showChangeDialog = false },
             onSaveSelected = {
                 scope.launch {
                     item.setValue(it)
-                    onNewSelected(it - selectedOptions)
+                    onNewSelected(it - selected)
                 }
             }
         )

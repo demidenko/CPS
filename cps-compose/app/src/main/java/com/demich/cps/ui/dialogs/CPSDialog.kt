@@ -229,12 +229,12 @@ fun <T> CPSDialogSelect(
 fun<T: Enum<T>> CPSDialogMultiSelectEnum(
     title: String,
     options: Iterable<T>,
-    selectedOptions: Collection<T>,
+    initSelected: Set<T>,
     optionContent: @Composable (T) -> Unit,
     onDismissRequest: () -> Unit,
     onSaveSelected: (Set<T>) -> Unit
 ) {
-    var currentlySelected: Set<T> by remember { mutableStateOf(selectedOptions.toSet()) }
+    var currentlySelected: Set<T> by remember { mutableStateOf(initSelected) }
 
     CPSDialog(
         title = title,
