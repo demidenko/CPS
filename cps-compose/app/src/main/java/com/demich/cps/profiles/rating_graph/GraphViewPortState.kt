@@ -33,7 +33,7 @@ import com.demich.cps.utils.transformY
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration
 
 @Composable
 internal fun rememberGraphViewPortState(): GraphViewPortState  {
@@ -140,10 +140,13 @@ internal inline fun GraphPointTranslator.pointRectToCanvasRect(
 }
 
 context(scope: PointerInputScope)
-internal suspend fun GraphViewPortState.detectTransformGestures() {
+internal suspend fun GraphViewPortState.detectTransformGestures(
+    minWidth: Duration,
+    minHeight: Int
+) {
     val minSize = Size(
-        width = 1.hours.inWholeSeconds.toFloat(),
-        height = 1f
+        width = minWidth.inWholeSeconds.toFloat(),
+        height = minHeight.toFloat()
     )
 
     scope.detectTransformGestures { centroid, pan, zoom, _ ->
