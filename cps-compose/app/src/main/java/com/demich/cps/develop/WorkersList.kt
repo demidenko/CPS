@@ -43,6 +43,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkInfo
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
+import com.demich.cps.profiles.rating_graph.RatingGraphBounds
+import com.demich.cps.profiles.rating_graph.rememberGraphViewPortState
+import com.demich.cps.profiles.rating_graph.toRect
+import com.demich.cps.profiles.rating_graph.translator
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
@@ -387,11 +391,15 @@ private fun WorkerDialog(
                         append(events.size)
                     })
 
+                    val cpsColors = cpsColors
                     EventsTimeline(
+                        modifier = Modifier.fillMaxWidth(),
                         events = events,
                         period = 24.hours,
+                        pointRadius = 3.dp,
                         lineWidth = 1.dp,
-                        modifier = Modifier.fillMaxWidth().height(6.dp)
+                        lineColor = cpsColors.divider,
+                        eventColor = { cpsColors.colorFor(result = it.resultType) }
                     )
                 }
             }
@@ -416,31 +424,47 @@ private fun WorkerDialog(
 private fun EventsTimeline(
     period: Duration,
     events: List<CPSWorker.ExecutionEvent>,
+    pointRadius: Dp,
     lineWidth: Dp,
+    lineColor: Color,
+    eventColor: (CPSWorker.ExecutionEvent) -> Color,
     modifier: Modifier = Modifier
 ) {
-    val cpsColors = cpsColors
-
     val endTime = localCurrentTime
     val startTime = endTime - period
 
     val events = events.sortedBy { it.start }
 
+    val viewPortState = rememberGraphViewPortState(
+        inflateHorizontal = pointRadius,
+        inflateVertical = pointRadius
+    ).also {
+        val bounds = RatingGraphBounds(
+            minRating = 0,
+            maxRating = 0,
+            startTime = startTime,
+            endTime = endTime
+        )
+        it.setViewPort(bounds.toRect())
+    }
+
     Canvas(
-        modifier = modifier.clipToBounds()
+        modifier = modifier
+            .height(pointRadius * 2)
+            .clipToBounds()
     ) {
-        val radius = size.height / 2
+        val translator = viewPortState.translator()
+        fun Instant.toX(): Float = translator.pointXToCanvasX(epochSeconds)
 
-        fun Instant.toX(): Float =
-            ((this - startTime) / period).toFloat() * (size.width - radius * 2) + radius
-
+        val radius = pointRadius.toPx()
+        val cornerRadius = CornerRadius(radius)
 
         val lineWidth = lineWidth.toPx()
 
         drawLine(
-            color = cpsColors.divider,
-            start = Offset(x = 0f, y = radius),
-            end = Offset(x = size.width, y = radius),
+            color = lineColor,
+            start = Offset(x = startTime.toX(), y = radius),
+            end = Offset(x = endTime.toX(), y = radius),
             strokeWidth = lineWidth
         )
 
@@ -450,12 +474,12 @@ private fun EventsTimeline(
             val mid = (l + r) / 2
 
             drawRoundRectWithBorderInside(
-                color = cpsColors.colorFor(event.resultType),
-                borderColor = cpsColors.divider,
+                color = eventColor(event),
+                borderColor = lineColor,
                 borderWidth = lineWidth,
                 topLeft = Offset(x = mid - radius, y = 0f),
                 size = Size(width = r - l + radius * 2, height = size.height),
-                cornerRadius = CornerRadius(radius),
+                cornerRadius = cornerRadius,
             )
         }
     }
