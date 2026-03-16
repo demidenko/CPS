@@ -109,17 +109,7 @@ internal class GraphPointTranslator(
             x = x.toCanvasX(),
             y = y.toCanvasY()
         )
-
-    fun pointXToCanvasX(x: Instant) = x.toCanvasX()
-
-    fun pointToCanvas(point: GraphPoint) = point.toCanvasPoint()
 }
-
-context(scope: DrawScope)
-internal fun GraphViewPortState.translator() = GraphPointTranslator(
-    viewPortRect = rect,
-    canvasRect = canvasRect()
-)
 
 internal inline fun <R> GraphViewPortState.withTranslator(
     canvasRect: Rect,

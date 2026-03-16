@@ -115,60 +115,59 @@ private fun RatingGraphCanvas(
         val pathWidth = pathWidth.toPx()
         val shadowOffset = shadowOffset.toOffset()
 
-        val translator = viewPortState.translator()
+        viewPortState.withTranslator {
+            val ratingPath = pointsToCanvasPath(ratingPoints)
 
-        val ratingPath = translator.pointsToCanvasPath(ratingPoints)
-
-        //rating filled areas
-        drawRatingBackground(
-            rectangles = rectangles,
-            translator = translator,
-            getColor = getColor
-        )
-
-        //time dashes
-        if (selectedPoint != null) {
-            val p = translator.pointToCanvas(selectedPoint)
-            drawVertical(
-                x = p.x,
-                bottomY = p.y,
-                color = markerColor,
-                pathEffect = dashEffect
+            //rating filled areas
+            drawRatingBackground(
+                rectangles = rectangles,
+                getColor = getColor
             )
-        } else {
-            markVerticals.forEach { x ->
+
+            //time dashes
+            if (selectedPoint != null) {
+                val p = selectedPoint.toCanvasPoint()
                 drawVertical(
-                    x = translator.pointXToCanvasX(x),
+                    x = p.x,
+                    bottomY = p.y,
                     color = markerColor,
                     pathEffect = dashEffect
                 )
+            } else {
+                markVerticals.forEach { x ->
+                    drawVertical(
+                        x = x.toCanvasX(),
+                        color = markerColor,
+                        pathEffect = dashEffect
+                    )
+                }
             }
-        }
 
-        drawWithShadow(
-            shadowColor = shadowColor,
-            shadowAlpha = shadowAlpha,
-            offset = shadowOffset,
-            graphicsLayer = shadowLayer
-        ) {
-            //rating path
-            drawPath(
-                path = ratingPath,
-                color = lineColor,
-                style = Stroke(width = pathWidth)
-            )
-
-            //rating points
-            pointsWithColors.forEach { (point, color) ->
-                drawPoint(
-                    center = translator.pointToCanvas(point),
-                    color = color,
-                    borderColor = lineColor,
-                    radius = circleRadius,
-                    borderWidth = circleBorderWidth,
-                    isSelected = point == selectedPoint,
-                    selectedScale = selectedPointScale
+            drawWithShadow(
+                shadowColor = shadowColor,
+                shadowAlpha = shadowAlpha,
+                offset = shadowOffset,
+                graphicsLayer = shadowLayer
+            ) {
+                //rating path
+                drawPath(
+                    path = ratingPath,
+                    color = lineColor,
+                    style = Stroke(width = pathWidth)
                 )
+
+                //rating points
+                pointsWithColors.forEach { (point, color) ->
+                    drawPoint(
+                        center = point.toCanvasPoint(),
+                        color = color,
+                        borderColor = lineColor,
+                        radius = circleRadius,
+                        borderWidth = circleBorderWidth,
+                        isSelected = point == selectedPoint,
+                        selectedScale = selectedPointScale
+                    )
+                }
             }
         }
     }
@@ -206,9 +205,9 @@ private fun DrawScope.drawPoint(
     }
 }
 
+context(translator: GraphPointTranslator)
 private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
-    translator: GraphPointTranslator,
     getColor: (HandleColor) -> Color
 ) {
     rectangles.forEachRect { bottomLeft, topRight, handleColor ->
