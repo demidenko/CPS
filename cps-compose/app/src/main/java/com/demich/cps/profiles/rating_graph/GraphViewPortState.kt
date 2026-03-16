@@ -99,10 +99,10 @@ internal class GraphPointTranslator(
     val canvasRect: Rect
 ) {
     fun pointXToCanvasX(x: Instant) =
-        x.epochSeconds.toFloatUseInf().transformX(from = viewPortRect, to = canvasRect)
+        x.toGraphX().transformX(from = viewPortRect, to = canvasRect)
 
-    fun pointYToCanvasY(y: Long) =
-        y.toFloatUseInf().transformY(from = viewPortRect, to = canvasRect)
+    fun pointYToCanvasY(y: Int) =
+        y.toGraphY().transformY(from = viewPortRect, to = canvasRect)
 
     fun pointToCanvas(point: GraphPoint) =
         Offset(
@@ -209,9 +209,16 @@ private fun Rect.coercedScale(scale: Float, center: Offset, minSize: Size): Rect
     return scale(scale = scale, center = center)
 }
 
-private fun Long.toFloatUseInf(): Float =
+internal fun Instant.toGraphX(): Float =
     when (this) {
-        Long.MIN_VALUE -> Float.NEGATIVE_INFINITY
-        Long.MAX_VALUE -> Float.POSITIVE_INFINITY
+        Instant.DISTANT_PAST -> Float.NEGATIVE_INFINITY
+        Instant.DISTANT_FUTURE -> Float.POSITIVE_INFINITY
+        else -> epochSeconds.toFloat()
+    }
+
+internal fun Int.toGraphY(): Float =
+    when (this) {
+        Int.MIN_VALUE -> Float.NEGATIVE_INFINITY
+        Int.MAX_VALUE -> Float.POSITIVE_INFINITY
         else -> toFloat()
     }

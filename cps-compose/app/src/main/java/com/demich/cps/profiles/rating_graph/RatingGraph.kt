@@ -169,7 +169,7 @@ private suspend fun GraphViewPortState.animateToViewPort(bounds: RatingGraphBoun
 private fun RatingGraphBounds.toGraphViewPortRect(): Rect =
     fixTimeWidth(border = 1.days).addRatingBorder(border = 100)
         .apply { require(startTime < endTime) }
-        .toRect()
+        .toGraphRect()
 
 private fun RatingGraphBounds.fixTimeWidth(border: Duration) =
     if (startTime == endTime) {

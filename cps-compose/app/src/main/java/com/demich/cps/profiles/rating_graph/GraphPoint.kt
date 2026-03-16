@@ -5,8 +5,8 @@ import kotlin.time.Instant
 
 internal data class GraphPoint(
     val x: Instant,
-    val y: Long
+    val y: Int
 )
 
 internal fun RatingChange.toGraphPoint() =
-    GraphPoint(x = date, y = rating.toLong())
+    GraphPoint(x = date, y = rating)

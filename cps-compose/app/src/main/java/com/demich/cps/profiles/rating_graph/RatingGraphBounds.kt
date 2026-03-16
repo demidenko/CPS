@@ -17,12 +17,12 @@ internal data class RatingGraphBounds(
     }
 }
 
-internal fun RatingGraphBounds.toRect(): Rect =
+internal fun RatingGraphBounds.toGraphRect(): Rect =
     Rect(
-        left = startTime.epochSeconds.toFloat(),
-        right = endTime.epochSeconds.toFloat(),
-        top = maxRating.toFloat(),
-        bottom = minRating.toFloat()
+        left = startTime.toGraphX(),
+        right = endTime.toGraphX(),
+        top = maxRating.toGraphY(),
+        bottom = minRating.toGraphY()
     )
 
 private fun createBounds(

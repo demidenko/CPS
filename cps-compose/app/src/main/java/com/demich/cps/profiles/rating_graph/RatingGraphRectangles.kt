@@ -17,9 +17,9 @@ internal class RatingGraphRectangles(
     private val rectangles: List<Pair<GraphPoint, HandleColor>> = buildList {
         fun addBounds(x: Instant, bounds: List<HandleColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
-                add(GraphPoint(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
+                add(GraphPoint(x = x, y = it.ratingUpperBound) to it.handleColor)
             }
-            add(GraphPoint(x = x, y = Long.MAX_VALUE) to HandleColor.RED)
+            add(GraphPoint(x = x, y = Int.MAX_VALUE) to HandleColor.RED)
         }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
@@ -42,7 +42,7 @@ internal class RatingGraphRectangles(
     inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
         var prevX: Instant = Instant.DISTANT_PAST
         rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
-            var prevY: Long = Long.MIN_VALUE
+            var prevY: Int = Int.MIN_VALUE
             rectangles.forEach(l, r) { (point, handleColor) ->
                 block(GraphPoint(prevX, prevY), point, handleColor)
                 prevY = point.y
