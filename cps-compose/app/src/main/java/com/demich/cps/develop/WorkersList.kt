@@ -454,7 +454,7 @@ private fun EventsTimeline(
             .clipToBounds()
     ) {
         val translator = viewPortState.translator()
-        fun Instant.toX(): Float = translator.pointXToCanvasX(epochSeconds)
+        fun Instant.toX(): Float = translator.pointXToCanvasX(this)
 
         val radius = pointRadius.toPx()
         val cornerRadius = CornerRadius(radius)

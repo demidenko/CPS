@@ -49,8 +49,8 @@ internal fun RatingGraphCanvas(
         }
     }
 
-    val timeMarkers: List<Instant> = remember(filterType, ratingChanges, currentTime) {
-        if (filterType == RatingFilterType.ALL || ratingChanges.size < 2) emptyList()
+    val markVerticals: List<Instant> = remember(filterType, ratingChanges, currentTime) {
+        if (filterType == ALL || ratingChanges.size < 2) emptyList()
         else {
             createBounds(ratingChanges, filterType, currentTime).run {
                 listOf(startTime, endTime)
@@ -65,7 +65,7 @@ internal fun RatingGraphCanvas(
     RatingGraphCanvas(
         ratingPoints = ratingPoints,
         selectedPoint = selectedRatingChange?.toGraphPoint(),
-        markVerticals = timeMarkers.map { it.epochSeconds },
+        markVerticals = markVerticals,
         getColor = colorsMap::getValue,
         viewPortState = viewPortState,
         rectangles = rectangles,
@@ -78,7 +78,7 @@ internal fun RatingGraphCanvas(
 private fun RatingGraphCanvas(
     ratingPoints: List<GraphPoint>,
     selectedPoint: GraphPoint?,
-    markVerticals: List<Long>,
+    markVerticals: List<Instant>,
     getColor: (HandleColor) -> Color,
     viewPortState: GraphViewPortState,
     rectangles: RatingGraphRectangles,

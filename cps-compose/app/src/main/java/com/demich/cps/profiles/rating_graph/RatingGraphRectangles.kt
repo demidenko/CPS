@@ -7,6 +7,7 @@ import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
 import com.demich.cps.utils.forEachRangeEqualBy
 import com.demich.kotlin_stdlib_boost.isSortedWith
+import kotlin.time.Instant
 
 @Immutable
 internal class RatingGraphRectangles(
@@ -14,7 +15,7 @@ internal class RatingGraphRectangles(
 ) {
     //point is upperBound (endTime, ratingUpperBound)
     private val rectangles: List<Pair<GraphPoint, HandleColor>> = buildList {
-        fun addBounds(x: Long, bounds: List<HandleColorBound>) {
+        fun addBounds(x: Instant, bounds: List<HandleColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
                 add(GraphPoint(x = x, y = it.ratingUpperBound.toLong()) to it.handleColor)
             }
@@ -24,10 +25,10 @@ internal class RatingGraphRectangles(
             manager.ratingUpperBoundRevolutions
                 .sortedBy { it.first }
                 .forEach { (endTime, bounds) ->
-                    addBounds(x = endTime.epochSeconds, bounds = bounds)
+                    addBounds(x = endTime, bounds = bounds)
                 }
         }
-        addBounds(x = Long.MAX_VALUE, bounds = manager.ratingsUpperBounds)
+        addBounds(x = Instant.DISTANT_FUTURE, bounds = manager.ratingsUpperBounds)
     }.apply {
         check(isSortedWith(compareBy<Pair<GraphPoint, HandleColor>> { it.first.x }.thenBy { it.first.y }))
     }
@@ -39,7 +40,7 @@ internal class RatingGraphRectangles(
         rectangles.asReversed().forEach { block(it.first, it.second) }
 
     inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
-        var prevX: Long = Long.MIN_VALUE
+        var prevX: Instant = Instant.DISTANT_PAST
         rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Long = Long.MIN_VALUE
             rectangles.forEach(l, r) { (point, handleColor) ->

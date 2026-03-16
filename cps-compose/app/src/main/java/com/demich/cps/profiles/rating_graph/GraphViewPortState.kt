@@ -34,6 +34,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 @Composable
 internal fun rememberGraphViewPortState(
@@ -97,8 +98,8 @@ internal class GraphPointTranslator(
     val viewPortRect: Rect,
     val canvasRect: Rect
 ) {
-    fun pointXToCanvasX(x: Long) =
-        x.toFloatUseInf().transformX(from = viewPortRect, to = canvasRect)
+    fun pointXToCanvasX(x: Instant) =
+        x.epochSeconds.toFloatUseInf().transformX(from = viewPortRect, to = canvasRect)
 
     fun pointYToCanvasY(y: Long) =
         y.toFloatUseInf().transformY(from = viewPortRect, to = canvasRect)
