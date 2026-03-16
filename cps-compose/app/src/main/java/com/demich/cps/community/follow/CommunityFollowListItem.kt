@@ -158,7 +158,7 @@ private fun UserOnlineInfo(
         Text(text = text)
         if (showWarning) {
             AttentionIcon(
-                dangerType = WARNING,
+                safetyLevel = WARNING,
                 modifier = Modifier.padding(start = 3.dp)
             )
         }

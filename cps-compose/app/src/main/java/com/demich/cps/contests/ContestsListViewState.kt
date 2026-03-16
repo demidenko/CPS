@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.SafetyLevel
 import com.demich.cps.utils.collectAsState
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration
@@ -81,8 +81,8 @@ class ContestsListViewState(
     fun isExpanded(contest: Contest): Boolean =
         contest.compositeId in expandedContests
 
-    private val safeMinDuration: Duration = 1.hours
-    fun collisionType(contest: Contest): DangerType {
+    private val safeMinDuration: Duration get() = 1.hours
+    fun collisionLevel(contest: Contest): SafetyLevel {
         val distance = expandedContests.values.minOfNotNull {
             val l = it.startTime
             val r = it.endTime

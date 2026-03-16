@@ -255,7 +255,7 @@ private fun ContestsColumn(
             ContestItem(
                 contest = contest,
                 isExpanded = { viewState.isExpanded(contest) },
-                collisionType = { viewState.collisionType(contest) },
+                collisionLevel = { viewState.collisionLevel(contest) },
                 onDeleteRequest = { onDeleteRequest(contest) },
                 modifier = Modifier
                     .fillMaxWidth()

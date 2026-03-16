@@ -85,7 +85,7 @@ private fun PermissionPanel(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             AttentionIcon(
-                dangerType = DANGER,
+                safetyLevel = DANGER,
                 size = 19.sp
             )
             Text(

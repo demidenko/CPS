@@ -342,7 +342,7 @@ private fun ResultIcon(
         )
     } else {
         AttentionIcon(
-            dangerType = if (result == RETRY) WARNING else DANGER,
+            safetyLevel = if (result == RETRY) WARNING else DANGER,
             modifier = modifier
         )
     }

@@ -22,7 +22,7 @@ import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
+import com.demich.cps.utils.SafetyLevel
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toSystemDateTime
@@ -31,7 +31,7 @@ import com.demich.cps.utils.toSystemDateTime
 fun ContestItem(
     contest: Contest,
     isExpanded: () -> Boolean,
-    collisionType: () -> DangerType,
+    collisionLevel: () -> SafetyLevel,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
@@ -40,15 +40,15 @@ fun ContestItem(
         modifier = modifier,
         horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
     ) {
-        if (!expanded) ContestItemContent(contest, collisionType)
-        else ContestExpandedItemContent(contest, collisionType, onDeleteRequest = onDeleteRequest)
+        if (!expanded) ContestItemContent(contest, collisionLevel)
+        else ContestExpandedItemContent(contest, collisionLevel, onDeleteRequest = onDeleteRequest)
     }
 }
 
 @Composable
 private fun ContestItemContent(
     contest: Contest,
-    collisionType: () -> DangerType
+    collisionLevel: () -> SafetyLevel
 ) {
     //TODO: call recomposes two times
     val phase = contest.phaseAt(localCurrentTime)
@@ -62,7 +62,7 @@ private fun ContestItemContent(
     ContestItemFooter(
         contest = contest,
         phase = phase,
-        collisionType = collisionType,
+        collisionLevel = collisionLevel,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -116,7 +116,7 @@ fun ContestItemFooter(
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
-    collisionType: () -> DangerType,
+    collisionLevel: () -> SafetyLevel,
     modifier: Modifier = Modifier
 ) {
     ContestItemFooter(
@@ -128,7 +128,7 @@ private fun ContestItemFooter(
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
-                collisionType = if (phase == BEFORE) collisionType() else SAFE
+                safetyLevel = if (phase == BEFORE) collisionLevel() else SAFE
             )
         },
         right = {

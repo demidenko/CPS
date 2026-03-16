@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.DangerType
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideContentColor
+import com.demich.cps.utils.SafetyLevel
 import com.demich.cps.utils.colorFor
 import com.demich.cps.utils.toSignedString
 
@@ -86,14 +86,14 @@ fun IconSp(
 
 @Composable
 fun AttentionIcon(
-    dangerType: DangerType,
+    safetyLevel: SafetyLevel,
     modifier: Modifier = Modifier,
     size: TextUnit = 14.sp
 ) {
     IconSp(
         imageVector = CPSIcons.Attention,
         size = size,
-        color = cpsColors.colorFor(dangerType),
+        color = cpsColors.colorFor(safetyLevel),
         modifier = modifier
     )
 }
