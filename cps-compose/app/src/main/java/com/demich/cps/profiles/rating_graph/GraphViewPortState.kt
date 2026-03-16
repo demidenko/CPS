@@ -98,23 +98,21 @@ internal class GraphPointTranslator(
     val viewPortRect: Rect,
     val canvasRect: Rect
 ) {
-    fun pointXToCanvasX(x: Instant) =
-        x.toGraphX().transformX(from = viewPortRect, to = canvasRect)
+    fun Instant.toCanvasX() =
+        toGraphX().transformX(from = viewPortRect, to = canvasRect)
 
-    fun Instant.toCanvasX() = pointXToCanvasX(x = this)
+    fun Int.toCanvasY() =
+        toGraphY().transformY(from = viewPortRect, to = canvasRect)
 
-    fun pointYToCanvasY(y: Int) =
-        y.toGraphY().transformY(from = viewPortRect, to = canvasRect)
-
-    fun Int.toCanvasY() = pointYToCanvasY(y = this)
-
-    fun pointToCanvas(point: GraphPoint) =
+    fun GraphPoint.toCanvasPoint() =
         Offset(
-            x = pointXToCanvasX(point.x),
-            y = pointYToCanvasY(point.y)
+            x = x.toCanvasX(),
+            y = y.toCanvasY()
         )
 
-    fun GraphPoint.toCanvasPoint() = pointToCanvas(point = this)
+    fun pointXToCanvasX(x: Instant) = x.toCanvasX()
+
+    fun pointToCanvas(point: GraphPoint) = point.toCanvasPoint()
 }
 
 context(scope: DrawScope)
@@ -146,7 +144,7 @@ internal inline fun <R> GraphViewPortState.withTranslator(
 internal fun GraphPointTranslator.pointsToCanvasPath(points: List<GraphPoint>): Path {
     return Path().apply {
         points.forEachIndexed { index, point ->
-            val (px, py) = pointToCanvas(point = point)
+            val (px, py) = point.toCanvasPoint()
             if (index == 0) moveTo(px, py)
             else lineTo(px, py)
         }
@@ -161,10 +159,10 @@ internal inline fun GraphPointTranslator.pointRectToCanvasRect(
 ) {
     val (width, height) = scope.size
 
-    val left = floor(pointXToCanvasX(bottomLeft.x).coerceAtLeast(0f))
-    val right = ceil(pointXToCanvasX(topRight.x).coerceAtMost(width))
-    val top = floor(pointYToCanvasY(topRight.y).coerceAtLeast(0f))
-    val bottom = ceil(pointYToCanvasY(bottomLeft.y).coerceAtMost(height))
+    val left = floor(bottomLeft.x.toCanvasX().coerceAtLeast(0f))
+    val right = ceil(topRight.x.toCanvasX().coerceAtMost(width))
+    val top = floor(topRight.y.toCanvasY().coerceAtLeast(0f))
+    val bottom = ceil(bottomLeft.y.toCanvasY().coerceAtMost(height))
 
     if (left <= right && top <= bottom) {
         block(Rect(left = left, top = top, right = right, bottom = bottom))
