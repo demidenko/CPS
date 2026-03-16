@@ -46,7 +46,7 @@ import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.rating_graph.RatingGraphBounds
 import com.demich.cps.profiles.rating_graph.rememberGraphViewPortState
 import com.demich.cps.profiles.rating_graph.toGraphRect
-import com.demich.cps.profiles.rating_graph.translator
+import com.demich.cps.profiles.rating_graph.withTranslator
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
@@ -453,34 +453,32 @@ private fun EventsTimeline(
             .height(pointRadius * 2)
             .clipToBounds()
     ) {
-        val translator = viewPortState.translator()
-        fun Instant.toX(): Float = translator.pointXToCanvasX(this)
-
         val radius = pointRadius.toPx()
-        val cornerRadius = CornerRadius(radius)
-
         val lineWidth = lineWidth.toPx()
 
-        drawLine(
-            color = lineColor,
-            start = Offset(x = startTime.toX(), y = radius),
-            end = Offset(x = endTime.toX(), y = radius),
-            strokeWidth = lineWidth
-        )
-
-        events.forEach { event ->
-            val l = event.start.toX()
-            val r = event.end?.toX() ?: l
-            val mid = (l + r) / 2
-
-            drawRoundRectWithBorderInside(
-                color = eventColor(event),
-                borderColor = lineColor,
-                borderWidth = lineWidth,
-                topLeft = Offset(x = mid - radius, y = 0f),
-                size = Size(width = r - l + radius * 2, height = size.height),
-                cornerRadius = cornerRadius,
+        viewPortState.withTranslator {
+            drawLine(
+                color = lineColor,
+                start = Offset(x = startTime.toCanvasX(), y = radius),
+                end = Offset(x = endTime.toCanvasX(), y = radius),
+                strokeWidth = lineWidth
             )
+
+            val cornerRadius = CornerRadius(radius)
+            events.forEach { event ->
+                val l = event.start.toCanvasX()
+                val r = event.end?.toCanvasX() ?: l
+                val mid = (l + r) / 2
+
+                drawRoundRectWithBorderInside(
+                    color = eventColor(event),
+                    borderColor = lineColor,
+                    borderWidth = lineWidth,
+                    topLeft = Offset(x = mid - radius, y = 0f),
+                    size = Size(width = r - l + radius * 2, height = size.height),
+                    cornerRadius = cornerRadius,
+                )
+            }
         }
     }
 }
