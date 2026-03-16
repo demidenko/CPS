@@ -79,7 +79,7 @@ internal class GraphViewPortState(
     }
 
     context(density: Density)
-    private fun Size.toBorderedRect(): Rect =
+    private fun Size.toInflatedRect(): Rect =
         with(density) {
             toRect().inflate(
                 horizontal = inflateHorizontal.toPx(),
@@ -88,10 +88,10 @@ internal class GraphViewPortState(
         }
 
     context(scope: DrawScope)
-    fun canvasRect(): Rect = scope.size.toBorderedRect()
+    fun canvasRect(): Rect = scope.size.toInflatedRect()
 
     context(scope: PointerInputScope)
-    fun canvasRect(): Rect = scope.size.toSize().toBorderedRect()
+    fun canvasRect(): Rect = scope.size.toSize().toInflatedRect()
 }
 
 internal class GraphPointTranslator(
