@@ -51,6 +51,8 @@ internal class GraphViewPortState(
     private val rectState: MutableState<Rect>,
     private val borderHorizontal: Dp
 ) {
+
+    //TODO: precision loss (make DoubleRect?)
     //x is seconds, y is rating
     val rect: Rect by rectState
 
