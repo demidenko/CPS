@@ -35,6 +35,7 @@ import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 
@@ -139,7 +140,10 @@ private fun RatingGraphWithHeader(
                 .height(graphHeight)
                 .clip(shape)
                 .pointerInput(viewPortState) {
-                    viewPortState.detectTransformGestures()
+                    viewPortState.detectTransformGestures(
+                        minWidth = 1.hours,
+                        minHeight = 1
+                    )
                 }
                 .pointerInput(ratingChanges) {
                     detectTapGestures { tapPoint ->
