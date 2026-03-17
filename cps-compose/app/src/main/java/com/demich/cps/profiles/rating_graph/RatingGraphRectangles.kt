@@ -39,16 +39,20 @@ internal class RatingGraphRectangles(
     inline fun forEachUpperBound(block: (GraphPoint, HandleColor) -> Unit) =
         upperBounds.asReversed().forEach { block(it.first, it.second) }
 
-    inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
+    private val rectangles: List<Triple<GraphPoint, GraphPoint, HandleColor>> = buildList {
         var prevX: Instant = Instant.DISTANT_PAST
         upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
             upperBounds.forEach(l, r) { (point, handleColor) ->
-                block(GraphPoint(prevX, prevY), point, handleColor)
+                add(Triple(GraphPoint(prevX, prevY), point, handleColor))
                 prevY = point.y
             }
             prevX = upperBounds[l].first.x
         }
+    }
+
+    inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
+        rectangles.forEach { block(it.first, it.second, it.third) }
     }
 }
 
