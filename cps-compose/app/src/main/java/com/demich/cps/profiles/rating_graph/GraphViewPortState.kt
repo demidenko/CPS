@@ -95,29 +95,36 @@ internal class GraphViewPortState(
 }
 
 internal class GraphPointTranslator(
-    val viewPortRect: Rect,
-    val canvasRect: Rect
+    private val from: Rect,
+    private val to: Rect
 ) {
-    fun Instant.toCanvasX() =
-        toGraphX().projectX(from = viewPortRect, to = canvasRect)
+    fun projectX(x: Float) =
+        x.projectX(from = from, to = to)
 
-    fun Int.toCanvasY() =
-        toGraphY().projectY(from = viewPortRect, to = canvasRect)
-
-    fun GraphPoint.toCanvasPoint() =
-        Offset(
-            x = x.toCanvasX(),
-            y = y.toCanvasY()
-        )
+    fun projectY(y: Float) =
+        y.projectY(from = from, to = to)
 }
+
+context(translator: GraphPointTranslator)
+internal fun Instant.toCanvasX() = translator.projectX(x = toGraphX())
+
+context(translator: GraphPointTranslator)
+internal fun Int.toCanvasY() = translator.projectY(y = toGraphY())
+
+context(translator: GraphPointTranslator)
+internal fun GraphPoint.toCanvasPoint() =
+    Offset(
+        x = x.toCanvasX(),
+        y = y.toCanvasY()
+    )
 
 internal inline fun <R> GraphViewPortState.withTranslator(
     canvasRect: Rect,
     block: GraphPointTranslator.() -> R
 ): R {
     return GraphPointTranslator(
-        viewPortRect = rect,
-        canvasRect = canvasRect
+        from = rect,
+        to = canvasRect
     ).block()
 }
 

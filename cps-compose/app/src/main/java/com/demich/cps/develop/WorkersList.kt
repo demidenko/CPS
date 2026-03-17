@@ -45,6 +45,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.rating_graph.RatingGraphBounds
 import com.demich.cps.profiles.rating_graph.rememberGraphViewPortState
+import com.demich.cps.profiles.rating_graph.toCanvasX
 import com.demich.cps.profiles.rating_graph.toGraphRect
 import com.demich.cps.profiles.rating_graph.withTranslator
 import com.demich.cps.profiles.userinfo.handle
