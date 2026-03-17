@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -104,6 +105,7 @@ private fun RatingGraphCanvas(
     }
 
     val shadowLayer = rememberGraphicsLayer()
+    val ratingPath = remember { Path() }
 
     Canvas(
         modifier = modifier
@@ -116,7 +118,7 @@ private fun RatingGraphCanvas(
         val shadowOffset = shadowOffset.toOffset()
 
         viewPortState.withTranslator {
-            val ratingPath = ratingPoints.toCanvasPath()
+            ratingPoints.toCanvasPath(ratingPath)
 
             //rating filled areas
             drawRatingBackground(
