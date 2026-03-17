@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.ui.inflate
+import com.demich.cps.ui.projectPoint
+import com.demich.cps.ui.projectVector
+import com.demich.cps.ui.projectX
+import com.demich.cps.ui.projectY
 import com.demich.cps.ui.scale
-import com.demich.cps.ui.transform
-import com.demich.cps.ui.transformVector
-import com.demich.cps.ui.transformX
-import com.demich.cps.ui.transformY
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
 import kotlin.math.absoluteValue
@@ -99,10 +99,10 @@ internal class GraphPointTranslator(
     val canvasRect: Rect
 ) {
     fun Instant.toCanvasX() =
-        toGraphX().transformX(from = viewPortRect, to = canvasRect)
+        toGraphX().projectX(from = viewPortRect, to = canvasRect)
 
     fun Int.toCanvasY() =
-        toGraphY().transformY(from = viewPortRect, to = canvasRect)
+        toGraphY().projectY(from = viewPortRect, to = canvasRect)
 
     fun GraphPoint.toCanvasPoint() =
         Offset(
@@ -173,8 +173,8 @@ internal suspend fun GraphViewPortState.detectTransformGestures(
         val canvasRect = canvasRect()
 
         val rect = rect
-        val pan = pan.transformVector(from = canvasRect, to = rect)
-        val centroid = centroid.transform(from = canvasRect, to = rect)
+        val pan = pan.projectVector(from = canvasRect, to = rect)
+        val centroid = centroid.projectPoint(from = canvasRect, to = rect)
 
         setViewPort(
             rect = rect

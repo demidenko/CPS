@@ -6,28 +6,28 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 
-fun Float.transformX(
+fun Float.projectX(
     from: Rect,
     to: Rect
 ): Float = (this - from.left) / from.width * to.width + to.left
 
-fun Float.transformY(
+fun Float.projectY(
     from: Rect,
     to: Rect
 ): Float = (this - from.top) / from.height * to.height + to.top
 
-fun Offset.transform(
+fun Offset.projectPoint(
     from: Rect,
     to: Rect
 ): Offset = Offset(
-    x = x.transformX(from, to),
-    y = y.transformY(from, to)
+    x = x.projectX(from, to),
+    y = y.projectY(from, to)
 )
 
-fun Offset.transformVector(
+fun Offset.projectVector(
     from: Rect,
     to: Rect
-): Offset = transform(from, to) - Offset.Zero.transform(from, to)
+): Offset = projectPoint(from, to) - Offset.Zero.projectPoint(from, to)
 
 fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
     Rect(
