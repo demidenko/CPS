@@ -24,3 +24,11 @@ fun Offset.projectPoint(): Offset =
 context(projector: RectProjector)
 fun Offset.projectVector(): Offset =
     projectPoint() - Offset.Zero.projectPoint()
+
+inline fun rectProjector(
+    from: Rect,
+    to: Rect,
+    block: RectProjector.() -> Unit
+) {
+    RectProjector(from = from, to = to).apply(block)
+}

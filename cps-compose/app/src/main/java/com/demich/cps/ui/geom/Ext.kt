@@ -16,19 +16,6 @@ fun Float.projectY(
     to: Rect
 ): Float = (this - from.top) / from.height * to.height + to.top
 
-fun Offset.projectPoint(
-    from: Rect,
-    to: Rect
-): Offset = Offset(
-    x = x.projectX(from, to),
-    y = y.projectY(from, to)
-)
-
-fun Offset.projectVector(
-    from: Rect,
-    to: Rect
-): Offset = projectPoint(from, to) - Offset.Zero.projectPoint(from, to)
-
 fun Rect.inflate(horizontal: Float, vertical: Float): Rect =
     Rect(
         left = left + horizontal,

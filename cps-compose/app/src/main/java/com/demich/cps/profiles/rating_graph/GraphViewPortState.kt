@@ -27,6 +27,7 @@ import com.demich.cps.ui.geom.projectPoint
 import com.demich.cps.ui.geom.projectVector
 import com.demich.cps.ui.geom.projectX
 import com.demich.cps.ui.geom.projectY
+import com.demich.cps.ui.geom.rectProjector
 import com.demich.cps.ui.geom.scale
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
@@ -178,16 +179,16 @@ internal suspend fun GraphViewPortState.detectTransformGestures(
 
     scope.detectTransformGestures { centroid, pan, zoom, _ ->
         val viewPort = rect
-        val canvasRect = canvasRect()
+        rectProjector(from = canvasRect(), to = viewPort) {
+            val pan = pan.projectVector()
+            val centroid = centroid.projectPoint()
 
-        val pan = pan.projectVector(from = canvasRect, to = viewPort)
-        val centroid = centroid.projectPoint(from = canvasRect, to = viewPort)
-
-        setViewPort(
-            rect = viewPort
-                .translate(-pan)
-                .coercedScale(scale = zoom, center = centroid, minSize = minSize)
-        )
+            setViewPort(
+                rect = viewPort
+                    .translate(-pan)
+                    .coercedScale(scale = zoom, center = centroid, minSize = minSize)
+            )
+        }
     }
 }
 
