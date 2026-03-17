@@ -116,7 +116,7 @@ private fun RatingGraphCanvas(
         val shadowOffset = shadowOffset.toOffset()
 
         viewPortState.withTranslator {
-            val ratingPath = pointsToCanvasPath(ratingPoints)
+            val ratingPath = ratingPoints.pointsToCanvasPath()
 
             //rating filled areas
             drawRatingBackground(

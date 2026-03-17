@@ -139,9 +139,10 @@ internal inline fun <R> GraphViewPortState.withTranslator(
     block: GraphPointTranslator.() -> R
 ): R = withTranslator(canvasRect = canvasRect(), block = block)
 
-internal fun GraphPointTranslator.pointsToCanvasPath(points: List<GraphPoint>): Path {
+context(translator: GraphPointTranslator)
+internal fun List<GraphPoint>.pointsToCanvasPath(): Path {
     return Path().apply {
-        points.forEachIndexed { index, point ->
+        forEachIndexed { index, point ->
             val (px, py) = point.toCanvasPoint()
             if (index == 0) moveTo(px, py)
             else lineTo(px, py)
