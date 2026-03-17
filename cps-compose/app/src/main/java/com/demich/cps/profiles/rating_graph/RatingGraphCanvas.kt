@@ -26,8 +26,8 @@ import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
+import com.demich.cps.ui.geom.toOffset
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.toOffset
 import com.demich.cps.utils.spawnDpState
 import kotlin.time.Instant
 
