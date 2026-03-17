@@ -44,7 +44,7 @@ import androidx.work.WorkInfo
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.rating_graph.RatingGraphBounds
-import com.demich.cps.profiles.rating_graph.rememberGraphViewPortState
+import com.demich.cps.profiles.rating_graph.rememberViewPortState
 import com.demich.cps.profiles.rating_graph.toCanvasX
 import com.demich.cps.profiles.rating_graph.toGraphRect
 import com.demich.cps.profiles.rating_graph.withTranslator
@@ -436,7 +436,7 @@ private fun EventsTimeline(
 
     val events = events.sortedBy { it.start }
 
-    val viewPortState = rememberGraphViewPortState(
+    val viewPortState = rememberViewPortState(
         inflateHorizontal = pointRadius,
         inflateVertical = pointRadius
     ).also {

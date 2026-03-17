@@ -38,13 +38,13 @@ import kotlin.time.Duration
 import kotlin.time.Instant
 
 @Composable
-internal fun rememberGraphViewPortState(
+internal fun rememberViewPortState(
     inflateHorizontal: Dp = 0.dp,
     inflateVertical: Dp = 0.dp,
-): GraphViewPortState  {
+): ViewPortState  {
     val rectState = rememberSaveable(stateSaver = rectSaver()) { mutableStateOf(Rect.Zero) }
     return remember(rectState) {
-        GraphViewPortState(
+        ViewPortState(
             rectState = rectState,
             inflateHorizontal = inflateHorizontal,
             inflateVertical = inflateVertical
@@ -55,7 +55,7 @@ internal fun rememberGraphViewPortState(
 //TODO: make inflate as inner state with set method
 
 @Stable
-internal class GraphViewPortState(
+internal class ViewPortState(
     private val rectState: MutableState<Rect>,
     private val inflateHorizontal: Dp,
     private val inflateVertical: Dp,
@@ -119,7 +119,7 @@ internal fun GraphPoint.toCanvasPoint() =
         y = y.toCanvasY()
     )
 
-internal inline fun <R> GraphViewPortState.withTranslator(
+internal inline fun <R> ViewPortState.withTranslator(
     canvasRect: Rect,
     block: GraphPointTranslator.() -> R
 ): R {
@@ -130,12 +130,12 @@ internal inline fun <R> GraphViewPortState.withTranslator(
 }
 
 context(scope: DrawScope)
-internal inline fun <R> GraphViewPortState.withTranslator(
+internal inline fun <R> ViewPortState.withTranslator(
     block: GraphPointTranslator.() -> R
 ): R = withTranslator(canvasRect = canvasRect(), block = block)
 
 context(scope: PointerInputScope)
-internal inline fun <R> GraphViewPortState.withTranslator(
+internal inline fun <R> ViewPortState.withTranslator(
     block: GraphPointTranslator.() -> R
 ): R = withTranslator(canvasRect = canvasRect(), block = block)
 
@@ -169,7 +169,7 @@ internal inline fun GraphPointTranslator.pointRectToCanvasRect(
 }
 
 context(scope: PointerInputScope)
-internal suspend fun GraphViewPortState.detectTransformGestures(
+internal suspend fun ViewPortState.detectTransformGestures(
     minWidth: Duration,
     minHeight: Int
 ) {
@@ -194,7 +194,7 @@ internal suspend fun GraphViewPortState.detectTransformGestures(
 }
 
 context(scope: PointerInputScope)
-internal fun GraphViewPortState.getNearestRatingChange(
+internal fun ViewPortState.getNearestRatingChange(
     ratingChanges: List<RatingChange>,
     tap: Offset,
     tapRadius: Float

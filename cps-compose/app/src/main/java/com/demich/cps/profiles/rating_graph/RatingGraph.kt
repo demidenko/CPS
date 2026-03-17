@@ -92,7 +92,7 @@ private fun RatingGraphWithHeader(
     require(ratingChanges.isNotEmpty())
 
     //TODO: saveables not reset after ratings changes
-    val viewPortState = rememberGraphViewPortState(inflateHorizontal = 10.dp)
+    val viewPortState = rememberViewPortState(inflateHorizontal = 10.dp)
 
     val currentTime = remember { getCurrentTime() }
     var filterType by rememberSaveable {
@@ -158,15 +158,15 @@ private fun RatingGraphWithHeader(
     }
 }
 
-private fun GraphViewPortState.setViewPort(bounds: RatingGraphBounds) {
-    setViewPort(rect = bounds.toGraphViewPortRect())
+private fun ViewPortState.setViewPort(bounds: RatingGraphBounds) {
+    setViewPort(rect = bounds.toViewPortRect())
 }
 
-private suspend fun GraphViewPortState.animateToViewPort(bounds: RatingGraphBounds) {
-    animateToViewPort(targetRect = bounds.toGraphViewPortRect())
+private suspend fun ViewPortState.animateToViewPort(bounds: RatingGraphBounds) {
+    animateToViewPort(targetRect = bounds.toViewPortRect())
 }
 
-private fun RatingGraphBounds.toGraphViewPortRect(): Rect =
+private fun RatingGraphBounds.toViewPortRect(): Rect =
     fixTimeWidth(border = 1.days).addRatingBorder(border = 100)
         .apply { require(startTime < endTime) }
         .toGraphRect()
