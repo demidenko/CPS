@@ -1,4 +1,4 @@
-package com.demich.cps.profiles.managers
+package com.demich.cps.profiles
 
 import com.demich.cps.platforms.api.atcoder.AtCoderRatingChange
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls

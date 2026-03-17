@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.demich.cps.profiles.managers.RatingChange
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.ui.geom.inflate
 import com.demich.cps.ui.geom.projectPoint
 import com.demich.cps.ui.geom.projectVector

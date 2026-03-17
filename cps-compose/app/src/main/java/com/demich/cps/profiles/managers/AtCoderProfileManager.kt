@@ -11,7 +11,9 @@ import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.screens.AtCoderUserInfoExpandedContent
+import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
 import com.demich.cps.profiles.userinfo.AtCoderUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult

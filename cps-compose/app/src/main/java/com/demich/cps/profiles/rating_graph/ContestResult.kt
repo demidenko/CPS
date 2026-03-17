@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.formatRatingChangeDate
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp

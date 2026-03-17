@@ -25,8 +25,10 @@ import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
 import com.demich.cps.platforms.utils.CodeChefUtils
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.SmallProfilePanelTwoLines
 import com.demich.cps.profiles.screens.CodeChefUserInfoExpandedContent
+import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
 import com.demich.cps.profiles.userinfo.CodeChefUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult

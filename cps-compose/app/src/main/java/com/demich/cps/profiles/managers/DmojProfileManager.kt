@@ -11,7 +11,9 @@ import com.demich.cps.platforms.api.dmoj.DmojUrls
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.screens.DmojUserInfoExpandedContent
+import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
 import com.demich.cps.profiles.userinfo.DmojUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult

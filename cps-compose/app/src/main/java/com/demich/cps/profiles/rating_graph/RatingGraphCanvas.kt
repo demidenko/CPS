@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.geom.toOffset

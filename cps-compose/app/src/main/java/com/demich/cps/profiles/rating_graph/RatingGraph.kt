@@ -23,8 +23,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.RatingChange
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors

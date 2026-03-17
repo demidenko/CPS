@@ -1,7 +1,7 @@
 package com.demich.cps.profiles.rating_graph
 
 import androidx.compose.ui.geometry.Rect
-import com.demich.cps.profiles.managers.RatingChange
+import com.demich.cps.profiles.RatingChange
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 

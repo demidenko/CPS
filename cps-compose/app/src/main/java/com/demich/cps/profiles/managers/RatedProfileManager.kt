@@ -7,6 +7,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.HandleColorBound
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.SmallRatedProfilePanel
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo

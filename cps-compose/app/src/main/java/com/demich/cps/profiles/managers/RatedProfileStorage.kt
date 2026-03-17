@@ -3,6 +3,7 @@ package com.demich.cps.profiles.managers
 import android.content.Context
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationChannelSingleId
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.handle

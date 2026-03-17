@@ -10,7 +10,7 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.profiles.managers.AtCoderProfileManager
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
-import com.demich.cps.profiles.managers.toRatingChange
+import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.toSignedString

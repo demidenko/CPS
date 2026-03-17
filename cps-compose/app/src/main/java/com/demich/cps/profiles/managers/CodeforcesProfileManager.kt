@@ -24,7 +24,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.screens.CodeforcesUserInfoExpandedContent
+import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
