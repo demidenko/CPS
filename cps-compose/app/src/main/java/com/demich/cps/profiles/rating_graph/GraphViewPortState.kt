@@ -177,14 +177,14 @@ internal suspend fun GraphViewPortState.detectTransformGestures(
     )
 
     scope.detectTransformGestures { centroid, pan, zoom, _ ->
+        val viewPort = rect
         val canvasRect = canvasRect()
 
-        val rect = rect
-        val pan = pan.projectVector(from = canvasRect, to = rect)
-        val centroid = centroid.projectPoint(from = canvasRect, to = rect)
+        val pan = pan.projectVector(from = canvasRect, to = viewPort)
+        val centroid = centroid.projectPoint(from = canvasRect, to = viewPort)
 
         setViewPort(
-            rect = rect
+            rect = viewPort
                 .translate(-pan)
                 .coercedScale(scale = zoom, center = centroid, minSize = minSize)
         )
