@@ -145,13 +145,14 @@ private fun RatingGraphWithHeader(
                         minHeight = 1
                     )
                 }
-                .pointerInput(ratingChanges) {
+                .pointerInput(viewPortState, ratingChanges) {
                     detectTapGestures { tapPoint ->
-                        selectedRatingChange = viewPortState.getNearestRatingChange(
-                            ratingChanges = ratingChanges,
-                            tap = tapPoint,
-                            tapRadius = 24.dp.toPx()
-                        )
+                        viewPortState.withTranslator {
+                            selectedRatingChange = ratingChanges.closestOrNull(
+                                tap = tapPoint,
+                                tapRadius = 24.dp.toPx()
+                            )
+                        }
                     }
                 }
         )
