@@ -14,7 +14,7 @@ internal class RatingGraphRectangles(
     manager: RatedProfileManager<*>
 ) {
     //point is upperBound (endTime, ratingUpperBound)
-    private val rectangles: List<Pair<GraphPoint, HandleColor>> = buildList {
+    private val upperBounds: List<Pair<GraphPoint, HandleColor>> = buildList {
         fun addBounds(x: Instant, bounds: List<HandleColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
                 add(GraphPoint(x = x, y = it.ratingUpperBound) to it.handleColor)
@@ -34,20 +34,20 @@ internal class RatingGraphRectangles(
     }
 
     fun getHandleColor(point: GraphPoint): HandleColor =
-        rectangles.first { (r, _) -> point.x < r.x && point.y < r.y }.second
+        upperBounds.first { (r, _) -> point.x < r.x && point.y < r.y }.second
 
     inline fun forEachUpperBound(block: (GraphPoint, HandleColor) -> Unit) =
-        rectangles.asReversed().forEach { block(it.first, it.second) }
+        upperBounds.asReversed().forEach { block(it.first, it.second) }
 
     inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
         var prevX: Instant = Instant.DISTANT_PAST
-        rectangles.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
+        upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
-            rectangles.forEach(l, r) { (point, handleColor) ->
+            upperBounds.forEach(l, r) { (point, handleColor) ->
                 block(GraphPoint(prevX, prevY), point, handleColor)
                 prevY = point.y
             }
-            prevX = rectangles[l].first.x
+            prevX = upperBounds[l].first.x
         }
     }
 }
