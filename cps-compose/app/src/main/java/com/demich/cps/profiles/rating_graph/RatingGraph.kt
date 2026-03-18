@@ -28,6 +28,7 @@ import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
+import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
@@ -149,7 +150,7 @@ private fun RatingGraphWithHeader(
                 }
                 .pointerInput(viewPortState, ratingChanges) {
                     detectTapGestures { tapPoint ->
-                        viewPortState.withTranslator {
+                        viewPortState.projectorToCanvas {
                             selectedRatingChange = ratingChanges.closestOrNull(
                                 tap = tapPoint,
                                 tapRadius = 24.dp.toPx()
@@ -161,7 +162,7 @@ private fun RatingGraphWithHeader(
     }
 }
 
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 private fun List<RatingChange>.closestOrNull(
     tap: Offset,
     tapRadius: Float

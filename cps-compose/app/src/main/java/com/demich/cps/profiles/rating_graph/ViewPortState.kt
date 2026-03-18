@@ -21,11 +21,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.geom.inflate
 import com.demich.cps.ui.geom.projectPoint
 import com.demich.cps.ui.geom.projectVector
-import com.demich.cps.ui.geom.projectX
-import com.demich.cps.ui.geom.projectY
 import com.demich.cps.ui.geom.rectProjector
 import com.demich.cps.ui.geom.scale
 import com.demich.cps.utils.rectSaver
@@ -93,54 +92,43 @@ internal class ViewPortState(
     fun canvasRect(): Rect = scope.size.toSize().toInflatedRect()
 }
 
-internal class GraphPointTranslator(
-    private val from: Rect,
-    private val to: Rect
-) {
-    fun projectX(x: Float) =
-        x.projectX(from = from, to = to)
+context(projector: RectProjector)
+internal fun Instant.toCanvasX() = projector.projectX(x = toGraphX())
 
-    fun projectY(y: Float) =
-        y.projectY(from = from, to = to)
-}
+context(projector: RectProjector)
+internal fun Int.toCanvasY() = projector.projectY(y = toGraphY())
 
-context(translator: GraphPointTranslator)
-internal fun Instant.toCanvasX() = translator.projectX(x = toGraphX())
-
-context(translator: GraphPointTranslator)
-internal fun Int.toCanvasY() = translator.projectY(y = toGraphY())
-
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 internal inline fun <R> GraphPoint.toCanvasPoint(block: (Float, Float) -> R) =
     block(
         x.toCanvasX(),
         y.toCanvasY()
     )
 
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 internal fun GraphPoint.toCanvasPoint() = toCanvasPoint(block = ::Offset)
 
-internal inline fun <R> ViewPortState.withTranslator(
+internal inline fun <R> ViewPortState.projectorToCanvas(
     canvasRect: Rect,
-    block: GraphPointTranslator.() -> R
-): R {
-    return GraphPointTranslator(
+    block: RectProjector.() -> R
+): R =
+    rectProjector(
         from = rect,
-        to = canvasRect
-    ).block()
-}
+        to = canvasRect,
+        block = block
+    )
 
 context(scope: DrawScope)
-internal inline fun <R> ViewPortState.withTranslator(
-    block: GraphPointTranslator.() -> R
-): R = withTranslator(canvasRect = canvasRect(), block = block)
+internal inline fun <R> ViewPortState.projectorToCanvas(
+    block: RectProjector.() -> R
+): R = projectorToCanvas(canvasRect = canvasRect(), block = block)
 
 context(scope: PointerInputScope)
-internal inline fun <R> ViewPortState.withTranslator(
-    block: GraphPointTranslator.() -> R
-): R = withTranslator(canvasRect = canvasRect(), block = block)
+internal inline fun <R> ViewPortState.projectorToCanvas(
+    block: RectProjector.() -> R
+): R = projectorToCanvas(canvasRect = canvasRect(), block = block)
 
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 internal fun List<GraphPoint>.toCanvasPath(path: Path) {
     path.reset()
     forEachIndexed { index, point ->
@@ -151,11 +139,11 @@ internal fun List<GraphPoint>.toCanvasPath(path: Path) {
     }
 }
 
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 internal fun List<GraphPoint>.toCanvasPath(): Path =
     Path().also { toCanvasPath(it) }
 
-context(scope: DrawScope, translator: GraphPointTranslator)
+context(scope: DrawScope, projector: RectProjector)
 internal inline fun toCanvasRect(
     bottomLeft: GraphPoint,
     topRight: GraphPoint,

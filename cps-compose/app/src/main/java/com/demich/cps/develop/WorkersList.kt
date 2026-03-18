@@ -44,10 +44,10 @@ import androidx.work.WorkInfo
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.rating_graph.RatingGraphBounds
+import com.demich.cps.profiles.rating_graph.projectorToCanvas
 import com.demich.cps.profiles.rating_graph.rememberViewPortState
 import com.demich.cps.profiles.rating_graph.toCanvasX
 import com.demich.cps.profiles.rating_graph.toGraphRect
-import com.demich.cps.profiles.rating_graph.withTranslator
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.AnimatedVisibleByNotNull
 import com.demich.cps.ui.AttentionIcon
@@ -457,7 +457,7 @@ private fun EventsTimeline(
         val radius = pointRadius.toPx()
         val lineWidth = lineWidth.toPx()
 
-        viewPortState.withTranslator {
+        viewPortState.projectorToCanvas {
             drawLine(
                 color = lineColor,
                 start = Offset(x = startTime.toCanvasX(), y = radius),

@@ -25,10 +25,8 @@ context(projector: RectProjector)
 fun Offset.projectVector(): Offset =
     projectPoint() - Offset.Zero.projectPoint()
 
-inline fun rectProjector(
+inline fun <R> rectProjector(
     from: Rect,
     to: Rect,
-    block: RectProjector.() -> Unit
-) {
-    RectProjector(from = from, to = to).apply(block)
-}
+    block: RectProjector.() -> R
+): R = RectProjector(from = from, to = to).block()

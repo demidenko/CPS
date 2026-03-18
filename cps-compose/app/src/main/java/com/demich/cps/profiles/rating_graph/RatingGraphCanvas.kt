@@ -27,6 +27,7 @@ import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
+import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.geom.toOffset
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.spawnDpState
@@ -117,7 +118,7 @@ private fun RatingGraphCanvas(
         val pathWidth = pathWidth.toPx()
         val shadowOffset = shadowOffset.toOffset()
 
-        viewPortState.withTranslator {
+        viewPortState.projectorToCanvas {
             ratingPoints.toCanvasPath(ratingPath)
 
             //rating filled areas
@@ -207,7 +208,7 @@ private fun DrawScope.drawPoint(
     }
 }
 
-context(translator: GraphPointTranslator)
+context(projector: RectProjector)
 private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
     getColor: (HandleColor) -> Color
