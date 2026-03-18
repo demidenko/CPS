@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
@@ -30,6 +31,7 @@ import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
@@ -157,6 +159,20 @@ private fun RatingGraphWithHeader(
                 }
         )
     }
+}
+
+context(translator: GraphPointTranslator)
+private fun List<RatingChange>.closestOrNull(
+    tap: Offset,
+    tapRadius: Float
+): RatingChange? {
+    val pos = minOfWithIndex {
+        val o = it.toGraphPoint().toCanvasPoint()
+        (o - tap).getDistance()
+    }.takeIf { it.value <= tapRadius }?.index ?: return null
+    val res = get(pos)
+    if (pos == 0 || res.oldRating != null) return res
+    return res.copy(oldRating = get(pos-1).rating)
 }
 
 private fun ViewPortState.setViewPort(bounds: RatingGraphBounds) {

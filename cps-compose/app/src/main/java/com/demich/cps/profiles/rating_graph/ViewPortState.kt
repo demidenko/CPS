@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.demich.cps.profiles.RatingChange
 import com.demich.cps.ui.geom.inflate
 import com.demich.cps.ui.geom.projectPoint
 import com.demich.cps.ui.geom.projectVector
@@ -29,7 +28,6 @@ import com.demich.cps.ui.geom.projectX
 import com.demich.cps.ui.geom.projectY
 import com.demich.cps.ui.geom.rectProjector
 import com.demich.cps.ui.geom.scale
-import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.rectSaver
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
@@ -196,20 +194,6 @@ internal suspend fun ViewPortState.detectTransformGestures(
             )
         }
     }
-}
-
-context(translator: GraphPointTranslator)
-internal fun List<RatingChange>.closestOrNull(
-    tap: Offset,
-    tapRadius: Float
-): RatingChange? {
-    val pos = minOfWithIndex {
-        val o = it.toGraphPoint().toCanvasPoint()
-        (o - tap).getDistance()
-    }.takeIf { it.value <= tapRadius }?.index ?: return null
-    val res = get(pos)
-    if (pos == 0 || res.oldRating != null) return res
-    return res.copy(oldRating = get(pos-1).rating)
 }
 
 private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
