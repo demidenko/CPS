@@ -111,18 +111,14 @@ context(translator: GraphPointTranslator)
 internal fun Int.toCanvasY() = translator.projectY(y = toGraphY())
 
 context(translator: GraphPointTranslator)
-internal fun GraphPoint.toCanvasPoint() =
-    Offset(
-        x = x.toCanvasX(),
-        y = y.toCanvasY()
-    )
-
-context(translator: GraphPointTranslator)
 internal inline fun <R> GraphPoint.toCanvasPoint(block: (Float, Float) -> R) =
     block(
         x.toCanvasX(),
         y.toCanvasY()
     )
+
+context(translator: GraphPointTranslator)
+internal fun GraphPoint.toCanvasPoint() = toCanvasPoint(block = ::Offset)
 
 internal inline fun <R> ViewPortState.withTranslator(
     canvasRect: Rect,
