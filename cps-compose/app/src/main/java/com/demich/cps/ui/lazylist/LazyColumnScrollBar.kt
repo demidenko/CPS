@@ -43,7 +43,6 @@ internal fun Modifier.drawScrollBar(
     enterAnimationSpec: AnimationSpec<Float>,
     exitAnimationSpec: AnimationSpec<Float>,
 ): Modifier = composed {
-    // TODO: this read recreates modifier
     val scrollInProgress = state.isScrollInProgress
 
     val fraction by animateFloatAsState(
