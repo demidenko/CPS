@@ -27,25 +27,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Instant
 
-private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
-    combine(
-        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
-        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
-    ) { ignored, monitorContestId ->
-        buildSet {
-            addAll(ignored)
-            monitorContestId?.let { add(Contest.Platform.codeforces to it.toString()) }
-        }
-    }
-
-private fun flowOfContests(context: Context) =
-    context.contestsListDao.flowOfContests()
-        .distinctUntilChanged()
-        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
-            if (ignored.isEmpty()) list
-            else list.filter { contest -> contest.compositeId !in ignored }
-        }
-
 internal data class SortedContests(
     val contests: List<Contest>,
     private val firstFinished: Int
@@ -161,3 +142,22 @@ internal fun produceSortedContestsWithTime(
 
     return init.first
 }
+
+private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
+    combine(
+        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
+        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
+    ) { ignored, monitorContestId ->
+        buildSet {
+            addAll(ignored)
+            monitorContestId?.let { add(Contest.Platform.codeforces to it.toString()) }
+        }
+    }
+
+private fun flowOfContests(context: Context): Flow<List<Contest>> =
+    context.contestsListDao.flowOfContests()
+        .distinctUntilChanged()
+        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
+            if (ignored.isEmpty()) list
+            else list.filter { contest -> contest.compositeId !in ignored }
+        }
