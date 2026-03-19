@@ -19,8 +19,8 @@ class NotificationChannelSingleId internal constructor(
     val channelInfo: NotificationChannelInfo
 ) {
     fun builder(context: Context): NotificationBuilder {
-        val notificationManager = NotificationManagerCompat.from(context).apply {
-            createNotificationChannel(channelInfo)
+        val notificationManager = NotificationManagerCompat.from(context).also {
+            it.createAndroidNotificationChannel(channelInfo)
         }
         return NotificationBuilder(
             builder = NotificationCompat.Builder(context, channelInfo.id),
@@ -45,7 +45,7 @@ fun NotificationChannelSingleId.getActiveNotification(context: Context): Notific
 
 class NotificationChannelRangeId internal constructor(
     private val idRange: IntRange,
-    val channelInfo: NotificationChannelInfo
+    private val channelInfo: NotificationChannelInfo
 ) {
     operator fun invoke(key: Any): NotificationChannelSingleId =
         NotificationChannelSingleId(
@@ -54,7 +54,7 @@ class NotificationChannelRangeId internal constructor(
         )
 }
 
-private fun NotificationManagerCompat.createNotificationChannel(channelInfo: NotificationChannelInfo) {
+private fun NotificationManagerCompat.createAndroidNotificationChannel(channelInfo: NotificationChannelInfo) {
     with(channelInfo) {
         createNotificationChannelGroup(group)
         val androidChannel = android.app.NotificationChannel(id, name, importance.toAndroidImportance()).also {
@@ -63,3 +63,10 @@ private fun NotificationManagerCompat.createNotificationChannel(channelInfo: Not
         createNotificationChannel(androidChannel)
     }
 }
+
+private fun Importance.toAndroidImportance(): Int =
+    when (this) {
+        DEFAULT -> NotificationManager.IMPORTANCE_DEFAULT
+        MIN -> NotificationManager.IMPORTANCE_MIN
+        HIGH -> NotificationManager.IMPORTANCE_HIGH
+    }
