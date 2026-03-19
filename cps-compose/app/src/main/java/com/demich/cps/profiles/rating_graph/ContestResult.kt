@@ -23,6 +23,7 @@ import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
+import com.demich.cps.profiles.ratingDiff
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.CPSTheme
@@ -90,7 +91,7 @@ private fun ContestResult(
             )
             if (ratingChange.oldRating != null) {
                 RatingChange(
-                    change = ratingChange.rating - ratingChange.oldRating,
+                    change = ratingChange.ratingDiff(),
                     fontSize = subTitleFontSize
                 )
             }

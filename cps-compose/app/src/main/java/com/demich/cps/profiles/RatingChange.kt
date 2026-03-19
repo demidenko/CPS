@@ -25,6 +25,9 @@ data class RatingChange(
     val url: String? = null
 )
 
+fun RatingChange.ratingDiff(): Int =
+    oldRating?.let { rating - it } ?: rating
+
 internal fun CodeforcesRatingChange.toRatingChange() =
     RatingChange(
         rating = newRating,

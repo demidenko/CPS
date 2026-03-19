@@ -4,6 +4,7 @@ import android.content.Context
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.ratingDiff
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.handle
@@ -61,7 +62,7 @@ abstract class RatedProfileStorage<U: RatedUserInfo>(
 
     private fun notifyRatingChange(ratingChange: RatingChange, handle: String) {
         ratingChangeNotificationChannel.notify(context) {
-            val difference = ratingChange.rating - (ratingChange.oldRating ?: 0)
+            val difference = ratingChange.ratingDiff()
             smallIcon = if (difference < 0) R.drawable.ic_rating_down else R.drawable.ic_rating_up
             contentTitle = "$handle new rating: ${ratingChange.rating}"
             contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
