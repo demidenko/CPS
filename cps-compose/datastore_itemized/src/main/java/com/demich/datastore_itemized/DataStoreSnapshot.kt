@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -61,7 +62,7 @@ suspend inline fun <D: ItemizedDataStore, R> D.fromSnapshot(
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    context(snapshot()) {
+    context(snapshotFlow().first()) {
         return block()
     }
 }
@@ -70,7 +71,7 @@ suspend fun <D: ItemizedDataStore> D.edit(
     block: context(DataStoreEditScope) D.() -> Unit
 ) {
     dataStore.edit {
-        with(DataStoreEditScope(it)) {
+        context(DataStoreEditScope(it)) {
             block()
         }
     }

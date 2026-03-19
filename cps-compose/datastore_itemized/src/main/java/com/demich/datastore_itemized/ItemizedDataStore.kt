@@ -10,7 +10,6 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import java.util.EnumSet
@@ -18,8 +17,6 @@ import java.util.EnumSet
 
 abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     internal val dataStore: DataStore<Preferences> = wrapper.dataStore
-
-    suspend fun snapshot(): DataStoreSnapshot = DataStoreSnapshot(dataStore.data.first())
 
     fun snapshotFlow(): Flow<DataStoreSnapshot> =
         dataStore.data.map { DataStoreSnapshot(it) }
