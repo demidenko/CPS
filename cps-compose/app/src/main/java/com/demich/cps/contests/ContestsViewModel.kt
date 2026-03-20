@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.loading.asContestsReceiver
@@ -78,7 +78,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
-                contestsReceiver = context.contestsListDao.asContestsReceiver()
+                contestsReceiver = context.contestsRepository.asContestsReceiver()
             )
         }
     }
@@ -92,9 +92,9 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             val settings = context.settingsContests
             val diff = settings.makeSnapshot().differenceFrom(snapshot)
 
-            val dao = context.contestsListDao
+            val repository = context.contestsRepository
             diff.toRemove.forEach { platform ->
-                dao.replace(platform, emptyList())
+                repository.replace(platform, emptyList())
                 errors.edit { remove(platform) }
                 setLoadingStatus(platform, PENDING)
             }
@@ -102,7 +102,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             reload(
                 platforms = diff.toReload,
                 settings = settings,
-                contestsReceiver = dao.asContestsReceiver()
+                contestsReceiver = repository.asContestsReceiver()
             )
         }
     }

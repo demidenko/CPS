@@ -1,6 +1,5 @@
 package com.demich.cps.contests.database
 
-import android.content.Context
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
@@ -9,15 +8,12 @@ import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
-val Context.contestsListDao: ContestsListDao
-    get() = contestsDatabase.contestsDao()
-
 internal const val contestsTableName = "contests_list"
 
 private const val SQLITE_MAX_VARIABLE_NUMBER = 1000 //actually is 32k https://www.sqlite.org/limits.html#9
 
 @Dao
-abstract class ContestsListDao {
+internal abstract class ContestsListDao: ContestsRepository {
     @Upsert
     protected abstract suspend fun insert(contests: List<Contest>)
 
@@ -39,7 +35,7 @@ abstract class ContestsListDao {
     }
 
     @Transaction
-    open suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
+    override suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()) { it.id }
         removeNotIn(platform, ids)
@@ -47,12 +43,12 @@ abstract class ContestsListDao {
     }
 
     @Query("select * from $contestsTableName")
-    abstract fun flowOfContests(): Flow<List<Contest>>
+    abstract override fun flowOfContests(): Flow<List<Contest>>
 
     @Query("select * from $contestsTableName where platform = :platform")
-    abstract suspend fun getContests(platform: Contest.Platform): List<Contest>
+    abstract override suspend fun getContests(platform: Contest.Platform): List<Contest>
 
     @Query("select * from $contestsTableName where platform = :platform and endTime > :currentTime")
-    abstract suspend fun getContestsNotFinished(platform: Contest.Platform, currentTime: Instant): List<Contest>
+    abstract override suspend fun getContestsNotFinished(platform: Contest.Platform, currentTime: Instant): List<Contest>
 
 }

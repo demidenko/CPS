@@ -3,7 +3,7 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.isContestant
@@ -109,7 +109,7 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
 private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
     workerStartTime: Instant
 ) {
-    context.contestsListDao.getContestsNotFinished(
+    context.contestsRepository.getContestsNotFinished(
         platform = Contest.Platform.codeforces,
         currentTime = workerStartTime
     ).minOfNotNull {

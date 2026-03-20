@@ -10,7 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.contestsListDao
+import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
@@ -155,7 +155,7 @@ private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestComposit
     }
 
 private fun flowOfContests(context: Context): Flow<List<Contest>> =
-    context.contestsListDao.flowOfContests()
+    context.contestsRepository.flowOfContests()
         .distinctUntilChanged()
         .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
             if (ignored.isEmpty()) list
