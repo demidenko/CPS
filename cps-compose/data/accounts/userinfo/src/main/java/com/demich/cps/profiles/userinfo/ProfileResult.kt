@@ -44,7 +44,7 @@ private val userInfoSerializersModule = SerializersModule {
     }
 }
 
-val jsonProfile = Json {
+val jsonProfile get() = Json {
     ignoreUnknownKeys = true
     serializersModule = userInfoSerializersModule
 }
