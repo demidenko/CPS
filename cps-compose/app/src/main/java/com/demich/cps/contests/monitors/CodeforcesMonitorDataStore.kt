@@ -83,12 +83,20 @@ internal data class CodeforcesMonitorSubmissionInfo(
 }
 
 context(scope: DataStoreSnapshot)
-private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
-    val contest = contestInfo.value ?: return null
-    if (contest.phase == UNDEFINED) return null
-
+private fun CodeforcesMonitorDataStore.contestInfoChecked(): CodeforcesContest? {
     // args can be changed before contestInfo reset
-    args.value.let { if (it?.contestId != contest.id) return null }
+    val contestId = args.value?.contestId ?: return null
+    val contest = contestInfo.value ?: return null
+    return when {
+        contest.id != contestId -> null
+        contest.phase == UNDEFINED -> null
+        else -> contest
+    }
+}
+
+context(scope: DataStoreSnapshot)
+private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
+    val contest = contestInfoChecked() ?: return null
 
     val phase = when (contest.phase) {
         CODING ->
@@ -137,15 +145,7 @@ fun CodeforcesMonitorDataStore.flowOfContestData(): Flow<CodeforcesMonitorData?>
         contestData()
     }
 
-// shortcut for flowOfContestData().map { it?.contestId }
 fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
     flowOf {
-        val contestInfo = contestInfo.value
-        val contestId = args.value?.contestId
-        when {
-            contestInfo == null -> null
-            contestInfo.id != contestId -> null
-            contestInfo.phase == UNDEFINED -> null
-            else -> contestId
-        }
+        contestInfoChecked()?.id
     }
