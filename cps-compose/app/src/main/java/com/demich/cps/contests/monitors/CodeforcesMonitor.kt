@@ -170,7 +170,7 @@ private inline fun CodeforcesMonitorDataStore.applyStandings(
         CodeforcesMonitorProblemResult(
             problemIndex = problem.index,
             points = result?.points ?: 0.0,
-            type = result?.type ?: FINAL
+            status = result?.type ?: FINAL
         )
     }
 
@@ -264,7 +264,7 @@ private fun needCheckSubmissions(
 private fun CodeforcesMonitorProblemResult.needCheckSubmissions(
     submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
 ): Boolean {
-    if (type != FINAL) return false
+    if (status != FINAL) return false
     val list = submissionsInfo[problemIndex] ?: return true
     return list.any { it.isPreliminary() }
 }

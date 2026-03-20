@@ -56,7 +56,7 @@ internal data class CodeforcesMonitorArgs(
 internal data class CodeforcesMonitorProblemResult(
     val problemIndex: String,
     val points: Double,
-    val type: CodeforcesProblemStatus
+    val status: CodeforcesProblemStatus
 )
 
 @Serializable
@@ -117,12 +117,12 @@ private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
         CodeforcesMonitorData.ProblemInfo(
             name = index,
             result = when {
-                contest.phase.isSystemTestOrFinished() && problem.type == PRELIMINARY ->
+                contest.phase.isSystemTestOrFinished() && problem.status == PRELIMINARY ->
                     CodeforcesMonitorData.ProblemResult.Pending
                 problem.points != 0.0 ->
                     CodeforcesMonitorData.ProblemResult.Points(
                         points = problem.points,
-                        isFinal = problem.type == FINAL
+                        isFinal = problem.status == FINAL
                     )
                 submissionsInfo[index]?.any { it.isFailedSystemTest() } == true ->
                     CodeforcesMonitorData.ProblemResult.FailedSystemTest
