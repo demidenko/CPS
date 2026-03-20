@@ -261,12 +261,11 @@ private fun needCheckSubmissions(
     return contestInfo.phase.isSystemTestOrFinished()
 }
 
-private fun needCheckSubmissions(
-    problemResult: CodeforcesMonitorProblemResult,
+private fun CodeforcesMonitorProblemResult.needCheckSubmissions(
     submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
 ): Boolean {
-    if (problemResult.type != FINAL) return false
-    val list = submissionsInfo[problemResult.problemIndex] ?: return true
+    if (type != FINAL) return false
+    val list = submissionsInfo[problemIndex] ?: return true
     return list.any { it.isPreliminary() }
 }
 
@@ -277,7 +276,7 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     if (needCheckSubmissions(contestInfo = contestInfo, participationType = participationType.value)) {
         val problemResults = problemResults.value
         val info = submissionsInfo.value
-        if (problemResults.any { needCheckSubmissions(it, info) }) block(problemResults)
+        if (problemResults.any { it.needCheckSubmissions(info) }) block(problemResults)
     }
 }
 
