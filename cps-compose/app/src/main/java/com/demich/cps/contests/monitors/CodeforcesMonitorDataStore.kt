@@ -15,7 +15,6 @@ import com.demich.datastore_itemized.DataStoreSnapshot
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.flowOf
-import com.demich.datastore_itemized.get
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
@@ -112,17 +111,18 @@ private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
         participationType = participationType.value
     )
 
-    val problems = problemResults.value.map { problem ->
-        val index = problem.problemIndex
+    val submissionsInfo = submissionsInfo.value
+    val problems = problemResults.value.map { result ->
+        val index = result.problemIndex
         CodeforcesMonitorData.ProblemInfo(
             name = index,
             result = when {
-                contest.phase.isSystemTestOrFinished() && problem.status == PRELIMINARY ->
+                contest.phase.isSystemTestOrFinished() && result.status == PRELIMINARY ->
                     CodeforcesMonitorData.ProblemResult.Pending
-                problem.points != 0.0 ->
+                result.points != 0.0 ->
                     CodeforcesMonitorData.ProblemResult.Points(
-                        points = problem.points,
-                        isFinal = problem.status == FINAL
+                        points = result.points,
+                        isFinal = result.status == FINAL
                     )
                 submissionsInfo[index]?.any { it.isFailedSystemTest() } == true ->
                     CodeforcesMonitorData.ProblemResult.FailedSystemTest
