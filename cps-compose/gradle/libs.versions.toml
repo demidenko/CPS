@@ -20,7 +20,7 @@ lifecycle = "2.10.0"  # https://developer.android.com/jetpack/androidx/releases/
 
 room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
 
-datastore = "1.2.0" # https://developer.android.com/jetpack/androidx/releases/datastore
+datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/datastore
 
 jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
 # 1.22.1:
