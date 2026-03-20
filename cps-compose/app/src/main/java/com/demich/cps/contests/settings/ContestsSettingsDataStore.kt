@@ -11,6 +11,7 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -28,38 +29,36 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     private val enabledKnownPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms")
     suspend fun changeEnabled(platform: Contest.Platform, enabled: Boolean) {
-        require(platform != Contest.Platform.unknown)
+        require(platform != unknown)
         enabledKnownPlatforms.edit {
             if (enabled) add(platform) else remove(platform)
         }
     }
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
-    val enabledPlatforms = combine(
-        enabledKnownPlatforms,
-        clistAdditionalResources
-    ) { platforms, clistAdditional ->
-        platforms.toEnumSet().apply {
-            if (clistAdditional.isNotEmpty()) add(Contest.Platform.unknown)
+    val enabledPlatforms = combine {
+        enabledKnownPlatforms.value.toEnumSet().apply {
+            if (clistAdditionalResources.value.isNotEmpty()) add(unknown)
         }
     }
 
     val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
     val clistApiKey = itemString(name = "clist_api_key", defaultValue = "")
-    val clistApiAccess = combine(clistApiLogin, clistApiKey) { login, key ->
-        ClistApi.ApiAccess(login = login, key = key)
+    val clistApiAccess = combine {
+        ClistApi.ApiAccess(
+            login = clistApiLogin.value,
+            key = clistApiKey.value
+        )
     }
 
     val contestMaxDuration = jsonCPS.item(name = "contest_max_duration", defaultValue = 30.days)
     val contestMaxNowToStart = jsonCPS.item(name = "contest_max_now_to_start", defaultValue = 120.days)
     val contestMaxEndToNow = jsonCPS.item(name = "contest_max_end_to_now", defaultValue = 7.days)
-    val contestsDateConstraints = combine(
-        contestMaxDuration, contestMaxNowToStart, contestMaxEndToNow
-    ) { maxDuration, maxNowToStart, maxEndToNow ->
+    val contestsDateConstraints = combine {
         ContestDateRelativeConstraints(
-            maxDuration = maxDuration,
-            nowToStartTimeMaxDuration = maxNowToStart,
-            endTimeToNowMaxDuration = maxEndToNow
+            maxDuration = contestMaxDuration.value,
+            nowToStartTimeMaxDuration = contestMaxNowToStart.value,
+            endTimeToNowMaxDuration = contestMaxEndToNow.value
         )
     }
 
