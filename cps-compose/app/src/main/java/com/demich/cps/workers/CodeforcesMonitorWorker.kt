@@ -18,6 +18,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
+import com.demich.cps.profiles.managers.applyRatingChange
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value

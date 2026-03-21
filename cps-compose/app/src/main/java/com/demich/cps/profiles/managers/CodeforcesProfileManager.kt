@@ -174,10 +174,6 @@ class CodeforcesProfileManager :
             observeContribution.value
         }
 
-    suspend fun applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
-        profileStorage(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
-    }
-
     override val ratingUpperBoundRevolutions
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
@@ -215,6 +211,10 @@ class CodeforcesProfileManager :
             //https://codeforces.com/blog/entry/126
         )
 
+}
+
+suspend fun CodeforcesProfileManager.applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
+    profileStorage(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
 }
 
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
