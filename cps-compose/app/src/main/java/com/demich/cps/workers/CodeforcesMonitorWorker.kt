@@ -90,7 +90,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                     launch { CodeforcesProfileManager().applyRatingChange(ratingChange, context) }
                 },
                 onSubmissionFinalResult = { submission ->
-                    launch { notify(submission) }
+                    launch { notify(submission, context) }
                 },
                 onCompletion = {
                     job.cancel()
@@ -100,25 +100,25 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
 
         return Result.success()
     }
-
-    private fun notify(submission: CodeforcesSubmission) =
-        notificationChannels.codeforces.submission_result(submission.id).notify(context) {
-            if (submission.verdict == OK) {
-                smallIcon = R.drawable.ic_problem_ok
-                colorResId = R.color.success
-            } else {
-                smallIcon = R.drawable.ic_problem_fail
-                colorResId = R.color.fail
-            }
-            val problemId = submission.problem.problemId
-            val result = submission.verdictString()
-            contentTitle = "Problem $problemId: $result"
-            subText = "Codeforces system testing result"
-            time = null
-            autoCancel = true
-            url = CodeforcesUrls.submission(submission)
-        }
 }
+
+private fun notify(submission: CodeforcesSubmission, context: Context) =
+    notificationChannels.codeforces.submission_result(submission.id).notify(context) {
+        if (submission.verdict == OK) {
+            smallIcon = R.drawable.ic_problem_ok
+            colorResId = R.color.success
+        } else {
+            smallIcon = R.drawable.ic_problem_fail
+            colorResId = R.color.fail
+        }
+        val problemId = submission.problem.problemId
+        val result = submission.verdictString()
+        contentTitle = "Problem $problemId: $result"
+        subText = "Codeforces system testing result"
+        time = null
+        autoCancel = true
+        url = CodeforcesUrls.submission(submission)
+    }
 
 private fun createNotificationBuilder(handle: String, context: Context) =
     notificationChannels.codeforces.contest_monitor.builder(context) {
