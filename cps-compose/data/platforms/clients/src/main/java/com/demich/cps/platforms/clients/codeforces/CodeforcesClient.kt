@@ -122,6 +122,10 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
+    private fun HttpRequestBuilder.handles(handles: Collection<String>) {
+        parameter(key = "handles", value = handles.joinToString(separator = ";"))
+    }
+
     override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry =
         getCodeforcesApi(method = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
@@ -145,7 +149,7 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
     ): CodeforcesContestStandings =
         getCodeforcesApi(method = "contest.standings") {
             parameter("contestId", contestId)
-            parameter("handles", handles.joinToString(separator = ";"))
+            handles(handles)
             parameter("showUnofficial", includeUnofficial)
         }
 
@@ -174,7 +178,7 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
     ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
         return getCodeforcesApi(method = "user.info") {
-            parameter("handles", handles.joinToString(separator = ";"))
+            handles(handles)
             parameter("checkHistoricHandles", checkHistoricHandles)
         }
     }
