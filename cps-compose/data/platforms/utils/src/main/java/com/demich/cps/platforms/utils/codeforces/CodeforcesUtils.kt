@@ -193,9 +193,8 @@ object CodeforcesUtils {
             ?.toIntOrNull()
     }
 
-    fun colorTagFrom(rating: Int?): CodeforcesColorTag =
+    fun colorTagFrom(rating: Int): CodeforcesColorTag =
         when {
-            rating == null -> BLACK
             rating < 1200 -> GRAY
             rating < 1400 -> GREEN
             rating < 1600 -> CYAN
@@ -205,6 +204,9 @@ object CodeforcesUtils {
             rating < 3000 -> RED
             else -> LEGENDARY
         }
+
+    fun colorTagFrom(rating: Int?): CodeforcesColorTag =
+        if (rating == null) BLACK else colorTagFrom(rating)
 }
 
 
