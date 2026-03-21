@@ -92,6 +92,7 @@ data class CodeforcesContestStandings(
     @Serializable
     data class CodeforcesContestParticipant(
         val participantType: CodeforcesParticipationType
+        // TODO: val participantId: Long? (not documented in api)
     )
 }
 
@@ -248,6 +249,8 @@ enum class CodeforcesProblemVerdict {
     WAITING,
     FAILED, OK, PARTIAL, COMPILATION_ERROR, RUNTIME_ERROR, WRONG_ANSWER, PRESENTATION_ERROR, TIME_LIMIT_EXCEEDED, MEMORY_LIMIT_EXCEEDED, IDLENESS_LIMIT_EXCEEDED, SECURITY_VIOLATED, CRASHED, INPUT_PREPARATION_CRASHED, CHALLENGED,
     SKIPPED, TESTING, REJECTED
+
+    //TODO: SUBMITTED
 }
 
 enum class CodeforcesTestset {
