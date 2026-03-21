@@ -74,7 +74,6 @@ class CodeforcesProfileManager :
         CodeforcesClient.getHandleSuggestions(str = str)
             .map { UserSuggestion(title = it.handle, userId = it.handle) }
             .toList()
-            .asReversed()
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
