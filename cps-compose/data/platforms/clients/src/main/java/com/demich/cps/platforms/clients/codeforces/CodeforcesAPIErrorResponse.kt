@@ -46,27 +46,27 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
     private fun isHandleFieldIncorrectLength(): Boolean {
         //user blog responses
-        if (comment == "handle: Field should contain between 3 and 24 characters, inclusive") return true
-        if (comment == "handle: Поле должно содержать от 3 до 24 символов, включительно") return true
+        if (comment.isField("handle", "Field should contain between 3 and 24 characters, inclusive")) return true
+        if (comment.isField("handle", "Поле должно содержать от 3 до 24 символов, включительно")) return true
 
         //userinfo responses
-        if (comment == "handles: Field should not be empty") return true
-        if (comment == "handles: Поле должно быть не пусто") return true
+        if (comment.isField("handles", "Field should not be empty")) return true
+        if (comment.isField("handles", "Поле должно быть не пусто")) return true
         return false
     }
 
     private fun isNotAllowedToReadThatBlog(): Boolean {
-        if (comment == "handle: You are not allowed to read that blog") return true
+        if (comment.isField("handle", "You are not allowed to read that blog")) return true
         return false
     }
 
     private fun isContestRatingChangesUnavailable(): Boolean {
-        if (comment == "contestId: Rating changes are unavailable for this contest") return true
+        if (comment.isField("contestId", "Rating changes are unavailable for this contest")) return true
         return false
     }
 
     private fun isContestRatingChangesUnavailableBecauseContestNotFinished(): Boolean {
-        if (comment == "contestId: Rating changes are unavailable, because the contest isn't finished yet") return true
+        if (comment.isField("contestId", "Rating changes are unavailable, because the contest isn't finished yet")) return true
         return false
     }
 
@@ -79,7 +79,7 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     }
 
     private fun isContestManagerAreNotAllowed(): Boolean {
-        if (comment == "asManager: Only contest managers can use \"asManager\" option") return true
+        if (comment.isField("asManager", "Only contest managers can use \"asManager\" option")) return true
         return false
     }
 
