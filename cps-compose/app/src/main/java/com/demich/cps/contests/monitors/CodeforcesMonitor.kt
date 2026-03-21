@@ -238,18 +238,21 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     contestId: Int,
     delay: Duration,
     pageContentProvider: CodeforcesPageContentProvider
-): Flow<Int> = distinctUntilChanged().transformLatest { phase ->
-    if (phase == SYSTEM_TEST) {
-        while (true) {
-            pageContentProvider.runCatching { getContestPage(contestId) }
-                .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
-                .onSuccess {
-                    if (it != null) emit(it)
-                }
-            delay(duration = delay)
+): Flow<Int> = distinctUntilChanged()
+    .transformLatest { phase ->
+        if (phase == SYSTEM_TEST) {
+            while (true) {
+                pageContentProvider.getSysTestPercentageOrNull(contestId = contestId)
+                    ?.let { emit(it) }
+                delay(duration = delay)
+            }
         }
-    }
-}
+    }.distinctUntilChanged()
+
+private suspend fun CodeforcesPageContentProvider.getSysTestPercentageOrNull(contestId: Int): Int? =
+    runCatching { getContestPage(contestId = contestId) }
+        .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
+        .getOrNull()
 
 
 private fun needCheckSubmissions(
