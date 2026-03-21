@@ -59,8 +59,7 @@ abstract class CPSOneTimeWork(
         )
     }
 
-    fun enqueue(replace: Boolean) =
-        enqueueWork(policy = if (replace) REPLACE else KEEP)
+    fun startImmediate() = enqueueWork(policy = REPLACE)
 }
 
 abstract class CPSPeriodicWork(

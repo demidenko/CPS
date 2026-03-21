@@ -48,21 +48,16 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
             val monitor = CodeforcesMonitorDataStore(context)
 
             val work = getWork(context)
-            val replace: Boolean
             if (monitor.args() == startArgs) {
-                if (work.workInfo().isRunning)
-                    replace = false
-                else
-                    replace = true
+                if (work.workInfo().isRunning) return
             } else {
-                replace = true
                 monitor.edit {
                     contextOf<DataStoreEditScope>().clear()
                     args.value = startArgs
                 }
             }
 
-            work.enqueue(replace)
+            work.startImmediate()
         }
     }
 
