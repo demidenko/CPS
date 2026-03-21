@@ -11,7 +11,7 @@ class CodeforcesApiHandleNotFoundException(comment: String, val handle: String):
 
 class CodeforcesApiNotAllowedReadBlogException(comment: String): CodeforcesApiException(comment)
 
-class CodeforcesApiContestRatingUnavailableException(comment: String): CodeforcesApiException(comment)
+class CodeforcesApiContestRatingChangesUnavailableException(comment: String): CodeforcesApiException(comment)
 
 class CodeforcesApiContestNotStartedException(comment: String, val contestId: Int): CodeforcesApiException(comment)
 

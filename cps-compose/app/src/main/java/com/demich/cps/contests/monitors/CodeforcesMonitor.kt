@@ -3,7 +3,7 @@ package com.demich.cps.contests.monitors
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingChangesUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -207,7 +207,7 @@ private class RatingChangeWaiter(
         api.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
-            if (it is CodeforcesApiContestRatingUnavailableException) {
+            if (it is CodeforcesApiContestRatingChangesUnavailableException) {
                 // unrated contest
                 return true
             }

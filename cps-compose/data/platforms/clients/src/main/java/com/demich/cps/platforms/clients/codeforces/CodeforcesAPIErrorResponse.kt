@@ -3,7 +3,7 @@ package com.demich.cps.platforms.clients.codeforces
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingUnavailableException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingChangesUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
@@ -25,7 +25,7 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
         ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
 
-        if (isContestRatingUnavailable()) return CodeforcesApiContestRatingUnavailableException(comment)
+        if (isContestRatingChangesUnavailable()) return CodeforcesApiContestRatingChangesUnavailableException(comment)
         ifIsContestNotStarted { return CodeforcesApiContestNotStartedException(comment, contestId = it) }
         ifIsContestNotFound { return CodeforcesApiContestNotFoundException(comment, contestId = it) }
 
@@ -60,7 +60,7 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         return false
     }
 
-    private fun isContestRatingUnavailable(): Boolean {
+    private fun isContestRatingChangesUnavailable(): Boolean {
         if (comment == "contestId: Rating changes are unavailable for this contest") return true
         return false
     }
