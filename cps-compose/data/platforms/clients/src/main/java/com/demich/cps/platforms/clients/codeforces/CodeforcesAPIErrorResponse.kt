@@ -105,5 +105,11 @@ private fun String.isField(
     key: String,
     description: String
 ): Boolean {
-    return this == "$key: $description"
+//    return this == "$key: $description"
+    if (length != key.length + 2 + description.length) return false
+    if (!startsWith(key)) return false
+    if (get(key.length) != ':') return false
+    if (get(key.length + 1) != ' ') return false
+    if (!endsWith(description)) return false
+    return true
 }
