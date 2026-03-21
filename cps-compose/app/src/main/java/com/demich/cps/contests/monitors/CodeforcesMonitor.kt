@@ -67,10 +67,10 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
         )
 
         ifNeedCheckSubmissions { problemResults ->
-            api.getSubmissionsOrNull(
+            api.getParticipantNonSkippedSubmissionsResult(
                 contestId = contestId,
                 handle = handle
-            )?.let { submissions ->
+            ).onSuccess { submissions ->
                 val notified = notifiedSubmissionsIds()
                 val newResultSubmissions = submissions.filter {
                     it.testset == TESTS
@@ -82,7 +82,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     notifiedSubmissionsIds.value += newResultSubmissions.map { it.id }
                     submissionsInfo.value = problemResults.makeMapWith(submissions)
                 }
-            }
+            }.onFailure { lastRequest.setValue(false) }
         }
 
         ratingChangeWaiter.getDelay(contest = contestInfo()).let { duration ->
@@ -280,10 +280,10 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     }
 }
 
-private suspend fun CodeforcesApi.getSubmissionsOrNull(
+private suspend fun CodeforcesApi.getParticipantNonSkippedSubmissionsResult(
     contestId: Int,
     handle: String
-): List<CodeforcesSubmission>? =
+): Result<List<CodeforcesSubmission>> =
     runCatching {
         getContestSubmissions(contestId = contestId, handle = handle)
     }.map { submissions ->
@@ -291,7 +291,7 @@ private suspend fun CodeforcesApi.getSubmissionsOrNull(
                it.author.isContestant()
             && it.verdict != SKIPPED
         }
-    }.getOrNull() //TODO: take this failure
+    }
 
 private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<CodeforcesSubmission>) =
     submissions.groupBy(
