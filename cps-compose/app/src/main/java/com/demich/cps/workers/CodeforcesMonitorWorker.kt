@@ -38,13 +38,19 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                     get() = OneTimeWorkRequestBuilder<CodeforcesMonitorWorker>()
             }
 
-        suspend fun start(contestId: Int, handle: String, context: Context) {
-            val monitor = CodeforcesMonitorDataStore(context)
-            val startArgs = CodeforcesMonitorArgs(contestId, handle)
+        suspend fun start(contestId: Int, handle: String, context: Context) =
+            start(
+                startArgs = CodeforcesMonitorArgs(contestId, handle),
+                context = context
+            )
 
+        suspend fun start(startArgs: CodeforcesMonitorArgs, context: Context) {
+            val monitor = CodeforcesMonitorDataStore(context)
+
+            val work = getWork(context)
             val replace: Boolean
             if (monitor.args() == startArgs) {
-                if (getWork(context).workInfo().isRunning)
+                if (work.workInfo().isRunning)
                     replace = false
                 else
                     replace = true
@@ -56,7 +62,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 }
             }
 
-            getWork(context).enqueue(replace)
+            work.enqueue(replace)
         }
     }
 

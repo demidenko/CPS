@@ -24,7 +24,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
         private val Context.cf_monitor_dataStore by dataStoreWrapper(name = "cf_monitor")
     }
 
-    internal val args = jsonCPS.itemNullable<CodeforcesMonitorArgs>(name = "args")
+    val args = jsonCPS.itemNullable<CodeforcesMonitorArgs>(name = "args")
 
     val lastRequest = jsonCPS.itemNullable<Boolean>(name = "last_request")
 
@@ -46,7 +46,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 }
 
 @Serializable
-internal data class CodeforcesMonitorArgs(
+data class CodeforcesMonitorArgs(
     val contestId: Int,
     val handle: String
 )

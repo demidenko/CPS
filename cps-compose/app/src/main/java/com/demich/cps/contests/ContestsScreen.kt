@@ -480,11 +480,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         LaunchedEffect(Unit) {
             if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
                 val args = monitor.args() ?: return@LaunchedEffect
-                CodeforcesMonitorWorker.start(
-                    contestId = args.contestId,
-                    handle = args.handle,
-                    context = context
-                )
+                CodeforcesMonitorWorker.start(startArgs = args, context = context)
             }
         }
     }

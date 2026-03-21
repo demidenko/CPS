@@ -138,8 +138,8 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
         }
         CodeforcesMonitorWorker.start(
             contestId = contestId,
-            context = context,
-            handle = handle
+            handle = handle,
+            context = context
         )
     }
 }
