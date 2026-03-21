@@ -226,3 +226,8 @@ suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Seq
                 .selectRatedUser()
                 ?.extractRatedUser()
         }
+
+suspend fun CodeforcesPageContentProvider.getSysTestPercentageOrNull(contestId: Int): Int? =
+    runCatching { getContestPage(contestId = contestId) }
+        .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
+        .getOrNull()

@@ -17,7 +17,7 @@ import com.demich.cps.platforms.api.codeforces.models.isContestant
 import com.demich.cps.platforms.api.codeforces.models.isContestantType
 import com.demich.cps.platforms.api.codeforces.models.isResult
 import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getSysTestPercentageOrNull
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.DataStoreEditScope
@@ -247,11 +247,6 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
             }
         }
     }.distinctUntilChanged()
-
-private suspend fun CodeforcesPageContentProvider.getSysTestPercentageOrNull(contestId: Int): Int? =
-    runCatching { getContestPage(contestId = contestId) }
-        .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
-        .getOrNull()
 
 
 private fun needCheckSubmissions(
