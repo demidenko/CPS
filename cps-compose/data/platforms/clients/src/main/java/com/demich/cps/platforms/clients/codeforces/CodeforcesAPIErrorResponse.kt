@@ -65,6 +65,11 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         return false
     }
 
+    private fun isContestRatingChangesUnavailableBecauseContestNotFinished(): Boolean {
+        if (comment == "contestId: Rating changes are unavailable, because the contest isn't finished yet") return true
+        return false
+    }
+
     private inline fun ifIsContestNotStarted(block: (Int) -> Unit) {
         comment.ifIntSurrounded("contestId: Contest with id ", " has not started", block)
     }
