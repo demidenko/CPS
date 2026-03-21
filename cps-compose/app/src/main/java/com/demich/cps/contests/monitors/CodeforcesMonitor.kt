@@ -52,10 +52,10 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 
     val ratingChangeWaiter = RatingChangeWaiter(
         contestId = contestId,
-        handle = handle,
-        api = api,
-        onRatingChange = onRatingChange
-    )
+        api = api
+    ) { ratingChanges ->
+        ratingChanges.find { it.handle == handle }?.let(onRatingChange)
+    }
 
     val mainJob = scope.launchWhileActive {
         api.updateStandingsData(
@@ -189,9 +189,8 @@ private inline fun CodeforcesMonitorDataStore.applyStandings(
 
 private class RatingChangeWaiter(
     val contestId: Int,
-    val handle: String,
     val api: CodeforcesApi,
-    val onRatingChange: (CodeforcesRatingChange) -> Unit
+    val onRatingChangeDone: (List<CodeforcesRatingChange>) -> Unit
 ) {
     suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
         if (isRatingChangeDone()) return Duration.INFINITE
@@ -208,16 +207,16 @@ private class RatingChangeWaiter(
         api.runCatching {
             getContestRatingChanges(contestId)
         }.getOrElse {
-            //TODO: take this failure
             if (it is CodeforcesApiContestRatingUnavailableException) {
-                //unrated contest
+                // unrated contest
                 return true
             }
+            //TODO: save this failure?
             return false
         }.let { ratingChanges ->
-            if (ratingChanges.isEmpty()) return false
-            ratingChanges.find { it.handle == handle }?.let(onRatingChange)
-            return true
+            if (ratingChanges.isEmpty()) return false // still waiting
+            onRatingChangeDone(ratingChanges)
+            return true // rated contest
         }
     }
 }
