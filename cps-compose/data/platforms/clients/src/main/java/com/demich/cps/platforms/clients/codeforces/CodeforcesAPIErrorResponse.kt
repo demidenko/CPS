@@ -100,3 +100,10 @@ private inline fun String.ifIntSurrounded(prefix: String, suffix: String, block:
         it.toIntOrNull()?.let(block)
     }
 }
+
+private fun String.isField(
+    key: String,
+    description: String
+): Boolean {
+    return this == "$key: $description"
+}
