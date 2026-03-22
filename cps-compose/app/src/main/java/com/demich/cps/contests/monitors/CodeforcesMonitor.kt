@@ -218,8 +218,8 @@ private class RatingChangeWaiter(
         }
 
         return when (status) {
-            CodeforcesRatingChangesStatus.Pending -> false
-            CodeforcesRatingChangesStatus.Unrated -> true
+            CodeforcesRatingChangesStatus.Empty -> false
+            CodeforcesRatingChangesStatus.Unavailable -> true
             is CodeforcesRatingChangesStatus.Done -> {
                 onRatingChangeDone(status.ratingChanges)
                 true
