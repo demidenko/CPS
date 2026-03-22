@@ -3,7 +3,6 @@ package com.demich.cps.contests.monitors
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingChangesUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -17,6 +16,8 @@ import com.demich.cps.platforms.api.codeforces.models.isContestant
 import com.demich.cps.platforms.api.codeforces.models.isContestantType
 import com.demich.cps.platforms.api.codeforces.models.isResult
 import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingChangesStatus
+import com.demich.cps.platforms.utils.codeforces.getContestRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getSysTestPercentageOrNull
 import com.demich.cps.utils.getCurrentTime
 import com.demich.cps.utils.launchWhileActive
@@ -209,19 +210,20 @@ private class RatingChangeWaiter(
     }
 
     private suspend fun isRatingChangeDone(): Boolean {
-        api.runCatching {
-            getContestRatingChanges(contestId)
+        val status = api.runCatching {
+            getContestRatingChangesStatus(contestId = contestId)
         }.getOrElse {
-            if (it is CodeforcesApiContestRatingChangesUnavailableException) {
-                // unrated contest
-                return true
-            }
             //TODO: save this failure?
             return false
-        }.let { ratingChanges ->
-            if (ratingChanges.isEmpty()) return false // still waiting
-            onRatingChangeDone(ratingChanges)
-            return true // rated contest
+        }
+
+        return when (status) {
+            CodeforcesRatingChangesStatus.Pending -> false
+            CodeforcesRatingChangesStatus.Unrated -> true
+            is CodeforcesRatingChangesStatus.Done -> {
+                onRatingChangeDone(status.ratingChanges)
+                true
+            }
         }
     }
 }
