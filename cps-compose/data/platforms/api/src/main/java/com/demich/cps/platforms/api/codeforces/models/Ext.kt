@@ -3,13 +3,19 @@ package com.demich.cps.platforms.api.codeforces.models
 import kotlin.time.Instant
 
 fun CodeforcesParticipationType.isContestantType(): Boolean =
-    this == CONTESTANT || this == OUT_OF_COMPETITION
+    when (this) {
+        CONTESTANT, OUT_OF_COMPETITION -> true
+        else -> false
+    }
 
 fun CodeforcesContestStandings.CodeforcesContestParticipant.isContestant(): Boolean =
     participantType.isContestantType()
 
 fun CodeforcesContestPhase.isSystemTestOrFinished() =
-    this == SYSTEM_TEST || this == FINISHED
+    when (this) {
+        SYSTEM_TEST, FINISHED -> true
+        else -> false
+    }
 
 val CodeforcesContestPhase.title
     get() = when (this) {
