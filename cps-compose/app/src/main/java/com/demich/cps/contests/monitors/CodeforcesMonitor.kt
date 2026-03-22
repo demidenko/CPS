@@ -266,7 +266,7 @@ private fun needCheckSubmissions(
 }
 
 private fun CodeforcesMonitorProblemResult.needCheckSubmissions(
-    submissionsInfo: Map<String, List<CodeforcesMonitorSubmissionInfo>>
+    submissionsInfo: Map<String, List<CodeforcesSubmissionJudgeInfo>>
 ): Boolean {
     if (status != FINAL) return false
     val list = submissionsInfo[problemIndex] ?: return true
@@ -300,10 +300,12 @@ private suspend fun CodeforcesApi.getParticipantNonSkippedSubmissionsResult(
 private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<CodeforcesSubmission>) =
     submissions.groupBy(
         keySelector = { it.problem.index },
-        valueTransform = { CodeforcesMonitorSubmissionInfo(it) }
+        valueTransform = { it.toJudgeInfo() }
     ).let { grouped ->
         associateBy(
             keySelector = { it.problemIndex },
             valueTransform = { grouped[it.problemIndex] ?: emptyList() }
-        ).mapValues { it.value.distinct() }
+        )
+    }.mapValues {
+        it.value.distinct()
     }

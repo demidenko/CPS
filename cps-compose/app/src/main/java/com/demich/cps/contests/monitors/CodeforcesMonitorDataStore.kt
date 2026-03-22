@@ -36,7 +36,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val problemResults = jsonCPS.itemList<CodeforcesMonitorProblemResult>(name = "problem_results")
 
-    internal val submissionsInfo = jsonCPS.itemMap<String, List<CodeforcesMonitorSubmissionInfo>>(name = "problems_submissions_info")
+    internal val submissionsInfo = jsonCPS.itemMap<String, List<CodeforcesSubmissionJudgeInfo>>(name = "problems_submissions_info")
 
     internal val sysTestPercentage = itemIntNullable(name = "sys_test_percentage")
 
@@ -59,14 +59,21 @@ internal data class CodeforcesMonitorProblemResult(
 )
 
 @Serializable
-internal data class CodeforcesMonitorSubmissionInfo(
-    val testset: CodeforcesTestset,
-    val verdict: CodeforcesProblemVerdict
+internal data class CodeforcesSubmissionJudgeInfo(
+    private val testset: CodeforcesTestset,
+    private val verdict: CodeforcesProblemVerdict
 ) {
-    constructor(submission: CodeforcesSubmission): this(
-        testset = submission.testset,
-        verdict = submission.verdict
-    )
+    fun isResult(): Boolean =
+        verdict.isResult()
+
+    fun isFailedResult(): Boolean =
+        isResult() && verdict != OK
+
+    fun isFailedSystemTest(): Boolean =
+        testset == TESTS && isFailedResult()
+
+    fun isFailedPretests(): Boolean =
+        testset == PRETESTS && isFailedResult()
 
     fun isPreliminary(): Boolean {
         if (verdict == WAITING) return true
@@ -76,10 +83,13 @@ internal data class CodeforcesMonitorSubmissionInfo(
         }
         return false
     }
-
-    fun isFailedSystemTest(): Boolean =
-        testset == TESTS && verdict.isResult() && verdict != OK
 }
+
+internal fun CodeforcesSubmission.toJudgeInfo() =
+    CodeforcesSubmissionJudgeInfo(
+        testset = testset,
+        verdict = verdict
+    )
 
 context(scope: DataStoreSnapshot)
 private fun CodeforcesMonitorDataStore.contestInfoChecked(): CodeforcesContest? {
