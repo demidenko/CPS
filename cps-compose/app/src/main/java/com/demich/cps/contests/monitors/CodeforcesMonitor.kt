@@ -135,19 +135,12 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             monitor.reset()
         }
     }.onSuccess { standings ->
-        var officialChanged = false
+        val standings = standings.toStandingsData()
         monitor.edit {
             lastRequest.value = true
-            applyStandings(
-                standings = standings.toStandingsData(),
-                participationTypeCheck = {
-                    if (isOfficialChanged(old = participationType, new = it)) {
-                        officialChanged = true
-                    }
-                }
-            )
+            saveStandings(standings = standings)
         }
-        if (officialChanged) {
+        if (isOfficialChanged(old = participationType, new = standings.participationType)) {
             onOfficialChanged()
         }
     }
@@ -156,7 +149,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
 private class StandingsData(
     val contest: CodeforcesContest,
     val problemResults: List<CodeforcesMonitorProblemResult>,
-    val participationType: CodeforcesParticipationType?,
+    val participationType: CodeforcesParticipationType,
     val rank: Int?
 )
 
@@ -176,7 +169,7 @@ private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
     return StandingsData(
         contest = contest,
         problemResults = monitorResults,
-        participationType = row?.party?.participantType,
+        participationType = row?.party?.participantType ?: NOT_PARTICIPATED,
         rank = row?.rank
     )
 }
@@ -190,18 +183,12 @@ private fun isOfficialChanged(
 ): Boolean = new.isOfficial() != old.isOfficial()
 
 context(_: DataStoreEditScope)
-private inline fun CodeforcesMonitorDataStore.applyStandings(
-    standings: StandingsData,
-    participationTypeCheck: (CodeforcesParticipationType) -> Unit
+private fun CodeforcesMonitorDataStore.saveStandings(
+    standings: StandingsData
 ) {
     contestInfo.value = standings.contest
     problemResults.value = standings.problemResults
-
-    standings.participationType?.let {
-        participationType.value = it
-        participationTypeCheck(it)
-    }
-
+    participationType.value = standings.participationType
     contestantRank.value = standings.rank
 }
 
