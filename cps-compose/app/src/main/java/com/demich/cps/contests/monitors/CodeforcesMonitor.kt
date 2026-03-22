@@ -256,13 +256,11 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     }.distinctUntilChanged()
 
 
-private fun needCheckSubmissions(
-    contestInfo: CodeforcesContest,
+private fun CodeforcesContest.needCheckSubmissions(
     participationType: CodeforcesParticipationType
 ): Boolean {
-    if (!participationType.isContestantType()) return false
-    if (contestInfo.type == ICPC) return false
-    return contestInfo.phase.isSystemTestOrFinished()
+    if (type == ICPC) return false
+    return phase.isSystemTestOrFinished() && participationType.isContestantType()
 }
 
 private fun CodeforcesMonitorProblemResult.needCheckSubmissions(
@@ -277,7 +275,7 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
 ) = fromSnapshot {
     val contestInfo = contestInfo.value ?: return@fromSnapshot
-    if (needCheckSubmissions(contestInfo = contestInfo, participationType = participationType.value)) {
+    if (contestInfo.needCheckSubmissions(participationType = participationType.value)) {
         val problemResults = problemResults.value
         val info = submissionsInfo.value
         if (problemResults.any { it.needCheckSubmissions(info) }) block(problemResults)
