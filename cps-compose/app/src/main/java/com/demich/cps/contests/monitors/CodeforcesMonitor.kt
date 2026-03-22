@@ -139,7 +139,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
         monitor.edit {
             lastRequest.value = true
             applyStandings(
-                standings = standings,
+                standings = standings.toStandingsData(),
                 participationTypeCheck = {
                     if (isOfficialChanged(old = participationType, new = it)) {
                         officialChanged = true
@@ -153,6 +153,34 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
     }
 }
 
+private class StandingsData(
+    val contest: CodeforcesContest,
+    val problemResults: List<CodeforcesMonitorProblemResult>,
+    val participationType: CodeforcesParticipationType?,
+    val rank: Int?
+)
+
+private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
+    val row = rows.find { row -> row.party.isContestant() }
+    val results = row?.problemResults
+
+    val monitorResults = problems.mapIndexed { index, problem ->
+        val result = results?.getOrNull(index)
+        CodeforcesMonitorProblemResult(
+            problemIndex = problem.index,
+            points = result?.points ?: 0.0,
+            status = result?.type ?: FINAL
+        )
+    }
+
+    return StandingsData(
+        contest = contest,
+        problemResults = monitorResults,
+        participationType = row?.party?.participantType,
+        rank = row?.rank
+    )
+}
+
 private fun CodeforcesParticipationType.isOfficial(): Boolean =
     this == CONTESTANT
 
@@ -163,29 +191,18 @@ private fun isOfficialChanged(
 
 context(_: DataStoreEditScope)
 private inline fun CodeforcesMonitorDataStore.applyStandings(
-    standings: CodeforcesContestStandings,
+    standings: StandingsData,
     participationTypeCheck: (CodeforcesParticipationType) -> Unit
 ) {
     contestInfo.value = standings.contest
+    problemResults.value = standings.problemResults
 
-    val row = standings.rows.find { row -> row.party.isContestant() }
-    val results = row?.problemResults
-    problemResults.value = standings.problems.mapIndexed { index, problem ->
-        val result = results?.getOrNull(index)
-        CodeforcesMonitorProblemResult(
-            problemIndex = problem.index,
-            points = result?.points ?: 0.0,
-            status = result?.type ?: FINAL
-        )
+    standings.participationType?.let {
+        participationType.value = it
+        participationTypeCheck(it)
     }
 
-    row?.run {
-        party.participantType.let {
-            participationType.value = it
-            participationTypeCheck(it)
-        }
-        contestantRank.value = rank
-    }
+    contestantRank.value = standings.rank
 }
 
 private class RatingChangeWaiter(
