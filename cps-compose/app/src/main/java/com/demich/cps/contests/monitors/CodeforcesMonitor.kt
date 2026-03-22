@@ -308,4 +308,5 @@ private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<C
         )
     }.mapValues {
         it.value.distinct()
+            .filter { !it.isFailedPretests() } // do not save useless
     }
