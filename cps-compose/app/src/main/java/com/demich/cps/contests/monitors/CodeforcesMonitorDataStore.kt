@@ -72,17 +72,20 @@ internal data class CodeforcesSubmissionJudgeInfo(
     fun isFailedSystemTest(): Boolean =
         testset == TESTS && isFailedResult()
 
+    fun isPassedPretests(): Boolean =
+        testset == PRETESTS && verdict == OK
+
     fun isFailedPretests(): Boolean =
         testset == PRETESTS && isFailedResult()
 
-    fun isPreliminary(): Boolean {
-        if (verdict == WAITING) return true
-        if (verdict == TESTING) return true
-        if (testset == PRETESTS) {
-            return verdict == OK
-        }
-        return false
-    }
+    fun isPendingOrTesting(): Boolean =
+        verdict == WAITING || verdict == TESTING
+}
+
+internal fun CodeforcesSubmissionJudgeInfo.isPreliminary(): Boolean {
+    if (isPassedPretests()) return true
+    if (isPendingOrTesting()) return true
+    return false
 }
 
 internal fun CodeforcesSubmission.toJudgeInfo() =
