@@ -119,11 +119,12 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
     handle: String,
     onOfficialChanged: () -> Unit
 ) {
+    val participationType = monitor.participationType()
     runCatching {
         getContestStandings(
             contestId = contestId,
             handle = handle,
-            includeUnofficial = !monitor.participationType().isOfficial()
+            includeUnofficial = !participationType.isOfficial()
         )
     }.onFailure { e ->
         monitor.lastRequest.setValue(false)
@@ -139,7 +140,11 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             lastRequest.value = true
             applyStandings(
                 standings = standings,
-                onOfficialChanged = { officialChanged = true }
+                participationTypeCheck = {
+                    if (isOfficialChanged(old = participationType, new = it)) {
+                        officialChanged = true
+                    }
+                }
             )
         }
         if (officialChanged) {
@@ -159,7 +164,7 @@ private fun isOfficialChanged(
 context(_: DataStoreEditScope)
 private inline fun CodeforcesMonitorDataStore.applyStandings(
     standings: CodeforcesContestStandings,
-    onOfficialChanged: () -> Unit
+    participationTypeCheck: (CodeforcesParticipationType) -> Unit
 ) {
     contestInfo.value = standings.contest
 
@@ -176,12 +181,8 @@ private inline fun CodeforcesMonitorDataStore.applyStandings(
 
     row?.run {
         party.participantType.let {
-            val old = participationType.value
             participationType.value = it
-            if (isOfficialChanged(old = old, new = it)) {
-                onOfficialChanged()
-                return
-            }
+            participationTypeCheck(it)
         }
         contestantRank.value = rank
     }
