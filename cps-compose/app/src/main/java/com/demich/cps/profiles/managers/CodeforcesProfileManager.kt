@@ -167,9 +167,9 @@ class CodeforcesProfileManager :
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
         settingsStorage(context).flowOf {
-            observeRating.value or
-            monitorEnabled.value or
-            upsolvingSuggestionsEnabled.value or
+            observeRating.value ||
+            monitorEnabled.value ||
+            upsolvingSuggestionsEnabled.value ||
             observeContribution.value
         }
 
