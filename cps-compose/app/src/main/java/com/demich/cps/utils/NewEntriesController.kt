@@ -40,22 +40,22 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<NewEntriesMap>
 ): DataStoreValue<NewEntriesMap>(item) {
-    private fun getCurrentDate(): LocalDate = getSystemTime().toSystemDateTime().date
+    private fun getSystemDate(): LocalDate = getSystemTime().toSystemDateTime().date
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)
 
     suspend fun markAtLeast(ids: List<Int>, type: NewEntryType) {
         if (ids.isEmpty()) return
-        val date = getCurrentDate()
+        val date = getSystemDate()
         item.edit {
             for (id in ids) markAtLeast(id, type, date)
         }
     }
 
     suspend fun removeOlderThan(days: Int) {
-        val currentDate = getCurrentDate()
+        val date = getSystemDate()
         item.update { types ->
-            types.filterValues { it.date.daysUntil(currentDate) <= days }
+            types.filterValues { it.date.daysUntil(date) <= days }
         }
     }
 }
