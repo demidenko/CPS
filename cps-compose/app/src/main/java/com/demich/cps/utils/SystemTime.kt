@@ -14,9 +14,9 @@ fun Clock.flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
     return flow {
         val period = seconds.seconds
         while (true) {
-            val currentTime = now()
-            val time = currentTime.truncateBySeconds(seconds)
+            val time = now().truncateBySeconds(seconds)
             emit(time)
+            val currentTime = now()
             // delay(duration = time + period - currentTime)
             delay(duration = period - (currentTime - time))
         }
