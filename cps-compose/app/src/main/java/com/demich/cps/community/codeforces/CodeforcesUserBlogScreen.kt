@@ -20,7 +20,7 @@ import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
-import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.randomUuid
@@ -99,7 +99,7 @@ private fun CodeforcesUserBlogContent(
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
     ) { blogEntries ->
-        ProvideTimeEachMinute {
+        ProvideSystemTimeEachMinute {
             CodeforcesBlogEntries(
                 blogEntriesState = rememberCodeforcesBlogEntriesState {
                     blogEntries.filterBy(filterState)

@@ -31,7 +31,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
-import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
@@ -59,7 +59,7 @@ private fun CommunityFollowScreen(
         }
     }
 
-    ProvideTimeEachMinute {
+    ProvideSystemTimeEachMinute {
         CodeforcesFollowList(
             userBlogs = { userBlogs },
             isRefreshing = { followLoadingStatus == LOADING },

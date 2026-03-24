@@ -62,7 +62,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -99,7 +99,7 @@ fun WorkersList(modifier: Modifier = Modifier) {
 
     var showMonitorDialog by remember { mutableStateOf(false) }
     var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
-    ProvideTimeEachMinute {
+    ProvideSystemTimeEachMinute {
         WorkersList(
             modifier = modifier,
             onClick = { showRestartDialogFor = it },

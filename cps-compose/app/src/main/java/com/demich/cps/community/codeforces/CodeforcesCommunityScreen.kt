@@ -32,7 +32,7 @@ import com.demich.cps.ui.platformIconPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
-import com.demich.cps.utils.ProvideTimeEachMinute
+import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
@@ -84,7 +84,7 @@ private fun CodeforcesPager(
     val renderAllTabs = rememberFirstValue { context.settingsCommunity.renderAllTabs }
 
     val newEntriesState = rememberNewEntriesState()
-    ProvideTimeEachMinute {
+    ProvideSystemTimeEachMinute {
         HorizontalPager(
             beyondViewportPageCount = if (renderAllTabs) controller.tabs.size - 1 else 0,
             state = controller.pagerState,

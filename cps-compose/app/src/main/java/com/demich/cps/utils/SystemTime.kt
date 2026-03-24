@@ -23,5 +23,5 @@ fun Clock.flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
     }
 }
 
-fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
+fun flowOfSystemTimeEachSecond(): Flow<Instant> =
     Clock.System.flowOfTruncatedCurrentTime(seconds = 1)
