@@ -122,8 +122,11 @@ private fun BottomBarBodyMain(
     onEnableSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
     val context = context
+    val scope = rememberCoroutineScope()
+    val startScreenItem = remember {
+        StartScreenDataStore(context).startRootScreen
+    }
 
     val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
     val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
@@ -144,7 +147,7 @@ private fun BottomBarBodyMain(
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
-            StartScreenDataStore(context).startRootScreen.setValueIn(scope, screen)
+            startScreenItem.setValueIn(scope, screen)
             onNavigateToScreen(screen)
         },
         onLongPress = onEnableSettings
