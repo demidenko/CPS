@@ -10,7 +10,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
-import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.repeatUntilSuccessOrLast
@@ -22,6 +21,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +34,7 @@ abstract class CPSWorker(
 
     protected val context get() = work.context
 
-    private val timeHolder = TimeHolder()
+    private val timeHolder = TimeHolder(clock = Clock.System)
     protected val workerStartTime by timeHolder
 
     final override suspend fun doWork(): Result {
@@ -49,7 +49,7 @@ abstract class CPSWorker(
             val event = ExecutionEvent(start = workerStartTime)
             workersInfo.append(event)
             smartRunWork().also { result ->
-                workersInfo.append(event.copy(end = getSystemTime(), resultType = result.toType()))
+                workersInfo.append(event.copy(end = timeHolder.now(), resultType = result.toType()))
                 if (result.toType() != SUCCESS) {
                     work.enqueueAsap()
                 }
@@ -67,7 +67,7 @@ abstract class CPSWorker(
             isSuccess = { it.toType() == SUCCESS }
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))
-            timeHolder.reset()
+            timeHolder.resetSaved()
             runCatching { runWork() }.getOrElse {
                 println("${work.name}: $it")
                 when {
@@ -176,10 +176,10 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
 }
 
 
-private class TimeHolder {
-    private var time: Instant = getSystemTime()
-    fun reset() {
-        time = getSystemTime()
+private class TimeHolder(private val clock: Clock): Clock by clock {
+    private var time: Instant = clock.now()
+    fun resetSaved() {
+        time = clock.now()
     }
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = time
 }
