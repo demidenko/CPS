@@ -19,7 +19,6 @@ import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getContestRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getSysTestPercentageOrNull
-import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
@@ -35,6 +34,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -53,7 +53,8 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 
     val ratingChangeWaiter = RatingChangeWaiter(
         contestId = contestId,
-        api = api
+        api = api,
+        clock = Clock.System
     ) { ratingChanges ->
         ratingChanges.find { it.handle == handle }?.let(onRatingChange)
     }
@@ -196,11 +197,12 @@ private fun CodeforcesMonitorDataStore.saveStandings(
 private class RatingChangeWaiter(
     val contestId: Int,
     val api: CodeforcesApi,
+    val clock: Clock,
     val onRatingChangeDone: (List<CodeforcesRatingChange>) -> Unit
 ) {
     suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
         if (isRatingChangeDone()) return Duration.INFINITE
-        val waitingTime = getSystemTime() - contestEnd
+        val waitingTime = clock.now() - contestEnd
         return when {
             waitingTime < 30.minutes -> 10.seconds
             waitingTime < 1.hours -> 30.seconds
