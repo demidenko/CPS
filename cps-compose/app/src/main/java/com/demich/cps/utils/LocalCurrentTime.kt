@@ -23,16 +23,20 @@ val LocalCurrentTime = compositionLocalOf<Instant> {
 }
 
 @Composable
-fun systemTimeAsState(period: Duration): State<Instant> {
+fun Clock.currentTimeAsState(period: Duration): State<Instant> {
     require(period.isPositive())
     val seconds = period.toComponents { seconds: Long, nanoseconds: Int ->
         require(nanoseconds == 0) { "period must be divisible by 1 second"}
         seconds
     }
-    return remember(key1 = seconds) {
-        Clock.System.flowOfTruncatedCurrentTime(seconds = seconds)
-    }.collectAsStateWithLifecycle(initialValue = remember { getSystemTime().truncateBySeconds(seconds) })
+    return remember(key1 = seconds, key2 = this) {
+        flowOfTruncatedCurrentTime(seconds = seconds)
+    }.collectAsStateWithLifecycle(initialValue = remember { now().truncateBySeconds(seconds) })
 }
+
+@Composable
+fun systemTimeAsState(period: Duration): State<Instant> =
+    Clock.System.currentTimeAsState(period = period)
 
 @Composable
 fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
