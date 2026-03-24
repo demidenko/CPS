@@ -14,10 +14,10 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.demich.cps.notifications.NotificationBuilder
-import com.demich.cps.utils.getSystemTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
@@ -31,7 +31,8 @@ abstract class CPSWork(
     val name: String,
     val context: Context
 ) {
-    val workManager: WorkManager get() = context.workManager
+    protected val workManager: WorkManager
+        get() = context.workManager
 
     fun stop() {
         workManager.cancelUniqueWork(name)
@@ -98,25 +99,27 @@ abstract class CPSPeriodicWork(
         }
     }
 
+    private fun systemTime(): Instant = Clock.System.now()
+
     suspend fun enqueueAtIfEarlier(time: Instant) {
         workInfo()?.repeatInterval?.let {
-            if (getSystemTime() + it < time) return
+            if (systemTime() + it < time) return
         }
         enqueueAt(time)
     }
 
     suspend fun enqueueInIfEarlier(duration: Duration) {
-        enqueueAtIfEarlier(time = getSystemTime() + duration)
+        enqueueAtIfEarlier(time = systemTime() + duration)
     }
 
     suspend fun enqueueInRepeatInterval() {
         workInfo()?.repeatInterval?.let {
-            enqueueAt(time = getSystemTime() + it)
+            enqueueAt(time = systemTime() + it)
         }
     }
 
     suspend fun enqueueAsap() {
-        val time = getSystemTime() + PeriodicWorkRequest.minPeriodicInterval
+        val time = systemTime() + PeriodicWorkRequest.minPeriodicInterval
         workInfo()?.nextScheduleTime?.let {
             if (it < time) return
         }
