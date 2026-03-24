@@ -7,9 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -24,23 +22,6 @@ val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
 }
 
-private fun flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
-    require(seconds > 0)
-    return flow {
-        val period = seconds.seconds
-        while (true) {
-            val currentTime = getCurrentTime()
-            val time = currentTime.truncateBySeconds(seconds)
-            emit(time)
-            // delay(duration = time + period - currentTime)
-            delay(duration = period - (currentTime - time))
-        }
-    }
-}
-
-fun flowOfCurrentTimeEachSecond(): Flow<Instant> =
-    flowOfTruncatedCurrentTime(seconds = 1)
-
 @Composable
 fun currentTimeAsState(period: Duration): State<Instant> {
     require(period.isPositive())
@@ -49,7 +30,7 @@ fun currentTimeAsState(period: Duration): State<Instant> {
         seconds
     }
     return remember(key1 = seconds) {
-        flowOfTruncatedCurrentTime(seconds = seconds)
+        Clock.System.flowOfTruncatedCurrentTime(seconds = seconds)
     }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBySeconds(seconds) })
 }
 
