@@ -20,7 +20,7 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.setValueIn
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +35,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     val onClick = remember {
-        patternClickListener(pattern = "._.._...", getCurrentTime = ::getCurrentTime) {
+        patternClickListener(pattern = "._.._...", getCurrentTime = ::getSystemTime) {
             showDevModeLine = true
             context.settingsUI.devModeEnabled.setValueIn(scope, true)
         }

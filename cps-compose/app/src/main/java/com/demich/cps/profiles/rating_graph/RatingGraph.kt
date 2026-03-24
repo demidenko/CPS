@@ -30,7 +30,7 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.saver
@@ -97,7 +97,7 @@ private fun RatingGraphWithHeader(
     //TODO: saveables not reset after ratings changes
     val viewPortState = rememberViewPortState(inflateHorizontal = 10.dp)
 
-    val currentTime = remember { getCurrentTime() }
+    val currentTime = remember { getSystemTime() }
     var filterType by rememberSaveable {
         viewPortState.setViewPort(
             createBounds(ratingChanges = ratingChanges, filterType = ALL, now = currentTime)

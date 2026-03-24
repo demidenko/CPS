@@ -31,7 +31,7 @@ fun currentTimeAsState(period: Duration): State<Instant> {
     }
     return remember(key1 = seconds) {
         Clock.System.flowOfTruncatedCurrentTime(seconds = seconds)
-    }.collectAsStateWithLifecycle(initialValue = remember { getCurrentTime().truncateBySeconds(seconds) })
+    }.collectAsStateWithLifecycle(initialValue = remember { getSystemTime().truncateBySeconds(seconds) })
 }
 
 @Composable

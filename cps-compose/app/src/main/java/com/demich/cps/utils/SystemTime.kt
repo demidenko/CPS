@@ -7,8 +7,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
-fun getCurrentTime(): Instant =
-    Clock.System.now()
+fun getSystemTime(): Instant = Clock.System.now()
 
 fun Clock.flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
     require(seconds > 0)

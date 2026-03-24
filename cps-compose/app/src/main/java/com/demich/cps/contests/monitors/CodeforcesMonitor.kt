@@ -19,7 +19,7 @@ import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getContestRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getSysTestPercentageOrNull
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
@@ -200,7 +200,7 @@ private class RatingChangeWaiter(
 ) {
     suspend fun getDelayOnFinished(contestEnd: Instant): Duration {
         if (isRatingChangeDone()) return Duration.INFINITE
-        val waitingTime = getCurrentTime() - contestEnd
+        val waitingTime = getSystemTime() - contestEnd
         return when {
             waitingTime < 30.minutes -> 10.seconds
             waitingTime < 1.hours -> 30.seconds

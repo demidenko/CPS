@@ -29,7 +29,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.SafetyLevel
 import com.demich.cps.utils.context
 import com.demich.cps.utils.formatTimerFull
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.openUrlInBrowser
 
@@ -172,7 +172,7 @@ private fun ContestItemMenuButton(
 private fun Contest.properLink(): String? {
     if (platform == Contest.Platform.codeforces) {
         val contestId = id.toIntOrNull() ?: return link
-        return when (phaseAt(time = getCurrentTime())) {
+        return when (phaseAt(time = getSystemTime())) {
             BEFORE -> CodeforcesUrls.contestPending(contestId = contestId)
             else -> CodeforcesUrls.contest(contestId = contestId)
         }

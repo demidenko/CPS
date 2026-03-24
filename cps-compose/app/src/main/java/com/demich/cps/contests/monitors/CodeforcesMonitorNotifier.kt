@@ -10,7 +10,7 @@ import com.demich.cps.R
 import com.demich.cps.notifications.NotificationBuilder
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.title
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 import kotlin.time.Duration.Companion.milliseconds
@@ -77,7 +77,7 @@ class CodeforcesMonitorNotifier(
     ) { oldPhase, phase ->
         views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
-            val remaining = phase.endTime - getCurrentTime()
+            val remaining = phase.endTime - getSystemTime()
             val elapsed = SystemClock.elapsedRealtime().milliseconds
             views.forEach { it.setChronometer(R.id.cf_monitor_progress, (elapsed + remaining).inWholeMilliseconds, null, true) }
         } else {

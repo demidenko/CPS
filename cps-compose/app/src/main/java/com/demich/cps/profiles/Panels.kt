@@ -43,7 +43,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.ifThen
 import com.demich.datastore_itemized.setValueIn
 import com.demich.kotlin_stdlib_boost.swap
@@ -83,7 +83,7 @@ fun <U: UserInfo> ProfilePanel(
                 detectTapGestures(
                     onPress = {
                         if (tryAwaitRelease()) {
-                            lastClickState.value = getCurrentTime()
+                            lastClickState.value = getSystemTime()
                         }
                     },
                     onDoubleTap = {
@@ -203,7 +203,7 @@ private fun hidingState(
     val hideDuration = 2.seconds
     value = 1f
     while (isActive) {
-        val dist = getCurrentTime() - lastClick
+        val dist = getSystemTime() - lastClick
         if (dist > delay + hideDuration) {
             value = 0f
             break

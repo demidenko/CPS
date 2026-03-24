@@ -13,7 +13,7 @@ import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.utils.getCurrentTime
+import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.toEnumSet
@@ -67,7 +67,7 @@ private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<
     fromSnapshot {
         contestsFetchFlows(
             setup = fetchPriorityLists.value.filterKeys { it in platforms },
-            dateConstraints = contestsDateConstraints.value.at(currentTime = getCurrentTime()),
+            dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime()),
         ) { fetchSource ->
             when (fetchSource) {
                 clist_api -> ClistContestsFetcher(
