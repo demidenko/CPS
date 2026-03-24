@@ -84,6 +84,7 @@ import com.demich.cps.workers.state
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Composable
@@ -165,7 +166,7 @@ private fun ContestsPager(
     val (
         contestsState: State<SortedContests>,
         currentTimeState: State<Instant>
-    ) = produceSortedContestsWithTime()
+    ) = produceSortedContestsWithTime(clock = Clock.System)
 
     LaunchedEffect(contestsState, filterState, viewState) {
         snapshotFlow { contestsState.value.contests }

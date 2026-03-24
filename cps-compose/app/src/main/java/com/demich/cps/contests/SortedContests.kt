@@ -15,8 +15,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
-import com.demich.cps.utils.flowOfSystemTimeEachSecond
-import com.demich.cps.utils.getSystemTime
+import com.demich.cps.utils.flowOfTruncatedCurrentTime
 import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 internal data class SortedContests(
@@ -111,14 +111,14 @@ private class ContestsSmartSorter: ContestsSorter {
 
 @Composable
 internal fun produceSortedContestsWithTime(
-
+    clock: Clock
 ): Pair<State<SortedContests>, State<Instant>> {
     val context = context
 
     val init = remember {
-        val initContests = flowOfContests(context).firstBlocking()
-        val currentTime = getSystemTime().truncateBySeconds(1)
         val sorter = ContestsSmartSorter()
+        val initContests = flowOfContests(context).firstBlocking()
+        val currentTime = clock.now().truncateBySeconds(1)
         sorter.apply(initContests, currentTime)
         val contestsState = mutableStateOf(sorter.contests)
         val currentTimeState = mutableStateOf(currentTime)
@@ -131,7 +131,7 @@ internal fun produceSortedContestsWithTime(
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             val (states, sorter: ContestsSorter) = init
             val (contestsState, currentTimeState) = states
-            flowOfContests(context).combine(flowOfSystemTimeEachSecond()) { contests, currentTime ->
+            flowOfContests(context).combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
                 if (sorter.apply(contests, currentTime)) {
                     contestsState.value = sorter.contests
                 }
