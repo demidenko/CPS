@@ -18,12 +18,11 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -55,7 +54,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
-import kotlin.random.Random
+import kotlin.uuid.Uuid
 
 val context: Context
     @Composable
@@ -248,9 +247,10 @@ inline fun<reified T: ViewModel> sharedViewModel(): T =
 
 
 @Composable
-fun rememberUUIDState(): MutableLongState = rememberSaveable { mutableLongStateOf(randomUuid()) }
+fun rememberUUIDState(): MutableState<Uuid> =
+    rememberSaveable { mutableStateOf(randomUuid()) }
 
-fun randomUuid(): Long = Random.nextLong()
+fun randomUuid(): Uuid = Uuid.random()
 
 //TODO: remove it (use default includeFontPadding = false)
 @Composable

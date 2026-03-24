@@ -44,6 +44,8 @@ fun Project.configureKotlin() {
 
             freeCompilerArgs.add("-Xcontext-parameters")
             freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+
+            freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
         }
     }
 }

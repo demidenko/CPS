@@ -123,7 +123,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesBlogEntry>>()
-    fun flowOfBlogEntriesResult(handle: String, context: Context, key: Long) =
+    fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
         blogEntriesLoader.execute(id = "$handle#$key") {
             val (result, colorTag) = awaitPair(
                 blockFirst = { context.followRepository.getAndReloadBlogEntries(handle) },

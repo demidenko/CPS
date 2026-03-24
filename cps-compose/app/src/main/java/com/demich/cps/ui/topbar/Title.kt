@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.randomUuid
 import com.demich.kotlin_stdlib_boost.takeRandom
 import kotlin.math.max
+import kotlin.uuid.Uuid
 
 @Composable
 internal fun Title(
@@ -53,13 +53,13 @@ private fun SubTitle(
     modifier: Modifier = Modifier,
     text: () -> String
 ) {
-    val letters: List<Pair<Char, Long>> by remember(text) {
+    val chars: List<Pair<Char, Uuid>> by remember(text) {
         var prev = ""
-        var ids = longArrayOf()
+        var ids = arrayOf<Uuid>()
         derivedStateOf {
             val cur = text()
             val prefix = longestCommonPrefix(cur, prev)
-            val newIds = LongArray(cur.length) { if (it < prefix) ids[it] else randomUuid() }
+            val newIds = Array(cur.length) { if (it < prefix) ids[it] else Uuid.random() }
             subsetIndices(
                 a = prev.substring(startIndex = prefix),
                 b = cur.substring(startIndex = prefix)
@@ -75,7 +75,7 @@ private fun SubTitle(
 
     LazyRow(modifier = modifier) {
         items(
-            items = letters,
+            items = chars,
             key = { it }
         ) {
             Text(
