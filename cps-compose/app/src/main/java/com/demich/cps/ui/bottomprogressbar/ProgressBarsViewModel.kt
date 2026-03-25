@@ -8,12 +8,12 @@ import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -40,14 +40,14 @@ class ProgressBarsViewModel: ViewModel() {
     fun doJob(
         id: String,
         coroutineScope: CoroutineScope = viewModelScope,
-        block: suspend FlowCollector<ProgressBarInfo>.() -> Unit
+        block: suspend ProducerScope<ProgressBarInfo>.() -> Unit
     ) {
         coroutineScope.launch(Dispatchers.Default) {
-            flow {
+            channelFlow {
                 block()
                 // compose doest not catch fast changes so this delay is necessary
                 delay(1.seconds)
-                emit(null)
+                send(null)
             }.collect { value ->
                 progressesStateFlow.edit {
                     if (value == null) remove(key = id)

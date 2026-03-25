@@ -57,10 +57,10 @@ private fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     CPSIconButton(icon = CPSIcons.Add) {
         progressBarsViewModel.doJob(id = Uuid.random().toString()) {
             val total = Random.nextInt(5, 15)
-            emit(ProgressBarInfo(total = total, title = total.toString()))
+            send(ProgressBarInfo(total = total, title = total.toString()))
             repeat(total) {
                 delay(1.seconds)
-                emit(ProgressBarInfo(total = total, title = total.toString(), current = it + 1))
+                send(ProgressBarInfo(total = total, title = total.toString(), current = it + 1))
             }
         }
     }

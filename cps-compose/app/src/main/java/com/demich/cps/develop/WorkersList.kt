@@ -130,11 +130,11 @@ private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context
             .profileStorage(context)
             .profile()?.handle ?: return@doJob
         var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
-        emit(progressInfo)
+        send(progressInfo)
         repeat(progressInfo.total) {
             delay(1.seconds)
             progressInfo++
-            emit(progressInfo)
+            send(progressInfo)
         }
         CodeforcesMonitorWorker.start(
             contestId = contestId,

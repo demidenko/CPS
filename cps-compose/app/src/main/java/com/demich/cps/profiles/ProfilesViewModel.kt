@@ -94,7 +94,7 @@ class ProfilesViewModel: ViewModel() {
                     }
                 }
             }.joinAllWithProgress(title = "clist import") {
-                emit(it)
+                send(it)
             }
         }
     }
