@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlin.time.measureTimedValue
 
@@ -27,13 +25,12 @@ inline fun<K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> 
     update { it.toMutableMap().apply(block) }
 
 suspend fun<A, B> awaitPair(
-    context: CoroutineContext = EmptyCoroutineContext,
     blockFirst: suspend CoroutineScope.() -> A,
     blockSecond: suspend CoroutineScope.() -> B,
 ): Pair<A, B> {
     return coroutineScope {
-        val first = async(context = context, block = blockFirst)
-        val second = async(context = context, block = blockSecond)
+        val first = async(block = blockFirst)
+        val second = async(block = blockSecond)
         Pair(first.await(), second.await())
     }
 }
