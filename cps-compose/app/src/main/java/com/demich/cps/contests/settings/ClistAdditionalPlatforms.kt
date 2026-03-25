@@ -11,7 +11,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +59,9 @@ private fun ColumnScope.DialogContent() {
     val scope = rememberCoroutineScope()
 
     val dataLoader = remember(scope) { BackgroundDataLoader<List<ClistResource>>(scope = scope) }
-    val resourcesResult by dataLoader.flowOfResult().collectAsState()
-
     var dataKey by rememberUUIDState()
-    LaunchedEffect(dataLoader, dataKey) {
+
+    val resourcesResult by
         dataLoader.execute(id = dataKey) {
             val settings = context.settingsContests
             val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
@@ -76,8 +74,7 @@ private fun ColumnScope.DialogContent() {
                         it.mapNotNull { res[it.id] }
                     }
                 }
-        }
-    }
+        }.collectAsState()
 
     val item = remember { context.settingsContests.clistAdditionalResources }
     val selected by collectItemAsState { item }
