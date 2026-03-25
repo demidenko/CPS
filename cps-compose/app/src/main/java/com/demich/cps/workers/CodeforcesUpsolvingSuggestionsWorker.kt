@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.notifications.notificationChannels
+import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
@@ -60,30 +62,33 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedItem = storage.upsolvingSuggestedProblems
         val suggestedProblems = suggestedItem()
 
-        CodeforcesClient.getUserRatingChanges(handle)
-            .filter { it.ratingUpdateTime >= dateThreshold }
-            .sortedByDescending { it.ratingUpdateTime }
-            .forEachWithProgress { ratingChange ->
-                getSuggestions(
-                    handle = handle,
-                    ratingChange = ratingChange,
-                    suggestedProblems = suggestedProblems,
-                    toRemoveAsSolved = { solved ->
-                        val solvedIds = solved.mapToSet { it.problemId }
-                        suggestedItem.update {
-                            it.filterValues { it.problemId !in solvedIds }
+        with(CodeforcesClient) {
+            getUserRatingChanges(handle)
+                .filter { it.ratingUpdateTime >= dateThreshold }
+                .sortedByDescending { it.ratingUpdateTime }
+                .forEachWithProgress { ratingChange ->
+                    getSuggestions(
+                        handle = handle,
+                        ratingChange = ratingChange,
+                        suggestedProblems = suggestedProblems,
+                        toRemoveAsSolved = { solved ->
+                            val solvedIds = solved.mapToSet { it.problemId }
+                            suggestedItem.update {
+                                it.filterValues { it.problemId !in solvedIds }
+                            }
                         }
+                    ) { problem ->
+                        suggestedItem.add(problem, ratingChange.ratingUpdateTime)
+                        notifyProblemForUpsolve(problem, context)
                     }
-                ) { problem ->
-                    suggestedItem.add(problem, ratingChange.ratingUpdateTime)
-                    notifyProblemForUpsolve(problem, context)
                 }
-            }
+        }
 
         return Result.success()
     }
 }
 
+context(api: CodeforcesApi, pageContentProvider: CodeforcesPageContentProvider)
 private suspend inline fun getSuggestions(
     handle: String,
     ratingChange: CodeforcesRatingChange,
@@ -94,10 +99,10 @@ private suspend inline fun getSuggestions(
     val contestId = ratingChange.contestId
     val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
-            CodeforcesClient.getContestSubmissions(contestId = contestId, handle = handle)
+            api.getContestSubmissions(contestId = contestId, handle = handle)
         },
         blockSecond = {
-            CodeforcesClient.getContestAcceptedStatistics(contestId = contestId)
+            pageContentProvider.getContestAcceptedStatistics(contestId = contestId)
         }
     )
 
