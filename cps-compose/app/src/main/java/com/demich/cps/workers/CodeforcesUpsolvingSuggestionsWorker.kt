@@ -8,6 +8,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getContestAcceptedStatistics
@@ -66,7 +67,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                 .filter { it.ratingUpdateTime >= dateThreshold }
                 .sortedByDescending { it.ratingUpdateTime }
                 .forEachWithProgress { ratingChange ->
-                    getContestProblemSuggestions(
+                    getContestUpsolvingSuggestions(
                         contestId = ratingChange.contestId,
                         handle = handle,
                         rank = ratingChange.rank,
@@ -89,7 +90,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
 }
 
 context(api: CodeforcesApi, pageContentProvider: CodeforcesPageContentProvider)
-private suspend inline fun getContestProblemSuggestions(
+private suspend inline fun getContestUpsolvingSuggestions(
     contestId: Int,
     handle: String,
     rank: Int,
@@ -106,13 +107,30 @@ private suspend inline fun getContestProblemSuggestions(
         }
     )
 
+    makeContestUpsolvingSuggestions(
+        rank = rank,
+        userSubmissions = userSubmissions,
+        acceptedStats = acceptedStats,
+        contestSuggested = suggestedProblems.filter { it.contestId == contestId },
+        toRemoveAsSolved = toRemoveAsSolved,
+        onNewSuggestion = onNewSuggestion,
+    )
+}
+
+private inline fun makeContestUpsolvingSuggestions(
+    rank: Int,
+    userSubmissions: List<CodeforcesSubmission>,
+    acceptedStats: Map<CodeforcesProblem, Int>,
+    contestSuggested: Collection<CodeforcesProblem>,
+    toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
+    onNewSuggestion: (CodeforcesProblem) -> Unit
+) {
     val solvedIndices = userSubmissions
         .filter { it.verdict == OK }
         .mapToSet { it.problem.index }
 
-    check(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
-
-    val contestSuggested = suggestedProblems.filter { it.contestId == contestId }
+//    check(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
+    check(acceptedStats.keys.mapToSet { it.index }.containsAll(solvedIndices))
 
     contestSuggested.filter { it.index in solvedIndices }.let { solved ->
         if (solved.isNotEmpty()) toRemoveAsSolved(solved)
