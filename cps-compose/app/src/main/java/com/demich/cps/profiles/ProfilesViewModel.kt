@@ -74,7 +74,7 @@ class ProfilesViewModel: ViewModel() {
         progressBarsViewModel: ProgressBarsViewModel,
         context: Context
     ) {
-        progressBarsViewModel.doJob(id = ProgressBarsViewModel.clistImportId, coroutineScope = viewModelScope) { progress ->
+        progressBarsViewModel.doJob(id = ProgressBarsViewModel.clistImportId, coroutineScope = viewModelScope) {
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 getManager(resource, userData.first, userData.second)
             }
@@ -94,7 +94,7 @@ class ProfilesViewModel: ViewModel() {
                     }
                 }
             }.joinAllWithProgress(title = "clist import") {
-                progress(it)
+                emit(it)
             }
         }
     }

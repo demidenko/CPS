@@ -10,11 +10,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.reflect.KProperty
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -39,29 +40,20 @@ class ProgressBarsViewModel: ViewModel() {
     fun doJob(
         id: String,
         coroutineScope: CoroutineScope = viewModelScope,
-        block: suspend CoroutineScope.((ProgressBarInfo) -> Unit) -> Unit
+        block: suspend FlowCollector<ProgressBarInfo>.() -> Unit
     ) {
         coroutineScope.launch(Dispatchers.Default) {
-            var progressBarInfo: ProgressBarInfo? by object {
-                operator fun getValue(thisObj: Any?, property: KProperty<*>): ProgressBarInfo? =
-                    progressesStateFlow.value[id]
-
-                operator fun setValue(thisObj: Any?, property: KProperty<*>, value: ProgressBarInfo?) {
-                    progressesStateFlow.edit {
-                        if (value == null) remove(key = id)
-                        else put(key = id, value = value)
-                    }
+            flow {
+                block()
+                // compose doest not catch fast changes so this delay is necessary
+                delay(1.seconds)
+                emit(null)
+            }.collect { value ->
+                progressesStateFlow.edit {
+                    if (value == null) remove(key = id)
+                    else put(key = id, value = value)
                 }
             }
-            check(progressBarInfo == null)
-            block {
-                progressBarInfo = it
-            }
-            progressBarInfo?.let {
-                // compose doest not catch fast changes so this delay is necessary
-                if (it.total > 0) delay(1.seconds)
-            }
-            progressBarInfo = null
         }
     }
 

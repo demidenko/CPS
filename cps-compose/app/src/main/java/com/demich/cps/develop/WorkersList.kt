@@ -125,16 +125,16 @@ fun WorkersList(modifier: Modifier = Modifier) {
 }
 
 private fun ProgressBarsViewModel.startCodeforcesMonitor(contestId: Int, context: Context) {
-    doJob(id = "run_cf_monitor $contestId") { progress ->
+    doJob(id = "run_cf_monitor $contestId") {
         val handle = CodeforcesProfileManager()
             .profileStorage(context)
             .profile()?.handle ?: return@doJob
         var progressInfo = ProgressBarInfo(total = 5, title = "cf monitor")
-        progress(progressInfo)
+        emit(progressInfo)
         repeat(progressInfo.total) {
             delay(1.seconds)
             progressInfo++
-            progress(progressInfo)
+            emit(progressInfo)
         }
         CodeforcesMonitorWorker.start(
             contestId = contestId,

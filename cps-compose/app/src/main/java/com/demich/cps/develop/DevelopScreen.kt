@@ -35,12 +35,12 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.randomUuid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+import kotlin.uuid.Uuid
 
 @Composable
 private fun DevelopScreen() {
@@ -55,12 +55,12 @@ private fun developAdditionalBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val progressBarsViewModel = progressBarsViewModel()
 
     CPSIconButton(icon = CPSIcons.Add) {
-        progressBarsViewModel.doJob(id = randomUuid().toString()) { progress ->
+        progressBarsViewModel.doJob(id = Uuid.random().toString()) {
             val total = Random.nextInt(5, 15)
-            progress(ProgressBarInfo(total = total, title = total.toString()))
+            emit(ProgressBarInfo(total = total, title = total.toString()))
             repeat(total) {
                 delay(1.seconds)
-                progress(ProgressBarInfo(total = total, title = total.toString(), current = it + 1))
+                emit(ProgressBarInfo(total = total, title = total.toString(), current = it + 1))
             }
         }
     }
