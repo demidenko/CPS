@@ -34,4 +34,4 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
         }
 }
 
-inline fun<reified T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)
+fun <T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)
