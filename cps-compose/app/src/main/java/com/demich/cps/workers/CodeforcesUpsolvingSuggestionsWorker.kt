@@ -8,7 +8,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.getContestAcceptedStatistics
@@ -67,9 +66,10 @@ class CodeforcesUpsolvingSuggestionsWorker(
                 .filter { it.ratingUpdateTime >= dateThreshold }
                 .sortedByDescending { it.ratingUpdateTime }
                 .forEachWithProgress { ratingChange ->
-                    getSuggestions(
+                    getContestProblemSuggestions(
+                        contestId = ratingChange.contestId,
                         handle = handle,
-                        ratingChange = ratingChange,
+                        rank = ratingChange.rank,
                         suggestedProblems = suggestedProblems,
                         toRemoveAsSolved = { solved ->
                             val solvedIds = solved.mapToSet { it.problemId }
@@ -89,14 +89,14 @@ class CodeforcesUpsolvingSuggestionsWorker(
 }
 
 context(api: CodeforcesApi, pageContentProvider: CodeforcesPageContentProvider)
-private suspend inline fun getSuggestions(
+private suspend inline fun getContestProblemSuggestions(
+    contestId: Int,
     handle: String,
-    ratingChange: CodeforcesRatingChange,
+    rank: Int,
     suggestedProblems: Collection<CodeforcesProblem>,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
-    val contestId = ratingChange.contestId
     val (userSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
             api.getContestSubmissions(contestId = contestId, handle = handle)
@@ -121,7 +121,7 @@ private suspend inline fun getSuggestions(
     val contestSuggestedIndices = contestSuggested.mapToSet { it.index }
 
     acceptedStats.forEach { (problem, solvers) ->
-        if (solvers >= ratingChange.rank && problem.index !in solvedIndices) {
+        if (solvers >= rank && problem.index !in solvedIndices) {
             if (problem.index !in contestSuggestedIndices) onNewSuggestion(problem)
         }
     }
