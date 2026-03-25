@@ -5,12 +5,16 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
-suspend fun CodeforcesPageContentProvider.getContestAcceptedStatistics(contestId: Int): Map<CodeforcesProblem, Int> {
+suspend fun CodeforcesPageContentProvider.getContestAcceptedStatistics(
+    contestId: Int
+): List<Pair<CodeforcesProblem, Int>> {
     val page = getContestPage(contestId = contestId)
-    return buildMap {
+    return buildList {
         Jsoup.parse(page).expectFirst("table.problems").select("tr")
             .forEach {
-                extractProblemWithAcceptedCount(it, contestId, ::put)
+                extractProblemWithAcceptedCount(it, contestId) { problem, index ->
+                    add(Pair(problem, index))
+                }
             }
     }
 }

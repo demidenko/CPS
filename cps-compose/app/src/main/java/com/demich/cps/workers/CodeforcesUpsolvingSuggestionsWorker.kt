@@ -120,7 +120,7 @@ private suspend inline fun getContestUpsolvingSuggestions(
 private inline fun makeContestUpsolvingSuggestions(
     rank: Int,
     userSubmissions: List<CodeforcesSubmission>,
-    acceptedStats: Map<CodeforcesProblem, Int>,
+    acceptedStats: List<Pair<CodeforcesProblem, Int>>,
     contestSuggested: Collection<CodeforcesProblem>,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
@@ -129,8 +129,8 @@ private inline fun makeContestUpsolvingSuggestions(
         .filter { it.verdict == OK }
         .mapToSet { it.problem.index }
 
-//    check(acceptedStats.map { it.key.index }.containsAll(solvedIndices))
-    check(acceptedStats.keys.mapToSet { it.index }.containsAll(solvedIndices))
+//    check(acceptedStats.mapToSet { it.first.index }.containsAll(solvedIndices))
+    check(solvedIndices.all { index -> acceptedStats.any { it.first.index == index } })
 
     contestSuggested.filter { it.index in solvedIndices }.let { solved ->
         if (solved.isNotEmpty()) toRemoveAsSolved(solved)
