@@ -56,19 +56,22 @@ class CodeforcesMonitorLauncherWorker(
                 predicate = { it.author.isContestant() }
             )
 
-            get?.firstParticipation?.let { submission ->
-                if (monitorCanceledContests().none { it == submission.contestId }) {
-                    CodeforcesMonitorWorker.start(
-                        contestId = submission.contestId,
-                        handle = info.handle,
-                        context = context
-                    )
+            get?.apply {
+                firstParticipation?.let { submission ->
+                    if (monitorCanceledContests().none { it == submission.contestId }) {
+                        CodeforcesMonitorWorker.start(
+                            contestId = submission.contestId,
+                            handle = info.handle,
+                            context = context
+                        )
+                    }
                 }
-            }
 
-            edit {
-                get?.firstSubmission?.let { monitorLastSubmissionId.value = it.id }
-                monitorCanceledContests.removeOld { !isActual(it) }
+                // note: intentionally run removeOld not every time
+                edit {
+                    monitorLastSubmissionId.value = firstSubmission.id
+                    monitorCanceledContests.removeOld { !isActual(it) }
+                }
             }
         }
 
