@@ -47,21 +47,21 @@ class CodeforcesMonitorLauncherWorker(
         //TODO: optimize read by snapshot
 
         with(storage) {
-            val info = profile()?.userInfoOrNull() ?: return Result.success()
+            val handle = profile()?.userInfoOrNull()?.handle ?: return Result.success()
 
             val get: GetResult? = CodeforcesClient.getFirstNewSubmissions(
-                handle = info.handle,
+                handle = handle,
                 lastId = monitorLastSubmissionId(),
                 isActual = ::isActual,
                 predicate = { it.author.isContestant() }
             )
 
             get?.apply {
-                firstParticipation?.let { submission ->
+                firstPredicate?.let { submission ->
                     if (monitorCanceledContests().none { it == submission.contestId }) {
                         CodeforcesMonitorWorker.start(
                             contestId = submission.contestId,
-                            handle = info.handle,
+                            handle = handle,
                             context = context
                         )
                     }
@@ -69,7 +69,7 @@ class CodeforcesMonitorLauncherWorker(
 
                 // note: intentionally run removeOld not every time
                 edit {
-                    monitorLastSubmissionId.value = firstSubmission.id
+                    monitorLastSubmissionId.value = first.id
                     monitorCanceledContests.removeOld { !isActual(it) }
                 }
             }
@@ -82,8 +82,8 @@ class CodeforcesMonitorLauncherWorker(
 }
 
 private class GetResult(
-    val firstSubmission: CodeforcesSubmission,
-    val firstParticipation: CodeforcesSubmission?
+    val first: CodeforcesSubmission,
+    val firstPredicate: CodeforcesSubmission?
 )
 
 private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
@@ -101,7 +101,7 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
             .forEach {
                 if (isActual(it.creationTime) && (lastId == null || it.id > lastId)) {
                     if (first == null) first = it
-                    if (predicate(it)) return GetResult(firstParticipation = it, firstSubmission = first)
+                    if (predicate(it)) return GetResult(firstPredicate = it, first = first)
                 } else {
                     break@loop
                 }
@@ -111,7 +111,7 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
     }
 
     if (first == null) return null
-    return GetResult(firstParticipation = null, firstSubmission = first)
+    return GetResult(firstPredicate = null, first = first)
 }
 
 private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
