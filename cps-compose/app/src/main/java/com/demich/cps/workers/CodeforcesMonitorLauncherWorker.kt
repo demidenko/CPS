@@ -49,15 +49,14 @@ class CodeforcesMonitorLauncherWorker(
         with(storage) {
             val info = profile()?.userInfoOrNull() ?: return Result.success()
 
-            val (firstParticipation, firstSubmission) = CodeforcesClient.getFirstNewSubmissions(
+            val get: GetResult? = CodeforcesClient.getFirstNewSubmissions(
                 handle = info.handle,
-                lastSubmissionId = monitorLastSubmissionId(),
-                isActual = ::isActual
-            ) { submission ->
-                submission.author.isContestant()
-            }
+                lastId = monitorLastSubmissionId(),
+                isActual = ::isActual,
+                predicate = { it.author.isContestant() }
+            )
 
-            firstParticipation?.let { submission ->
+            get?.firstParticipation?.let { submission ->
                 if (monitorCanceledContests().none { it == submission.contestId }) {
                     CodeforcesMonitorWorker.start(
                         contestId = submission.contestId,
@@ -68,7 +67,7 @@ class CodeforcesMonitorLauncherWorker(
             }
 
             edit {
-                firstSubmission?.let { monitorLastSubmissionId.value = it.id }
+                get?.firstSubmission?.let { monitorLastSubmissionId.value = it.id }
                 monitorCanceledContests.removeOld { !isActual(it) }
             }
         }
@@ -79,12 +78,17 @@ class CodeforcesMonitorLauncherWorker(
     }
 }
 
+private class GetResult(
+    val firstSubmission: CodeforcesSubmission,
+    val firstParticipation: CodeforcesSubmission?
+)
+
 private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
     handle: String,
-    lastSubmissionId: Long?,
+    lastId: Long?,
     isActual: (Instant) -> Boolean,
     predicate: (CodeforcesSubmission) -> Boolean
-): Pair<CodeforcesSubmission?, CodeforcesSubmission?> {
+): GetResult? {
     var first: CodeforcesSubmission? = null
     var from = 1L
     var step = 1L
@@ -92,18 +96,19 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
         getUserSubmissions(handle = handle, from = from, count = step)
             .also { if (it.isEmpty()) break@loop }
             .forEach {
-                if (isActual(it.creationTime) && (lastSubmissionId == null || it.id > lastSubmissionId)) {
+                if (isActual(it.creationTime) && (lastId == null || it.id > lastId)) {
                     if (first == null) first = it
-                    if (predicate(it)) return Pair(it, first)
+                    if (predicate(it)) return GetResult(firstParticipation = it, firstSubmission = first)
                 } else {
                     break@loop
                 }
             }
-
         from += step
         step += 10
     }
-    return Pair(null, first)
+
+    if (first == null) return null
+    return GetResult(firstParticipation = null, firstSubmission = first)
 }
 
 private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
