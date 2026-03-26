@@ -12,6 +12,7 @@ import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.removeOld
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
@@ -44,17 +45,18 @@ class CodeforcesMonitorLauncherWorker(
 
         val storage = CodeforcesProfileManager().profileStorage(context)
 
-        //TODO: optimize read by snapshot
-
         with(storage) {
-            val handle = profile()?.userInfoOrNull()?.handle ?: return Result.success()
+            val handle: String
 
-            val get: GetResult? = CodeforcesClient.getFirstNewSubmissions(
-                handle = handle,
-                lastId = monitorLastSubmissionId(),
-                isActual = ::isActual,
-                predicate = { it.author.isContestant() }
-            )
+            val get: GetResult? = fromSnapshot {
+                handle = profile.value?.userInfoOrNull()?.handle ?: return Result.success()
+                CodeforcesClient.getFirstNewSubmissions(
+                    handle = handle,
+                    lastId = monitorLastSubmissionId.value,
+                    isActual = ::isActual,
+                    predicate = { it.author.isContestant() }
+                )
+            }
 
             get?.apply {
                 firstPredicate?.let { submission ->
