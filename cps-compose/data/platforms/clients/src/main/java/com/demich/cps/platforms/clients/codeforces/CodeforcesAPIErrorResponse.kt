@@ -110,8 +110,10 @@ private inline fun String.ifIsFieldMsg(
     name: String,
     block: (String) -> Unit
 ) {
-    if (startsWith("$name: ")) {
-        block(substring(startIndex = name.length + 2))
+    // if (startsWith("$name: ")) block(substring(startIndex = name.length + 2))
+    val k = name.length
+    if (length >= k + 2 && startsWith(name) && get(k) == ':' && get(k + 1) == ' ') {
+        block(substring(startIndex = k + 2))
     }
 }
 
