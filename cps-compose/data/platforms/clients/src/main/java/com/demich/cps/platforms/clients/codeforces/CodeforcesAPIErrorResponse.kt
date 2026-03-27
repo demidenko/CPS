@@ -67,6 +67,8 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     private fun isCountFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "count")
     private fun isFromFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "from")
 
+    // TODO: Field should contain long integer value
+    // TODO: Field should be no more than 100
     private fun isIntFieldIncorrect(name: String): Boolean {
         if (comment.isField(name, "Field should contain integer value")) return true
         if (comment.isField(name, "Field should be at least 1")) return true
