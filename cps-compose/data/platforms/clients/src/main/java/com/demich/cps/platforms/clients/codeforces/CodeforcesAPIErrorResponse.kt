@@ -150,3 +150,9 @@ private inline fun String.ifIntSurrounded(prefix: String, suffix: String, block:
         it.toIntOrNull()?.let(block)
     }
 }
+
+private inline fun String.ifLongSurrounded(prefix: String, suffix: String, block: (Long) -> Unit) {
+    ifSurrounded(prefix = prefix, suffix = suffix) {
+        it.toLongOrNull()?.let(block)
+    }
+}
