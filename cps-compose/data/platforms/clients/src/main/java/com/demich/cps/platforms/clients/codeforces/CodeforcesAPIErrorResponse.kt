@@ -20,6 +20,15 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     }
      */
 
+    /* TODO:
+
+    cf can answer multiple comments
+    https://codeforces.com/api/user.status?handle=&from=sad&count=9
+    ->
+    {"status":"FAILED","comment":"handle: Field should contain between 3 and 24 characters, inclusive;from: Field should contain integer value"}
+
+     */
+
     fun toApiException(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
