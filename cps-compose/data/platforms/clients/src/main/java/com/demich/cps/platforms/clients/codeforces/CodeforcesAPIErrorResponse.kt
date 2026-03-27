@@ -55,12 +55,19 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
     private fun isHandleFieldIncorrectLength(): Boolean {
         //user blog responses
-        if (comment.isField("handle", "Field should contain between 3 and 24 characters, inclusive")) return true
-        if (comment.isField("handle", "Поле должно содержать от 3 до 24 символов, включительно")) return true
+        comment.ifIsFieldMsg("handle") { msg ->
+            if (msg == "Field should contain between 3 and 24 characters, inclusive") return true
+            if (msg == "Поле должно содержать от 3 до 24 символов, включительно") return true
+        }
+        return false
+    }
 
+    private fun isHandlesListEmpty(): Boolean {
         //userinfo responses
-        if (comment.isField("handles", "Field should not be empty")) return true
-        if (comment.isField("handles", "Поле должно быть не пусто")) return true
+        comment.ifIsFieldMsg("handles") { msg ->
+            if (msg == "Field should not be empty") return true
+            if (msg == "Поле должно быть не пусто") return true
+        }
         return false
     }
 
@@ -110,14 +117,12 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     }
 }
 
-private inline fun String.isFieldMsg(
+private inline fun String.ifIsFieldMsg(
     name: String,
-    block: (String) -> Boolean
-): Boolean {
-    return if (startsWith("$name: ")) {
+    block: (String) -> Unit
+) {
+    if (startsWith("$name: ")) {
         block(substring(startIndex = name.length + 2))
-    } else {
-        false
     }
 }
 
