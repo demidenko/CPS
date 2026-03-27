@@ -32,17 +32,10 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     fun toApiExceptionOld(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
-        ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
-
         return CodeforcesApiUnspecifiedException(comment)
     }
 
     private fun isCallLimitExceeded() = comment == "Call limit exceeded"
-
-    private inline fun ifIsHandleNotFound(block: (String) -> Unit) {
-        //userinfo response
-        comment.ifSurrounded("handles: User with handle ", " not found", block)
-    }
 
     private fun isHandleFieldIncorrectLength(): Boolean {
         //user blog responses
@@ -92,6 +85,12 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
         }
         when (msg) {
             "You are not allowed to read that blog" -> return CodeforcesApiNotAllowedReadBlogException(comment)
+        }
+    }
+
+    comment.ifIsFieldMsg("handles") { msg ->
+        msg.ifSurrounded("User with handle ", " not found") {
+            return CodeforcesApiHandleNotFoundException(comment, handle = it)
         }
     }
 
