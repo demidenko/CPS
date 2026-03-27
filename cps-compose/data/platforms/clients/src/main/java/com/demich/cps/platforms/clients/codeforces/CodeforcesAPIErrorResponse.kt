@@ -29,14 +29,10 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
      */
 
-    fun toApiException(): CodeforcesApiException {
+    fun toApiExceptionOld(): CodeforcesApiException {
         if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
 
         ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
-
-        if (isContestRatingChangesUnavailable()) return CodeforcesApiContestRatingChangesUnavailableException(comment)
-        ifIsContestNotStarted { return CodeforcesApiContestNotStartedException(comment, contestId = it) }
-        ifIsContestNotFound { return CodeforcesApiContestNotFoundException(comment, contestId = it) }
 
         if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
 
@@ -88,24 +84,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         return false
     }
 
-    private fun isContestRatingChangesUnavailable(): Boolean {
-        if (comment.isField("contestId", "Rating changes are unavailable for this contest")) return true
-        return false
-    }
-
-    private fun isContestRatingChangesUnavailableBecauseContestNotFinished(): Boolean {
-        if (comment.isField("contestId", "Rating changes are unavailable, because the contest isn't finished yet")) return true
-        return false
-    }
-
-    private inline fun ifIsContestNotStarted(block: (Int) -> Unit) {
-        comment.ifIntSurrounded("contestId: Contest with id ", " has not started", block)
-    }
-
-    private inline fun ifIsContestNotFound(block: (Int) -> Unit) {
-        comment.ifIntSurrounded("contestId: Contest with id ", " not found", block)
-    }
-
     private fun isContestManagerAreNotAllowed(): Boolean {
         if (comment.isField("asManager", "Only contest managers can use \"asManager\" option")) return true
         return false
@@ -115,6 +93,23 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         comment.ifIntSurrounded("blogEntryId: Blog entry with id ", " not found", block)
         comment.ifIntSurrounded("Blog entry with id ", " not found", block)
     }
+}
+
+internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException {
+    comment.ifIsFieldMsg("contestId") { msg ->
+        msg.ifIntSurrounded("Contest with id ", " not found") {
+            return CodeforcesApiContestNotFoundException(comment, contestId = it)
+        }
+        msg.ifIntSurrounded("Contest with id ", " has not started") {
+            return CodeforcesApiContestNotStartedException(comment, contestId = it)
+        }
+        when (msg) {
+            "Rating changes are unavailable for this contest" -> return CodeforcesApiContestRatingChangesUnavailableException(comment)
+            // "Rating changes are unavailable, because the contest isn't finished yet"
+        }
+    }
+
+    return toApiExceptionOld()
 }
 
 private inline fun String.ifIsFieldMsg(
