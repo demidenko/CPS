@@ -29,14 +29,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
      */
 
-    fun toApiExceptionOld(): CodeforcesApiException {
-        if (isCallLimitExceeded()) return CodeforcesApiCallLimitExceededException(comment)
-
-        return CodeforcesApiUnspecifiedException(comment)
-    }
-
-    private fun isCallLimitExceeded() = comment == "Call limit exceeded"
-
     private fun isHandleFieldIncorrectLength(): Boolean {
         //user blog responses
         comment.ifIsFieldMsg("handle") { msg ->
@@ -107,7 +99,11 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
         }
     }
 
-    return toApiExceptionOld()
+    when (comment) {
+        "Call limit exceeded" -> return CodeforcesApiCallLimitExceededException(comment)
+    }
+
+    return CodeforcesApiUnspecifiedException(comment)
 }
 
 private inline fun String.ifIsFieldMsg(
