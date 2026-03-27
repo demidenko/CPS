@@ -34,8 +34,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
         ifIsHandleNotFound { return CodeforcesApiHandleNotFoundException(comment, handle = it) }
 
-        if (isNotAllowedToReadThatBlog()) return CodeforcesApiNotAllowedReadBlogException(comment)
-
         return CodeforcesApiUnspecifiedException(comment)
     }
 
@@ -44,9 +42,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     private inline fun ifIsHandleNotFound(block: (String) -> Unit) {
         //userinfo response
         comment.ifSurrounded("handles: User with handle ", " not found", block)
-
-        //user blog response
-        comment.ifSurrounded("handle: User with handle ", " not found", block)
     }
 
     private fun isHandleFieldIncorrectLength(): Boolean {
@@ -79,11 +74,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         return false
     }
 
-    private fun isNotAllowedToReadThatBlog(): Boolean {
-        if (comment.isField("handle", "You are not allowed to read that blog")) return true
-        return false
-    }
-
     private fun isContestManagerAreNotAllowed(): Boolean {
         if (comment.isField("asManager", "Only contest managers can use \"asManager\" option")) return true
         return false
@@ -96,6 +86,15 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 }
 
 internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException {
+    comment.ifIsFieldMsg("handle") { msg ->
+        msg.ifSurrounded("User with handle ", " not found") {
+            return CodeforcesApiHandleNotFoundException(comment, handle = it)
+        }
+        when (msg) {
+            "You are not allowed to read that blog" -> return CodeforcesApiNotAllowedReadBlogException(comment)
+        }
+    }
+
     comment.ifIsFieldMsg("contestId") { msg ->
         msg.ifIntSurrounded("Contest with id ", " not found") {
             return CodeforcesApiContestNotFoundException(comment, contestId = it)
