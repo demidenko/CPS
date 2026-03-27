@@ -140,7 +140,13 @@ private fun String.isField(
 }
 
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
-    if (prefix.length + suffix.length <= length && startsWith(prefix) && endsWith(suffix)) {
+    // prefix.length + suffix.length <= length can overflow :)
+    if (
+        suffix.length <= length &&
+        prefix.length <= length - suffix.length &&
+        startsWith(prefix) &&
+        endsWith(suffix)
+    ) {
         block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
     }
 }
