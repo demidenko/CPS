@@ -110,6 +110,30 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     }
 }
 
+private inline fun String.isFieldMsg(
+    name: String,
+    block: (String) -> Boolean
+): Boolean {
+    return if (startsWith("$name: ")) {
+        block(substring(startIndex = name.length + 2))
+    } else {
+        false
+    }
+}
+
+private fun String.isField(
+    name: String,
+    description: String
+): Boolean {
+//    return this == "name: $description"
+    if (length != name.length + 2 + description.length) return false
+    if (!startsWith(name)) return false
+    if (get(name.length) != ':') return false
+    if (get(name.length + 1) != ' ') return false
+    if (!endsWith(description)) return false
+    return true
+}
+
 private inline fun String.ifSurrounded(prefix: String, suffix: String, block: (String) -> Unit) {
     if (prefix.length + suffix.length <= length && startsWith(prefix) && endsWith(suffix)) {
         block(substring(startIndex = prefix.length, endIndex = length - suffix.length))
@@ -120,17 +144,4 @@ private inline fun String.ifIntSurrounded(prefix: String, suffix: String, block:
     ifSurrounded(prefix = prefix, suffix = suffix) {
         it.toIntOrNull()?.let(block)
     }
-}
-
-private fun String.isField(
-    key: String,
-    description: String
-): Boolean {
-//    return this == "$key: $description"
-    if (length != key.length + 2 + description.length) return false
-    if (!startsWith(key)) return false
-    if (get(key.length) != ':') return false
-    if (get(key.length + 1) != ' ') return false
-    if (!endsWith(description)) return false
-    return true
 }
