@@ -112,7 +112,7 @@ private fun CodeforcesMonitorDataStore.contestRank(): CodeforcesMonitorData.Cont
     val participationType = participationType.value ?: return null
     return CodeforcesMonitorData.ContestRank(
         rank = rank,
-        participationType = participationType
+        isOutOfCompetition = participationType != CONTESTANT
     )
 }
 

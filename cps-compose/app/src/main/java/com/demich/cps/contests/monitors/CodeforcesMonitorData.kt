@@ -3,7 +3,6 @@ package com.demich.cps.contests.monitors
 import androidx.compose.runtime.Immutable
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import kotlin.time.Instant
 
 @Immutable
@@ -29,7 +28,7 @@ data class CodeforcesMonitorData(
 
     data class ContestRank(
         val rank: Int,
-        val participationType: CodeforcesParticipationType
+        val isOutOfCompetition: Boolean
     )
 
     data class ProblemInfo(

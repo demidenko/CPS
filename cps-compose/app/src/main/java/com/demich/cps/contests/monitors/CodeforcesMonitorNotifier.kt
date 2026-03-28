@@ -62,7 +62,7 @@ class CodeforcesMonitorNotifier(
     ) {
         val rank = buildString {
             if (it != null) {
-                if (it.participationType != CONTESTANT) append('*')
+                if (it.isOutOfCompetition) append('*')
                 append(it.rank)
             }
         }

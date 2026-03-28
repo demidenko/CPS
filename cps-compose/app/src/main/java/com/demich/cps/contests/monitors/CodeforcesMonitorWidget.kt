@@ -305,7 +305,7 @@ private fun Rank(
             )
 
             val rankText = buildString {
-                if (contestantRank.participationType != CONTESTANT) append('*')
+                if (contestantRank.isOutOfCompetition) append('*')
                 append(rank)
             }
 
