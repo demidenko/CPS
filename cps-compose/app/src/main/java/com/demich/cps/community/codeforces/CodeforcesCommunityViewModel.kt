@@ -8,13 +8,12 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.extractTitle
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
+import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.utils.LoadingStatus
@@ -132,14 +131,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
                 blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) ?: BLACK }
             )
             blogEntries.map {
-                CodeforcesWebBlogEntry(
-                    id = it.id,
-                    title = it.extractTitle(),
-                    author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag),
-                    creationTime = it.creationTime,
-                    rating = it.rating,
-                    commentsCount = 0,
-                )
+                it.toWebBlogEntry(colorTag = colorTag)
             }
         }
 }
