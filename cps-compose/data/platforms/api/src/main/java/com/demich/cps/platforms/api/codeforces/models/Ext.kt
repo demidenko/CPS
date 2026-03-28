@@ -8,7 +8,7 @@ fun CodeforcesParticipationType.isContestantType(): Boolean =
         else -> false
     }
 
-fun CodeforcesContestStandings.CodeforcesContestParticipant.isContestant(): Boolean =
+fun CodeforcesContestParticipant.isContestant(): Boolean =
     participantType.isContestantType()
 
 fun CodeforcesContestPhase.isSystemTestOrFinished() =

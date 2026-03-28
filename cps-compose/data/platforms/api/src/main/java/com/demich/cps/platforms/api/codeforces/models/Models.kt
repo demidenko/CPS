@@ -88,13 +88,13 @@ data class CodeforcesContestStandings(
         // Party results for each problem. Order of the problems is the same as in "problems" field of the returned object
         val problemResults: List<CodeforcesProblemResult>
     )
-
-    @Serializable
-    data class CodeforcesContestParticipant(
-        val participantType: CodeforcesParticipationType
-        // TODO: val participantId: Long? (not documented in api)
-    )
 }
+
+@Serializable
+data class CodeforcesContestParticipant(
+    val participantType: CodeforcesParticipationType
+    // TODO: val participantId: Long? (not documented in api)
+)
 
 @Serializable
 data class CodeforcesProblem(
@@ -123,7 +123,7 @@ data class CodeforcesSubmission(
 
     val problem: CodeforcesProblem,
 
-    val author: CodeforcesContestStandings.CodeforcesContestParticipant,
+    val author: CodeforcesContestParticipant,
 
     // Can be absent.
     val verdict: CodeforcesProblemVerdict = WAITING,
