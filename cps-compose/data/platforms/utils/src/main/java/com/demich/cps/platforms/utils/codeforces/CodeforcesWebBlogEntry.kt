@@ -8,5 +8,5 @@ data class CodeforcesWebBlogEntry(
     val author: CodeforcesHandle,
     val creationTime: Instant,
     val rating: Int,
-    val commentsCount: Int?
+    val commentsCount: Int
 )

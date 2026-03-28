@@ -66,7 +66,7 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
                     author = it.blogEntry.author,
                     creationTime = it.blogEntry.creationTime,
                     rating = it.blogEntry.rating,
-                    commentsCount = null,
+                    commentsCount = 0,
                 )
             }
     }

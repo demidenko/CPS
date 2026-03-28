@@ -137,7 +137,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
                     author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag ?: BLACK),
                     creationTime = it.creationTime,
                     rating = it.rating,
-                    commentsCount = null,
+                    commentsCount = 0,
                 )
             }
         }
