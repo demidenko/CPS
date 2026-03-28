@@ -126,15 +126,15 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
     fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
         blogEntriesLoader.execute(id = Pair(handle, key)) {
-            val (result, colorTag) = awaitPair(
-                blockFirst = { context.followRepository.getAndReloadBlogEntries(handle) },
-                blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) }
+            val (blogEntries, colorTag) = awaitPair(
+                blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },
+                blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) ?: BLACK }
             )
-            result.getOrThrow().map {
+            blogEntries.map {
                 CodeforcesWebBlogEntry(
                     id = it.id,
                     title = CodeforcesUtils.extractTitle(it),
-                    author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag ?: BLACK),
+                    author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag),
                     creationTime = it.creationTime,
                     rating = it.rating,
                     commentsCount = 0,
