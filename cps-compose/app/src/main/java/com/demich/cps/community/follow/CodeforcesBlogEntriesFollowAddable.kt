@@ -12,8 +12,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesBlogEntries
 import com.demich.cps.community.codeforces.CodeforcesBlogEntriesState
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.withVibration
@@ -26,11 +25,11 @@ fun CodeforcesBlogEntriesFollowAddable(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     scrollBarEnabled: Boolean = false,
-    label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
+    label: (@Composable (CodeforcesWebBlogEntry) -> Unit)? = null
 ) {
     val context = context
 
-    var showAddToFollowDialogFor: CodeforcesBlogEntry? by remember { mutableStateOf(null) }
+    var showAddToFollowDialogFor: CodeforcesWebBlogEntry? by remember { mutableStateOf(null) }
 
     CodeforcesBlogEntries(
         blogEntriesState = blogEntriesState,
@@ -46,7 +45,7 @@ fun CodeforcesBlogEntriesFollowAddable(
             blogEntry = blogEntry,
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
-                controller.addToFollowList(handle = blogEntry.authorHandle, context = context)
+                controller.addToFollowList(handle = blogEntry.author.handle, context = context)
             }
         )
     }
@@ -54,7 +53,7 @@ fun CodeforcesBlogEntriesFollowAddable(
 
 @Composable
 private fun BlogEntryDialog(
-    blogEntry: CodeforcesBlogEntry,
+    blogEntry: CodeforcesWebBlogEntry,
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit
 ) {

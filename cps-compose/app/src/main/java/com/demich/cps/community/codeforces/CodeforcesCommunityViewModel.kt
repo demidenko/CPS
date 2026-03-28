@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
@@ -122,7 +123,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesBlogEntry>>()
+    private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
     fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
         blogEntriesLoader.execute(id = Pair(handle, key)) {
             val (result, colorTag) = awaitPair(
@@ -130,9 +131,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
                 blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) }
             )
             result.getOrThrow().map {
-                it.copy(
+                CodeforcesWebBlogEntry(
+                    id = it.id,
                     title = CodeforcesUtils.extractTitle(it),
-                    authorColorTag = colorTag ?: BLACK
+                    author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag ?: BLACK),
+                    creationTime = it.creationTime,
+                    rating = it.rating,
+                    commentsCount = it.commentsCount,
                 )
             }
         }

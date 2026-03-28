@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.niceMessage
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
@@ -60,7 +60,7 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
+    blogEntriesResult: () -> Result<List<CodeforcesWebBlogEntry>>?,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
@@ -88,7 +88,7 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogContent(
-    blogEntriesResult: () -> Result<List<CodeforcesBlogEntry>>?,
+    blogEntriesResult: () -> Result<List<CodeforcesWebBlogEntry>>?,
     onRetry: () -> Unit,
     filterState: FilterState,
     modifier: Modifier = Modifier
@@ -112,7 +112,7 @@ private fun CodeforcesUserBlogContent(
     }
 }
 
-private fun List<CodeforcesBlogEntry>.filterBy(state: FilterState) =
+private fun List<CodeforcesWebBlogEntry>.filterBy(state: FilterState) =
     filterByTokensAsSubsequence(state.filter) {
         sequenceOf(title)
     }

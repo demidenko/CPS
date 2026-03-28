@@ -58,7 +58,7 @@ object CodeforcesUtils {
 
     private fun String.extractTime(): Instant = DateTimeParser.parse(this)
 
-    private fun extractBlogEntryOrNull(topic: Element): CodeforcesBlogEntry? {
+    private fun extractBlogEntryOrNull(topic: Element): CodeforcesWebBlogEntry? {
         return kotlin.runCatching {
             val id: Int
             val title: String
@@ -82,11 +82,10 @@ object CodeforcesUtils {
                 commentsCount = commentsItem.select("a")[1].text().toInt()
             }
 
-            CodeforcesBlogEntry(
+            CodeforcesWebBlogEntry(
                 id = id,
                 title = title,
-                authorHandle = author.handle,
-                authorColorTag = author.colorTag,
+                author = author,
                 creationTime = creationTime,
                 rating = rating,
                 commentsCount = commentsCount
@@ -170,7 +169,7 @@ object CodeforcesUtils {
     fun extractTitle(blogEntry: CodeforcesBlogEntry): String =
         Jsoup.parse(blogEntry.title).text()
 
-    fun extractBlogEntries(source: String): List<CodeforcesBlogEntry> {
+    fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> {
         return Jsoup.parse(source).expectContent().select("div.topic")
             .mapNotNull(::extractBlogEntryOrNull)
     }

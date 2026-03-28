@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.NewEntriesMap
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
@@ -55,10 +55,10 @@ fun rememberNewEntriesState(): NewEntriesState {
 
 @Stable
 abstract class CodeforcesBlogEntriesState {
-    abstract val blogEntries: List<CodeforcesBlogEntry>
+    abstract val blogEntries: List<CodeforcesWebBlogEntry>
 
-    protected open fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) = Unit
-    fun openBlogEntry(blogEntry: CodeforcesBlogEntry, context: Context) {
+    protected open fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) = Unit
+    fun openBlogEntry(blogEntry: CodeforcesWebBlogEntry, context: Context) {
         onOpenBlogEntry(blogEntry)
         context.openUrlInBrowser(url = CodeforcesUrls.blogEntry(blogEntryId = blogEntry.id))
     }
@@ -68,7 +68,7 @@ abstract class CodeforcesBlogEntriesState {
 
 @Composable
 fun rememberCodeforcesBlogEntriesState(
-    blogEntries: () -> List<CodeforcesBlogEntry>
+    blogEntries: () -> List<CodeforcesWebBlogEntry>
 ): CodeforcesBlogEntriesState {
     return remember(blogEntries) {
         object : CodeforcesBlogEntriesState() {
@@ -79,7 +79,7 @@ fun rememberCodeforcesBlogEntriesState(
 
 @Composable
 fun rememberCodeforcesBlogEntriesState(
-    blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
+    blogEntriesFlow: Flow<List<CodeforcesWebBlogEntry>>,
     isTabVisible: () -> Boolean,
     listState: LazyListState,
     newEntriesState: NewEntriesState,
@@ -102,7 +102,7 @@ fun rememberCodeforcesBlogEntriesState(
         object : CodeforcesBlogEntriesState() {
             override val blogEntries by blogEntriesState
 
-            override fun onOpenBlogEntry(blogEntry: CodeforcesBlogEntry) {
+            override fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) {
                 newEntriesState.markOpened(id = blogEntry.id)
             }
 

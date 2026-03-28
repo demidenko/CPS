@@ -21,8 +21,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSFontSize
@@ -44,8 +43,8 @@ fun CodeforcesBlogEntries(
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
     scrollUpButtonEnabled: Boolean = false,
-    onLongClick: ((CodeforcesBlogEntry) -> Unit)? = null,
-    label: (@Composable (CodeforcesBlogEntry) -> Unit)? = null
+    onLongClick: ((CodeforcesWebBlogEntry) -> Unit)? = null,
+    label: (@Composable (CodeforcesWebBlogEntry) -> Unit)? = null
 ) {
     val context = context
     LazyColumnOfData(
@@ -54,7 +53,7 @@ fun CodeforcesBlogEntries(
         scrollBarEnabled = scrollBarEnabled,
         scrollUpButtonEnabled = scrollUpButtonEnabled,
         items = blogEntriesState::blogEntries,
-        key = CodeforcesBlogEntry::id,
+        key = { it.id },
         contentType = { CodeforcesBlogEntryContentType }
     ) { blogEntry ->
         ItemWithDivider(modifier = Modifier.animateItem()) {
@@ -88,7 +87,7 @@ fun LazyListState.visibleBlogEntriesIds(requiredVisiblePart: Float): List<Int> =
 
 @Composable
 private fun BlogEntryInfo(
-    blogEntry: CodeforcesBlogEntry,
+    blogEntry: CodeforcesWebBlogEntry,
     markNew: Boolean,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?

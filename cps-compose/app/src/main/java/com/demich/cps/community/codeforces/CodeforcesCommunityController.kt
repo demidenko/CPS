@@ -16,8 +16,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.NewEntryTypeCounters
@@ -179,7 +179,7 @@ fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTitle, c
     }
 
 private fun flowOfNewEntryCounters(
-    blogEntriesFlow: Flow<List<CodeforcesBlogEntry>>,
+    blogEntriesFlow: Flow<List<CodeforcesWebBlogEntry>>,
     newEntriesItem: NewEntriesDataStoreItem
 ): Flow<NewEntryTypeCounters> =
     combineToCounters(

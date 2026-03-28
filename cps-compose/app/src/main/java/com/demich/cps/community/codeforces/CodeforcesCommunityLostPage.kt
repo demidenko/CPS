@@ -13,9 +13,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
+import com.demich.cps.platforms.utils.codeforces.author
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.mapToSet
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -52,10 +55,19 @@ fun CodeforcesCommunityLostPage(
     )
 }
 
-fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context) =
+fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
     context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
         blogEntries.sortedByDescending { it.timeStamp }
-            .map { it.blogEntry }
+            .map {
+                CodeforcesWebBlogEntry(
+                    id = it.blogEntry.id,
+                    title = it.blogEntry.title,
+                    author = it.blogEntry.author,
+                    creationTime = it.blogEntry.creationTime,
+                    rating = it.blogEntry.rating,
+                    commentsCount = it.blogEntry.commentsCount,
+                )
+            }
     }
 
 @Composable
