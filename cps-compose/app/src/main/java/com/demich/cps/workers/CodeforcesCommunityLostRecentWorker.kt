@@ -284,8 +284,7 @@ private suspend inline fun findSuspects(
                 blogEntry.copy(
                     authorColorTag = it.author.colorTag,
                     title = CodeforcesUtils.extractTitle(blogEntry),
-                    rating = 0,
-                    commentsCount = null
+                    rating = 0
                 )
             )
         }
