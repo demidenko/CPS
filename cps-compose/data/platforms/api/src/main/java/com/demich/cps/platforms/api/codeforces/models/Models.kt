@@ -17,6 +17,7 @@ enum class CodeforcesLocale {
         }
 }
 
+// TODO: move to utils
 enum class CodeforcesColorTag {
     BLACK,
     GRAY,
