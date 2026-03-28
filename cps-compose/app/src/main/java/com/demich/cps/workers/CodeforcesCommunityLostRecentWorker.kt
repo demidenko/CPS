@@ -283,7 +283,6 @@ private suspend inline fun findSuspects(
             onSuspect(
                 blogEntry.copy(
                     authorColorTag = it.author.colorTag,
-                    title = CodeforcesUtils.extractTitle(blogEntry),
                     rating = 0
                 )
             )
