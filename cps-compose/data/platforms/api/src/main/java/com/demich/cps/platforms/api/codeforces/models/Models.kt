@@ -208,15 +208,15 @@ data class CodeforcesComment(
 @Serializable
 data class CodeforcesRecentAction(
     // Action time, in unix format
-    @SerialName("timeSeconds")
-    @Serializable(with = InstantAsSecondsSerializer::class)
-    val time: Instant, //TODO: unused
+    // @SerialName("timeSeconds")
+    // @Serializable(with = InstantAsSecondsSerializer::class)
+    // val time: Instant,
 
     // In short form. Can be absent.
     val blogEntry: CodeforcesBlogEntry? = null,
 
     // Can be absent.
-    val comment: CodeforcesComment? = null //TODO: unused
+    // val comment: CodeforcesComment? = null
 )
 
 enum class CodeforcesContestPhase {
