@@ -10,7 +10,7 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 ktor = "3.4.1" # https://github.com/ktorio/ktor/releases
 
 core = "1.18.0" # https://developer.android.com/jetpack/androidx/releases/core
-work = "2.11.1" # https://developer.android.com/jetpack/androidx/releases/work
+work = "2.11.2" # https://developer.android.com/jetpack/androidx/releases/work
 
 compose-bom = "2026.03.00" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 
@@ -24,7 +24,6 @@ datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/da
 
 jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
 # 1.22.1:
-# Missing classes detected while running R8. Please add the missing classes or apply additional keep rules that are generated in /home/demich/StudioProjects/CPS/cps-compose/app/build/intermediates/mapping/release/minifyReleaseWithR8/missing_rules.txt.
 # Missing class com.google.re2j.Matcher (referenced from: com.google.re2j.Matcher org.jsoup.helper.Re2jRegex$Re2jMatcher.delegate and 3 other contexts)
 # Missing class com.google.re2j.Pattern (referenced from: com.google.re2j.Pattern org.jsoup.helper.Re2jRegex.re2jPattern and 4 other contexts)
 
