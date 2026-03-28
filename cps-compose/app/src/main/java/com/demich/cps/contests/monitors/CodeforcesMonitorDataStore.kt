@@ -79,7 +79,7 @@ internal data class CodeforcesSubmissionJudgeInfo(
         testset == PRETESTS && isFailedResult()
 
     fun isPendingOrTesting(): Boolean =
-        verdict == WAITING || verdict == TESTING
+        verdict == PENDING || verdict == TESTING
 }
 
 internal fun CodeforcesSubmissionJudgeInfo.isPreliminary(): Boolean {

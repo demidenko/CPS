@@ -26,7 +26,7 @@ val CodeforcesContestPhase.title
 
 fun CodeforcesProblemVerdict.isResult(): Boolean =
     when (this) {
-        WAITING, TESTING, SKIPPED -> false
+        PENDING, TESTING, SKIPPED -> false
         else -> true
     }
 
