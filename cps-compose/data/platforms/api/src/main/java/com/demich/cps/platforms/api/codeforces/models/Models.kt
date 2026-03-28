@@ -237,7 +237,6 @@ enum class CodeforcesContestType {
 }
 
 enum class CodeforcesParticipationType {
-    NOT_PARTICIPATED,
     CONTESTANT, PRACTICE, VIRTUAL, MANAGER, OUT_OF_COMPETITION
 }
 

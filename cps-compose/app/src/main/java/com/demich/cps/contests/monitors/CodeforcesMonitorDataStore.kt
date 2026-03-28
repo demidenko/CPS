@@ -30,7 +30,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val contestInfo = jsonCPS.itemNullable<CodeforcesContest>(name = "contest_info")
 
-    internal val participationType = itemEnum(name = "participation_type", defaultValue = CodeforcesParticipationType.NOT_PARTICIPATED)
+    internal val participationType = jsonCPS.itemNullable<CodeforcesParticipationType>(name = "participation_type")
 
     internal val contestantRank = itemIntNullable(name = "contestant_rank")
 

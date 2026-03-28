@@ -151,7 +151,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
 private class StandingsData(
     val contest: CodeforcesContest,
     val problemResults: List<CodeforcesMonitorProblemResult>,
-    val participationType: CodeforcesParticipationType,
+    val participationType: CodeforcesParticipationType?,
     val rank: Int?
 )
 
@@ -171,17 +171,17 @@ private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
     return StandingsData(
         contest = contest,
         problemResults = monitorResults,
-        participationType = row?.party?.participantType ?: NOT_PARTICIPATED,
+        participationType = row?.party?.participantType,
         rank = row?.rank
     )
 }
 
-private fun CodeforcesParticipationType.isOfficial(): Boolean =
+private fun CodeforcesParticipationType?.isOfficial(): Boolean =
     this == CONTESTANT
 
 private fun isOfficialChanged(
-    old: CodeforcesParticipationType,
-    new: CodeforcesParticipationType
+    old: CodeforcesParticipationType?,
+    new: CodeforcesParticipationType?
 ): Boolean = new.isOfficial() != old.isOfficial()
 
 context(_: DataStoreEditScope)
@@ -259,10 +259,10 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
 
 
 private fun CodeforcesContest.needCheckSubmissions(
-    participationType: CodeforcesParticipationType
+    participationType: CodeforcesParticipationType?
 ): Boolean {
     if (type == ICPC) return false
-    return phase.isSystemTestOrFinished() && participationType.isContestantType()
+    return phase.isSystemTestOrFinished() && (participationType != null && participationType.isContestantType())
 }
 
 private fun CodeforcesMonitorProblemResult.needCheckSubmissions(

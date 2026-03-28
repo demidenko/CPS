@@ -58,7 +58,7 @@ class CodeforcesMonitorNotifier(
     }
 
     private var contestantRank by delegate(
-        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = NOT_PARTICIPATED)
+        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = null)
     ) {
         val rank = buildString {
             if (it.participationType != CONTESTANT) append('*')
@@ -147,7 +147,7 @@ class CodeforcesMonitorNotifier(
 
     private fun submitNotification() {
         notificationBuilder.edit {
-            val notParticipated = contestantRank.participationType == NOT_PARTICIPATED
+            val notParticipated = contestantRank.participationType == null
 
             setCustomContentView(viewSmall.apply {
                 setTextViewText(
