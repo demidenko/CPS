@@ -29,24 +29,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
      */
 
-    private fun isHandleFieldIncorrectLength(): Boolean {
-        //user blog responses
-        comment.ifIsFieldMsg("handle") { msg ->
-            if (msg == "Field should contain between 3 and 24 characters, inclusive") return true
-            if (msg == "Поле должно содержать от 3 до 24 символов, включительно") return true
-        }
-        return false
-    }
-
-    private fun isHandlesListEmpty(): Boolean {
-        //userinfo responses
-        comment.ifIsFieldMsg("handles") { msg ->
-            if (msg == "Field should not be empty") return true
-            if (msg == "Поле должно быть не пусто") return true
-        }
-        return false
-    }
-
     private fun isCountFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "count")
     private fun isFromFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "from")
 
@@ -77,12 +59,17 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
         }
         when (msg) {
             "You are not allowed to read that blog" -> return CodeforcesApiNotAllowedReadBlogException(comment)
+            // "Field should contain between 3 and 24 characters, inclusive", "Поле должно содержать от 3 до 24 символов, включительно"
+            // "Field should contain only Latin letters, digits, underscore or dash characters", "Поле должно содержать только латинские буквы, цифры, символы подчёркивание или дефис"
         }
     }
 
     comment.ifIsFieldMsg("handles") { msg ->
         msg.ifSurrounded("User with handle ", " not found") {
             return CodeforcesApiHandleNotFoundException(comment, handle = it)
+        }
+        when (msg) {
+            // "Field should not be empty", "Поле должно быть не пусто" ->
         }
     }
 
