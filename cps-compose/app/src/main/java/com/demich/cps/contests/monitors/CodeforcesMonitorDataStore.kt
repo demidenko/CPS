@@ -107,6 +107,16 @@ private fun CodeforcesMonitorDataStore.contestInfoChecked(): CodeforcesContest? 
 }
 
 context(scope: DataStoreSnapshot)
+private fun CodeforcesMonitorDataStore.contestRank(): CodeforcesMonitorData.ContestRank? {
+    val rank = contestantRank.value ?: return null
+    val participationType = participationType.value ?: return null
+    return CodeforcesMonitorData.ContestRank(
+        rank = rank,
+        participationType = participationType
+    )
+}
+
+context(scope: DataStoreSnapshot)
 private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
     val contest = contestInfoChecked() ?: return null
 
@@ -119,10 +129,7 @@ private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
             CodeforcesMonitorData.ContestPhase.Other(phase = contest.phase)
     }
 
-    val contestantRank = CodeforcesMonitorData.ContestRank(
-        rank = contestantRank.value,
-        participationType = participationType.value
-    )
+    val contestantRank = contestRank()
 
     val submissionsInfo = submissionsInfo.value
     val problems = problemResults.value.map { result ->

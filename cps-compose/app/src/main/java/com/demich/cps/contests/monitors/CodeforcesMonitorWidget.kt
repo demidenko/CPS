@@ -119,7 +119,7 @@ private fun Header(
 
 @Composable
 private fun Footer(
-    contestantRank: CodeforcesMonitorData.ContestRank,
+    contestantRank: CodeforcesMonitorData.ContestRank?,
     contestPhase: CodeforcesMonitorData.ContestPhase,
     requestFailed: Boolean,
     modifier: Modifier = Modifier
@@ -288,10 +288,10 @@ private fun ProblemResultCell(
 
 @Composable
 private fun Rank(
-    contestantRank: CodeforcesMonitorData.ContestRank,
+    contestantRank: CodeforcesMonitorData.ContestRank?,
     modifier: Modifier = Modifier
 ) {
-    when (contestantRank.rank) {
+    when (contestantRank) {
         null -> {
             Text(
                 text = "rank: no",

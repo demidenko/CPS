@@ -57,12 +57,14 @@ class CodeforcesMonitorNotifier(
         if (changed) submitNotification()
     }
 
-    private var contestantRank by delegate(
-        initialValue = CodeforcesMonitorData.ContestRank(rank = null, participationType = null)
+    private var contestantRank by delegate<CodeforcesMonitorData.ContestRank?>(
+        initialValue = null
     ) {
         val rank = buildString {
-            if (it.participationType != CONTESTANT) append('*')
-            append(it.rank)
+            if (it != null) {
+                if (it.participationType != CONTESTANT) append('*')
+                append(it.rank)
+            }
         }
         viewBig.setTextViewText(R.id.cf_monitor_rank, rank)
     }
@@ -147,13 +149,13 @@ class CodeforcesMonitorNotifier(
 
     private fun submitNotification() {
         notificationBuilder.edit {
-            val notParticipated = contestantRank.participationType == null
+            val notParticipated = contestantRank == null
 
             setCustomContentView(viewSmall.apply {
                 setTextViewText(
                     R.id.cf_monitor_rank,
                     if (notParticipated) "not participated"
-                    else "rank: ${contestantRank.rank}"
+                    else "rank: ${contestantRank?.rank}"
                 )
             })
 

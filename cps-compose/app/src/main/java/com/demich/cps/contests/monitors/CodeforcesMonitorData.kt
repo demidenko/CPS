@@ -10,7 +10,7 @@ import kotlin.time.Instant
 data class CodeforcesMonitorData(
     val contestInfo: CodeforcesContest,
     val contestPhase: ContestPhase,
-    val contestantRank: ContestRank,
+    val contestantRank: ContestRank?,
     val problems: List<ProblemInfo>
 ) {
     sealed interface ContestPhase {
@@ -28,8 +28,8 @@ data class CodeforcesMonitorData(
     }
 
     data class ContestRank(
-        val rank: Int?,
-        val participationType: CodeforcesParticipationType?
+        val rank: Int,
+        val participationType: CodeforcesParticipationType
     )
 
     data class ProblemInfo(

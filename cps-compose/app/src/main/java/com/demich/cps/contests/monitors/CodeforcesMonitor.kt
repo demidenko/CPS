@@ -142,7 +142,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             lastRequest.value = true
             saveStandings(standings = standings)
         }
-        if (isOfficialChanged(old = participationType, new = standings.participationType)) {
+        if (isOfficialChanged(old = participationType, new = standings.contestRank?.participationType)) {
             onOfficialChanged()
         }
     }
@@ -151,8 +151,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
 private class StandingsData(
     val contest: CodeforcesContest,
     val problemResults: List<CodeforcesMonitorProblemResult>,
-    val participationType: CodeforcesParticipationType?,
-    val rank: Int?
+    val contestRank: CodeforcesMonitorData.ContestRank?
 )
 
 private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
@@ -171,8 +170,7 @@ private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
     return StandingsData(
         contest = contest,
         problemResults = monitorResults,
-        participationType = row?.party?.participantType,
-        rank = row?.rank
+        contestRank = row?.let { CodeforcesMonitorData.ContestRank(it.rank, it.party.participantType) }
     )
 }
 
@@ -190,8 +188,8 @@ private fun CodeforcesMonitorDataStore.saveStandings(
 ) {
     contestInfo.value = standings.contest
     problemResults.value = standings.problemResults
-    participationType.value = standings.participationType
-    contestantRank.value = standings.rank
+    participationType.value = standings.contestRank?.participationType
+    contestantRank.value = standings.contestRank?.rank
 }
 
 private class RatingChangeWaiter(
