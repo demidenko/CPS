@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
+import org.jsoup.Jsoup
 import kotlin.time.Instant
 
 data class CodeforcesWebBlogEntry(
@@ -10,3 +12,6 @@ data class CodeforcesWebBlogEntry(
     val rating: Int,
     val commentsCount: Int
 )
+
+fun CodeforcesBlogEntry.extractTitle(): String =
+    Jsoup.parse(title).text()

@@ -8,7 +8,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.extractTitle
 
 val Context.followRepository: CodeforcesFollowRepository
     get() = CodeforcesFollowRepositoryImpl(context = this)
@@ -22,7 +22,7 @@ private class CodeforcesFollowRepositoryImpl(val context: Context):
         notificationChannels.codeforces.new_blog_entry(blogEntry.id).notify(context) {
             subText = "New codeforces blog entry"
             contentTitle = blogEntry.authorHandle
-            bigContent = CodeforcesUtils.extractTitle(blogEntry)
+            bigContent = blogEntry.extractTitle()
             smallIcon = R.drawable.ic_new_post
             autoCancel = true
             time = blogEntry.creationTime

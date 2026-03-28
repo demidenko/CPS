@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
@@ -154,9 +153,6 @@ object CodeforcesUtils {
             )
         }.getOrNull()
     }
-
-    fun extractTitle(blogEntry: CodeforcesBlogEntry): String =
-        Jsoup.parse(blogEntry.title).text()
 
     fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> {
         return Jsoup.parse(source).expectContent().select("div.topic")

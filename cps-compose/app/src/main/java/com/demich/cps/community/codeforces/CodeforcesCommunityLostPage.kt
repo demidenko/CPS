@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.author
+import com.demich.cps.platforms.utils.codeforces.extractTitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -62,7 +62,7 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
             .map {
                 CodeforcesWebBlogEntry(
                     id = it.blogEntry.id,
-                    title = CodeforcesUtils.extractTitle(it.blogEntry),
+                    title = it.blogEntry.extractTitle(),
                     author = it.blogEntry.author,
                     creationTime = it.blogEntry.creationTime,
                     rating = it.blogEntry.rating,

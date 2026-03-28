@@ -12,6 +12,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
+import com.demich.cps.platforms.utils.codeforces.extractTitle
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
@@ -133,7 +134,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             blogEntries.map {
                 CodeforcesWebBlogEntry(
                     id = it.id,
-                    title = CodeforcesUtils.extractTitle(it),
+                    title = it.extractTitle(),
                     author = CodeforcesHandle(handle = it.authorHandle, colorTag = colorTag),
                     creationTime = it.creationTime,
                     rating = it.rating,
