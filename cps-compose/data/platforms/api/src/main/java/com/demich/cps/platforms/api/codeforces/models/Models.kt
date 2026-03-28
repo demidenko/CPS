@@ -202,9 +202,7 @@ data class CodeforcesComment(
     @SerialName("text")
     val html: String,
 
-    val rating: Int,
-
-    val commentatorHandleColorTag: CodeforcesColorTag = BLACK //TODO: remove as unofficial
+    val rating: Int
 )
 
 @Serializable
@@ -218,7 +216,7 @@ data class CodeforcesRecentAction(
     val blogEntry: CodeforcesBlogEntry? = null,
 
     // Can be absent.
-    val comment: CodeforcesComment? = null
+    val comment: CodeforcesComment? = null //TODO: unused
 )
 
 enum class CodeforcesContestPhase {
