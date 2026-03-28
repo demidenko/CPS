@@ -155,8 +155,14 @@ private class StandingsData(
     val participationType: CodeforcesParticipationType?
 )
 
+private fun CodeforcesContestStandings.findProperRow(): CodeforcesContestStandings.CodeforcesContestStandingsRow? {
+    rows.forEach { if (it.party.participantType == CONTESTANT) return it }
+    rows.forEach { if (it.party.participantType == OUT_OF_COMPETITION) return it }
+    return null
+}
+
 private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
-    val row = rows.find { row -> row.party.isContestant() }
+    val row = findProperRow()
     val results = row?.problemResults
 
     val monitorResults = problems.mapIndexed { index, problem ->
