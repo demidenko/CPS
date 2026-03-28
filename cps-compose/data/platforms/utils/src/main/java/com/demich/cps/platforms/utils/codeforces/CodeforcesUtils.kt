@@ -3,8 +3,6 @@ package com.demich.cps.platforms.utils.codeforces
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
@@ -93,7 +91,7 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
-    private fun extractCommentOrNull(commentBox: Element): CodeforcesRecentAction? {
+    private fun extractCommentOrNull(commentBox: Element): CodeforcesWebComment? {
         return kotlin.runCatching {
             val commentator = commentBox.expectFirst(".avatar")
                 .expectRatedUser()
@@ -126,24 +124,15 @@ object CodeforcesUtils {
             val commentHtml = commentBox.selectFirst("div.ttypography")?.html()
                 ?: ""
 
-            CodeforcesRecentAction(
-                time = commentCreationTime,
-                comment = CodeforcesComment(
-                    id = commentId,
-                    commentatorHandle = commentator.handle,
-                    commentatorHandleColorTag = commentator.colorTag,
-                    html = commentHtml,
-                    rating = commentRating,
-                    creationTime = commentCreationTime
-                ),
-                blogEntry = CodeforcesBlogEntry(
-                    id = blogEntryId,
-                    title = blogEntryTitle,
-                    authorHandle = blogEntryAuthor.handle,
-                    authorColorTag = blogEntryAuthor.colorTag,
-                    creationTime = Instant.DISTANT_PAST,
-                    rating = 0
-                )
+            CodeforcesWebComment(
+                id = commentId,
+                author = commentator,
+                html = commentHtml,
+                rating = commentRating,
+                creationTime = commentCreationTime,
+                blogEntryId = blogEntryId,
+                blogEntryTitle = blogEntryTitle,
+                blogEntryAuthor = blogEntryAuthor,
             )
         }.getOrNull()
     }
@@ -174,7 +163,7 @@ object CodeforcesUtils {
             .mapNotNull(::extractBlogEntryOrNull)
     }
 
-    fun extractComments(source: String): List<CodeforcesRecentAction> {
+    fun extractComments(source: String): List<CodeforcesWebComment> {
         return Jsoup.parse(source).expectContent().select(".comment-table")
             .mapNotNull(::extractCommentOrNull)
     }

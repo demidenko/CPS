@@ -22,10 +22,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
-import com.demich.cps.platforms.utils.codeforces.commentator
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -75,19 +74,18 @@ internal fun Modifier.recentBlogEntryPaddings() =
 @Immutable
 internal data class RecentBlogEntryData(
     val blogEntry: CodeforcesRecentFeedBlogEntry,
-    val comments: List<CodeforcesComment>, //only first comment per each commentator
+    val comments: List<CodeforcesWebComment>, //only first comment per each commentator
 ) {
     val isLowRated: Boolean get() = blogEntry.isLowRated
 }
 
 private fun CodeforcesRecentFeed.makeRecentBlogEntries(): List<RecentBlogEntryData> {
-    val commentsGrouped = comments.groupBy { it.blogEntry?.id }
+    val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->
         RecentBlogEntryData(
             blogEntry = blogEntry,
             comments = commentsGrouped[blogEntry.id]
-                ?.mapNotNull { it.comment } //TODO: nulls skipped
-                ?.distinctBy { it.commentatorHandle }
+                ?.distinctBy { it.author }
                 ?: emptyList()
         )
     }
@@ -104,7 +102,7 @@ private fun RecentBlogEntry(
         commentators = buildAnnotatedString {
             recentBlogEntryData.comments.forEachIndexed { index, comment ->
                 if (index > 0) append(", ")
-                append(comment.commentator.toHandleSpan())
+                append(comment.author.toHandleSpan())
             }
         },
         isLowRated = recentBlogEntryData.isLowRated,

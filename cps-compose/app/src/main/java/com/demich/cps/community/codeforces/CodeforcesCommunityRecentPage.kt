@@ -12,10 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
@@ -82,7 +81,7 @@ fun CodeforcesCommunityRecentPage(
 private fun RecentBlogEntriesPage(
     recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
-    onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesComment) -> Unit,
+    onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesWebComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
     onOpenComments: (CodeforcesRecentFeedBlogEntry) -> Unit
 ) {
@@ -105,14 +104,14 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    comments: () -> List<CodeforcesRecentAction>,
+    comments: () -> List<CodeforcesWebComment>,
     blogEntry: CodeforcesRecentFeedBlogEntry,
     modifier: Modifier = Modifier
 ) {
     val id = blogEntry.id
     val filteredComments by remember(key1 = id, key2 = comments) {
         derivedStateOf {
-            comments().filter { it.blogEntry?.id == id }
+            comments().filter { it.blogEntryId == id }
         }
     }
 

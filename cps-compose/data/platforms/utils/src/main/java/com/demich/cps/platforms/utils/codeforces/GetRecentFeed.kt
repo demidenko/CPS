@@ -13,14 +13,12 @@ suspend fun CodeforcesPageContentProvider.getRecentFeed(locale: CodeforcesLocale
     val usedIds = mutableSetOf<Int>()
     var index = 0
     for (comment in comments) {
-        val blogEntry = requireNotNull(comment.blogEntry).let {
-            CodeforcesRecentFeedBlogEntry(
-                id = it.id,
-                title = it.title,
-                author = it.author,
-                isLowRated = false
-            )
-        }
+        val blogEntry = CodeforcesRecentFeedBlogEntry(
+            id = comment.blogEntryId,
+            title = comment.blogEntryTitle,
+            author = comment.blogEntryAuthor,
+            isLowRated = false
+        )
         val id = blogEntry.id
         if (id !in blogEntriesIds) {
             blogEntriesIds.add(id)

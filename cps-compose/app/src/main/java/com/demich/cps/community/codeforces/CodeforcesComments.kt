@@ -32,9 +32,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesComment
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
-import com.demich.cps.platforms.utils.codeforces.commentator
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -49,7 +47,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CodeforcesComments(
-    comments: () -> List<CodeforcesRecentAction>,
+    comments: () -> List<CodeforcesWebComment>,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     showTitle: Boolean = true
@@ -60,18 +58,16 @@ fun CodeforcesComments(
         scrollUpButtonEnabled = true,
         modifier = modifier,
         items = comments,
-        key = { requireNotNull(it.comment).id }
-    ) { recentAction ->
-        val blogEntry = recentAction.blogEntry
-        val comment = requireNotNull(recentAction.comment)
+        key = { it.id }
+    ) { comment ->
         Comment(
             comment = comment,
-            blogEntryTitle = blogEntry?.title.takeIf { showTitle },
+            showBlogEntryTitle = showTitle,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    if (blogEntry != null) context.openUrlInBrowser(
-                        CodeforcesUrls.comment(blogEntryId = blogEntry.id, commentId = comment.id)
+                    context.openUrlInBrowser(
+                        CodeforcesUrls.comment(blogEntryId = comment.blogEntryId, commentId = comment.id)
                     )
                 }
                 .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
@@ -83,14 +79,14 @@ fun CodeforcesComments(
 
 @Composable
 private fun Comment(
-    comment: CodeforcesComment,
-    blogEntryTitle: String?,
+    comment: CodeforcesWebComment,
+    showBlogEntryTitle: Boolean,
     modifier: Modifier = Modifier
 ) {
     Comment(
         modifier = modifier,
-        authorHandle = comment.commentator.toHandleSpan(),
-        blogEntryTitle = blogEntryTitle,
+        authorHandle = comment.author.toHandleSpan(),
+        blogEntryTitle = comment.blogEntryTitle.takeIf { showBlogEntryTitle },
         rating = comment.rating,
         timeAgo = comment.creationTime.formatTimeAgo(),
         commentHtml = comment.html
