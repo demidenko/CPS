@@ -22,7 +22,7 @@ fun CodeforcesBlogEntry.extractTitle(): String =
 fun CodeforcesBlogEntry.toWebBlogEntry(colorTag: CodeforcesColorTag) =
     CodeforcesWebBlogEntry(
         id = id,
-        title = title,
+        title = extractTitle(),
         author = CodeforcesHandle(handle = authorHandle, colorTag = colorTag),
         creationTime = creationTime,
         rating = rating,
