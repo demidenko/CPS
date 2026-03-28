@@ -27,6 +27,9 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     ->
     {"status":"FAILED","comment":"handle: Field should contain between 3 and 24 characters, inclusive;from: Field should contain integer value"}
 
+    https://codeforces.com/api/contest.standings?participantTypes=;&contestId=566i ->
+    {"status":"FAILED","comment":"contestId: Поле должно содержать длинное целое число;participantTypes: Unknown participant type: \u0027;\u0027"}
+
      */
 
     private fun isCountFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "count")
@@ -53,6 +56,9 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 }
 
 internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException {
+    // "participantTypes: Unknown participant type: 'AAAAAA'"
+
+
     comment.ifIsFieldMsg("handle") { msg ->
         msg.ifSurrounded("User with handle ", " not found") {
             return CodeforcesApiHandleNotFoundException(comment, handle = it)
@@ -88,6 +94,7 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
 
     when (comment) {
         "Call limit exceeded" -> return CodeforcesApiCallLimitExceededException(comment)
+        // "Internal Server Error" -> status 500
     }
 
     return CodeforcesApiUnspecifiedException(comment)
