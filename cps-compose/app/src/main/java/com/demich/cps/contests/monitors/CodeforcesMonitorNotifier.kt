@@ -57,7 +57,7 @@ class CodeforcesMonitorNotifier(
         if (changed) submitNotification()
     }
 
-    private var contestantRank by delegate<CodeforcesMonitorData.ContestRank?>(
+    private var contestantRank: CodeforcesMonitorData.ContestRank? by delegate(
         initialValue = null
     ) {
         val rank = buildString {
@@ -73,16 +73,16 @@ class CodeforcesMonitorNotifier(
         notificationBuilder.edit { subText = "$it • $handle" }
     }
 
-    private var phase: CodeforcesMonitorData.ContestPhase by delegateWithOld(
-        initialValue = CodeforcesMonitorData.ContestPhase.Other(phase = UNDEFINED)
+    private var phase: CodeforcesMonitorData.ContestPhase? by delegateWithOld(
+        initialValue = null
     ) { oldPhase, phase ->
-        views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase.phase.title) }
+        views.forEach { it.setTextViewText(R.id.cf_monitor_phase, phase?.phase?.title ?: "") }
         if (phase is CodeforcesMonitorData.ContestPhase.Coding) {
             val remainingMs = (phase.endTime - Clock.System.now()).inWholeMilliseconds.coerceAtLeast(0)
             val elapsedMs = SystemClock.elapsedRealtime()
             views.forEach { it.setChronometer(R.id.cf_monitor_progress, elapsedMs + remainingMs, null, true) }
         } else {
-            if (phase.phase != oldPhase.phase) {
+            if (phase?.phase != oldPhase?.phase) {
                 views.forEach { it.setChronometer(R.id.cf_monitor_progress, 0, null, false) }
                 views.forEach { it.setTextViewText(R.id.cf_monitor_progress, "") }
             }

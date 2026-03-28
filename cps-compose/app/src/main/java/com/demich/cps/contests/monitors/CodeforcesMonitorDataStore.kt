@@ -101,7 +101,6 @@ private fun CodeforcesMonitorDataStore.contestInfoChecked(): CodeforcesContest? 
     val contest = contestInfo.value ?: return null
     return when {
         contest.id != contestId -> null
-        contest.phase == UNDEFINED -> null
         else -> contest
     }
 }

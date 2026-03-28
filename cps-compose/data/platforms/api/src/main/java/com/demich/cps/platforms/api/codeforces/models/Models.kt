@@ -223,7 +223,6 @@ data class CodeforcesRecentAction(
 )
 
 enum class CodeforcesContestPhase {
-    UNDEFINED, //not official
     BEFORE,
     CODING,
     PENDING_SYSTEM_TEST,
