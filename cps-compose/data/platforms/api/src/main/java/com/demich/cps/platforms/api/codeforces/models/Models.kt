@@ -131,20 +131,21 @@ data class CodeforcesSubmission(
     val passedTestCount: Int
 )
 
+// https://codeforces.com/apiHelp/objects#BlogEntry
 @Serializable
 data class CodeforcesBlogEntry(
     val id: Int,
-
-    // Localized
-    val title: String,
-
-    // Author user handle
-    val authorHandle: String,
 
     // Time, when blog entry was created, in unix format
     @SerialName("creationTimeSeconds")
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
+
+    // Author user handle
+    val authorHandle: String,
+
+    // Localized
+    val title: String,
 
     val rating: Int
 )
