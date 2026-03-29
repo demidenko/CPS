@@ -105,7 +105,7 @@ class ProfilesViewModel: ViewModel() {
 
     private val ratingLoader = backgroundDataLoader<List<RatingChange>>()
     fun flowOfRatingResult(manager: RatedProfileManager<*>, userId: String, key: Any) =
-        ratingLoader.execute(id = Pair(userId, key)) { manager.getRatingChangeHistory(userId) }
+        ratingLoader.execute(key = Pair(userId, key)) { manager.getRatingChangeHistory(userId) }
 }
 
 private fun getManager(resource: String, userName: String, link: String): Pair<ProfilePlatform, String>? =

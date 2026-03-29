@@ -62,7 +62,7 @@ private fun ColumnScope.DialogContent() {
     var dataKey by rememberUUIDState()
 
     val resourcesResult by
-        dataLoader.execute(id = dataKey) {
+        dataLoader.execute(key = dataKey) {
             val settings = context.settingsContests
             val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
             ClistClient.getResources(apiAccess = settings.clistApiAccess())

@@ -12,22 +12,22 @@ import kotlinx.coroutines.launch
 
 //TODO: data is still existing even after close screen
 class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
-    private var currentId: Any? = null
+    private var currentKey: Any? = null
     private val flow = MutableStateFlow<Result<T>?>(null)
     private var job: Job? = null
 
     fun flowOfResult(): StateFlow<Result<T>?> = flow
 
-    fun execute(id: Any, block: suspend () -> T) =
+    fun execute(key: Any, block: suspend () -> T) =
         flowOfResult().also {
-            if (currentId != id) {
+            if (currentKey != key) {
                 flow.value = null
-                currentId = id
+                currentKey = key
                 job?.cancel()
                 job = scope.launch(Dispatchers.Default) {
                     kotlin.runCatching { block() }.let {
                         ensureActive()
-                        if (currentId == id) flow.value = it
+                        if (currentKey == key) flow.value = it
                     }
                 }
             }

@@ -125,7 +125,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
     fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
-        blogEntriesLoader.execute(id = Pair(handle, key)) {
+        blogEntriesLoader.execute(key = Pair(handle, key)) {
             val (blogEntries, colorTag) = awaitPair(
                 blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },
                 blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) ?: BLACK }
