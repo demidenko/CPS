@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
@@ -56,7 +56,7 @@ fun CodeforcesCommunityLostPage(
 }
 
 fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
-    context.lostBlogEntriesDao.flowOfLost().map { blogEntries ->
+    context.codeforcesLostRepository.flowOfLost().map { blogEntries ->
         blogEntries.sortedByDescending { it.timeStamp }
             .map {
                 it.blogEntry.toWebBlogEntry(colorTag = it.blogEntry.authorColorTag)

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
-import com.demich.cps.features.codeforces.lost.database.CodeforcesLostDao
-import com.demich.cps.features.codeforces.lost.database.lostBlogEntriesDao
+import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
+import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -51,7 +51,7 @@ class CodeforcesCommunityLostRecentWorker(
             checkRecentActions(
                 locale = codeforcesLocale.value,
                 minRatingColorTag = codeforcesLostMinRatingTag.value,
-                dao = context.lostBlogEntriesDao
+                repository = context.codeforcesLostRepository
             )
         }
 
@@ -63,13 +63,13 @@ class CodeforcesCommunityLostRecentWorker(
     private suspend fun checkRecentActions(
         locale: CodeforcesLocale,
         minRatingColorTag: CodeforcesColorTag,
-        dao: CodeforcesLostDao
+        repository: CodeforcesLostRepository
     ) {
         val recentBlogEntries = CodeforcesClient.getRecentBlogEntries(locale = locale)
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
         //get current suspects with removing old ones
-        val suspects = dao.getSuspectsRemoveInvalid {
+        val suspects = repository.getSuspectsRemoveInvalid {
             isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
         }
 
@@ -82,7 +82,7 @@ class CodeforcesCommunityLostRecentWorker(
             api = CodeforcesClient,
             hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage()
         ) {
-            dao.insert(
+            repository.insert(
                 CodeforcesLostBlogEntry(
                     blogEntry = it,
                     isSuspect = true,
@@ -91,7 +91,7 @@ class CodeforcesCommunityLostRecentWorker(
             )
         }
 
-        dao.checkSuspects(
+        repository.checkSuspects(
             recentBlogEntries = recentBlogEntries,
             suspects = suspects,
             currentTime = workerStartTime,
@@ -100,7 +100,7 @@ class CodeforcesCommunityLostRecentWorker(
     }
 }
 
-private suspend inline fun CodeforcesLostDao.getSuspectsRemoveInvalid(
+private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
     isValid: (CodeforcesLostBlogEntry) -> Boolean
 ): List<CodeforcesLostBlogEntry> =
     getSuspects()
@@ -110,7 +110,7 @@ private suspend inline fun CodeforcesLostDao.getSuspectsRemoveInvalid(
             valid
         }
 
-private suspend fun CodeforcesLostDao.checkSuspects(
+private suspend fun CodeforcesLostRepository.checkSuspects(
     recentBlogEntries: List<CodeforcesRecentFeedBlogEntry>,
     suspects: List<CodeforcesLostBlogEntry>,
     currentTime: Instant,
