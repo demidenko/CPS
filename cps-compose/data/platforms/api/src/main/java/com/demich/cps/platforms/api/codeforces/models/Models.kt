@@ -33,6 +33,7 @@ data class CodeforcesUser(
     val lastOnlineTime: Instant
 )
 
+// https://codeforces.com/apiHelp/objects#Contest
 @Serializable
 data class CodeforcesContest(
     val id: Int,
@@ -40,10 +41,10 @@ data class CodeforcesContest(
     // Localized
     val name: String,
 
-    val phase: CodeforcesContestPhase,
-
     // Scoring system used for the contest
     val type: CodeforcesContestType,
+
+    val phase: CodeforcesContestPhase,
 
     // Duration of the contest in seconds
     @SerialName("durationSeconds")
