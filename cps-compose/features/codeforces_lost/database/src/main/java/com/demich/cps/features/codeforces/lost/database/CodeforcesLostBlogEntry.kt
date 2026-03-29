@@ -3,7 +3,7 @@ package com.demich.cps.features.codeforces.lost.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.demich.cps.platforms.api.InstantAsSecondsSerializer
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import kotlinx.serialization.SerialName

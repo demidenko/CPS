@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 import kotlin.time.Instant

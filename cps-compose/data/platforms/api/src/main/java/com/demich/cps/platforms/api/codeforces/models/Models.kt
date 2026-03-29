@@ -17,20 +17,6 @@ enum class CodeforcesLocale {
         }
 }
 
-// TODO: move to utils
-enum class CodeforcesColorTag {
-    BLACK,
-    GRAY,
-    GREEN,
-    CYAN,
-    BLUE,
-    VIOLET,
-    ORANGE,
-    RED,
-    LEGENDARY,
-    ADMIN
-}
-
 @Serializable
 data class CodeforcesUser(
     // Codeforces user handle

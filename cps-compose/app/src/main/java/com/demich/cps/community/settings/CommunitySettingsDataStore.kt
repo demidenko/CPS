@@ -2,8 +2,8 @@ package com.demich.cps.community.settings
 
 import android.content.Context
 import com.demich.cps.community.codeforces.CodeforcesTitle
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
