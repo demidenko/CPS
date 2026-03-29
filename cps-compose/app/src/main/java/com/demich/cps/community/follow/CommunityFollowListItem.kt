@@ -16,8 +16,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.ui.AttentionIcon
@@ -79,7 +79,7 @@ private fun UserHandle(
     Text(
         text = CodeforcesHandle(
             handle = userInfo?.handle ?: handle,
-            colorTag = CodeforcesUtils.colorTagFrom(userInfo?.rating)
+            colorTag = CodeforcesColorTag.fromRating(userInfo?.rating)
         ).toHandleSpan(),
         fontSize = CPSFontSize.itemTitle,
         maxLines = 1,

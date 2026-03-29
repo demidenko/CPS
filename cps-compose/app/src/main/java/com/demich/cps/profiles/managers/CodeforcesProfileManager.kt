@@ -20,7 +20,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.profiles.HandleColor
@@ -79,7 +78,7 @@ class CodeforcesProfileManager :
         CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy(mode = NONE) {
-        CodeforcesUtils.ratingUpperBounds()
+        ratingUpperBounds()
     }
 
     override val rankedHandleColors = HandleColor.rankedCodeforces
@@ -119,7 +118,7 @@ class CodeforcesProfileManager :
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(
             handle = text,
-            tag = CodeforcesUtils.colorTagFrom(rating),
+            tag = CodeforcesColorTag.fromRating(rating),
             cpsColors = cpsColors
         )
 
@@ -270,7 +269,7 @@ class CodeforcesProfileSettingsDataStore(context: Context):
 
 }
 
-private fun CodeforcesUtils.ratingUpperBounds() =
+private fun ratingUpperBounds() =
     listOf<CodeforcesColorTag>(
         GRAY,
         GREEN,
@@ -282,7 +281,7 @@ private fun CodeforcesUtils.ratingUpperBounds() =
         // bs can be optimized if iterate from orange to gray
         // but it speedups whole function only from 3.5us to 2.5us
         val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
-            colorTagFrom(rating) <= colorTag
+            CodeforcesColorTag.fromRating(rating) <= colorTag
         }
         val handleColor = requireNotNull(colorTag.toHandleColor())
         handleColor until rating

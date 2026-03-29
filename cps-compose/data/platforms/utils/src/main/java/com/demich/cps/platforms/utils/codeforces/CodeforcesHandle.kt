@@ -21,7 +21,7 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
         enumValueOf<CodeforcesColorTag>(str)
     }.getOrElse {
         str.toIntOrNull()?.let {
-            CodeforcesUtils.colorTagFrom(it)
+            CodeforcesColorTag.fromRating(it)
         }
     }
 }
