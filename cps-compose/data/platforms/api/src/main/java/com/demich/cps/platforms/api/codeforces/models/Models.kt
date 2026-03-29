@@ -83,16 +83,17 @@ data class CodeforcesContestParticipant(
     // TODO: val participantId: Long? (not documented in api)
 )
 
+// https://codeforces.com/apiHelp/objects#Problem
 @Serializable
 data class CodeforcesProblem(
-    // Localized
-    val name: String,
+    // Id of the contest, containing the problem. Can be absent.
+    val contestId: Int = -1,
 
     // Usually, a letter or letter with digit(s) indicating the problem index in a contest
     val index: String,
 
-    // Id of the contest, containing the problem. Can be absent.
-    val contestId: Int = -1
+    // Localized
+    val name: String
 )
 
 @Serializable
