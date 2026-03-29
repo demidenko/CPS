@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.niceMessage
@@ -63,17 +64,7 @@ private fun ColumnScope.DialogContent() {
 
     val resourcesResult by
         dataLoader.execute(key = dataKey) {
-            val settings = context.settingsContests
-            val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
-            ClistClient.getResources(apiAccess = settings.clistApiAccess())
-                .filter { it.id !in alreadySupported }
-                .sortedBy { it.name }
-                .also { list ->
-                    val res = list.associateBy { it.id }
-                    settings.clistAdditionalResources.update {
-                        it.mapNotNull { res[it.id] }
-                    }
-                }
+            ClistClient.getResourcesSyncWithSettings(context.settingsContests)
         }.collectAsState()
 
     val item = remember { context.settingsContests.clistAdditionalResources }
@@ -127,6 +118,21 @@ private fun ColumnScope.DialogContent() {
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+private suspend fun ClistApi.getResourcesSyncWithSettings(
+    settings: ContestsSettingsDataStore
+): List<ClistResource> {
+    val alreadySupported = Contest.platformsExceptUnknown.mapToSet { ClistUtils.getClistApiResourceId(it) }
+    return getResources(apiAccess = settings.clistApiAccess())
+        .filter { it.id !in alreadySupported }
+        .sortedBy { it.name }
+        .also { list ->
+            val res = list.associateBy { it.id }
+            settings.clistAdditionalResources.update {
+                it.mapNotNull { res[it.id] }
+            }
+        }
 }
 
 private fun filter(resources: List<ClistResource>, searchFilter: String) =
