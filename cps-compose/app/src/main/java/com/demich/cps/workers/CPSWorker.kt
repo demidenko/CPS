@@ -44,10 +44,10 @@ abstract class CPSWorker(
 
         val event = ExecutionEvent(start = workerStartTime)
         val workersInfo = CPSWorkersDataStore(context)
-        workersInfo.append(event)
+        workersInfo.add(work.name, event)
 
         val result = smartRunWork()
-        workersInfo.append(event.copy(end = timeHolder.now(), resultType = result.toType()))
+        workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = result.toType()))
 
         if (result.toType() != SUCCESS) {
             work.enqueueAsap()
@@ -135,23 +135,9 @@ abstract class CPSWorker(
         val duration: Duration? get() = end?.minus(start)
     }
 
-    private suspend fun CPSWorkersDataStore.append(event: ExecutionEvent) {
-        executions.edit {
-            val dateThreshold = event.start - 24.hours
-            update(work.name) { list ->
-                buildList {
-                    list.filterTo(this) { it.start >= dateThreshold }
-                    indexOfFirst { it.start == event.start }.let { index ->
-                        if (index == -1) add(event)
-                        else set(index, event)
-                    }
-                }
-            }
-        }
-    }
-
     protected val hintsDataStore: WorkersHintsDataStore
         get() = WorkersHintsDataStore(context)
+
 }
 
 private const val KEY_PROGRESS = "cpsworker_progress"
@@ -170,6 +156,24 @@ class CPSWorkersDataStore(context: Context): ItemizedDataStore(context.workersDa
     }
 
     val executions = jsonCPS.itemMap<String, List<CPSWorker.ExecutionEvent>>("executions")
+}
+
+private suspend fun CPSWorkersDataStore.add(
+    workName: String,
+    event: CPSWorker.ExecutionEvent
+) {
+    executions.edit {
+        val dateThreshold = event.start - 24.hours
+        update(workName) { list ->
+            buildList {
+                list.filterTo(this) { it.start >= dateThreshold }
+                indexOfFirst { it.start == event.start }.let { index ->
+                    if (index == -1) add(event)
+                    else set(index, event)
+                }
+            }
+        }
+    }
 }
 
 
