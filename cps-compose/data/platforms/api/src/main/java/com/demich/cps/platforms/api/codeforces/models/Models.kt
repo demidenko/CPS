@@ -158,9 +158,7 @@ data class CodeforcesBlogEntry(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val creationTime: Instant,
 
-    val rating: Int,
-
-    val authorColorTag: CodeforcesColorTag = BLACK //TODO: remove as unofficial
+    val rating: Int
 )
 
 @Serializable

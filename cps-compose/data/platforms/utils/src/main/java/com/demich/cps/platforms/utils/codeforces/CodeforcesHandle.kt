@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesColorTag
 import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
@@ -11,13 +10,6 @@ data class CodeforcesHandle(
     val handle: String,
     val colorTag: CodeforcesColorTag
 )
-
-val CodeforcesBlogEntry.author: CodeforcesHandle
-    get() = CodeforcesHandle(
-        handle = authorHandle,
-        colorTag = authorColorTag
-    )
-
 
 private fun Element.extractColorTag(): CodeforcesColorTag? {
     val str = classNames()
