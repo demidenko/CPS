@@ -150,6 +150,7 @@ data class CodeforcesBlogEntry(
     val rating: Int
 )
 
+// https://codeforces.com/apiHelp/objects#RatingChange
 @Serializable
 data class CodeforcesRatingChange(
     val contestId: Int,
@@ -163,16 +164,16 @@ data class CodeforcesRatingChange(
     // Place of the user in the contest. This field contains user rank on the moment of rating update. If afterwards rank changes (e.g. someone get disqualified), this field will not be update and will contain old rank
     val rank: Int,
 
+    // Time, when rating for the contest was update, in unix-format
+    @SerialName("ratingUpdateTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val ratingUpdateTime: Instant,
+
     // User rating before the contest
     val oldRating: Int,
 
     // User rating after the contest
-    val newRating: Int,
-
-    // Time, when rating for the contest was update, in unix-format
-    @SerialName("ratingUpdateTimeSeconds")
-    @Serializable(with = InstantAsSecondsSerializer::class)
-    val ratingUpdateTime: Instant
+    val newRating: Int
 )
 
 @Serializable
