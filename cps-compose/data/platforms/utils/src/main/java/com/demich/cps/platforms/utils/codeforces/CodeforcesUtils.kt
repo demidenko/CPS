@@ -169,11 +169,19 @@ object CodeforcesUtils {
             .mapNotNull(::extractRecentBlogEntryOrNull)
     }
 
+    private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
+        val sidebar = Jsoup.parse(source).selectSidebar() ?: return
+        val phaseText = sidebar.selectFirst("span.contest-state-phase")?.text()?.trim() ?: return
+        val infoText = sidebar.selectFirst("span.contest-state-regular")?.text()?.trim() ?: return
+        block(phaseText, infoText)
+    }
+
     fun extractContestSystemTestingPercentageOrNull(source: String): Int? {
-        return Jsoup.parse(source).selectSidebar()?.selectFirst("span.contest-state-regular")
-            ?.text()
-            ?.removeSuffix("%")
-            ?.toIntOrNull()
+        extractContestPhaseInfo(source) { phase, text ->
+            if (phase != "System testing") return null
+            return text.removeSuffix("%").toIntOrNull()
+        }
+        return null
     }
 }
 
