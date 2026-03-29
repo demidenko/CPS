@@ -8,7 +8,6 @@ import androidx.room.TypeConverters
 import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.features.room.instanceDelegate
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 
 
 @Database(
@@ -27,10 +26,10 @@ internal val Context.lostDataBase by instanceDelegate<CodeforcesLostDataBase>(
     name = "codeforces_lost_db"
 )
 
-internal class CodeforcesBlogEntryConverter: RoomJsonConverter<CodeforcesBlogEntry>() {
+internal class CodeforcesBlogEntryConverter: RoomJsonConverter<DeprecatedCodeforcesBlogEntry>() {
     @TypeConverter
-    override fun decode(str: String): CodeforcesBlogEntry = decodeFromString(str)
+    override fun decode(str: String): DeprecatedCodeforcesBlogEntry = decodeFromString(str)
 
     @TypeConverter
-    override fun encode(value: CodeforcesBlogEntry) = encodeToString(value)
+    override fun encode(value: DeprecatedCodeforcesBlogEntry) = encodeToString(value)
 }

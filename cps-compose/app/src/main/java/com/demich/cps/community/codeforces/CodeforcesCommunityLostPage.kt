@@ -14,7 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -56,12 +55,7 @@ fun CodeforcesCommunityLostPage(
 }
 
 fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
-    context.codeforcesLostRepository.flowOfLost().map { blogEntries ->
-        blogEntries.sortedByDescending { it.timeStamp }
-            .map {
-                it.blogEntry.toWebBlogEntry(colorTag = it.blogEntry.authorColorTag)
-            }
-    }
+    context.codeforcesLostRepository.flowOfLost()
 
 @Composable
 private fun TopLabel() {

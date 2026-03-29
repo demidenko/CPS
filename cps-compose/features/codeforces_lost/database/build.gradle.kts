@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -30,6 +31,7 @@ android {
 dependencies {
     implementation(project(":features:room_base"))
     implementation(project(":data:platforms:api"))
+    implementation(project(":data:platforms:utils"))
 
     implementation(libs.kotlinx.serialization)
 

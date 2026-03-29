@@ -3,7 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.lost.database.CodeforcesLostBlogEntry
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
 import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -14,7 +13,9 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getProfiles
+import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.fromSnapshot
@@ -70,7 +71,7 @@ class CodeforcesCommunityLostRecentWorker(
 
         //get current suspects with removing old ones
         val suspects = repository.getSuspectsRemoveInvalid {
-            isNew(it.blogEntry.creationTime) && it.blogEntry.authorColorTag >= minRatingColorTag
+            isNew(it.creationTime) && it.author.colorTag >= minRatingColorTag
         }
 
         //catch new suspects from recent actions
@@ -82,13 +83,7 @@ class CodeforcesCommunityLostRecentWorker(
             api = CodeforcesClient,
             hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage()
         ) {
-            repository.insert(
-                CodeforcesLostBlogEntry(
-                    blogEntry = it,
-                    isSuspect = true,
-                    timeStamp = Instant.DISTANT_PAST
-                )
-            )
+            repository.insertSuspect(it)
         }
 
         repository.checkSuspects(
@@ -101,8 +96,8 @@ class CodeforcesCommunityLostRecentWorker(
 }
 
 private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
-    isValid: (CodeforcesLostBlogEntry) -> Boolean
-): List<CodeforcesLostBlogEntry> =
+    isValid: (CodeforcesWebBlogEntry) -> Boolean
+): List<CodeforcesWebBlogEntry> =
     getSuspects()
         .partition(isValid)
         .let { (valid, invalid) ->
@@ -112,7 +107,7 @@ private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
 
 private suspend fun CodeforcesLostRepository.checkSuspects(
     recentBlogEntries: List<CodeforcesRecentFeedBlogEntry>,
-    suspects: List<CodeforcesLostBlogEntry>,
+    suspects: List<CodeforcesWebBlogEntry>,
     currentTime: Instant,
     staleAfter: Duration
 ) {
@@ -121,7 +116,6 @@ private suspend fun CodeforcesLostRepository.checkSuspects(
     //remove from lost
     remove(
         getLost().filter {
-            val it = it.blogEntry
             currentTime - it.creationTime > staleAfter || it.id in recentIds
         }
     )
@@ -129,10 +123,7 @@ private suspend fun CodeforcesLostRepository.checkSuspects(
     //suspect become lost
     suspects.forEach { blogEntry ->
         if (blogEntry.id !in recentIds) {
-            insert(blogEntry.copy(
-                isSuspect = false,
-                timeStamp = currentTime
-            ))
+            insertLost(blogEntry)
         }
     }
 }
@@ -239,7 +230,7 @@ private suspend inline fun findSuspects(
     crossinline isNew: (Instant) -> Boolean,
     hintStorage: CodeforcesLostHintStorage,
     api: CodeforcesApi,
-    onSuspect: (CodeforcesBlogEntry) -> Unit
+    onSuspect: (CodeforcesWebBlogEntry) -> Unit
 ) {
     val api = api.withBlogEntriesCache { blogEntry ->
         val time = blogEntry.creationTime
@@ -281,10 +272,9 @@ private suspend inline fun findSuspects(
         .forEach {
             val blogEntry = api.getBlogEntry(it.id, locale)
             onSuspect(
-                blogEntry.copy(
-                    authorColorTag = it.author.colorTag,
-                    rating = 0
-                )
+                blogEntry
+                    .copy(rating = 0)
+                    .toWebBlogEntry(colorTag = it.author.colorTag)
             )
         }
 }
