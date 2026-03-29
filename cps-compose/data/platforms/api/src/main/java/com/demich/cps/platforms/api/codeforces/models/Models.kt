@@ -17,15 +17,16 @@ enum class CodeforcesLocale {
         }
 }
 
+// https://codeforces.com/apiHelp/objects#User
 @Serializable
 data class CodeforcesUser(
     // Codeforces user handle
     val handle: String,
 
-    val rating: Int? = null,
-
     // User contribution
     val contribution: Int,
+
+    val rating: Int? = null,
 
     // Time, when user was last seen online, in unix format
     @SerialName("lastOnlineTimeSeconds")
@@ -97,6 +98,7 @@ data class CodeforcesProblem(
     val name: String
 )
 
+// https://codeforces.com/apiHelp/objects#ProblemResult
 @Serializable
 data class CodeforcesProblemResult(
     val points: Double,
