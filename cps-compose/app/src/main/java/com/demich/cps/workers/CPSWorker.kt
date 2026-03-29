@@ -17,7 +17,6 @@ import com.demich.cps.utils.update
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
@@ -43,17 +42,15 @@ abstract class CPSWorker(
             return Result.success()
         }
 
+        val event = ExecutionEvent(start = workerStartTime)
         val workersInfo = CPSWorkersDataStore(context)
+        workersInfo.append(event)
 
-        val result = coroutineScope {
-            val event = ExecutionEvent(start = workerStartTime)
-            workersInfo.append(event)
-            smartRunWork().also { result ->
-                workersInfo.append(event.copy(end = timeHolder.now(), resultType = result.toType()))
-                if (result.toType() != SUCCESS) {
-                    work.enqueueAsap()
-                }
-            }
+        val result = smartRunWork()
+        workersInfo.append(event.copy(end = timeHolder.now(), resultType = result.toType()))
+
+        if (result.toType() != SUCCESS) {
+            work.enqueueAsap()
         }
 
         return result
