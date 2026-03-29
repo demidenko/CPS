@@ -103,10 +103,18 @@ data class CodeforcesProblemResult(
     val type: CodeforcesProblemStatus
 )
 
+// https://codeforces.com/apiHelp/objects#Submission
 @Serializable
 data class CodeforcesSubmission(
+    val id: Long,
+
     // Can be absent.
     val contestId: Int = -1,
+
+    // Time, when submission was created, in unix-format
+    @SerialName("creationTimeSeconds")
+    @Serializable(with = InstantAsSecondsSerializer::class)
+    val creationTime: Instant,
 
     val problem: CodeforcesProblem,
 
@@ -115,18 +123,11 @@ data class CodeforcesSubmission(
     // Can be absent.
     val verdict: CodeforcesProblemVerdict = PENDING,
 
-    // Number of passed tests
-    val passedTestCount: Int,
-
-    val id: Long,
-
-    // Time, when submission was created, in unix-format
-    @SerialName("creationTimeSeconds")
-    @Serializable(with = InstantAsSecondsSerializer::class)
-    val creationTime: Instant,
-
     // Testset used for judging the submission
-    val testset: CodeforcesTestset
+    val testset: CodeforcesTestset,
+
+    // Number of passed tests
+    val passedTestCount: Int
 )
 
 @Serializable
