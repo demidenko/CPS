@@ -20,7 +20,7 @@ internal fun RatingGraphItem(
     handle: String,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: RatingLoadingViewModel = viewModelScoped()
+    val viewModel = viewModelScoped { RatingLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
     val ratingChangesResult by viewModel
@@ -35,7 +35,7 @@ internal fun RatingGraphItem(
     )
 }
 
-class RatingLoadingViewModel: ViewModel() {
+private class RatingLoadingViewModel: ViewModel() {
 
     private val loader = backgroundDataLoader<List<RatingChange>>()
 
