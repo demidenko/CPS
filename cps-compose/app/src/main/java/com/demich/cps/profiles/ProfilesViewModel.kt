@@ -87,7 +87,7 @@ class ProfilesViewModel: ViewModel() {
                         reload(manager, context)
                     } else {
                         setLoadingStatus(manager, LOADING)
-                        getAndSave(manager, userId, context)
+                        manager.fetchAndSaveProfile(userId, context)
                         setLoadingStatus(manager, PENDING)
                     }
                 }
@@ -96,10 +96,10 @@ class ProfilesViewModel: ViewModel() {
             }
         }
     }
+}
 
-    private suspend fun <U: UserInfo> getAndSave(manager: ProfileManager<U>, userId: String, context: Context) {
-        manager.profileStorage(context).setProfile(manager.fetchProfile(userId))
-    }
+private suspend fun <U: UserInfo> ProfileManager<U>.fetchAndSaveProfile(userId: String, context: Context) {
+    profileStorage(context).setProfile(fetchProfile(userId))
 }
 
 private fun getManager(resource: String, userName: String, link: String): Pair<ProfilePlatform, String>? =
