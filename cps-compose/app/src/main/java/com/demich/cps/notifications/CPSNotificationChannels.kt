@@ -3,7 +3,7 @@ package com.demich.cps.notifications
 val notificationChannels get() = CPSNotificationChannels()
 
 
-class CPSNotificationChannels: NotificationIdProvider(rangeLength = 1 shl 22) {
+class CPSNotificationChannels: NotificationIdProvider(rangeLength = 1 shl 23) {
 
     inner class CodeforcesNotificationsGroup: NotificationChannelGroupInfo("codeforces", "Codeforces") {
         val rating_changes = channel(nextId(), "rating_changes", "Rating changes", Importance.HIGH)

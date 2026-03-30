@@ -1,7 +1,7 @@
 package com.demich.cps.notifications
 
 private class Allocator {
-    private var firstUnused = 0
+    private var firstUnused = Int.MIN_VALUE
     operator fun invoke(size: Int) =
         firstUnused.also {
             require(size > 0)
