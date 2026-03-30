@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -33,13 +34,14 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.BackgroundDataLoader
+import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.mapToSet
+import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,13 +61,12 @@ private fun ColumnScope.DialogContent() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val dataLoader = remember(scope) { BackgroundDataLoader<List<ClistResource>>(scope = scope) }
+    val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
-    val resourcesResult by
-        dataLoader.execute(key = dataKey) {
-            ClistClient.getResourcesSyncWithSettings(context.settingsContests)
-        }.collectAsState()
+    val resourcesResult by viewModel
+        .flowOfResourcesResult(settings = context.settingsContests, key = dataKey)
+        .collectAsState()
 
     val item = remember { context.settingsContests.clistAdditionalResources }
     val selected by collectItemAsState { item }
@@ -158,4 +159,13 @@ private fun ClistResourcesList(
             }
         }
     }
+}
+
+private class CListResourcesLoadingViewModel: ViewModel() {
+    private val loader = backgroundDataLoader<List<ClistResource>>()
+
+    fun flowOfResourcesResult(settings: ContestsSettingsDataStore, key: Any) =
+        loader.execute(key = key) {
+            ClistClient.getResourcesSyncWithSettings(settings)
+        }
 }
