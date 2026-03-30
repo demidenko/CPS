@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,6 +19,7 @@ import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.isSortedWith
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.demich.kotlin_stdlib_boost.partitionIndex
+import com.sebaslogen.resaca.rememberScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -115,13 +115,13 @@ internal fun produceSortedContestsWithTime(
 ): Pair<State<SortedContests>, State<Instant>> {
     val context = context
 
-    val init = remember {
+    val init = rememberScoped {
         val sorter = ContestsSmartSorter()
         val initContests = flowOfContests(context).firstBlocking()
-        val currentTime = clock.now().truncateBySeconds(1)
-        sorter.apply(initContests, currentTime)
+        val initTime = clock.now().truncateBySeconds(1)
+        sorter.apply(initContests, initTime)
         val contestsState = mutableStateOf(sorter.contests)
-        val currentTimeState = mutableStateOf(currentTime)
+        val currentTimeState = mutableStateOf(initTime)
         Pair(Pair(contestsState, currentTimeState), sorter)
     }
 
