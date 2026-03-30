@@ -10,15 +10,10 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
-import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.awaitPair
-import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -122,18 +117,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             followLoadingStatus.value = PENDING
         }
     }
-
-    private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
-    fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
-        blogEntriesLoader.execute(key = Pair(handle, key)) {
-            val (blogEntries, colorTag) = awaitPair(
-                blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },
-                blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) ?: BLACK }
-            )
-            blogEntries.map {
-                it.toWebBlogEntry(colorTag = colorTag)
-            }
-        }
 }
 
 private class CodeforcesDataLoader<T: Any>(
