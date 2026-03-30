@@ -6,14 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfilePlatform
-import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.joinAllWithProgress
@@ -102,10 +100,6 @@ class ProfilesViewModel: ViewModel() {
     private suspend fun <U: UserInfo> getAndSave(manager: ProfileManager<U>, userId: String, context: Context) {
         manager.profileStorage(context).setProfile(manager.fetchProfile(userId))
     }
-
-    private val ratingLoader = backgroundDataLoader<List<RatingChange>>()
-    fun flowOfRatingResult(manager: RatedProfileManager<*>, userId: String, key: Any) =
-        ratingLoader.execute(key = Pair(userId, key)) { manager.getRatingChangeHistory(userId) }
 }
 
 private fun getManager(resource: String, userName: String, link: String): Pair<ProfilePlatform, String>? =
