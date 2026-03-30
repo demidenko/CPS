@@ -44,9 +44,9 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
         val settings = context.settingsCommunity
         val defaultTab = settings.codeforcesDefaultTab.getValueBlocking()
         CodeforcesCommunityController(
-            viewModel = viewModel,
+            dataManager = viewModel,
             tabsState = tabsState,
-            data = CodeforcesCommunityControllerData(
+            pagerData = CodeforcesCommunityPagerData(
                 selectedTab = defaultTab,
                 topPageType = BlogEntries,
                 recentPageType = CodeforcesCommunityController.RecentPageType.RecentFeed
@@ -63,24 +63,23 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 }
 
 @Serializable
-internal data class CodeforcesCommunityControllerData(
+data class CodeforcesCommunityPagerData(
     val selectedTab: CodeforcesTitle,
     val topPageType: CodeforcesCommunityController.TopPageType,
     val recentPageType: CodeforcesCommunityController.RecentPageType
 )
 
 @Stable
-class CodeforcesCommunityController internal constructor(
-    viewModel: CodeforcesCommunityViewModel,
+class CodeforcesCommunityController(
+    dataManager: CodeforcesCommunityDataManger,
     tabsState: State<List<CodeforcesTitle>>,
-    data: CodeforcesCommunityControllerData
-): CodeforcesCommunityDataManger by viewModel {
+    pagerData: CodeforcesCommunityPagerData
+): CodeforcesCommunityDataManger by dataManager {
     val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
     val pagerState = object : PagerState(
-        currentPage = tabs.indexOf(data.selectedTab)
-            .takeIf { it != -1 } ?: 0
+        currentPage = tabs.indexOf(pagerData.selectedTab).let { if (it != -1) it else 0 }
     ) {
         override val pageCount: Int
             get() = tabs.size
@@ -105,8 +104,8 @@ class CodeforcesCommunityController internal constructor(
         pagerState.animateScrollToPage(page = tabs.indexOf(tab))
 
 
-    var topPageType by mutableStateOf(data.topPageType)
-    var recentPageType by mutableStateOf(data.recentPageType)
+    var topPageType by mutableStateOf(pagerData.topPageType)
+    var recentPageType by mutableStateOf(pagerData.recentPageType)
 
     enum class TopPageType {
         BlogEntries, Comments
@@ -144,11 +143,11 @@ fun CodeforcesCommunityDataManger.loadingStatusState(title: CodeforcesTitle): St
 
 
 private fun controllerSaver(
-    viewModel: CodeforcesCommunityViewModel,
+    dataManager: CodeforcesCommunityDataManger,
     tabsState: State<List<CodeforcesTitle>>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
-        jsonCPS.encodeToString(CodeforcesCommunityControllerData(
+        jsonCPS.encodeToString(CodeforcesCommunityPagerData(
             selectedTab = it.currentTab,
             topPageType = it.topPageType,
             recentPageType = it.recentPageType
@@ -156,9 +155,9 @@ private fun controllerSaver(
     },
     restore = {
         CodeforcesCommunityController(
-            viewModel = viewModel,
+            dataManager = dataManager,
             tabsState = tabsState,
-            data = jsonCPS.decodeFromString(it)
+            pagerData = jsonCPS.decodeFromString(it)
         )
     }
 )
