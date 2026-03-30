@@ -87,7 +87,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
         viewModelScope.launch(Dispatchers.Default) {
             val infoDataStore = ContestsInfoDataStore(context)
             val snapshot = infoDataStore.settingsSnapshot() ?: return@launch
-            infoDataStore.settingsSnapshot.update { null }
+            infoDataStore.settingsSnapshot.setValue(null)
 
             val settings = context.settingsContests
             val diff = settings.makeSnapshot().differenceFrom(snapshot)
