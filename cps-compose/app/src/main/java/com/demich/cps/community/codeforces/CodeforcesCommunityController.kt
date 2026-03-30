@@ -17,9 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
-import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.NewEntriesDataStoreItem
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
@@ -165,27 +163,17 @@ private fun controllerSaver(
     }
 )
 
-fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? =
-    when (tab) {
-        MAIN -> flowOfNewEntryCounters(
-            blogEntriesFlow = flowOfMainBlogEntries(context),
-            newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
-        )
-        LOST -> flowOfNewEntryCounters(
-            blogEntriesFlow = flowOfLostBlogEntries(context),
-            newEntriesItem = CodeforcesNewEntriesDataStore(context).commonNewEntries
-        )
-        else -> null
+fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? {
+    val flow = when (tab) {
+        MAIN -> flowOfMainBlogEntries(context)
+        LOST -> flowOfLostBlogEntries(context)
+        else -> return null
     }
-
-private fun flowOfNewEntryCounters(
-    blogEntriesFlow: Flow<List<CodeforcesWebBlogEntry>>,
-    newEntriesItem: NewEntriesDataStoreItem
-): Flow<NewEntryTypeCounters> =
-    combineToCounters(
-        flowOfIds = blogEntriesFlow.map { it.map { it.id } },
-        flowOfTypes = newEntriesItem.asFlow()
+    return combineToCounters(
+        flowOfIds = flow.map { it.map { it.id } },
+        flowOfTypes = CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
     )
+}
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
     visitedTabs.forEach { tab ->
