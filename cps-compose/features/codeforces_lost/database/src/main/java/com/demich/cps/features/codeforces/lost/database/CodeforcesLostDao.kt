@@ -23,9 +23,9 @@ interface CodeforcesLostRepository {
 
     fun flowOfLost(): Flow<List<CodeforcesWebBlogEntry>>
 
-    suspend fun getLost(): List<CodeforcesWebBlogEntry>
+    suspend fun lostEntries(): List<CodeforcesWebBlogEntry>
 
-    suspend fun getSuspects(): List<CodeforcesWebBlogEntry>
+    suspend fun suspects(): List<CodeforcesWebBlogEntry>
 }
 
 internal const val cfLostTableName = "BlogEntries"
@@ -53,32 +53,32 @@ internal interface CodeforcesLostDao: CodeforcesLostRepository {
     }
 
     @Delete(entity = CodeforcesLostBlogEntry::class)
-    suspend fun removeByIds(blogEntries: List<IdHolder>)
+    suspend fun removeByIds(ids: List<IdHolder>)
 
     @Query("$selectSuspect = 0")
-    suspend fun getLostDao(): List<CodeforcesLostBlogEntry>
+    suspend fun daoGetLost(): List<CodeforcesLostBlogEntry>
 
     @Query("$selectSuspect = 0")
-    fun flowOfLostDao(): Flow<List<CodeforcesLostBlogEntry>>
+    fun daoFlowOfLost(): Flow<List<CodeforcesLostBlogEntry>>
 
     @Query("$selectSuspect = 1")
-    suspend fun getSuspectsDao(): List<CodeforcesLostBlogEntry>
+    suspend fun daoGetSuspects(): List<CodeforcesLostBlogEntry>
 
     override suspend fun remove(blogEntries: Collection<CodeforcesWebBlogEntry>) {
         removeByIds(blogEntries.map { IdHolder(it.id) })
     }
 
     override fun flowOfLost(): Flow<List<CodeforcesWebBlogEntry>> =
-        flowOfLostDao().map { list ->
+        daoFlowOfLost().map { list ->
             list.sortedByDescending { it.timeStamp }
                 .map { it.blogEntry.toWebBlogEntry() }
         }
 
-    override suspend fun getLost(): List<CodeforcesWebBlogEntry> =
-        getLostDao().map { it.blogEntry.toWebBlogEntry() }
+    override suspend fun lostEntries(): List<CodeforcesWebBlogEntry> =
+        daoGetLost().map { it.blogEntry.toWebBlogEntry() }
 
-    override suspend fun getSuspects(): List<CodeforcesWebBlogEntry> =
-        getSuspectsDao().map { it.blogEntry.toWebBlogEntry() }
+    override suspend fun suspects(): List<CodeforcesWebBlogEntry> =
+        daoGetSuspects().map { it.blogEntry.toWebBlogEntry() }
 }
 
 internal class IdHolder(val id: Int)

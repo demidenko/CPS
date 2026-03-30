@@ -98,7 +98,7 @@ class CodeforcesCommunityLostRecentWorker(
 private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
     isValid: (CodeforcesWebBlogEntry) -> Boolean
 ): List<CodeforcesWebBlogEntry> =
-    getSuspects()
+    suspects()
         .partition(isValid)
         .let { (valid, invalid) ->
             remove(invalid)
@@ -115,7 +115,7 @@ private suspend fun CodeforcesLostRepository.checkSuspects(
 
     //remove from lost
     remove(
-        getLost().filter {
+        lostEntries().filter {
             currentTime - it.creationTime > staleAfter || it.id in recentIds
         }
     )
