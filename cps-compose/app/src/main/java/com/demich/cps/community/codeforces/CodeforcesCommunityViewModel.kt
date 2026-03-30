@@ -16,6 +16,7 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
+import com.demich.datastore_itemized.DataStoreValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -63,24 +64,22 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
-    private fun reload(title: CodeforcesTitle, locale: CodeforcesLocale) {
+    private fun reload(title: CodeforcesTitle, localeItem: DataStoreValue<CodeforcesLocale>) {
         when (title) {
-            MAIN -> mainBlogEntries.launchLoadIfActive(locale)
+            MAIN -> mainBlogEntries.launchLoadIfActive(localeItem)
             TOP -> {
-                topBlogEntries.launchLoadIfActive(locale)
+                topBlogEntries.launchLoadIfActive(localeItem)
                 //TODO: set comments inactive after many reloads without showing them
-                topComments.launchLoadIfActive(locale)
+                topComments.launchLoadIfActive(localeItem)
             }
-            RECENT -> recentActions.launchLoadIfActive(locale)
+            RECENT -> recentActions.launchLoadIfActive(localeItem)
             else -> return
         }
     }
 
     override fun reload(titles: List<CodeforcesTitle>, context: Context) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val locale = context.settingsCommunity.codeforcesLocale()
-            titles.forEach { reload(title = it, locale = locale) }
-        }
+        val localeItem = context.settingsCommunity.codeforcesLocale
+        titles.forEach { reload(title = it, localeItem = localeItem) }
     }
 
     private suspend fun getMainBlogEntries(locale: CodeforcesLocale) =
@@ -130,9 +129,7 @@ private class CodeforcesDataLoader<T: Any>(
     fun flowOfData(context: Context): StateFlow<T> {
         if (inactive) {
             inactive = false
-            scope.launch {
-                launchLoadIfActive(locale = context.settingsCommunity.codeforcesLocale())
-            }
+            launchLoadIfActive(localeItem = context.settingsCommunity.codeforcesLocale)
         }
         return dataFlow
     }
@@ -140,7 +137,7 @@ private class CodeforcesDataLoader<T: Any>(
     private val loadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     val loadingStatusFlow: StateFlow<LoadingStatus> get() = loadingStatus
 
-    fun launchLoadIfActive(locale: CodeforcesLocale) {
+    fun launchLoadIfActive(localeItem: DataStoreValue<CodeforcesLocale>) {
         if (inactive) return
         loadingStatus.update {
             if (it == LOADING) return
@@ -148,6 +145,7 @@ private class CodeforcesDataLoader<T: Any>(
         }
         scope.launch(Dispatchers.Default) {
             runCatching {
+                val locale = localeItem()
                 getData(locale)
             }.onFailure {
                 loadingStatus.value = FAILED
