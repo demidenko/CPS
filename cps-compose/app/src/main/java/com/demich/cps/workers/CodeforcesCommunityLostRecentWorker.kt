@@ -18,10 +18,12 @@ import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -40,10 +42,18 @@ class CodeforcesCommunityLostRecentWorker(
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
+
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(
                     repeatInterval = 30.minutes
                 )
+
+            override fun flowOfInfo(): Flow<Map<String, Any?>> {
+                return WorkersHintsDataStore(context).flowOf {
+                    val hint = codeforcesLostHintNotNew.value
+                    mapOf("hint" to hint?.run { "($blogEntryId, $creationTime)" })
+                }
+            }
         }
     }
 
