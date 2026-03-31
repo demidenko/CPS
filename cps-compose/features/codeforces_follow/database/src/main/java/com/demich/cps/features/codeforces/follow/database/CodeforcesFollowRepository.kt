@@ -78,15 +78,15 @@ abstract class CodeforcesFollowRepository(
         dao.applyProfilesResults(profiles)
     }
 
-    suspend fun updateFailedBlogEntries() {
-        dao.getUserBlogs().forEach {
-            if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
-        }
-    }
-
     protected abstract suspend fun getLocale(): CodeforcesLocale
 
     protected abstract fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry)
+}
+
+suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
+    blogs().forEach {
+        if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
+    }
 }
 
 private suspend fun CodeforcesApi.getBlogEntries(
