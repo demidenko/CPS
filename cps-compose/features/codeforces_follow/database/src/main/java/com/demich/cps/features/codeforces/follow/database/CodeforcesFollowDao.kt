@@ -23,6 +23,9 @@ internal interface CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
     suspend fun getUserBlog(handle: String): CodeforcesUserBlog?
 
+    @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
+    suspend fun hasUser(handle: String): Boolean
+
     @Query("SELECT handle FROM $cfFollowTableName")
     suspend fun getHandles(): List<String>
 

@@ -52,7 +52,7 @@ abstract class CodeforcesFollowRepository(
         if (result is ProfileResult.NotFound) return
 
         val handle = result.handle
-        if (dao.getUserBlog(handle) != null) return
+        if (dao.hasUser(handle)) return
         dao.insert(
             CodeforcesUserBlog(
                 handle = handle,
@@ -64,7 +64,7 @@ abstract class CodeforcesFollowRepository(
     }
 
     suspend fun addNewUser(handle: String) {
-        if (dao.getUserBlog(handle) != null) return
+        if (dao.hasUser(handle)) return
         //TODO: sync?? parallel? (addNewUser loads blog without info)
         addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
