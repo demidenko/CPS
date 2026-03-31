@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -23,34 +24,33 @@ fun contestsFetchFlows(
     val memoizer = ContestsFetchMemoizer(setup, dateConstraints, createFetcher)
 
     return setup.mapValues { (platform, priorities) ->
-        contestsFetchFlow(
+        priorities.toFetchFlow(
             platform = platform,
-            priorities = priorities,
             memoizer = memoizer
-        )
+        ).transformWhile {
+            emit(it)
+            it.result.isFailure
+        }
     }
 }
 
-private fun contestsFetchFlow(
+private fun List<ContestsFetchSource>.toFetchFlow(
     platform: Contest.Platform,
-    priorities: List<ContestsFetchSource>,
     memoizer: ContestsFetchMemoizer
-) = flow {
-    for (fetchSource in priorities) {
-        val result: Result<List<Contest>> = memoizer.getContests(platform, fetchSource)
-        emit(ContestsFetchResult(
+): Flow<ContestsFetchResult> = flow {
+    forEach { fetchSource ->
+        val result = ContestsFetchResult(
             platform = platform,
             fetchSource = fetchSource,
-            result = result.map { it.map { it.correctTitle() } }
-        ))
-
-        if (result.isSuccess) break
+            result = memoizer.getContests(platform, fetchSource).map { it.map { it.correctTitle() } }
+        )
+        emit(result)
     }
 }
 
 private fun Contest.correctTitle(): Contest {
     val fixedTitle = when (platform) {
-        Contest.Platform.atcoder -> correctAtCoderTitle(title)
+        atcoder -> correctAtCoderTitle(title)
         else -> title
     }.trim()
     return if (title == fixedTitle) this
