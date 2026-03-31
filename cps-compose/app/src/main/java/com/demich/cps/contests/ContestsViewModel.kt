@@ -21,7 +21,6 @@ import com.demich.cps.workers.ContestsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -32,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
-class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
+class ContestsViewModel: ViewModel(), ContestsReloader {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }
@@ -106,12 +105,5 @@ class ContestsViewModel: ViewModel(), ContestsReloader, ContestsIdsHolder {
             )
         }
     }
-
-    private val expandedContests = MutableStateFlow(emptyMap<ContestCompositeId, Contest>())
-    fun flowOfExpandedContests(): StateFlow<Map<ContestCompositeId, Contest>> = expandedContests
-
-    override fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit) =
-        expandedContests.edit(block)
-
 }
 

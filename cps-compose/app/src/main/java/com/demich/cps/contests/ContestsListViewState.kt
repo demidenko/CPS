@@ -3,16 +3,14 @@ package com.demich.cps.contests
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.SafetyLevel
-import com.demich.cps.utils.collectAsState
 import com.demich.kotlin_stdlib_boost.minOfNotNull
+import com.sebaslogen.resaca.rememberScoped
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
@@ -29,26 +27,26 @@ private fun isParallel(c1: Contest, c2: Contest): Boolean =
     c1.platform == c2.platform && c1.startTime == c2.startTime && c1.endTime == c2.endTime
 
 @Composable
-internal fun rememberContestsListViewState(): ContestsListViewState {
-    val contestsViewModel = contestsViewModel()
-
-    val expandedContestsState = collectAsState { contestsViewModel.flowOfExpandedContests() }
-
+fun rememberContestsListViewState(): ContestsListViewState {
     val contestsPageState = rememberSaveable {
         mutableStateOf(ContestsListViewState.ContestsPage.RunningOrFuture)
     }
 
-    return remember(contestsViewModel, expandedContestsState) {
-        ContestsListViewState(
-            contestsViewModel = contestsViewModel,
-            expandedContestsState = expandedContestsState,
-            contestsPageState = contestsPageState
-        )
+    return rememberScoped(key = contestsPageState) {
+        ContestsListViewState(contestsPageState = contestsPageState)
     }
 }
 
-internal interface ContestsIdsHolder {
-    fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit)
+@Stable
+class ContestsListViewState(
+    contestsPageState: MutableState<ContestsPage>
+) {
+    private val expandedContestsState = mutableStateOf<Map<ContestCompositeId, Contest>>(emptyMap())
+    private val expandedContests by expandedContestsState
+
+    private inline fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit) {
+        expandedContestsState.value = expandedContests.toMutableMap().apply(block)
+    }
 
     fun toggleExpanded(contest: Contest) {
         editIds {
@@ -58,7 +56,7 @@ internal interface ContestsIdsHolder {
         }
     }
 
-    fun applyContests(contests: List<Contest>) {
+    fun syncExpanded(contests: List<Contest>) {
         editIds {
             val prev = this.keys.toSet()
             clear()
@@ -68,15 +66,6 @@ internal interface ContestsIdsHolder {
             }
         }
     }
-}
-
-@Stable
-class ContestsListViewState(
-    contestsViewModel: ContestsViewModel,
-    expandedContestsState: State<Map<ContestCompositeId, Contest>>,
-    contestsPageState: MutableState<ContestsPage>
-): ContestsIdsHolder by contestsViewModel {
-    private val expandedContests by expandedContestsState
 
     fun isExpanded(contest: Contest): Boolean =
         contest.compositeId in expandedContests

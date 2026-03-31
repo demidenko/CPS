@@ -172,7 +172,7 @@ private fun ContestsPager(
         snapshotFlow { contestsState.value.contests }
             .collect { contests ->
                 filterState.available = contests.isNotEmpty()
-                viewState.applyContests(contests)
+                viewState.syncExpanded(contests)
             }
     }
 
