@@ -20,17 +20,13 @@ fun contestsFetchFlows(
     dateConstraints: ContestDateConstraints,
     createFetcher: (ContestsFetchSource) -> ContestsFetcher
 ): Map<Contest.Platform, Flow<ContestsFetchResult>> {
-    val memoizer = MultiplatformMemoizer(setup, dateConstraints)
-
-    val fetchers = mutableMapOf<ContestsFetchSource, ContestsFetcher>()
+    val memoizer = ContestsFetchMemoizer(setup, dateConstraints, createFetcher)
 
     return setup.mapValues { (platform, priorities) ->
         contestsFetchFlow(
             platform = platform,
             priorities = priorities,
-            dateConstraints = dateConstraints,
-            memoizer = memoizer,
-            getFetcher = { fetchers.getOrPut(it) { createFetcher(it) } }
+            memoizer = memoizer
         )
     }
 }
@@ -38,23 +34,10 @@ fun contestsFetchFlows(
 private fun contestsFetchFlow(
     platform: Contest.Platform,
     priorities: List<ContestsFetchSource>,
-    dateConstraints: ContestDateConstraints,
-    memoizer: MultiplatformMemoizer,
-    getFetcher: (ContestsFetchSource) -> ContestsFetcher
+    memoizer: ContestsFetchMemoizer
 ) = flow {
     for (fetchSource in priorities) {
-        val fetcher = getFetcher(fetchSource)
-        val result: Result<List<Contest>> =
-            if (fetcher is ContestsMultiplatformFetcher) {
-                memoizer.getContests(fetcher).map {
-                    it.getOrElse(platform) { emptyList() }
-                }
-            } else {
-                fetcher.runCatching {
-                    fetchContests(platform = platform, dateConstraints = dateConstraints)
-                }
-            }
-
+        val result: Result<List<Contest>> = memoizer.getContests(platform, fetchSource)
         emit(ContestsFetchResult(
             platform = platform,
             fetchSource = fetchSource,
@@ -74,22 +57,45 @@ private fun Contest.correctTitle(): Contest {
     else copy(title = fixedTitle)
 }
 
-private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
-
-private class MultiplatformMemoizer(
+private class ContestsFetchMemoizer(
     private val setup: Map<Contest.Platform, List<ContestsFetchSource>>,
-    private val dateConstraints: ContestDateConstraints
+    private val dateConstraints: ContestDateConstraints,
+    private val getFetcher: (ContestsFetchSource) -> ContestsFetcher
 ) {
+    private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
+
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
-    suspend fun getContests(fetcher: ContestsMultiplatformFetcher): ContestsResult {
-        return mutex.withLock {
-            results.getOrPut(fetcher.fetchSource) {
-                coroutineScope {
-                    async { fetcher.fetchAllPlatforms() }
-                }
+    private val fetchers = mutableMapOf<ContestsFetchSource, ContestsFetcher>()
+
+    suspend fun getContests(
+        platform: Contest.Platform,
+        source: ContestsFetchSource
+    ): Result<List<Contest>> {
+        val fetcher = mutex.withLock {
+            fetchers.getOrPut(source) {
+                getFetcher(source)
             }
-        }.await()
+        }
+
+        if (fetcher is ContestsMultiplatformFetcher) {
+            return mutex.withLock {
+                results.getOrPut(source) {
+                    coroutineScope {
+                        async { fetcher.fetchAllPlatforms() }
+                    }
+                }
+            }.await().map {
+                it.getOrElse(platform) { emptyList() }
+            }
+        } else {
+            return fetcher.runCatching {
+                fetchContests(
+                    platform = platform,
+                    dateConstraints = dateConstraints
+                )
+            }
+        }
     }
 
     private suspend fun ContestsMultiplatformFetcher.fetchAllPlatforms(): ContestsResult {
