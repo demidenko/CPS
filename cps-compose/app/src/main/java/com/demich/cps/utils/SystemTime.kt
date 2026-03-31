@@ -1,5 +1,6 @@
 package com.demich.cps.utils
 
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -11,3 +12,5 @@ fun getSystemTime(): Instant =
 
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+
+fun Instant.toSystemDate(): LocalDate = toSystemDateTime().date

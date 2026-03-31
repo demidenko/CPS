@@ -40,7 +40,7 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<NewEntriesMap>
 ): DataStoreValue<NewEntriesMap>(item) {
-    private fun getSystemDate(): LocalDate = getSystemTime().toSystemDateTime().date
+    private fun getSystemDate(): LocalDate = getSystemTime().toSystemDate()
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)
 

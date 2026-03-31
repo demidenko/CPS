@@ -5,7 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.utils.toSystemDateTime
+import com.demich.cps.utils.toSystemDate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -39,7 +39,7 @@ class CodeforcesCommunityFollowWorker(
         workerStartTime - userLastOnlineTime() > 2.days
 
     private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
-        if (lastSuccess == null || !sameSystemDate(workerStartTime, lastSuccess)) this
+        if (lastSuccess == null || workerStartTime.toSystemDate() != lastSuccess.toSystemDate()) this
         else filter {
             it.blogEntries == null || !it.isUserInactive()
         }
@@ -77,9 +77,6 @@ class CodeforcesCommunityFollowWorker(
 
 private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
     userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
-
-private fun sameSystemDate(a: Instant, b: Instant): Boolean =
-    a.toSystemDateTime().date == b.toSystemDateTime().date
 
 private fun nextEnqueueIn(
     blogsCount: Int,
