@@ -12,6 +12,7 @@ import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.removeOld
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -35,6 +36,14 @@ class CodeforcesMonitorLauncherWorker(
                 CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
                     repeatInterval = 1.hours
                 )
+
+            override fun flowOfInfo() =
+                CodeforcesProfileManager().profileStorage(context).flowOf {
+                    mapOf(
+                        "last submission id" to monitorLastSubmissionId.value,
+                        "canceled" to monitorCanceledContests.value.valuesSortedByTime()
+                    )
+                }
         }
     }
 
