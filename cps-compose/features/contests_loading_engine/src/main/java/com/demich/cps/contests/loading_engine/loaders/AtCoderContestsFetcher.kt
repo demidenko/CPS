@@ -20,10 +20,10 @@ internal fun correctAtCoderTitle(origin: String): String {
         .replace("）",") ")
         .trimEnd()
 
-    s.splitTrailingBrackets { title, brackets ->
+    s.splitTrailingBrackets { str, brackets ->
         if (brackets.isNotEmpty()) {
-            val t = brackets.substring(1, brackets.length - 1)
-            if (t.isContestTitle()) return "$t ${brackets.first()}${title.trim()}${brackets.last()}"
+            val title = brackets.substring(1, brackets.length - 1)
+            if (title.isContestTitle()) return "$title ${brackets.first()}${str.trim()}${brackets.last()}"
         }
     }
 
@@ -31,5 +31,5 @@ internal fun correctAtCoderTitle(origin: String): String {
 }
 
 private fun String.isContestTitle(): Boolean {
-    return matches(Regex("^atcoder (beginner|regular|grand|heuristic) contest .*", RegexOption.IGNORE_CASE))
+    return matches(Regex("^atcoder [a-z]+ contest .*", RegexOption.IGNORE_CASE))
 }
