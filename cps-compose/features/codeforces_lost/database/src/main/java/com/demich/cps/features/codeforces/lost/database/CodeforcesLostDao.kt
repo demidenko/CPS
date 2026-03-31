@@ -23,6 +23,8 @@ interface CodeforcesLostRepository {
 
     fun flowOfLost(): Flow<List<CodeforcesWebBlogEntry>>
 
+    fun flowOfSuspects(): Flow<List<CodeforcesWebBlogEntry>>
+
     suspend fun lostEntries(): List<CodeforcesWebBlogEntry>
 
     suspend fun suspects(): List<CodeforcesWebBlogEntry>
@@ -64,20 +66,26 @@ internal interface CodeforcesLostDao: CodeforcesLostRepository {
     @Query("$selectSuspect = 1")
     suspend fun daoGetSuspects(): List<CodeforcesLostBlogEntry>
 
+    @Query("$selectSuspect = 1")
+    fun daoFlowOfSuspects(): Flow<List<CodeforcesLostBlogEntry>>
+
     override suspend fun remove(blogEntries: Collection<CodeforcesWebBlogEntry>) {
         removeByIds(blogEntries.map { IdHolder(it.id) })
     }
 
-    override fun flowOfLost(): Flow<List<CodeforcesWebBlogEntry>> =
+    override fun flowOfLost() =
         daoFlowOfLost().map { list ->
             list.sortedByDescending { it.timeStamp }
                 .map { it.blogEntry.toWebBlogEntry() }
         }
 
-    override suspend fun lostEntries(): List<CodeforcesWebBlogEntry> =
+    override fun flowOfSuspects(): Flow<List<CodeforcesWebBlogEntry>> =
+        daoFlowOfSuspects().map { it.map { it.blogEntry.toWebBlogEntry() } }
+
+    override suspend fun lostEntries() =
         daoGetLost().map { it.blogEntry.toWebBlogEntry() }
 
-    override suspend fun suspects(): List<CodeforcesWebBlogEntry> =
+    override suspend fun suspects() =
         daoGetSuspects().map { it.blogEntry.toWebBlogEntry() }
 }
 

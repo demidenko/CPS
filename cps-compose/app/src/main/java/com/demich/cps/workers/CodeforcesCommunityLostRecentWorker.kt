@@ -24,6 +24,9 @@ import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -49,9 +52,17 @@ class CodeforcesCommunityLostRecentWorker(
                 )
 
             override fun flowOfInfo(): Flow<Map<String, Any?>> {
-                return WorkersHintsDataStore(context).flowOf {
-                    val hint = codeforcesLostHintNotNew.value
-                    mapOf("hint" to hint?.run { "($blogEntryId, $creationTime)" })
+                val hintFlow = WorkersHintsDataStore(context).flowOf {
+                    codeforcesLostHintNotNew.value?.run { "($blogEntryId, $creationTime)" }
+                }
+                val suspectsCountFlow = context.codeforcesLostRepository
+                    .flowOfSuspects().map { it.size }
+                    .distinctUntilChanged()
+                return combine(hintFlow, suspectsCountFlow) { hintStr, suspectsCount ->
+                    mapOf(
+                        "hint" to hintStr,
+                        "suspects" to suspectsCount
+                    )
                 }
             }
         }
