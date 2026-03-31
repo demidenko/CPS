@@ -403,6 +403,11 @@ private fun WorkerDialog(
                         eventColor = { cpsColors.colorFor(result = it.resultType) }
                     )
                 }
+
+                val info by collectAsStateWithLifecycle { work.flowOfInfo() }
+                info.forEach { (key, value) ->
+                    Text(text = "$key: $value", fontSize = 12.sp)
+                }
             }
         }
 

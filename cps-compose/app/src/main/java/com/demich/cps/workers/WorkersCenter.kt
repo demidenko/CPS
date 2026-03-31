@@ -16,6 +16,7 @@ import androidx.work.WorkManager
 import com.demich.cps.notifications.NotificationBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -41,6 +42,8 @@ abstract class CPSWork(
     fun flowOfWorkInfo(): Flow<WorkInfo?> =
         workManager.getWorkInfosForUniqueWorkFlow(name)
             .map { it.firstOrNull() }
+
+    open fun flowOfInfo(): Flow<Map<String, Any?>> = flowOf(emptyMap())
 }
 
 abstract class CPSOneTimeWork(
