@@ -22,9 +22,9 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
-    fun flowOfAllBlogs() = dao.flowOfAllBlogs()
+    fun flowOfUserBlogs() = dao.flowOfUserBlogs()
 
-    suspend fun blogs() = dao.getAllBlogs()
+    suspend fun blogs() = dao.getUserBlogs()
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
@@ -79,7 +79,7 @@ abstract class CodeforcesFollowRepository(
     }
 
     suspend fun updateFailedBlogEntries() {
-        dao.getAllBlogs().forEach {
+        dao.getUserBlogs().forEach {
             if (it.blogEntries == null) getAndReloadBlogEntries(handle = it.handle)
         }
     }

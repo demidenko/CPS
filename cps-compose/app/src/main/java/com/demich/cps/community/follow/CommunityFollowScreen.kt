@@ -54,7 +54,7 @@ private fun CommunityFollowScreen(
     val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
     val userBlogs by collectAsStateWithLifecycle {
-        context.followRepository.flowOfAllBlogs().map {
+        context.followRepository.flowOfUserBlogs().map {
             it.sortedByDescending { it.id }
         }
     }

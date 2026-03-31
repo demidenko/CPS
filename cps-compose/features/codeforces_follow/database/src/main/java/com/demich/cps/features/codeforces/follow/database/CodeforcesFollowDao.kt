@@ -15,16 +15,16 @@ internal const val cfFollowTableName = "FollowList"
 @Dao
 internal interface CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName")
-    suspend fun getAllBlogs(): List<CodeforcesUserBlog>
+    suspend fun getUserBlogs(): List<CodeforcesUserBlog>
 
     @Query("SELECT * FROM $cfFollowTableName")
-    fun flowOfAllBlogs(): Flow<List<CodeforcesUserBlog>>
-
-    @Query("SELECT handle FROM $cfFollowTableName")
-    suspend fun getHandles(): List<String>
+    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
     suspend fun getUserBlog(handle: String): CodeforcesUserBlog?
+
+    @Query("SELECT handle FROM $cfFollowTableName")
+    suspend fun getHandles(): List<String>
 
     @Insert
     suspend fun insert(blog: CodeforcesUserBlog)
