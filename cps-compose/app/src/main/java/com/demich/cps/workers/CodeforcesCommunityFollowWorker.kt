@@ -38,13 +38,11 @@ class CodeforcesCommunityFollowWorker(
     private fun CodeforcesUserBlog.isUserInactive() =
         workerStartTime - userLastOnlineTime() > 2.days
 
-    private suspend fun needFullCheck(): Boolean {
-        val lastSuccess = hintsDataStore.followLastSuccessTime() ?: return true
-        if (workerStartTime.toSystemDateTime().date != lastSuccess.toSystemDateTime().date) {
-            return true
+    private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
+        if (lastSuccess == null || !sameSystemDate(workerStartTime, lastSuccess)) this
+        else filter {
+            it.blogEntries == null || !it.isUserInactive()
         }
-        return false
-    }
 
     override suspend fun runWork(): Result {
         val repository = context.followRepository
@@ -53,13 +51,11 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         repository.updateUsers()
 
+        val lastSuccessItem = hintsDataStore.followLastSuccessTime
         val blogs = repository.blogs()
 
         blogs
-            .let {
-                if (needFullCheck()) it
-                else it.filter { blog -> blog.blogEntries == null || !blog.isUserInactive() }
-            }
+            .necessaryToUpdate(lastSuccess = lastSuccessItem())
             .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress {
                 val handle = it.handle
@@ -73,7 +69,7 @@ class CodeforcesCommunityFollowWorker(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
 
-        hintsDataStore.followLastSuccessTime.setValue(workerStartTime)
+        lastSuccessItem.setValue(workerStartTime)
 
         return Result.success()
     }
@@ -81,6 +77,9 @@ class CodeforcesCommunityFollowWorker(
 
 private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
     userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
+
+private fun sameSystemDate(a: Instant, b: Instant): Boolean =
+    a.toSystemDateTime().date == b.toSystemDateTime().date
 
 private fun nextEnqueueIn(
     blogsCount: Int,
