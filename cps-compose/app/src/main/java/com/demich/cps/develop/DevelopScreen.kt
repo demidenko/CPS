@@ -35,6 +35,7 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.workers.CPSWorkersDataStore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -47,7 +48,8 @@ private fun DevelopScreen() {
     //TestHandles(modifier = Modifier.fillMaxWidth())
     Column {
         WorkersList(modifier = Modifier.fillMaxWidth().weight(1f))
-        NewEntriesCfInfo(modifier = Modifier.fillMaxWidth().padding(all = 12.dp))
+        WorkersEventsInfo(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp))
+        NewEntriesCfInfo(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp))
     }
 }
 
@@ -83,13 +85,37 @@ private fun NewEntriesCfInfo(
     val count by collectAsState {
         CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow().map { it.size }
     }
-    Text(
+    InfoText(
         modifier = modifier,
-        text = "cf new entries: $count",
-        style = CPSDefaults.MonospaceTextStyle.copy(fontSize = 16.sp)
+        text = "cf new entries: $count"
     )
 }
 
+@Composable
+private fun WorkersEventsInfo(modifier: Modifier = Modifier) {
+    val context = context
+    val count by collectAsState {
+        CPSWorkersDataStore(context).executions.asFlow().map {
+            it.values.sumOf { it.size }
+        }
+    }
+    InfoText(
+        modifier = modifier,
+        text = "work events: $count"
+    )
+}
+
+@Composable
+private fun InfoText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = CPSDefaults.MonospaceTextStyle.copy(fontSize = 16.sp)
+    )
+}
 
 @Composable
 fun ContentLoadingButton(
