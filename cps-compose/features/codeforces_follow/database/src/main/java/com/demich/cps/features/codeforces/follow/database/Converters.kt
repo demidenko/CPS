@@ -8,8 +8,7 @@ import kotlinx.serialization.SerializationException
 
 internal class IntListAsBytesConverter {
     @TypeConverter
-    fun intsToString(ints: List<Int>?): String? {
-        if (ints == null) return null
+    fun intsToString(ints: List<Int>): String {
         return buildString {
             ints.forEach { num ->
                 var x = num
@@ -22,8 +21,7 @@ internal class IntListAsBytesConverter {
     }
 
     @TypeConverter
-    fun decodeToInts(s: String?): List<Int>? {
-        if (s == null) return null
+    fun decodeToInts(s: String): List<Int> {
         return (s.indices step 4).map { i ->
             ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
         }
