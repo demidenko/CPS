@@ -40,6 +40,7 @@ class NotificationBuildScope(
         builder.setColor(context.getColor(it))
     }
 
+    // NOTE: If time is too old, android system may not show notification
     var time: Instant? by writeOnlyProperty {
         builder.setShowWhen(it != null)
         if (it != null) builder.setWhen(it.toEpochMilliseconds())
