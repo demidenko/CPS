@@ -110,8 +110,8 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
         getUserSubmissions(handle = handle, from = from, count = step)
             .also { if (it.isEmpty()) break@loop }
             .forEach {
-                if (isActual(it.creationTime) && (lastId == null || it.id > lastId)) {
-                    if (first == null) first = it
+                if (first == null) first = it
+                if ((lastId == null || it.id > lastId) && isActual(it.creationTime)) {
                     if (predicate(it)) return GetResult(firstPredicate = it, first = first)
                 } else {
                     break@loop
