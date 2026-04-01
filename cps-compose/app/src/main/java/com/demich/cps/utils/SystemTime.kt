@@ -13,4 +13,4 @@ fun getSystemTime(): Instant =
 fun Instant.toSystemDateTime(): LocalDateTime =
     toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
 
-fun Instant.toSystemDate(): LocalDate = toSystemDateTime().date
+fun Instant.toSystemLocalDate(): LocalDate = toSystemDateTime().date
