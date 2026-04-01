@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 
@@ -37,24 +39,25 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
     if (type > oldType) set(key = id, value = NewEntryInfo(type, date))
 }
 
+private fun systemDate(): LocalDate = getSystemTime().toLocalDateTime(TimeZone.UTC).date
+
 class NewEntriesDataStoreItem (
     private val item: DataStoreItem<NewEntriesMap>
 ): DataStoreValue<NewEntriesMap>(item) {
-    private fun getSystemDate(): LocalDate = getSystemTime().toSystemDate()
 
     suspend fun markAtLeast(id: Int, type: NewEntryType) = markAtLeast(listOf(id), type)
 
-    suspend fun markAtLeast(ids: List<Int>, type: NewEntryType) {
+    suspend fun markAtLeast(ids: Collection<Int>, type: NewEntryType) {
         if (ids.isEmpty()) return
-        val date = getSystemDate()
         item.edit {
+            val date = systemDate()
             for (id in ids) markAtLeast(id, type, date)
         }
     }
 
     suspend fun removeOlderThan(days: Int) {
-        val date = getSystemDate()
         item.update { types ->
+            val date = systemDate()
             types.filterValues { it.date.daysUntil(date) <= days }
         }
     }
