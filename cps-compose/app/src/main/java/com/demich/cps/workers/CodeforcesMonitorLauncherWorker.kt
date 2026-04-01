@@ -105,24 +105,24 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
 ): GetResult? {
     var first: CodeforcesSubmission? = null
     var from = 1L
-    var step = 1L
+    var count = 1L
     loop@while (true) {
-        getUserSubmissions(handle = handle, from = from, count = step)
-            .also { if (it.isEmpty()) break@loop }
-            .forEach {
-                if (untilId == null || it.id > untilId) {
-                    if (first == null) first = it
-                    if (isActual(it.creationTime)) {
-                        if (predicate(it)) return GetResult(firstPredicate = it, first = first)
-                    } else {
-                        break@loop
-                    }
+        val submissions = getUserSubmissions(handle = handle, from = from, count = count)
+        submissions.forEach {
+            if (untilId == null || it.id > untilId) {
+                if (first == null) first = it
+                if (isActual(it.creationTime)) {
+                    if (predicate(it)) return GetResult(firstPredicate = it, first = first)
                 } else {
                     break@loop
                 }
+            } else {
+                break@loop
             }
-        from += step
-        step += 10
+        }
+        if (submissions.size < count) break
+        from += count
+        count += 10
     }
 
     if (first == null) return null
