@@ -67,8 +67,8 @@ internal interface CodeforcesFollowDao {
     ) {
         val userBlog = getUserBlog(handle) ?: return
 
-        val currentIds = userBlog.blogEntries?.toSet()
-        val newIds = mutableListOf<Int>()
+        val currentIds = userBlog.blogEntries
+        val newIds = mutableSetOf<Int>()
         blogEntries.forEach {
             if (currentIds == null || it.id !in currentIds) {
                 newIds.add(it.id)

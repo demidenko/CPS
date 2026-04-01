@@ -13,7 +13,7 @@ data class CodeforcesUserBlog(
 
     val userInfo: CodeforcesUserInfo?,
 
-    internal val blogEntries: List<Int>?
+    internal val blogEntries: Set<Int>?
 )
 
 val CodeforcesUserBlog.blogSize: Int?
