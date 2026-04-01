@@ -39,7 +39,6 @@ import com.demich.cps.utils.context
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
@@ -54,11 +53,7 @@ private fun CommunityFollowScreen(
 
     val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
 
-    val userBlogs by collectAsStateWithLifecycle {
-        context.followRepository.flowOfUserBlogs().map {
-            it.sortedByDescending { it.id }
-        }
-    }
+    val userBlogs by collectAsStateWithLifecycle { context.followRepository.flowOfUserBlogs() }
 
     ProvideSystemTimeEachMinute {
         CodeforcesFollowList(
