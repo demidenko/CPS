@@ -6,7 +6,7 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import kotlinx.serialization.SerializationException
 
 
-internal class IntsListConverter {
+internal class IntListAsBytesConverter {
     @TypeConverter
     fun intsToString(ints: List<Int>?): String? {
         if (ints == null) return null

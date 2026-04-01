@@ -15,7 +15,7 @@ import com.demich.cps.features.room.instanceDelegate
     ]
 )
 @TypeConverters(
-    IntsListConverter::class,
+    IntListAsBytesConverter::class,
     CodeforcesUserInfoConverter::class
 )
 internal abstract class CodeforcesFollowDataBase: RoomDatabase() {
