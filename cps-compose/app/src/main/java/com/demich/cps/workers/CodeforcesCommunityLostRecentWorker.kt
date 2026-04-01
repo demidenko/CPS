@@ -18,15 +18,11 @@ import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -51,20 +47,16 @@ class CodeforcesCommunityLostRecentWorker(
                     repeatInterval = 30.minutes
                 )
 
-            override fun flowOfInfo(): Flow<Map<String, Any?>> {
-                val hintFlow = WorkersHintsDataStore(context).flowOf {
-                    codeforcesLostHintNotNew.value?.run { "($blogEntryId, $creationTime)" }
-                }
-                val suspectsCountFlow = context.codeforcesLostRepository
-                    .flowOfSuspects().map { it.size }
-                    .distinctUntilChanged()
-                return combine(hintFlow, suspectsCountFlow) { hintStr, suspectsCount ->
+            override fun flowOfInfo() =
+                combine(
+                    flow = context.codeforcesLostRepository.flowOfSuspects(),
+                    flow2 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
+                ) { suspects, hint ->
                     mapOf(
-                        "hint" to hintStr,
-                        "suspects" to suspectsCount
+                        "suspects" to suspects.size,
+                        "hint" to hint?.run { "($blogEntryId, $creationTime)" }
                     )
                 }
-            }
         }
     }
 
