@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.blogSize
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -134,7 +135,7 @@ private fun CodeforcesFollowList(
                 CommunityFollowListItem(
                     handle = userBlog.handle,
                     userInfo = userBlog.userInfo,
-                    blogEntriesCount = userBlog.blogEntries?.size,
+                    blogEntriesCount = userBlog.blogSize,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 5.dp)
                         .fillMaxWidth()

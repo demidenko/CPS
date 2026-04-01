@@ -9,6 +9,9 @@ data class CodeforcesUserBlog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val handle: String,
-    val blogEntries: List<Int>?,
+    internal val blogEntries: List<Int>?,
     val userInfo: CodeforcesUserInfo?
 )
+
+val CodeforcesUserBlog.blogSize: Int?
+    get() = blogEntries?.size

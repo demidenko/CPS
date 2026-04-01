@@ -5,6 +5,7 @@ import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.blogSize
 import com.demich.cps.utils.toSystemLocalDate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -41,7 +42,7 @@ class CodeforcesCommunityFollowWorker(
     private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
         if (lastSuccess == null || !isSameDay(workerStartTime, lastSuccess)) this
         else filter {
-            it.blogEntries == null || !it.isUserInactive()
+            it.blogSize == null || !it.isUserInactive()
         }
 
     override suspend fun runWork(): Result {
