@@ -77,7 +77,10 @@ internal interface CodeforcesFollowDao {
         if (currentIds == null) {
             update(userBlog.copy(blogEntries = newIds))
         } else {
-            if (newIds.isNotEmpty()) update(userBlog.copy(blogEntries = newIds + currentIds))
+            if (newIds.isNotEmpty()) {
+                newIds += currentIds
+                update(userBlog.copy(blogEntries = newIds))
+            }
         }
     }
 
