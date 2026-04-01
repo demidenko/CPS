@@ -15,6 +15,8 @@ import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
 import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
 import com.demich.cps.utils.asHtmlToSpanned
+import com.demich.datastore_itemized.flowOf
+import com.demich.datastore_itemized.value
 import kotlin.time.Duration.Companion.hours
 
 class NewsWorker(
@@ -36,6 +38,11 @@ class NewsWorker(
                     repeatInterval = 6.hours,
                     batteryNotLow = true
                 )
+
+            override fun flowOfInfo() =
+                WorkersHintsDataStore(context).flowOf {
+                    newsFeedsLastIds.value.mapKeys { it.key.name }
+                }
         }
     }
 
