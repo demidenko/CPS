@@ -66,6 +66,7 @@ internal interface CodeforcesFollowDao {
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ) {
         val userBlog = getUserBlog(handle) ?: return
+
         val currentIds = userBlog.blogEntries?.toSet()
         val newIds = mutableListOf<Int>()
         blogEntries.forEach {
@@ -74,10 +75,12 @@ internal interface CodeforcesFollowDao {
                 if (currentIds != null) onNewBlogEntry(it)
             }
         }
-        if (currentIds == null) {
-            update(userBlog.copy(blogEntries = newIds))
-        } else {
-            if (newIds.isNotEmpty()) {
+
+        when {
+            currentIds == null -> {
+                update(userBlog.copy(blogEntries = newIds))
+            }
+            newIds.isNotEmpty() -> {
                 newIds += currentIds
                 update(userBlog.copy(blogEntries = newIds))
             }

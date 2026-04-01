@@ -8,9 +8,12 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 data class CodeforcesUserBlog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+
     val handle: String,
-    internal val blogEntries: List<Int>?,
-    val userInfo: CodeforcesUserInfo?
+
+    val userInfo: CodeforcesUserInfo?,
+
+    internal val blogEntries: List<Int>?
 )
 
 val CodeforcesUserBlog.blogSize: Int?
