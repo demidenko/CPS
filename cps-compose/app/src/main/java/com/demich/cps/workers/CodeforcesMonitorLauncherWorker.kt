@@ -61,7 +61,7 @@ class CodeforcesMonitorLauncherWorker(
                 handle = profile.value?.userInfoOrNull()?.handle ?: return Result.success()
                 CodeforcesClient.getFirstNewSubmissions(
                     handle = handle,
-                    lastId = monitorLastSubmissionId.value,
+                    untilId = monitorLastSubmissionId.value,
                     isActual = ::isActual,
                     predicate = { it.author.isContestant() }
                 )
@@ -99,7 +99,7 @@ private class GetResult(
 
 private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
     handle: String,
-    lastId: Long?,
+    untilId: Long?,
     isActual: (Instant) -> Boolean,
     predicate: (CodeforcesSubmission) -> Boolean
 ): GetResult? {
@@ -110,9 +110,13 @@ private suspend inline fun CodeforcesApi.getFirstNewSubmissions(
         getUserSubmissions(handle = handle, from = from, count = step)
             .also { if (it.isEmpty()) break@loop }
             .forEach {
-                if (first == null) first = it
-                if ((lastId == null || it.id > lastId) && isActual(it.creationTime)) {
-                    if (predicate(it)) return GetResult(firstPredicate = it, first = first)
+                if (untilId == null || it.id > untilId) {
+                    if (first == null) first = it
+                    if (isActual(it.creationTime)) {
+                        if (predicate(it)) return GetResult(firstPredicate = it, first = first)
+                    } else {
+                        break@loop
+                    }
                 } else {
                     break@loop
                 }
