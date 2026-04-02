@@ -4,6 +4,9 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import kotlin.streams.asSequence
 
+internal fun Element.expectFirst(evaluator: Evaluator): Element =
+    requireNotNull(selectFirst(evaluator))
+
 internal fun Element.selectSequence(cssQuery: String): Sequence<Element> =
     selectStream(cssQuery).asSequence()
 
