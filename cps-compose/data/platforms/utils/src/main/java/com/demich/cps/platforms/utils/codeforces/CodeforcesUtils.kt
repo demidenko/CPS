@@ -30,6 +30,8 @@ private fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 private val evaluatorHumanTime = Selector.evaluatorOf(".format-humantime")
 private fun Element.expectHumanTimeTitle(): String = expectFirst(evaluatorHumanTime).attr("title")
 
+private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
+
 object CodeforcesUtils {
     private object DateTimeParser {
         private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
@@ -113,7 +115,7 @@ object CodeforcesUtils {
             commentBox.expectDivInfo().let { info ->
                 blogEntryAuthor = info.expectRatedUser().extractRatedUser()
                 commentCreationTime = info.expectHumanTimeTitle().extractTime()
-                info.expectFirst(Evaluator.AttributeWithValueStarting("href", "/blog/entry/")).let { commentLink ->
+                info.expectFirst(evaluatorHrefBlogEntry).let { commentLink ->
                     blogEntryTitle = commentLink.text()
                     commentLink.attr("href").let { url ->
                         // href="/blog/entry/XXXXXX#comment-YYYYYY"
@@ -152,7 +154,7 @@ object CodeforcesUtils {
             val author = item.expectRatedUser().extractRatedUser()
             val blogEntryId: Int
             val blogEntryTitle: String
-            item.getElementsByAttributeValueStarting("href", "/blog/entry/")[0].let {
+            item.expectFirst(evaluatorHrefBlogEntry).let {
                 blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
                 blogEntryTitle = it.text()
             }
