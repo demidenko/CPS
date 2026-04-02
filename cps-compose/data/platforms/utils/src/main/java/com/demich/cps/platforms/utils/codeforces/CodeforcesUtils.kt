@@ -90,6 +90,7 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
+    // TODO: to slow probably
     private fun extractCommentOrNull(commentBox: Element): CodeforcesWebComment? {
         return kotlin.runCatching {
             val commentator = commentBox.expectFirst(".avatar")
