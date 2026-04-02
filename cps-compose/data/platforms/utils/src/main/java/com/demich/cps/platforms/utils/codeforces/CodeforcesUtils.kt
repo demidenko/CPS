@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.selectSequence
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
@@ -156,30 +157,27 @@ object CodeforcesUtils {
     }
 
 
-    internal fun extractBlogEntries(document: Document): List<CodeforcesWebBlogEntry> {
-        return document.expectContent().select("div.topic")
+    internal fun extractBlogEntries(document: Document) =
+        document.expectContent().selectSequence("div.topic")
             .mapNotNull(::extractBlogEntryOrNull)
-    }
 
     fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
-        extractBlogEntries(Jsoup.parse(source))
+        extractBlogEntries(Jsoup.parse(source)).toList()
 
-    internal fun extractComments(document: Document): List<CodeforcesWebComment> {
-        return document.expectContent().select(".comment-table")
+    internal fun extractComments(document: Document) =
+        document.expectContent().selectSequence(".comment-table")
             .mapNotNull(::extractCommentOrNull)
-    }
 
     fun extractComments(source: String): List<CodeforcesWebComment> =
-        extractComments(Jsoup.parse(source))
+        extractComments(Jsoup.parse(source)).toList()
 
-    internal fun extractRecentBlogEntries(document: Document): List<CodeforcesRecentFeedBlogEntry> {
-        return document.expectSidebar().expectFirst("div.recent-actions")
-            .select("li")
+    internal fun extractRecentBlogEntries(document: Document) =
+        document.expectSidebar().expectFirst("div.recent-actions")
+            .selectSequence("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)
-    }
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
-        extractRecentBlogEntries(Jsoup.parse(source))
+        extractRecentBlogEntries(Jsoup.parse(source)).toList()
 
     private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
         val sidebar = Jsoup.parse(source).selectSidebar() ?: return
