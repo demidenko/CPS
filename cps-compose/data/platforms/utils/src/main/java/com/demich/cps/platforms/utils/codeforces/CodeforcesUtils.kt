@@ -11,6 +11,7 @@ import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.select.Evaluator
 import org.jsoup.select.Selector
 import kotlin.time.Instant
 
@@ -112,14 +113,17 @@ object CodeforcesUtils {
             commentBox.expectDivInfo().let { info ->
                 blogEntryAuthor = info.expectRatedUser().extractRatedUser()
                 commentCreationTime = info.expectHumanTimeTitle().extractTime()
-                info.getElementsByAttributeValueContaining("href", "#comment")[0].let { commentLink ->
-                    with(commentLink.attr("href").split("#comment-")) {
-                        blogEntryId = this[0].removePrefix("/blog/entry/").toInt()
-                        commentId = this[1].toLong()
-                    }
+                info.expectFirst(Evaluator.AttributeWithValueStarting("href", "/blog/entry/")).let { commentLink ->
                     blogEntryTitle = commentLink.text()
+                    commentLink.attr("href").let { url ->
+                        // href="/blog/entry/XXXXXX#comment-YYYYYY"
+                        val j = url.indexOf('#')
+                        val i = url.lastIndexOf('/', j - 1)
+                        blogEntryId = url.substring(i + 1, j).toInt()
+                    }
                 }
-                info.getElementsByAttribute("commentid")[0].let { ratingBox ->
+                info.expectFirst(Evaluator.Attribute("commentid")).let { ratingBox ->
+                    commentId = ratingBox.attr("commentid").toLong()
                     commentRating = ratingBox.text().trim().toInt()
                 }
             }
