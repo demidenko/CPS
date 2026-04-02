@@ -7,6 +7,7 @@ import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
@@ -153,21 +154,31 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
-    fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> {
-        return Jsoup.parse(source).expectContent().select("div.topic")
+
+    internal fun extractBlogEntries(document: Document): List<CodeforcesWebBlogEntry> {
+        return document.expectContent().select("div.topic")
             .mapNotNull(::extractBlogEntryOrNull)
     }
 
-    fun extractComments(source: String): List<CodeforcesWebComment> {
-        return Jsoup.parse(source).expectContent().select(".comment-table")
+    fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
+        extractBlogEntries(Jsoup.parse(source))
+
+    internal fun extractComments(document: Document): List<CodeforcesWebComment> {
+        return document.expectContent().select(".comment-table")
             .mapNotNull(::extractCommentOrNull)
     }
 
-    fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> {
-        return Jsoup.parse(source).expectSidebar().expectFirst("div.recent-actions")
+    fun extractComments(source: String): List<CodeforcesWebComment> =
+        extractComments(Jsoup.parse(source))
+
+    internal fun extractRecentBlogEntries(document: Document): List<CodeforcesRecentFeedBlogEntry> {
+        return document.expectSidebar().expectFirst("div.recent-actions")
             .select("li")
             .mapNotNull(::extractRecentBlogEntryOrNull)
     }
+
+    fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
+        extractRecentBlogEntries(Jsoup.parse(source))
 
     private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
         val sidebar = Jsoup.parse(source).selectSidebar() ?: return
