@@ -1,0 +1,11 @@
+package com.demich.cps.platforms.utils
+
+import org.jsoup.nodes.Element
+import org.jsoup.select.Evaluator
+import kotlin.streams.asSequence
+
+internal fun Element.selectSequence(cssQuery: String): Sequence<Element> =
+    selectStream(cssQuery).asSequence()
+
+internal fun Element.selectSequence(evaluator: Evaluator): Sequence<Element> =
+    selectStream(evaluator).asSequence()
