@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.selectSequence
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
@@ -10,6 +11,7 @@ import kotlinx.datetime.toInstant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.select.Selector
 import kotlin.time.Instant
 
 private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
@@ -17,12 +19,15 @@ private fun Element.expectContent(): Element = expectFirst("div.content-with-sid
 private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
 private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
-private fun Element.expectDivInfo(): Element = expectFirst("div.info")
+private val evaluatorDivInfo = Selector.evaluatorOf("div.info")
+private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 
-private fun Element.selectRatedUser(): Element? = selectFirst(".rated-user")
-private fun Element.expectRatedUser(): Element = requireNotNull(selectRatedUser())
+private val evaluatorRatedUser = Selector.evaluatorOf(".rated-user")
+private fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
+private fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 
-private fun Element.expectHumanTimeTitle(): String = expectFirst(".format-humantime").attr("title")
+private val evaluatorHumanTime = Selector.evaluatorOf(".format-humantime")
+private fun Element.expectHumanTimeTitle(): String = expectFirst(evaluatorHumanTime).attr("title")
 
 object CodeforcesUtils {
     private object DateTimeParser {
