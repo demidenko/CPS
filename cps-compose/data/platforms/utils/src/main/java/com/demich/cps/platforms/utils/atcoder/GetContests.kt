@@ -38,7 +38,7 @@ private fun extractContestOrNull(
     format: DateTimeFormat<DateTimeComponents>
 ): Contest? {
     return runCatching {
-        val row = timeElement.parents().first { it.normalName() == "tr" }
+        val row = requireNotNull(timeElement.closest("tr"))
         val td = row.select("td")
 
         val timeString = timeElement.text()
