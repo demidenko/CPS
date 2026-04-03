@@ -13,7 +13,17 @@ internal fun Element.selectSequence(cssQuery: String): Sequence<Element> =
 internal fun Element.selectSequence(evaluator: Evaluator): Sequence<Element> =
     selectStream(evaluator).asSequence()
 
-// TODO: optimize without calling classNames()
 internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean): String? {
-    return classNames().firstOrNull(predicate)
+    // return classNames().firstOrNull(predicate)
+    // classNames() is terribly inefficient so do manually
+    val s = className()
+    var i = 0
+    while (i < s.length) {
+        while (i < s.length && s[i].isWhitespace()) ++i
+        val p = i
+        while (i < s.length && !s[i].isWhitespace()) ++i
+        val name = s.substring(p, i)
+        if (predicate(name)) return name
+    }
+    return null
 }
