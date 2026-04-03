@@ -20,21 +20,17 @@ private fun Element.expectContent(): Element = expectFirst("div.content-with-sid
 private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
 private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
-private val evaluatorDivTypography = EvaluatorTagWithClass(tag = "div", className = "ttypography") // Selector.evaluatorOf("div.ttypography")
-private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info") // Selector.evaluatorOf("div.info")
+private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 
-private val evaluatorRatedUser = Evaluator.Class("rated-user") // Selector.evaluatorOf(".rated-user")
+private val evaluatorRatedUser = Evaluator.Class("rated-user")
 private fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
 private fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 
-private val evaluatorHumanTime = Evaluator.Class("format-humantime") // Selector.evaluatorOf(".format-humantime")
+private val evaluatorHumanTime = Evaluator.Class("format-humantime")
 private fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
-private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
-private val evaluatorAvatar = Evaluator.Class("avatar")
-
 
 object CodeforcesUtils {
     private object DateTimeParser {
@@ -68,11 +64,15 @@ object CodeforcesUtils {
 
     private fun Element.extractTime(): Instant = DateTimeParser.parse(attr("title"))
 
+    private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
+    private val evaluatorMeta = Evaluator.Class("meta")
+    private val evaluatorLeftMeta = Evaluator.Class("left-meta")
+    private val evaluatorRightMeta = Evaluator.Class("right-meta")
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesWebBlogEntry? {
         return kotlin.runCatching {
             val id: Int
             val title: String
-            topic.expectFirst("div.title").expectFirst("a").let {
+            topic.expectFirst(evaluatorDivTitle).expectFirst("a").let {
                 title = it.text()
                 id = it.attr("href").removePrefix("/blog/entry/").toInt()
             }
@@ -86,9 +86,9 @@ object CodeforcesUtils {
 
             val rating: Int
             val commentsCount: Int
-            topic.expectFirst(".roundbox").let { box ->
-                rating = box.expectFirst(".left-meta").expectFirst("span").text().toInt()
-                val commentsItem = box.expectFirst(".right-meta").select("li")[2]
+            topic.expectFirst(evaluatorMeta).let { bottom ->
+                rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(".topic-rating").text().toInt()
+                val commentsItem = bottom.expectFirst(evaluatorRightMeta).select("li")[2]
                 commentsCount = commentsItem.select("a")[1].text().toInt()
             }
 
@@ -103,7 +103,9 @@ object CodeforcesUtils {
         }.getOrNull()
     }
 
-    // TODO: to slow probably
+    private val evaluatorAvatar = Evaluator.Class("avatar")
+    private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
+    private val evaluatorDivTypography = EvaluatorTagWithClass(tag = "div", className = "ttypography")
     private fun extractCommentOrNull(commentBox: Element): CodeforcesWebComment? {
         return kotlin.runCatching {
             val commentator = commentBox.expectFirst(evaluatorAvatar)
