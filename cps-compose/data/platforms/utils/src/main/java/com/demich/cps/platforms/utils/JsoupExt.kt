@@ -2,6 +2,7 @@ package com.demich.cps.platforms.utils
 
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
+import org.jsoup.select.Selector
 import kotlin.streams.asSequence
 
 internal fun Element.expectFirst(evaluator: Evaluator): Element =
@@ -33,3 +34,6 @@ internal class EvaluatorTagWithClass(val tag: String, val className: String): Ev
         return element.normalName() == tag && element.hasClass(className)
     }
 }
+
+internal fun EvaluatorNthTag(tag: String, index: Int): Evaluator =
+    Selector.evaluatorOf("$tag:eq($index)")

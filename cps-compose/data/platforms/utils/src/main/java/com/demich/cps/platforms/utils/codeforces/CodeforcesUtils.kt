@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.EvaluatorNthTag
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.selectSequence
@@ -68,6 +69,9 @@ object CodeforcesUtils {
     private val evaluatorMeta = Evaluator.Class("meta")
     private val evaluatorLeftMeta = Evaluator.Class("left-meta")
     private val evaluatorRightMeta = Evaluator.Class("right-meta")
+    private val evaluatorTopicRating = Evaluator.Class("topic-rating")
+    private val evaluator_li2 = EvaluatorNthTag("li", 2)
+    private val evaluator_a1 = EvaluatorNthTag("a", 1)
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesWebBlogEntry? {
         return kotlin.runCatching {
             val id: Int
@@ -87,9 +91,9 @@ object CodeforcesUtils {
             val rating: Int
             val commentsCount: Int
             topic.expectFirst(evaluatorMeta).let { bottom ->
-                rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(".topic-rating").text().toInt()
-                val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst("li:eq(2)")
-                commentsCount = commentsItem.expectFirst("a:eq(1)").text().toInt()
+                rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(evaluatorTopicRating).text().toInt()
+                val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst(evaluator_li2)
+                commentsCount = commentsItem.expectFirst(evaluator_a1).text().toInt()
             }
 
             CodeforcesWebBlogEntry(
