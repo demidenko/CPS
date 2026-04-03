@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.selectSequence
 import kotlinx.datetime.LocalDateTime
@@ -12,7 +13,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
-import org.jsoup.select.Selector
 import kotlin.time.Instant
 
 private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
@@ -20,8 +20,8 @@ private fun Element.expectContent(): Element = expectFirst("div.content-with-sid
 private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
 private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
-private val evaluatorDivTypography = Selector.evaluatorOf("div.ttypography")
-private val evaluatorDivInfo = Selector.evaluatorOf("div.info")
+private val evaluatorDivTypography = EvaluatorTagWithClass(tag = "div", className = "ttypography") // Selector.evaluatorOf("div.ttypography")
+private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info") // Selector.evaluatorOf("div.info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 
 private val evaluatorRatedUser = Evaluator.Class("rated-user") // Selector.evaluatorOf(".rated-user")

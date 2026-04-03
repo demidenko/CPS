@@ -27,3 +27,9 @@ internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean)
     }
     return null
 }
+
+internal class EvaluatorTagWithClass(val tag: String, val className: String): Evaluator() {
+    override fun matches(root: Element, element: Element): Boolean {
+        return element.normalName() == tag && element.hasClass(className)
+    }
+}
