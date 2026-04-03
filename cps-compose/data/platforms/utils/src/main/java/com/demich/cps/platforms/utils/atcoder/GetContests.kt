@@ -11,13 +11,12 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration
 import kotlin.time.Instant
 
 suspend fun AtCoderApi.getContests(): List<Contest> =
     AtCoderContestParser()
-        .extractContests(source = getContestsPage())
+        .parseContests(source = getContestsPage())
         .toList()
 
 private class AtCoderContestParser {
@@ -30,35 +29,37 @@ private class AtCoderContestParser {
         offsetMinutesOfHour()
     }
 
-    fun extractContestOrNull(timeElement: Element): Contest? {
-        return kotlin.runCatching {
-            val row = requireNotNull(timeElement.closest("tr"))
-            val td = row.select("td")
+    fun extractContest(timeElement: Element): Contest {
+        val row = requireNotNull(timeElement.closest("tr"))
+        val td = row.select("td")
 
-            val timeString = timeElement.text()
-            val startTime = Instant.parse(timeString, contestDateTimeFormat)
+        val title = td[1].expectFirst("a")
+        val id = title.attr("href").removePrefix("/contests/")
 
-            val duration = td[2].text().split(':').let {
-                val h = it[0].toInt()
-                val m = it[1].toInt()
-                h.hours + m.minutes
-            }
+        val timeString = timeElement.text()
+        val startTime = Instant.parse(timeString, contestDateTimeFormat)
 
-            val title = td[1].expectFirst("a")
-            val id = title.attr("href").removePrefix("/contests/")
+        val duration = Duration.parseHHMM(input = td[2].text())
 
-            Contest(
-                platform = Contest.Platform.atcoder,
-                title = title.text().trim(),
-                id = id,
-                link = AtCoderUrls.contest(id),
-                startTime = startTime,
-                duration = duration
-            )
-        }.getOrNull()
+        return Contest(
+            platform = Contest.Platform.atcoder,
+            title = title.text().trim(),
+            id = id,
+            link = AtCoderUrls.contest(id),
+            startTime = startTime,
+            duration = duration
+        )
     }
 
-    fun extractContests(source: String): Sequence<Contest> =
+    fun parseContests(source: String): Sequence<Contest> =
         Jsoup.parse(source).selectSequence("time.fixtime-full")
-            .mapNotNull(::extractContestOrNull)
+            .map(::extractContest)
+}
+
+internal fun Duration.Companion.parseHHMM(input: String): Duration {
+    require(input.length == 5)
+    require(input[2] == ':')
+    val h = input[0].digitToInt() * 60 + input[1].digitToInt()
+    val m = input[3].digitToInt() * 60 + input[4].digitToInt()
+    return h.hours + m.minutes
 }
