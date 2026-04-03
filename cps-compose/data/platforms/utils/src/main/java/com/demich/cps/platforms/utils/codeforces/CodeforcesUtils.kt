@@ -23,11 +23,11 @@ private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 private val evaluatorDivInfo = Selector.evaluatorOf("div.info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 
-private val evaluatorRatedUser = Selector.evaluatorOf(".rated-user")
+private val evaluatorRatedUser = Evaluator.Class("rated-user") // Selector.evaluatorOf(".rated-user")
 private fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
 private fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 
-private val evaluatorHumanTime = Selector.evaluatorOf(".format-humantime")
+private val evaluatorHumanTime = Evaluator.Class("format-humantime") // Selector.evaluatorOf(".format-humantime")
 private fun Element.expectHumanTimeTitle(): String = expectFirst(evaluatorHumanTime).attr("title")
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
