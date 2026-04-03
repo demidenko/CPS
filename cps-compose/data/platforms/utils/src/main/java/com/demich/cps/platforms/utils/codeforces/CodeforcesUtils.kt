@@ -88,8 +88,8 @@ object CodeforcesUtils {
             val commentsCount: Int
             topic.expectFirst(evaluatorMeta).let { bottom ->
                 rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(".topic-rating").text().toInt()
-                val commentsItem = bottom.expectFirst(evaluatorRightMeta).select("li")[2]
-                commentsCount = commentsItem.select("a")[1].text().toInt()
+                val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst("li:eq(2)")
+                commentsCount = commentsItem.expectFirst("a:eq(1)").text().toInt()
             }
 
             CodeforcesWebBlogEntry(
