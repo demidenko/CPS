@@ -12,8 +12,8 @@ suspend fun CodeforcesPageContentProvider.getContestAcceptedStatistics(
     return buildList {
         Jsoup.parse(page).expectFirst("table.problems").select("tr")
             .forEach {
-                extractProblemWithAcceptedCount(it, contestId) { problem, index ->
-                    add(Pair(problem, index))
+                extractProblemWithAcceptedCount(it, contestId) { problem, count ->
+                    add(Pair(problem, count))
                 }
             }
     }
