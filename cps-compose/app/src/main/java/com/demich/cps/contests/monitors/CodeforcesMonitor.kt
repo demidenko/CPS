@@ -126,7 +126,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
         getContestStandings(
             contestId = contestId,
             handle = handle,
-            includeUnofficial = !participationType.isOfficial()
+            participantTypes = listOf(CONTESTANT, OUT_OF_COMPETITION)
         )
     }.onFailure { e ->
         monitor.lastRequest.setValue(false)
