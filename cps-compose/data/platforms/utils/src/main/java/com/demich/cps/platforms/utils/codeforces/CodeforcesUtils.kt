@@ -29,7 +29,7 @@ private fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser
 private fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 
 private val evaluatorHumanTime = Evaluator.Class("format-humantime") // Selector.evaluatorOf(".format-humantime")
-private fun Element.expectHumanTimeTitle(): String = expectFirst(evaluatorHumanTime).attr("title")
+private fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
 private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
@@ -66,7 +66,7 @@ object CodeforcesUtils {
             LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
     }
 
-    private fun String.extractTime(): Instant = DateTimeParser.parse(this)
+    private fun Element.extractTime(): Instant = DateTimeParser.parse(attr("title"))
 
     private fun extractBlogEntryOrNull(topic: Element): CodeforcesWebBlogEntry? {
         return kotlin.runCatching {
@@ -81,7 +81,7 @@ object CodeforcesUtils {
             val creationTime: Instant
             topic.expectDivInfo().let { info ->
                 author = info.expectRatedUser().extractRatedUser()
-                creationTime = info.expectHumanTimeTitle().extractTime()
+                creationTime = info.expectHumanTime().extractTime()
             }
 
             val rating: Int
@@ -118,7 +118,7 @@ object CodeforcesUtils {
             val commentRating: Int
             commentBox.expectDivInfo().let { info ->
                 blogEntryAuthor = info.expectRatedUser().extractRatedUser()
-                commentCreationTime = info.expectHumanTimeTitle().extractTime()
+                commentCreationTime = info.expectHumanTime().extractTime()
                 info.expectFirst(evaluatorHrefBlogEntry).let { commentLink ->
                     blogEntryTitle = commentLink.text()
                     commentLink.attr("href").let { url ->
