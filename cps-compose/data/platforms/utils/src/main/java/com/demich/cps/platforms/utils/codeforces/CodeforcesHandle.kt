@@ -11,15 +11,16 @@ data class CodeforcesHandle(
 )
 
 private fun Element.extractColorTag(): CodeforcesColorTag? {
-    val str = classNames()
+    val str = classNames() //TODO: classNames() is slow
         .firstOrNull { name -> name.startsWith("user-") }
         ?.removePrefix("user-")
         ?.uppercase(Locale.ENGLISH)
         ?: return null
 
     return kotlin.runCatching {
-        enumValueOf<CodeforcesColorTag>(str)
+        CodeforcesColorTag.valueOf(str)
     }.getOrElse {
+        // user-4000 case
         str.toIntOrNull()?.let {
             CodeforcesColorTag.fromRating(it)
         }
