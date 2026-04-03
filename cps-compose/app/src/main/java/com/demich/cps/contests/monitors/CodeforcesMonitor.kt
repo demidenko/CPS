@@ -62,10 +62,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
     val mainJob = scope.launchWhileActive {
         api.updateStandingsData(
             contestId = contestId,
-            handle = handle,
-            onOfficialChanged = {
-                return@launchWhileActive Duration.ZERO
-            }
+            handle = handle
         )
 
         ifNeedCheckSubmissions { problemResults ->
@@ -118,10 +115,8 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
 context(monitor: CodeforcesMonitorDataStore)
 private suspend inline fun CodeforcesApi.updateStandingsData(
     contestId: Int,
-    handle: String,
-    onOfficialChanged: () -> Unit
+    handle: String
 ) {
-    val participationType = monitor.participationType()
     runCatching {
         getContestStandings(
             contestId = contestId,
@@ -141,9 +136,6 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
         monitor.edit {
             lastRequest.value = true
             saveStandings(standings = standings)
-        }
-        if (isOfficialChanged(old = participationType, new = standings.participationType)) {
-            onOfficialChanged()
         }
     }
 }
@@ -181,14 +173,6 @@ private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
         participationType = row?.party?.participantType
     )
 }
-
-private fun CodeforcesParticipationType?.isOfficial(): Boolean =
-    this == CONTESTANT
-
-private fun isOfficialChanged(
-    old: CodeforcesParticipationType?,
-    new: CodeforcesParticipationType?
-): Boolean = new.isOfficial() != old.isOfficial()
 
 context(_: DataStoreEditScope)
 private fun CodeforcesMonitorDataStore.saveStandings(
