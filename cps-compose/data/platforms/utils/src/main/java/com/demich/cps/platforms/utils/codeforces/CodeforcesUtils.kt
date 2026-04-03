@@ -20,6 +20,7 @@ private fun Element.expectContent(): Element = expectFirst("div.content-with-sid
 private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
 private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
 
+private val evaluatorDivTypography = Selector.evaluatorOf("div.ttypography")
 private val evaluatorDivInfo = Selector.evaluatorOf("div.info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 
@@ -31,6 +32,9 @@ private val evaluatorHumanTime = Evaluator.Class("format-humantime") // Selector
 private fun Element.expectHumanTimeTitle(): String = expectFirst(evaluatorHumanTime).attr("title")
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
+private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
+private val evaluatorAvatar = Evaluator.Class("avatar")
+
 
 object CodeforcesUtils {
     private object DateTimeParser {
@@ -102,7 +106,7 @@ object CodeforcesUtils {
     // TODO: to slow probably
     private fun extractCommentOrNull(commentBox: Element): CodeforcesWebComment? {
         return kotlin.runCatching {
-            val commentator = commentBox.expectFirst(".avatar")
+            val commentator = commentBox.expectFirst(evaluatorAvatar)
                 .expectRatedUser()
                 .extractRatedUser()
 
@@ -124,7 +128,7 @@ object CodeforcesUtils {
                         blogEntryId = url.substring(i + 1, j).toInt()
                     }
                 }
-                info.expectFirst(Evaluator.Attribute("commentid")).let { ratingBox ->
+                info.expectFirst(evaluatorAttrCommentId).let { ratingBox ->
                     commentId = ratingBox.attr("commentid").toLong()
                     commentRating = ratingBox.text().trim().toInt()
                 }
@@ -133,8 +137,7 @@ object CodeforcesUtils {
             //<span class="notice">Пользователь создал или обновил текст</span>
             //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
             //TODO: use outerHtml() to match api response
-            val commentHtml = commentBox.selectFirst("div.ttypography")?.html()
-                ?: ""
+            val commentHtml = commentBox.selectFirst(evaluatorDivTypography)?.html().orEmpty()
 
             CodeforcesWebComment(
                 id = commentId,
