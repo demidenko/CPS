@@ -10,6 +10,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -142,15 +143,33 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
             parameter("contestId", contestId)
         }
 
+    private suspend inline fun getContestStandings(
+        contestId: Int,
+        handles: Collection<String>,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): CodeforcesContestStandings =
+        getCodeforcesApi(method = "contest.standings") {
+            parameter("contestId", contestId)
+            handles(handles)
+            block()
+        }
+
     override suspend fun getContestStandings(
         contestId: Int,
         handles: Collection<String>,
         includeUnofficial: Boolean
     ): CodeforcesContestStandings =
-        getCodeforcesApi(method = "contest.standings") {
-            parameter("contestId", contestId)
-            handles(handles)
+        getContestStandings(contestId = contestId, handles = handles) {
             parameter("showUnofficial", includeUnofficial)
+        }
+
+    override suspend fun getContestStandings(
+        contestId: Int,
+        handles: Collection<String>,
+        participantTypes: Collection<CodeforcesParticipationType>
+    ): CodeforcesContestStandings =
+        getContestStandings(contestId = contestId, handles = handles) {
+            parameter("participantTypes", participantTypes.joinToString(separator = ","))
         }
 
     override suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> =

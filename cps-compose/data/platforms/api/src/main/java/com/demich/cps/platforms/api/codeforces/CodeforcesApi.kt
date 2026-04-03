@@ -4,6 +4,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -27,7 +28,12 @@ interface CodeforcesApi {
         contestId: Int,
         handles: Collection<String>,
         includeUnofficial: Boolean
-        //TODO: participantTypes: Collection<CodeforcesParticipationType>
+    ): CodeforcesContestStandings
+
+    suspend fun getContestStandings(
+        contestId: Int,
+        handles: Collection<String>,
+        participantTypes: Collection<CodeforcesParticipationType>
     ): CodeforcesContestStandings
 
     suspend fun getContestSubmissions(
@@ -68,6 +74,17 @@ suspend fun CodeforcesApi.getContestStandings(
         contestId = contestId,
         handles = listOf(handle),
         includeUnofficial = includeUnofficial
+    )
+
+suspend fun CodeforcesApi.getContestStandings(
+    contestId: Int,
+    handle: String,
+    participantTypes: Collection<CodeforcesParticipationType>
+): CodeforcesContestStandings =
+    getContestStandings(
+        contestId = contestId,
+        handles = listOf(handle),
+        participantTypes = participantTypes
     )
 
 suspend fun CodeforcesApi.getUser(
