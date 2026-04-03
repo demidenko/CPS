@@ -1,5 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
+import com.demich.cps.platforms.utils.classNameStartsWithOrNull
 import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
 import java.util.Locale
@@ -11,8 +12,7 @@ data class CodeforcesHandle(
 )
 
 private fun Element.extractColorTag(): CodeforcesColorTag? {
-    val str = classNames() //TODO: classNames() is slow
-        .firstOrNull { name -> name.startsWith("user-") }
+    val str = classNameStartsWithOrNull("user-")
         ?.removePrefix("user-")
         ?.uppercase(Locale.ENGLISH)
         ?: return null
