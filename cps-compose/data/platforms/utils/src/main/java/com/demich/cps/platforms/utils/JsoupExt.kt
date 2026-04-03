@@ -14,6 +14,6 @@ internal fun Element.selectSequence(evaluator: Evaluator): Sequence<Element> =
     selectStream(evaluator).asSequence()
 
 // TODO: optimize without calling classNames()
-internal fun Element.classNameStartsWithOrNull(prefix: String): String? {
-    return classNames().firstOrNull { name -> name.startsWith(prefix) }
+internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean): String? {
+    return classNames().firstOrNull(predicate)
 }
