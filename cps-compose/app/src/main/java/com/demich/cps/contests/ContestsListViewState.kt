@@ -44,12 +44,8 @@ class ContestsListViewState(
     private val expandedContestsState = mutableStateOf<Map<ContestCompositeId, Contest>>(emptyMap())
     private val expandedContests by expandedContestsState
 
-    private inline fun editIds(block: MutableMap<ContestCompositeId, Contest>.() -> Unit) {
-        expandedContestsState.value = expandedContests.toMutableMap().apply(block)
-    }
-
     fun toggleExpanded(contest: Contest) {
-        editIds {
+        expandedContestsState.edit {
             val id = contest.compositeId
             if (id in this) remove(id)
             else put(key = id, value = contest)
@@ -57,9 +53,8 @@ class ContestsListViewState(
     }
 
     fun syncExpanded(contests: List<Contest>) {
-        editIds {
-            val prev = this.keys.toSet()
-            clear()
+        val prev = expandedContests
+        expandedContestsState.value = buildMap {
             contests.forEach { contest ->
                 val id = contest.compositeId
                 if (id in prev) put(key = id, value = contest)
@@ -93,4 +88,8 @@ class ContestsListViewState(
     enum class ContestsPage {
         Finished, RunningOrFuture
     }
+}
+
+private inline fun <K, V> MutableState<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) {
+    value = value.toMutableMap().apply(block)
 }
