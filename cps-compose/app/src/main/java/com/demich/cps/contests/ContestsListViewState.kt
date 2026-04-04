@@ -9,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.SafetyLevel
+import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.sebaslogen.resaca.rememberScoped
 import kotlin.time.Duration
@@ -43,6 +44,7 @@ class ContestsListViewState(
 ) {
     private val expandedContestsState = mutableStateOf<Map<ContestCompositeId, Contest>>(emptyMap())
     private val expandedContests by expandedContestsState
+    private var notFinishedIds by mutableStateOf<Set<ContestCompositeId>>(emptySet())
 
     fun toggleExpanded(contest: Contest) {
         expandedContestsState.edit {
@@ -60,13 +62,13 @@ class ContestsListViewState(
                 if (id in prev) put(key = id, value = contest)
             }
         }
+        notFinishedIds = contests.runningOrFuture.mapToSet { it.compositeId }
     }
 
     fun isExpanded(contest: Contest): Boolean =
         contest.compositeId in expandedContests
 
     private val safeMinDuration: Duration get() = 1.hours
-    // TODO: ignore finished expanded contests
     fun collisionLevel(contest: Contest): SafetyLevel {
         val distance = expandedContests.values.minOfNotNull {
             val l = it.startTime
@@ -74,6 +76,7 @@ class ContestsListViewState(
             when {
                 isParallel(it, contest) -> null
                 it.isVirtual -> null
+                it.compositeId !in notFinishedIds -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
                 else -> return DANGER
