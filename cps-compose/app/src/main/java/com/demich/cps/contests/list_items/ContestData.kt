@@ -9,12 +9,12 @@ import kotlin.time.Instant
 
 internal inline fun Contest.counterAt(
     time: Instant,
-    before: (Duration) -> String,
+    upcoming: (Duration) -> String,
     running: (Duration) -> String,
     finished: () -> String
 ): String =
     when (phaseAt(time)) {
-        UPCOMING -> before(startTime - time)
+        UPCOMING -> upcoming(startTime - time)
         RUNNING -> running(endTime - time)
         FINISHED -> finished()
     }
@@ -22,13 +22,13 @@ internal inline fun Contest.counterAt(
 @Composable
 @ReadOnlyComposable
 internal inline fun Contest.localCurrentCounter(
-    before: (Duration) -> String,
+    upcoming: (Duration) -> String,
     running: (Duration) -> String,
     finished: () -> String = { "" }
 ): String =
     counterAt(
         time = localCurrentTime,
-        before = before,
+        upcoming = upcoming,
         running = running,
         finished = finished
     )

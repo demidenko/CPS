@@ -144,7 +144,7 @@ private fun ContestCounter(
     Text(
         modifier = modifier,
         text = contest.localCurrentCounter(
-            before = { "in ${it.formatTimerShort()}" },
+            upcoming = { "in ${it.formatTimerShort()}" },
             running = { "left ${it.formatTimerShort()}" }
         )
     )

@@ -194,7 +194,7 @@ private fun ContestsPager(
 private fun SortedContests.sublist(page: ContestsListViewState.ContestsPage): List<Contest> =
     when (page) {
         Finished -> finished
-        RunningOrFuture -> runningOrFuture
+        RunningOrUpcoming -> runningOrUpcoming
     }
 
 private fun List<Contest>.filterBy(state: FilterState) =
@@ -309,7 +309,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         ScreenTitleState {
             when (viewState.contestsPage) {
                 Finished -> cpsScreenTitleOf("contests", "finished")
-                RunningOrFuture -> cpsScreenTitleOf("contests")
+                RunningOrUpcoming -> cpsScreenTitleOf("contests")
             }
         }
     }
@@ -399,8 +399,8 @@ private fun ContestsPageSwitchButton(
         onClick = {
             onClick(
                 when (contestsPage) {
-                    Finished -> RunningOrFuture
-                    RunningOrFuture -> Finished
+                    Finished -> RunningOrUpcoming
+                    RunningOrUpcoming -> Finished
                 }
             )
         }

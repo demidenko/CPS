@@ -32,7 +32,7 @@ private fun Contest.isParallelTo(c2: Contest): Boolean =
 @Composable
 fun rememberContestsListViewState(): ContestsListViewState {
     val contestsPageState = rememberSaveable {
-        mutableStateOf(ContestsListViewState.ContestsPage.RunningOrFuture)
+        mutableStateOf(ContestsListViewState.ContestsPage.RunningOrUpcoming)
     }
 
     return rememberScoped(key = contestsPageState) {
@@ -64,7 +64,7 @@ class ContestsListViewState(
                 if (id in prev) put(key = id, value = contest)
             }
         }
-        notFinishedIds = contests.runningOrFuture.mapToSet { it.compositeId }
+        notFinishedIds = contests.runningOrUpcoming.mapToSet { it.compositeId }
     }
 
     fun isExpanded(contest: Contest): Boolean =
@@ -93,7 +93,7 @@ class ContestsListViewState(
     var contestsPage by contestsPageState
 
     enum class ContestsPage {
-        Finished, RunningOrFuture
+        Finished, RunningOrUpcoming
     }
 }
 

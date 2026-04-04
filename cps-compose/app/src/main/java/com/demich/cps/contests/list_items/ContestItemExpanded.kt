@@ -105,7 +105,7 @@ private fun ContestCounter(
     ProvideContestSubtitleTextStyle {
         Text(
             text = contest.localCurrentCounter(
-                before = { "starts in ${it.formatTimerFull()}" },
+                upcoming = { "starts in ${it.formatTimerFull()}" },
                 running = { "ends in ${it.formatTimerFull()}" },
                 finished = { "finished" }
             )

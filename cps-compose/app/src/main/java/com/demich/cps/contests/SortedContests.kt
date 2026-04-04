@@ -34,7 +34,7 @@ data class SortedContests(
     val finished: List<Contest> =
         contests.subList(fromIndex = firstFinished, toIndex = contests.size)
 
-    val runningOrFuture: List<Contest> =
+    val runningOrUpcoming: List<Contest> =
         contests.subList(fromIndex = 0, toIndex = firstFinished)
 }
 
