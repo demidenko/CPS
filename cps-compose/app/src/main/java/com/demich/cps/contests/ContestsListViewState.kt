@@ -24,8 +24,10 @@ val Contest.compositeId: ContestCompositeId
 val Contest.isVirtual: Boolean
     get() = duration < eventDuration
 
-private fun isParallel(c1: Contest, c2: Contest): Boolean =
-    c1.platform == c2.platform && c1.startTime == c2.startTime && c1.endTime == c2.endTime
+private fun Contest.isParallelTo(c2: Contest): Boolean =
+    platform == c2.platform &&
+    startTime == c2.startTime &&
+    endTime == c2.endTime
 
 @Composable
 fun rememberContestsListViewState(): ContestsListViewState {
@@ -68,15 +70,17 @@ class ContestsListViewState(
     fun isExpanded(contest: Contest): Boolean =
         contest.compositeId in expandedContests
 
+    private fun Contest.isFinished() = compositeId !in notFinishedIds
+
     private val safeMinDuration: Duration get() = 1.hours
     fun collisionLevel(contest: Contest): SafetyLevel {
         val distance = expandedContests.values.minOfNotNull {
             val l = it.startTime
             val r = it.endTime
             when {
-                isParallel(it, contest) -> null
+                it.isParallelTo(contest) -> null
                 it.isVirtual -> null
-                it.compositeId !in notFinishedIds -> null
+                it.isFinished() -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
                 else -> return DANGER
