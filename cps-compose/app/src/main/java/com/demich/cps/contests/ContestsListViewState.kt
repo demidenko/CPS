@@ -36,13 +36,17 @@ fun rememberContestsListViewState(): ContestsListViewState {
     }
 
     return rememberScoped(key = contestsPageState) {
-        ContestsListViewState(contestsPageState = contestsPageState)
+        ContestsListViewState(
+            contestsPageState = contestsPageState,
+            noCollisionMinDuration = 1.hours
+        )
     }
 }
 
 @Stable
 class ContestsListViewState(
-    contestsPageState: MutableState<ContestsPage>
+    contestsPageState: MutableState<ContestsPage>,
+    private val noCollisionMinDuration: Duration?
 ) {
     private val expandedContestsState = mutableStateOf<Map<ContestCompositeId, Contest>>(emptyMap())
     private val expandedContests by expandedContestsState
@@ -72,9 +76,9 @@ class ContestsListViewState(
 
     private fun Contest.isFinished() = compositeId !in notFinishedIds
 
-    private val safeMinDuration: Duration get() = 1.hours
     fun collisionLevel(contest: Contest): SafetyLevel {
-        val distance = expandedContests.values.minOfNotNull {
+        if (noCollisionMinDuration == null) return SAFE
+        val duration = expandedContests.values.minOfNotNull {
             val l = it.startTime
             val r = it.endTime
             when {
@@ -86,7 +90,7 @@ class ContestsListViewState(
                 else -> return DANGER
             }
         } ?: Duration.INFINITE
-        if (distance < safeMinDuration) return WARNING
+        if (duration < noCollisionMinDuration) return WARNING
         return SAFE
     }
 
