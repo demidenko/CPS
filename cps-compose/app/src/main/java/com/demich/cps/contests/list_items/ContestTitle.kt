@@ -2,7 +2,7 @@ package com.demich.cps.contests.list_items
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,7 +29,7 @@ internal fun ContestTitleCollapsed(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = title.makeTitle(),
+        text = contestTitleSpan(title = title, bracketsColor = cpsColors.contentAdditional),
         color = cpsColors.colorFor(phase, isVirtual),
         fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
@@ -49,7 +49,11 @@ internal fun ContestTitleExpanded(
     // TODO: find better solution
     var isMultiline by rememberSaveable(title) { mutableStateOf(false) }
     Text(
-        text = title.makeTitle(useNewLine = isMultiline),
+        text = contestTitleSpan(
+            title = title,
+            bracketsColor = cpsColors.contentAdditional,
+            useNewLine = isMultiline
+        ),
         color = cpsColors.colorFor(phase, isVirtual),
         fontSize = CPSFontSize.itemTitle,
         fontWeight = FontWeight.Bold,
@@ -65,15 +69,18 @@ fun CPSColors.colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
     if (phase == RUNNING && !isVirtual) success
     else content
 
-@Composable
-@ReadOnlyComposable
-private fun String.makeTitle(useNewLine: Boolean = false): AnnotatedString =
+@Stable
+private fun contestTitleSpan(
+    title: String,
+    bracketsColor: Color,
+    useNewLine: Boolean = false
+): AnnotatedString =
     buildAnnotatedString {
-        splitTrailingBrackets { title, brackets ->
+        title.splitTrailingBrackets { title, brackets ->
             append(title)
             if (brackets.isNotBlank()) {
                 if (useNewLine) append('\n')
-                append(brackets, color = cpsColors.contentAdditional)
+                append(brackets, color = bracketsColor)
             }
         }
     }
