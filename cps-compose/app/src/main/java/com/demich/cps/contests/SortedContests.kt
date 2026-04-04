@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-internal data class SortedContests(
+data class SortedContests(
     val contests: List<Contest>,
     private val firstFinished: Int
 ) {

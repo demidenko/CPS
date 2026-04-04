@@ -52,10 +52,10 @@ class ContestsListViewState(
         }
     }
 
-    fun syncExpanded(contests: List<Contest>) {
+    fun syncExpanded(contests: SortedContests) {
         val prev = expandedContests
         expandedContestsState.value = buildMap {
-            contests.forEach { contest ->
+            contests.contests.forEach { contest ->
                 val id = contest.compositeId
                 if (id in prev) put(key = id, value = contest)
             }
