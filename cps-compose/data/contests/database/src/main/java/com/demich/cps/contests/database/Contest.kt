@@ -90,15 +90,15 @@ data class Contest (
             if (phase1 != phase2) {
                 compareValuesBy(phase1, phase2) {
                     when (it) {
-                        RUNNING -> 0
-                        UPCOMING -> 1
-                        FINISHED -> 2
+                        FINISHED -> 0
+                        RUNNING -> 1
+                        UPCOMING -> 2
                     }
                 }
             } else {
                 when (phase1) {
-                    RUNNING -> compareValues(c1.endTime, c2.endTime)
                     UPCOMING -> compareValues(c1.startTime, c2.startTime)
+                    RUNNING -> compareValues(c1.endTime, c2.endTime)
                     FINISHED -> -compareValues(c1.endTime, c2.endTime)
                 }
             }

@@ -27,15 +27,17 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+
+// FINISHED | RUNNING | UPCOMING
 data class SortedContests(
     val contests: List<Contest>,
-    private val firstFinished: Int
+    private val firstRunningOrUpcoming: Int
 ) {
     val finished: List<Contest> =
-        contests.subList(fromIndex = firstFinished, toIndex = contests.size)
+        contests.subList(fromIndex = 0, toIndex = firstRunningOrUpcoming)
 
     val runningOrUpcoming: List<Contest> =
-        contests.subList(fromIndex = 0, toIndex = firstFinished)
+        contests.subList(fromIndex = firstRunningOrUpcoming, toIndex = contests.size)
 }
 
 private interface ContestsSorter {
@@ -43,8 +45,8 @@ private interface ContestsSorter {
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
 
-private fun List<Contest>.firstFinished(currentTime: Instant) =
-    partitionIndex { it.phaseAt(currentTime) != FINISHED }
+private fun List<Contest>.firstRunningOrUpcoming(currentTime: Instant) =
+    partitionIndex { it.phaseAt(currentTime) == FINISHED }
 
 private class ContestsBruteSorter: ContestsSorter {
     override var contests: SortedContests = SortedContests(emptyList(), 0)
@@ -54,7 +56,7 @@ private class ContestsBruteSorter: ContestsSorter {
         val sorted = contests.sortedWith(Contest.comparatorAt(currentTime))
         this.contests = SortedContests(
             contests = sorted,
-            firstFinished = sorted.firstFinished(currentTime)
+            firstRunningOrUpcoming = sorted.firstRunningOrUpcoming(currentTime)
         )
         return true
     }
@@ -80,7 +82,7 @@ private class ContestsSmartSorter: ContestsSorter {
                 }
             } ?: Instant.DISTANT_FUTURE
 
-        val firstFinished: Int = sorted.firstFinished(sortedAt)
+        val firstRunningOrUpcoming: Int = sorted.firstRunningOrUpcoming(sortedAt)
     }
 
     private var last: List<Contest> = emptyList()
@@ -89,7 +91,7 @@ private class ContestsSmartSorter: ContestsSorter {
     override val contests: SortedContests
         get() = SortedContests(
             contests = sortedLast.sorted,
-            firstFinished = sortedLast.firstFinished
+            firstRunningOrUpcoming = sortedLast.firstRunningOrUpcoming
         )
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
