@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -95,12 +94,12 @@ fun ContestItemHeader(
 }
 
 @Composable
-fun ContestItemFooter(
+inline fun ContestItemFooter(
     modifier: Modifier = Modifier,
-    left: @Composable () -> Unit,
-    right: @Composable () -> Unit
+    crossinline left: @Composable () -> Unit,
+    crossinline right: @Composable () -> Unit
 ) {
-    ProvideTextStyle(contestSubtitleTextStyle()) {
+    ProvideContestSubtitleTextStyle {
         Box(modifier = modifier) {
             Box(modifier = Modifier.align(Alignment.CenterStart)) {
                 left()
@@ -152,9 +151,14 @@ private fun ContestCounter(
 }
 
 @Composable
-@ReadOnlyComposable
-fun contestSubtitleTextStyle() =
-    CPSDefaults.MonospaceTextStyle.copy(
-        fontSize = 15.sp,
-        color = cpsColors.contentAdditional
+fun ProvideContestSubtitleTextStyle(
+    content: @Composable () -> Unit
+) {
+    ProvideTextStyle(
+        value = CPSDefaults.MonospaceTextStyle.copy(
+            fontSize = 15.sp,
+            color = cpsColors.contentAdditional
+        ),
+        content = content
     )
+}

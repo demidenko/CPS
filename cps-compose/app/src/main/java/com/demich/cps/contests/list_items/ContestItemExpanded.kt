@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -103,7 +102,7 @@ private fun ContestTitle(
 private fun ContestCounter(
     contest: Contest
 ) {
-    ProvideTextStyle(contestSubtitleTextStyle()) {
+    ProvideContestSubtitleTextStyle {
         Text(
             text = contest.localCurrentCounter(
                 before = { "starts in ${it.formatTimerFull()}" },
@@ -122,7 +121,7 @@ private fun ContestItemDatesAndMenuButton(
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        ProvideTextStyle(contestSubtitleTextStyle()) {
+        ProvideContestSubtitleTextStyle {
             AttentionText(
                 text = contest.dateRange(),
                 safetyLevel = if (phase == BEFORE) collisionLevel() else SAFE,
