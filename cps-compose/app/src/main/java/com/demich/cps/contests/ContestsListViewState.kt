@@ -71,6 +71,7 @@ class ContestsListViewState(
         contest.compositeId in expandedContests
 
     private val safeMinDuration: Duration get() = 1.hours
+    // TODO: ignore finished expanded contests
     fun collisionLevel(contest: Contest): SafetyLevel {
         val distance = expandedContests.values.minOfNotNull {
             val l = it.startTime
