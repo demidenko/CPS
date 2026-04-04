@@ -141,7 +141,7 @@ private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
                 enqueueAsap()
                 return
             }
-            BEFORE -> it.startTime
+            UPCOMING -> it.startTime
             else -> null
         }
     }?.let {

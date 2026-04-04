@@ -14,7 +14,7 @@ internal inline fun Contest.counterAt(
     finished: () -> String
 ): String =
     when (phaseAt(time)) {
-        BEFORE -> before(startTime - time)
+        UPCOMING -> before(startTime - time)
         RUNNING -> running(endTime - time)
         FINISHED -> finished()
     }

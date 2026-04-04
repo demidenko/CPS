@@ -110,7 +110,7 @@ private fun Header(
         contestTitle = contestTitle,
         phase = when (contestPhase) {
             is CodeforcesMonitorData.ContestPhase.Coding -> RUNNING
-            else -> BEFORE
+            else -> UPCOMING
         },
         isVirtual = false,
         modifier = modifier

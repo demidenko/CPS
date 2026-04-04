@@ -22,7 +22,7 @@ data class Contest (
 
     fun phaseAt(time: Instant): Phase = when {
         time >= endTime -> FINISHED
-        time < startTime -> BEFORE
+        time < startTime -> UPCOMING
         else -> RUNNING
     }
 
@@ -65,7 +65,7 @@ data class Contest (
     )
 
     enum class Phase {
-        BEFORE,
+        UPCOMING,
         RUNNING,
         FINISHED
     }
@@ -91,14 +91,14 @@ data class Contest (
                 compareValuesBy(phase1, phase2) {
                     when (it) {
                         RUNNING -> 0
-                        BEFORE -> 1
+                        UPCOMING -> 1
                         FINISHED -> 2
                     }
                 }
             } else {
                 when (phase1) {
                     RUNNING -> compareValues(c1.endTime, c2.endTime)
-                    BEFORE -> compareValues(c1.startTime, c2.startTime)
+                    UPCOMING -> compareValues(c1.startTime, c2.startTime)
                     FINISHED -> -compareValues(c1.endTime, c2.endTime)
                 }
             }

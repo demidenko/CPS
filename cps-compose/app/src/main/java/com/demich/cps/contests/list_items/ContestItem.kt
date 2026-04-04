@@ -123,11 +123,11 @@ private fun ContestItemFooter(
         left = {
             AttentionText(
                 text = when (phase) {
-                    BEFORE -> contest.dateBriefRange()
+                    UPCOMING -> contest.dateBriefRange()
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
-                safetyLevel = if (phase == BEFORE) collisionLevel() else SAFE
+                safetyLevel = if (phase == UPCOMING) collisionLevel() else SAFE
             )
         },
         right = {
