@@ -57,9 +57,10 @@ private class AtCoderContestParser {
 }
 
 internal fun Duration.Companion.parseHHMM(input: String): Duration {
-    require(input.length == 5)
-    require(input[2] == ':')
-    val h = input[0].digitToInt() * 60 + input[1].digitToInt()
-    val m = input[3].digitToInt() * 60 + input[4].digitToInt()
+    val i = input.indexOf(':')
+    require(i != -1) { "expected ':' in $input" }
+    require(input.length == i + 3) { "expected 2 minutes characters in $input" }
+    val m = input[i+1].digitToInt() * 60 + input[i+2].digitToInt()
+    val h = input.substring(0, i).toInt()
     return h.hours + m.minutes
 }
