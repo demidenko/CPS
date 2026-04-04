@@ -31,7 +31,8 @@ import kotlin.time.Instant
 // FINISHED | RUNNING | UPCOMING
 data class SortedContests(
     val contests: List<Contest>,
-    private val firstRunningOrUpcoming: Int
+    private val firstRunningOrUpcoming: Int,
+    // TODO: firstUpcoming to get contest with phase
 ) {
     val finished: List<Contest> =
         contests.subList(fromIndex = 0, toIndex = firstRunningOrUpcoming)
