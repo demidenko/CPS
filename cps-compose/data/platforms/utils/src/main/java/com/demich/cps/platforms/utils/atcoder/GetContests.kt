@@ -60,7 +60,7 @@ internal fun Duration.Companion.parseHHMM(input: String): Duration {
     val i = input.indexOf(':')
     require(i != -1) { "expected ':' in $input" }
     require(input.length == i + 3) { "expected 2 minutes characters in $input" }
-    val m = input[i+1].digitToInt() * 60 + input[i+2].digitToInt()
+    val m = input[i+1].digitToInt() * 10 + input[i+2].digitToInt()
     val h = input.substring(0, i).toInt()
     return h.hours + m.minutes
 }
