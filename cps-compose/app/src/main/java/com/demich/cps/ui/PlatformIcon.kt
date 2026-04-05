@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import com.demich.cps.R
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.Contest.Platform.unknown
 
 enum class Platform {
     codeforces,
@@ -16,6 +17,16 @@ enum class Platform {
     project_euler,
     clist
 }
+
+fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
+    when (this) {
+        unknown -> null
+        codeforces -> codeforces
+        atcoder -> atcoder
+        codechef -> codechef
+        topcoder -> topcoder
+        dmoj -> dmoj
+    }
 
 @Composable
 fun platformLogoPainter(platform: Platform): Painter {
@@ -33,11 +44,7 @@ fun platformLogoPainter(platform: Platform): Painter {
 
 @Composable
 fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
-    when (platform) {
-        unknown -> rememberVectorPainter(CPSIcons.Contest)
-        codeforces -> platformLogoPainter(Platform.codeforces)
-        atcoder -> platformLogoPainter(Platform.atcoder)
-        topcoder -> platformLogoPainter(Platform.topcoder)
-        codechef -> platformLogoPainter(Platform.codechef)
-        dmoj -> platformLogoPainter(Platform.dmoj)
+    when (val platform = platform.toGeneralPlatformOrNull()) {
+        null -> rememberVectorPainter(CPSIcons.Contest)
+        else -> platformLogoPainter(platform)
     }
