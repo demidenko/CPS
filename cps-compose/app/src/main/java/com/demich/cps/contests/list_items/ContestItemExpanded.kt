@@ -40,8 +40,7 @@ internal fun ContestExpandedItemContent(
 ) {
     val phase = contest.phaseAt(localCurrentTime)
     ContestPlatform(
-        platform = contest.platform,
-        platformName = contest.platformName()
+        contest = contest
     )
     ContestTitle(
         contest = contest,
@@ -62,17 +61,16 @@ private fun Contest.platformName() = host ?: platform.name
 
 @Composable
 private fun ContestPlatform(
-    platform: Contest.Platform,
-    platformName: String
+    contest: Contest
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         ContestPlatformIcon(
-            platform = platform,
+            contest = contest,
             size = 18.sp,
             color = cpsColors.contentAdditional
         )
         Text(
-            text = platformName,
+            text = contest.platformName(),
             style = CPSDefaults.MonospaceTextStyle.copy(
                 fontSize = 13.sp,
                 color = cpsColors.contentAdditional

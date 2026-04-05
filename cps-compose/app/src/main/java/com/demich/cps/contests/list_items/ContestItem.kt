@@ -17,9 +17,11 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.dateBriefRange
 import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.formatContestDate
+import com.demich.cps.contests.generalPlatformOrNull
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.ui.Platform
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.SafetyLevel
@@ -53,10 +55,8 @@ private fun ContestItemContent(
     //TODO: call recomposes two times
     val phase = contest.phaseAt(localCurrentTime)
     ContestItemHeader(
-        platform = contest.platform,
-        contestTitle = contest.title,
+        contest = contest,
         phase = phase,
-        isVirtual = contest.isVirtual,
         modifier = Modifier.fillMaxWidth()
     )
     ContestItemFooter(
@@ -69,7 +69,22 @@ private fun ContestItemContent(
 
 @Composable
 fun ContestItemHeader(
-    platform: Contest.Platform,
+    contest: Contest,
+    phase: Contest.Phase,
+    modifier: Modifier = Modifier
+) {
+    ContestItemHeader(
+        platform = contest.generalPlatformOrNull(),
+        contestTitle = contest.title,
+        phase = phase,
+        isVirtual = contest.isVirtual,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ContestItemHeader(
+    platform: Platform?,
     contestTitle: String,
     phase: Contest.Phase,
     isVirtual: Boolean,

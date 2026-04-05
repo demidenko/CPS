@@ -12,7 +12,7 @@ import com.demich.cps.ui.Platform
 import com.demich.cps.ui.platformLogoPainter
 
 @Composable
-private fun ContestPlatformIcon(
+fun ContestPlatformIcon(
     platform: Platform?,
     modifier: Modifier = Modifier,
     size: TextUnit,
