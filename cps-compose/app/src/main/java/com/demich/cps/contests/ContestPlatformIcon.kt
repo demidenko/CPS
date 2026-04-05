@@ -27,9 +27,9 @@ fun ContestPlatformIcon(
     )
 }
 
-fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
+private inline fun Contest.Platform.toGeneralPlatformOr(block: () -> Nothing): Platform =
     when (this) {
-        unknown -> null
+        unknown -> block()
         codeforces -> codeforces
         atcoder -> atcoder
         codechef -> codechef
@@ -37,8 +37,19 @@ fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
         dmoj -> dmoj
     }
 
+fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
+    toGeneralPlatformOr { return null }
+
 fun Contest.Platform.toGeneralPlatform(): Platform =
-    toGeneralPlatformOrNull() ?: throw IllegalArgumentException()
+    toGeneralPlatformOr { throw IllegalArgumentException() }
+
+fun Contest.generalPlatformOrNull(): Platform? =
+    platform.toGeneralPlatformOr {
+        return when {
+            host == "projecteuler.net" -> project_euler
+            else -> null
+        }
+    }
 
 @Composable
 private fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
