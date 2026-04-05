@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.toGeneralPlatform
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
@@ -30,7 +31,6 @@ import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.toGeneralPlatform
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.toEnumSet

@@ -9,6 +9,7 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.cps.ui.platformLogoResId
 import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
@@ -69,7 +70,7 @@ class ProjectEulerRecentProblemsWorker(
                 subText = "Project Euler • New problem published!"
                 contentTitle = "Problem $problemId"
                 bigContent = post.name
-                smallIcon = R.drawable.ic_logo_projecteuler
+                smallIcon = platformLogoResId(platform = project_euler)
                 colorResId = R.color.project_euler_main
                 time = post.date
                 autoCancel = true

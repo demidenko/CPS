@@ -9,8 +9,8 @@ import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.Platform
 import com.demich.cps.ui.platformLogoPainter
-import com.demich.cps.ui.toGeneralPlatformOrNull
 
 @Composable
 fun ContestPlatformIcon(
@@ -26,6 +26,19 @@ fun ContestPlatformIcon(
         color = color
     )
 }
+
+fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
+    when (this) {
+        unknown -> null
+        codeforces -> codeforces
+        atcoder -> atcoder
+        codechef -> codechef
+        topcoder -> topcoder
+        dmoj -> dmoj
+    }
+
+fun Contest.Platform.toGeneralPlatform(): Platform =
+    toGeneralPlatformOrNull() ?: throw IllegalArgumentException()
 
 @Composable
 private fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
