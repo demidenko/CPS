@@ -48,12 +48,6 @@ import androidx.compose.material.icons.rounded.PeopleAlt
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.twotone.Error
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
-import com.demich.cps.R
-import com.demich.cps.contests.database.Contest
 
 object CPSIcons {
     val Profile get() = Icons.Rounded.Person
@@ -103,18 +97,4 @@ object CPSIcons {
     val Monitor get() = Icons.AutoMirrored.Filled.Dvr
     val Upsolving get() = Icons.Default.FitnessCenter
     val Swap get() = Icons.Default.SwapHoriz
-}
-
-
-@Composable
-fun platformIconPainter(platform: Contest.Platform): Painter {
-    if (platform == unknown) return rememberVectorPainter(CPSIcons.Contest)
-    val iconId = when (platform) {
-        codeforces -> R.drawable.ic_logo_codeforces
-        atcoder -> R.drawable.ic_logo_atcoder
-        topcoder -> R.drawable.ic_logo_topcoder
-        codechef -> R.drawable.ic_logo_codechef
-        dmoj -> R.drawable.ic_logo_dmoj
-    }
-    return painterResource(iconId)
 }
