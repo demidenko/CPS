@@ -3,7 +3,6 @@ package com.demich.cps.contests
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
@@ -13,14 +12,47 @@ import com.demich.cps.ui.Platform
 import com.demich.cps.ui.platformLogoPainter
 
 @Composable
+private fun ContestPlatformIcon(
+    platform: Platform?,
+    modifier: Modifier = Modifier,
+    size: TextUnit,
+    color: Color
+) {
+    IconSp(
+        painter = when (platform) {
+            null -> rememberVectorPainter(CPSIcons.Contest)
+            else -> platformLogoPainter(platform)
+        },
+        size = size,
+        modifier = modifier,
+        color = color
+    )
+}
+
+@Composable
 fun ContestPlatformIcon(
     platform: Contest.Platform,
     modifier: Modifier = Modifier,
     size: TextUnit,
     color: Color
 ) {
-    IconSp(
-        painter = contestPlatformLogoPainter(platform),
+    ContestPlatformIcon(
+        platform = platform.toGeneralPlatformOrNull(),
+        size = size,
+        modifier = modifier,
+        color = color
+    )
+}
+
+@Composable
+fun ContestPlatformIcon(
+    contest: Contest,
+    modifier: Modifier = Modifier,
+    size: TextUnit,
+    color: Color
+) {
+    ContestPlatformIcon(
+        platform = contest.generalPlatformOrNull(),
         size = size,
         modifier = modifier,
         color = color
@@ -49,11 +81,4 @@ fun Contest.generalPlatformOrNull(): Platform? =
             host == "projecteuler.net" -> project_euler
             else -> null
         }
-    }
-
-@Composable
-private fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
-    when (val platform = platform.toGeneralPlatformOrNull()) {
-        null -> rememberVectorPainter(CPSIcons.Contest)
-        else -> platformLogoPainter(platform)
     }
