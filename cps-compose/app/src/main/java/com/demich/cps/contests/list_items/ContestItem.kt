@@ -21,6 +21,7 @@ import com.demich.cps.contests.isVirtual
 import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.SafetyLevel
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
@@ -74,22 +75,24 @@ fun ContestItemHeader(
     isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        ContestPlatformIcon(
-            platform = platform,
-            size = 18.sp,
-            color = cpsColors.contentAdditional
-        )
-        ContestTitleCollapsed(
-            title = contestTitle,
-            phase = phase,
-            isVirtual = isVirtual,
-            modifier = Modifier.weight(1f)
-        )
+    IncludeFontPadding(false) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            ContestPlatformIcon(
+                platform = platform,
+                size = 18.sp,
+                color = cpsColors.contentAdditional
+            )
+            ContestTitleCollapsed(
+                title = contestTitle,
+                phase = phase,
+                isVirtual = isVirtual,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
