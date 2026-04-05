@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.R
@@ -47,13 +46,6 @@ fun platformLogoPainter(platform: Platform): Painter {
     }
     return painterResource(iconId)
 }
-
-@Composable
-fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
-    when (val platform = platform.toGeneralPlatformOrNull()) {
-        null -> rememberVectorPainter(CPSIcons.Contest)
-        else -> platformLogoPainter(platform)
-    }
 
 @Composable
 fun PlatformIcon(
