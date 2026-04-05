@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -24,11 +23,14 @@ import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.Platform
+import com.demich.cps.ui.PlatformIcon
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.toGeneralPlatform
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.kotlin_stdlib_boost.toEnumSet
@@ -114,7 +116,7 @@ private fun PlatformCheckRow(
     onCheckedChange: (Boolean) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        LeadingIcon(platform = platform)
+        LeadingIcon(platform = platform.toGeneralPlatform())
         Text(
             text = platform.name,
             style = CPSDefaults.MonospaceTextStyle,
@@ -156,7 +158,7 @@ private fun ClistAdditionalRow(resources: List<ClistResource>) {
     var showDialog by remember { mutableStateOf(false) }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        LeadingIcon(platform = Contest.Platform.unknown)
+        LeadingIcon(platform = clist)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "clist additional", style = CPSDefaults.MonospaceTextStyle)
             if (resources.isNotEmpty()) {
@@ -178,8 +180,8 @@ private fun ClistAdditionalRow(resources: List<ClistResource>) {
 }
 
 @Composable
-private fun LeadingIcon(platform: Contest.Platform) =
-    ContestPlatformIcon(
+private fun LeadingIcon(platform: Platform) =
+    PlatformIcon(
         platform = platform,
         size = 28.sp,
         color = cpsColors.content,
