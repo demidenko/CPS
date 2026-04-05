@@ -18,7 +18,7 @@ enum class Platform {
 }
 
 @Composable
-fun platformIconPainter(platform: Platform): Painter {
+fun platformLogoPainter(platform: Platform): Painter {
     val iconId = when (platform) {
         codeforces -> R.drawable.ic_logo_codeforces
         atcoder -> R.drawable.ic_logo_atcoder
@@ -32,12 +32,12 @@ fun platformIconPainter(platform: Platform): Painter {
 }
 
 @Composable
-fun platformIconPainter(platform: Contest.Platform): Painter =
+fun contestPlatformLogoPainter(platform: Contest.Platform): Painter =
     when (platform) {
         unknown -> rememberVectorPainter(CPSIcons.Contest)
-        codeforces -> platformIconPainter(Platform.codeforces)
-        atcoder -> platformIconPainter(Platform.atcoder)
-        topcoder -> platformIconPainter(Platform.topcoder)
-        codechef -> platformIconPainter(Platform.codechef)
-        dmoj -> platformIconPainter(Platform.dmoj)
+        codeforces -> platformLogoPainter(Platform.codeforces)
+        atcoder -> platformLogoPainter(Platform.atcoder)
+        topcoder -> platformLogoPainter(Platform.topcoder)
+        codechef -> platformLogoPainter(Platform.codechef)
+        dmoj -> platformLogoPainter(Platform.dmoj)
     }

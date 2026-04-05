@@ -25,10 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
-import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
@@ -120,7 +119,7 @@ private fun CodeforcesPagerHeader(
                 .padding(start = 6.dp, end = 10.dp)
         ) {
             Icon(
-                painter = platformIconPainter(platform = Contest.Platform.codeforces),
+                painter = platformLogoPainter(platform = codeforces),
                 contentDescription = null,
                 tint = cpsColors.content,
                 modifier = Modifier

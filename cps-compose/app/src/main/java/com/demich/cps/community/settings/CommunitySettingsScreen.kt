@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import com.demich.cps.R
 import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -28,7 +27,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.MultiSelectEnum
 import com.demich.cps.ui.settings.SelectEnum
@@ -68,7 +67,7 @@ private fun CommunitySettingsScreen() {
     ) {
         SettingsSectionHeader(
             title = "codeforces",
-            painter = platformIconPainter(platform = Contest.Platform.codeforces)
+            painter = platformLogoPainter(platform = codeforces)
         ) {
             DefaultTabSettingsItem()
             FollowSettingsItem()

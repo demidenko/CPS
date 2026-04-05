@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.platformIconPainter
+import com.demich.cps.ui.contestPlatformLogoPainter
 
 @Composable
 fun ContestPlatformIcon(
@@ -16,7 +16,7 @@ fun ContestPlatformIcon(
     color: Color
 ) {
     IconSp(
-        painter = platformIconPainter(platform),
+        painter = contestPlatformLogoPainter(platform),
         size = size,
         modifier = modifier,
         color = color
