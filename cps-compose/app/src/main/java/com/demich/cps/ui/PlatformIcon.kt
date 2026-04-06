@@ -6,17 +6,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
-import com.demich.cps.R
-
-enum class Platform {
-    codeforces,
-    atcoder,
-    codechef,
-    topcoder,
-    dmoj,
-    project_euler,
-    clist
-}
+import com.demich.cps.platforms.Platform
+import com.demich.cps.platforms.platformLogoResId
 
 @Composable
 fun PlatformIcon(
@@ -36,14 +27,3 @@ fun PlatformIcon(
 @Composable
 fun platformLogoPainter(platform: Platform): Painter =
     painterResource(platformLogoResId(platform))
-
-fun platformLogoResId(platform: Platform): Int =
-    when (platform) {
-        codeforces -> R.drawable.ic_logo_codeforces
-        atcoder -> R.drawable.ic_logo_atcoder
-        topcoder -> R.drawable.ic_logo_topcoder
-        codechef -> R.drawable.ic_logo_codechef
-        dmoj -> R.drawable.ic_logo_dmoj
-        project_euler -> R.drawable.ic_logo_projecteuler
-        clist -> R.drawable.ic_logo_clist
-    }

@@ -19,12 +19,12 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.toGeneralPlatform
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.Platform
 import com.demich.cps.ui.PlatformIcon
 import com.demich.cps.ui.WordsWithCounterOnOverflow
 import com.demich.cps.ui.settings.Expandable

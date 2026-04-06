@@ -6,9 +6,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.Platform
 import com.demich.cps.ui.platformLogoPainter
 
 @Composable
