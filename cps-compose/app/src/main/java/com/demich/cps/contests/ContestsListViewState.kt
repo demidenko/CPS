@@ -24,10 +24,13 @@ val Contest.compositeId: ContestCompositeId
 val Contest.isVirtual: Boolean
     get() = duration < eventDuration
 
-private fun Contest.isParallelTo(c2: Contest): Boolean =
-    platform == c2.platform &&
-    startTime == c2.startTime &&
-    endTime == c2.endTime
+private fun Contest.isOnSamePlatform(other: Contest): Boolean =
+    platform == other.platform && (platform != unknown || host == other.host)
+
+private fun Contest.isParallelTo(other: Contest): Boolean =
+    isOnSamePlatform(other) &&
+    startTime == other.startTime &&
+    endTime == other.endTime
 
 @Composable
 fun rememberContestsListViewState(): ContestsListViewState {
