@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.codechef.CodeChefUrls
 import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
@@ -52,7 +53,7 @@ class CodeChefProfileManager :
         private const val star = "★"
     }
 
-    override val platform get() = ProfilePlatform.codechef
+    override val platform: Platform get() = codechef
     override val urlHomePage get() = CodeChefUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)

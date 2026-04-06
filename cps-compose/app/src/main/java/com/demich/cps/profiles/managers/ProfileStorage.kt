@@ -2,6 +2,7 @@ package com.demich.cps.profiles.managers
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.jsonProfile
@@ -74,8 +75,8 @@ interface ProfileSettingsProvider {
     fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
 
-fun profileDataStoreWrapper(platform: ProfilePlatform) =
+fun profileDataStoreWrapper(platform: Platform) =
     dataStoreWrapper(name = platform.name + "_profile_datastore")
 
-fun profileSettingsDataStoreWrapper(platform: ProfilePlatform) =
+fun profileSettingsDataStoreWrapper(platform: Platform) =
     dataStoreWrapper(name = platform.name + "_profile_settings")

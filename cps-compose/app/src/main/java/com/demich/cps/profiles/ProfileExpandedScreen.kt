@@ -14,8 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -84,7 +84,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
 }
 
 private fun profileExpandedMenuBuilder(
-    platform: ProfilePlatform,
+    platform: Platform,
     onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {

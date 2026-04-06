@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
@@ -31,7 +32,7 @@ class AtCoderProfileManager :
     ProfileSettingsProvider,
     ProfileSuggestionsProvider
 {
-    override val platform get() = ProfilePlatform.atcoder
+    override val platform: Platform get() = atcoder
     override val urlHomePage get() = AtCoderUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {
@@ -118,7 +119,7 @@ class AtCoderProfileStorage(manager: AtCoderProfileManager, context: Context):
     RatedProfileStorage<AtCoderUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileDataStoreWrapper(platform = ProfilePlatform.atcoder)
+        private val Context.dataStore by profileDataStoreWrapper(platform = atcoder)
     }
 
     override val profileItem = makeProfileItem<AtCoderUserInfo>()
@@ -133,7 +134,7 @@ class AtCoderProfileSettingsDataStore(context: Context):
     ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileSettingsDataStoreWrapper(ProfilePlatform.atcoder)
+        private val Context.dataStore by profileSettingsDataStoreWrapper(platform = atcoder)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

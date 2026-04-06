@@ -3,7 +3,7 @@ package com.demich.cps.navigation
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
-import com.demich.cps.profiles.managers.ProfilePlatform
+import com.demich.cps.platforms.Platform
 import kotlinx.serialization.Serializable
 
 
@@ -23,17 +23,17 @@ sealed interface Screen {
     data object Profiles: RootScreen
 
     interface ProfileScreen {
-        val platform: ProfilePlatform
+        val platform: Platform
     }
 
     @Serializable
-    data class ProfileExpanded(override val platform: ProfilePlatform): Screen, ProfileScreen {
+    data class ProfileExpanded(override val platform: Platform): Screen, ProfileScreen {
         override val rootScreen: RootScreen
             get() = Profiles
     }
 
     @Serializable
-    data class ProfileSettings(override val platform: ProfilePlatform): Screen, ProfileScreen, NoBottomBarScreen {
+    data class ProfileSettings(override val platform: Platform): Screen, ProfileScreen, NoBottomBarScreen {
         override val rootScreen: RootScreen
             get() = Profiles
     }

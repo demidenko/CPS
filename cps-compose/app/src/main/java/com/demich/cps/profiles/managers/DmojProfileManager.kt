@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.dmoj.DmojUrls
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.isPageNotFound
@@ -27,7 +28,7 @@ class DmojProfileManager :
     RatedProfileManager<DmojUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val platform get() = ProfilePlatform.dmoj
+    override val platform: Platform get() = dmoj
     override val urlHomePage get() = DmojUrls.main
 
     override fun isValidForUserId(char: Char): Boolean = when(char) {

@@ -9,9 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.managers.getHandleColor
@@ -114,7 +114,7 @@ private fun interface RankGetter {
 
 private class EnabledRankGetter(
     private val validRanks: List<RatedRank>,
-    disabledPlatforms: Set<ProfilePlatform>,
+    disabledPlatforms: Set<Platform>,
     rankSelector: UISettingsDataStore.StatusBarRankSelector
 ): RankGetter {
     private val rank: RatedRank? =
@@ -133,7 +133,7 @@ private class EnabledRankGetter(
 }
 
 private data class Settings(
-    val disabledPlatforms: Set<ProfilePlatform>,
+    val disabledPlatforms: Set<Platform>,
     val rankSelector: UISettingsDataStore.StatusBarRankSelector
 )
 

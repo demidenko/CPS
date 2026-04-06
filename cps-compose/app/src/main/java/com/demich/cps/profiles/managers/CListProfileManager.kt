@@ -2,6 +2,7 @@ package com.demich.cps.profiles.managers
 
 import android.content.Context
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistUrls
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.isPageNotFound
@@ -16,7 +17,7 @@ class CListProfileManager :
     ProfileManager<ClistUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val platform get() = ProfilePlatform.clist
+    override val platform: Platform get() = clist
     override val userIdTitle = "login"
     override val urlHomePage = ClistUrls.main
 

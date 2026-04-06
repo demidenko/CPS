@@ -2,6 +2,7 @@ package com.demich.cps.platforms
 
 import com.demich.cps.R
 
+@androidx.annotation.Keep //navigation agr type
 enum class Platform {
     codeforces,
     atcoder,

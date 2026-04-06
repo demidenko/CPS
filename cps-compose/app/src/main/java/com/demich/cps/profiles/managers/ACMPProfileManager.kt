@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.acmp.ACMPUrls
 import com.demich.cps.platforms.clients.ACMPClient
 import com.demich.cps.platforms.clients.isRedirect
@@ -19,7 +20,7 @@ class ACMPProfileManager :
     ProfileManager<ACMPUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val platform get() = ProfilePlatform.acmp
+    override val platform: Platform get() = acmp
     override val userIdTitle get() = "id"
     override val urlHomePage get() = ACMPUrls.main
 

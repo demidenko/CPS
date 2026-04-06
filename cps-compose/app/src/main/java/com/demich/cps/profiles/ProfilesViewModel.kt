@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 
 class ProfilesViewModel: ViewModel() {
-    private val loadingStatuses = MutableStateFlow(emptyMap<ProfilePlatform, LoadingStatus>())
+    private val loadingStatuses = MutableStateFlow(emptyMap<Platform, LoadingStatus>())
 
     fun flowOfLoadingStatus(manager: ProfileManager<*>): Flow<LoadingStatus> =
         loadingStatuses.map { it[manager.platform] ?: PENDING }
@@ -102,15 +102,15 @@ private suspend fun <U: UserInfo> ProfileManager<U>.fetchAndSaveProfile(userId: 
     profileStorage(context).setProfile(fetchProfile(userId))
 }
 
-private fun getManager(resource: String, userName: String, link: String): Pair<ProfilePlatform, String>? =
+private fun getManager(resource: String, userName: String, link: String): Pair<Platform, String>? =
     when (resource) {
-        "codeforces.com" -> ProfilePlatform.codeforces to userName
-        "atcoder.jp" -> ProfilePlatform.atcoder to userName
-        "codechef.com" -> ProfilePlatform.codechef to userName
-        "dmoj.ca" -> ProfilePlatform.dmoj to userName
+        "codeforces.com" -> Platform.codeforces to userName
+        "atcoder.jp" -> Platform.atcoder to userName
+        "codechef.com" -> Platform.codechef to userName
+        "dmoj.ca" -> Platform.dmoj to userName
         "acm.timus.ru", "timus.online" -> {
             val userId = link.substring(link.lastIndexOf('=')+1)
-            ProfilePlatform.timus to userId
+            Platform.timus to userId
         }
         else -> null
     }

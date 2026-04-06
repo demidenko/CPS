@@ -14,6 +14,7 @@ import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.R
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
@@ -56,7 +57,7 @@ class CodeforcesProfileManager :
     ProfileSuggestionsProvider,
     RatingRevolutionsProvider
 {
-    override val platform get() = ProfilePlatform.codeforces
+    override val platform: Platform get() = codeforces
     override val urlHomePage get() = CodeforcesUrls.main
 
     override fun isValidForSearch(char: Char) = isValidForUserId(char)
@@ -238,7 +239,7 @@ class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Conte
     RatedProfileStorage<CodeforcesUserInfo>(manager, context, context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileDataStoreWrapper(ProfilePlatform.codeforces)
+        private val Context.dataStore by profileDataStoreWrapper(platform = codeforces)
     }
 
     override val profileItem = makeProfileItem<CodeforcesUserInfo>()
@@ -259,7 +260,7 @@ class CodeforcesProfileSettingsDataStore(context: Context):
     ItemizedDataStore(context.dataStore)
 {
     companion object {
-        private val Context.dataStore by profileSettingsDataStoreWrapper(ProfilePlatform.codeforces)
+        private val Context.dataStore by profileSettingsDataStoreWrapper(platform = codeforces)
     }
 
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)

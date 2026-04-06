@@ -25,7 +25,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.profiles.managers.ProfilePlatform
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
@@ -57,7 +57,7 @@ import kotlin.time.Instant
 fun <U: UserInfo> ProfilePanel(
     profileResultWithManager: ProfileResultWithManager<U>,
     modifier: Modifier = Modifier,
-    visibleOrder: List<ProfilePlatform>? = null,
+    visibleOrder: List<Platform>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
@@ -143,8 +143,8 @@ private fun PanelUIButtons(
 
 @Composable
 private fun PanelMovingButtons(
-    platform: ProfilePlatform,
-    visibleOrder: List<ProfilePlatform>,
+    platform: Platform,
+    visibleOrder: List<Platform>,
     modifier: Modifier = Modifier
 ) {
     val context = context

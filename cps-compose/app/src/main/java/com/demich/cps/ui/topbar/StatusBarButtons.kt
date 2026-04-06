@@ -16,8 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.ui.CPSCheckBox
@@ -85,11 +85,11 @@ private fun StatusBarButtons(
     modifier: Modifier = Modifier,
     coloredStatusBar: Boolean,
     rankSelector: UISettingsDataStore.StatusBarRankSelector,
-    platforms: List<ProfilePlatform>,
-    disabledPlatforms: Set<ProfilePlatform>,
+    platforms: List<Platform>,
+    disabledPlatforms: Set<Platform>,
     onSetEnabled: (Boolean) -> Unit,
     onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
-    onCheckedChange: (ProfilePlatform, Boolean) -> Unit
+    onCheckedChange: (Platform, Boolean) -> Unit
 ) {
     var showPopup by rememberSaveable { mutableStateOf(false) }
     val noneEnabled = platforms.all { it in disabledPlatforms }
@@ -130,9 +130,9 @@ private fun StatusBarPlatformsPopup(
     expanded: Boolean,
     rankSelector: UISettingsDataStore.StatusBarRankSelector,
     onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
-    disabledPlatforms: Set<ProfilePlatform>,
-    onCheckedChange: (ProfilePlatform, Boolean) -> Unit,
-    platforms: List<ProfilePlatform>,
+    disabledPlatforms: Set<Platform>,
+    onCheckedChange: (Platform, Boolean) -> Unit,
+    platforms: List<Platform>,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(

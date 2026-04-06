@@ -1,6 +1,7 @@
 package com.demich.cps.profiles.managers
 
 import android.content.Context
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import kotlinx.coroutines.flow.combine
@@ -12,7 +13,7 @@ data class ProfileResultWithManager<U: UserInfo>(
 ) {
 }
 
-val ProfileResultWithManager<*>.platform: ProfilePlatform
+val ProfileResultWithManager<*>.platform: Platform
     get() = manager.platform
 
 fun <U: UserInfo> ProfileManager<U>.flowWithProfileResult(context: Context) =

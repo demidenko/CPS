@@ -3,6 +3,7 @@ package com.demich.cps.profiles.managers
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.timus.TimusUrls
 import com.demich.cps.platforms.clients.TimusClient
 import com.demich.cps.platforms.utils.TimusUtils
@@ -17,7 +18,7 @@ class TimusProfileManager :
     ProfileManager<TimusUserInfo>(),
     ProfileSuggestionsProvider
 {
-    override val platform get() = ProfilePlatform.timus
+    override val platform: Platform get() = timus
     override val userIdTitle get() = "id"
     override val urlHomePage get() = TimusUrls.main
 

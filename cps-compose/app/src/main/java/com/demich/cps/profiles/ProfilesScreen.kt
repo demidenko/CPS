@@ -22,13 +22,14 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.CListProfileManager
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
 import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.profiles.managers.profileManagerOf
+import com.demich.cps.profiles.managers.profilePlatforms
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.CPSDefaults
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 private fun ProfilesScreen(
     profiles: List<ProfileResultWithManager<*>>,
-    onExpandProfile: (ProfilePlatform) -> Unit,
+    onExpandProfile: (Platform) -> Unit,
     reorderEnabled: Boolean,
 ) {
     val context = context
@@ -85,7 +86,7 @@ private fun ProfilesScreen(
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
-    onExpandProfile: (ProfilePlatform) -> Unit
+    onExpandProfile: (Platform) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
     val profilesOrder by profilesOrderState()
@@ -169,13 +170,13 @@ private fun ReloadProfilesButton(
 }
 
 @Composable
-private fun AddProfileMenuItem(platform: ProfilePlatform, onSelect: () -> Unit) {
+private fun AddProfileMenuItem(platform: Platform, onSelect: () -> Unit) {
     DropdownMenuItem(
         onClick = onSelect,
         content = {
             Text(
                 text = when (platform) {
-                    ProfilePlatform.clist -> "import from clist.by"
+                    clist -> "import from clist.by"
                     else -> platform.name
                 },
                 style = CPSDefaults.MonospaceTextStyle
@@ -189,7 +190,7 @@ private fun AddProfileButton(
     availableProfiles: List<ProfileResultWithManager<*>>
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var selectedPlatform: ProfilePlatform? by remember { mutableStateOf(null) }
+    var selectedPlatform: Platform? by remember { mutableStateOf(null) }
 
     val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
@@ -207,10 +208,10 @@ private fun AddProfileButton(
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            val platforms = remember(availableProfiles) {
-                val all = ProfileManager.entries().map { it.platform }
+            val platforms: List<Platform> = remember(availableProfiles) {
+                val all = profilePlatforms
                 val available = availableProfiles.map { it.platform }
-                all - available + ProfilePlatform.clist
+                all - available + Platform.clist
             }
 
             platforms.forEach { platform ->
@@ -223,7 +224,7 @@ private fun AddProfileButton(
     }
 
     selectedPlatform?.let { platform ->
-        if (platform == ProfilePlatform.clist) {
+        if (platform == clist) {
             CListImportDialog(
                 onDismissRequest = { selectedPlatform = null }
             )

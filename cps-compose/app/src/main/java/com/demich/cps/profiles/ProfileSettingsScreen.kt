@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.ProfileSettingsProvider
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 private fun ProfileSettingsScreen(
-    platform: ProfilePlatform
+    platform: Platform
 ) {
     val manager = remember(platform) { profileManagerOf(platform) }
     ProfileSettingsScreen(manager = manager)

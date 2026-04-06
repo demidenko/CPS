@@ -5,26 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
 
-@androidx.annotation.Keep //navigation agr type
-enum class ProfilePlatform {
-    codeforces,
-    atcoder,
-    codechef,
-    dmoj,
-    acmp,
-    timus,
-    clist
-}
 
 // TODO: rename manager to smth better
 abstract class ProfileManager<U: UserInfo> {
-    abstract val platform: ProfilePlatform
+    abstract val platform: Platform
 
     override fun equals(other: Any?): Boolean {
         return other is ProfileManager<U> && platform == other.platform
@@ -73,7 +64,11 @@ abstract class ProfileManager<U: UserInfo> {
     }
 }
 
-fun profileManagerOf(platform: ProfilePlatform) =
+// used in profile screen
+val profilePlatforms: List<Platform> =
+    ProfileManager.entries().map { it.platform }
+
+fun profileManagerOf(platform: Platform) =
     ProfileManager.entries().first { it.platform == platform }
 
 interface ProfileSuggestionsProvider {

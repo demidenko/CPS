@@ -21,8 +21,8 @@ import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.ProfilePlatform
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -144,8 +144,8 @@ private fun TestHandles(
 ) {
     val managers = remember { ProfileManager.ratedEntries() }
 
-    var selectedPlatform by rememberSaveable {
-        mutableStateOf(ProfilePlatform.codeforces)
+    var selectedPlatform: Platform by rememberSaveable {
+        mutableStateOf(codeforces)
     }
 
     Row(modifier = modifier) {
