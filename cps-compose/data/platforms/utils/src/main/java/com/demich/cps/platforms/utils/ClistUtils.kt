@@ -28,34 +28,34 @@ object ClistUtils {
         additionalResources: Collection<ClistResource> = emptyList()
     ): List<Int> = buildList {
         for (platform in platforms) {
-            if (platform == Contest.Platform.unknown) addAll(additionalResources.map { it.id })
+            if (platform == unknown) addAll(additionalResources.map { it.id })
             else add(getClistApiResourceId(platform))
         }
     }
 
     fun getClistApiResourceId(platform: Contest.Platform): Int =
         when (platform) {
-            Contest.Platform.unknown -> throw IllegalArgumentException("unknown not allowed")
-            Contest.Platform.codeforces -> 1
-            Contest.Platform.atcoder -> 93
-            Contest.Platform.topcoder -> 12
-            Contest.Platform.codechef -> 2
-            Contest.Platform.dmoj -> 77
+            unknown -> throw IllegalArgumentException("unknown not allowed")
+            codeforces -> 1
+            atcoder -> 93
+            topcoder -> 12
+            codechef -> 2
+            dmoj -> 77
         }
 
     fun extractContestId(contest: ClistContest, platform: Contest.Platform?): String =
         when (platform) {
-            Contest.Platform.codeforces -> {
+            codeforces -> {
                 contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")
                     .toIntOrNull()?.toString()
             }
-            Contest.Platform.atcoder -> {
+            atcoder -> {
                 contest.href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
             }
-            Contest.Platform.codechef -> {
+            codechef -> {
                 contest.href.removePrefixHttp().removePrefix("www.codechef.com/")
             }
-            Contest.Platform.dmoj -> {
+            dmoj -> {
                 contest.href.removePrefixHttp().removePrefix("dmoj.ca/contest/")
             }
             else -> null
