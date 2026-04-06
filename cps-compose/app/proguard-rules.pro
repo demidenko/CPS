@@ -50,3 +50,6 @@
 # END https://github.com/Kotlin/kotlinx.serialization#android
 
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+
+# navigation agr type
+-keep class com.demich.cps.platforms.Platform

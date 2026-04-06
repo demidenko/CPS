@@ -2,19 +2,6 @@ package com.demich.cps.platforms
 
 import com.demich.cps.R
 
-@androidx.annotation.Keep //navigation agr type
-enum class Platform {
-    codeforces,
-    atcoder,
-    codechef,
-    topcoder,
-    dmoj,
-    project_euler,
-    clist,
-    acmp,
-    timus,
-}
-
 fun platformLogoResId(platform: Platform): Int =
     when (platform) {
         codeforces -> R.drawable.ic_logo_codeforces
