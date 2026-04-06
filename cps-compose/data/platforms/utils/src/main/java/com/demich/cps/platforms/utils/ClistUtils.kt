@@ -29,37 +29,9 @@ object ClistUtils {
     ): List<Int> = buildList {
         for (platform in platforms) {
             if (platform == unknown) addAll(additionalResources.map { it.id })
-            else add(getClistApiResourceId(platform))
+            else add(platform.clistRosourceId())
         }
     }
-
-    fun getClistApiResourceId(platform: ContestPlatform): Int =
-        when (platform) {
-            unknown -> throw IllegalArgumentException("unknown not allowed")
-            codeforces -> 1
-            atcoder -> 93
-            topcoder -> 12
-            codechef -> 2
-            dmoj -> 77
-        }
-
-    fun extractContestId(contest: ClistContest, platform: ContestPlatform?): String =
-        when (platform) {
-            codeforces -> {
-                contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")
-                    .toIntOrNull()?.toString()
-            }
-            atcoder -> {
-                contest.href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
-            }
-            codechef -> {
-                contest.href.removePrefixHttp().removePrefix("www.codechef.com/")
-            }
-            dmoj -> {
-                contest.href.removePrefixHttp().removePrefix("dmoj.ca/contest/")
-            }
-            else -> null
-        } ?: contest.id.toString()
 
     fun extractLoginSuggestions(source: String): List<String> =
         Jsoup.parse(source).select("td.username").map { it.text() }
@@ -104,4 +76,33 @@ object ClistUtils {
     }
 }
 
-private fun String.removePrefixHttp() = removePrefix("http://").removePrefix("https://")
+fun ClistContest.extractContestId(platform: ContestPlatform?): String =
+    when (platform) {
+        codeforces -> {
+            href.removePrefixHttp().removePrefix("codeforces.com/contests/")
+                .toIntOrNull()?.toString()
+        }
+        atcoder -> {
+            href.removePrefixHttp().removePrefix("atcoder.jp/contests/")
+        }
+        codechef -> {
+            href.removePrefixHttp().removePrefix("www.codechef.com/")
+        }
+        dmoj -> {
+            href.removePrefixHttp().removePrefix("dmoj.ca/contest/")
+        }
+        else -> null
+    } ?: id.toString()
+
+private fun String.removePrefixHttp() =
+    removePrefix("http://").removePrefix("https://")
+
+fun ContestPlatform.clistRosourceId(): Int =
+    when (this) {
+        unknown -> throw IllegalArgumentException("unknown not allowed")
+        codeforces -> 1
+        atcoder -> 93
+        topcoder -> 12
+        codechef -> 2
+        dmoj -> 77
+    }

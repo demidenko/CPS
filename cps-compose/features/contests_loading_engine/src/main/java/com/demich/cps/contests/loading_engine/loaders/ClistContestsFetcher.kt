@@ -8,6 +8,8 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.utils.ClistUtils
+import com.demich.cps.platforms.utils.clistRosourceId
+import com.demich.cps.platforms.utils.extractContestId
 import kotlin.time.Duration.Companion.seconds
 
 class ClistContestsFetcher(
@@ -43,12 +45,12 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
 
 private fun ClistContest.toContest(): Contest {
     val platform: ContestPlatform = Contest.platformsExceptUnknown
-        .find { ClistUtils.getClistApiResourceId(it) == resource_id }
+        .find { it.clistRosourceId() == resource_id }
         ?: unknown
 
     return Contest(
         platform = platform,
-        id = ClistUtils.extractContestId(this, platform),
+        id = extractContestId(platform),
         title = event,
         startTime = ClistUtils.parseContestDate(start),
         endTime = ClistUtils.parseContestDate(end),
