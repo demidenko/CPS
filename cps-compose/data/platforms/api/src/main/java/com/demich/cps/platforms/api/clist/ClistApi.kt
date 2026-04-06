@@ -6,7 +6,7 @@ interface ClistApi {
 
     suspend fun getContests(
         apiAccess: ApiAccess,
-        resourceIds: List<Int>,
+        resourceIds: Collection<Int>,
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest>

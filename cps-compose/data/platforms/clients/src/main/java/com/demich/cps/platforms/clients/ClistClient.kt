@@ -63,7 +63,7 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
 
     override suspend fun getContests(
         apiAccess: ClistApi.ApiAccess,
-        resourceIds: List<Int>,
+        resourceIds: Collection<Int>,
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest> {

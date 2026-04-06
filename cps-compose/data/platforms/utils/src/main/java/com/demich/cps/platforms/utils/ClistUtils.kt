@@ -27,7 +27,7 @@ object ClistUtils {
     fun makeResourceIds(
         platforms: Collection<ContestPlatform>,
         additionalResources: Collection<ClistResource> = emptyList()
-    ): List<Int> = buildList {
+    ): Set<Int> = buildSet {
         for (platform in platforms) {
             if (platform == unknown) addAll(additionalResources.map { it.id })
             else add(platform.clistResourceId())
