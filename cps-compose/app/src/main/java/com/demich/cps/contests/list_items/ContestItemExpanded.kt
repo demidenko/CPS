@@ -92,6 +92,7 @@ private fun ContestTitle(
         isVirtual = contest.isVirtual,
         modifier = Modifier
             .padding(horizontal = 8.dp)
+            .padding(top = 2.dp)
             .fillMaxWidth()
     )
 }

@@ -271,7 +271,7 @@ internal fun Modifier.contestItemPaddings() =
     this.padding(
         start = 4.dp,
         end = 7.dp,
-        top = 3.dp,
+        top = 5.dp,
         bottom = 4.dp
     )
 
