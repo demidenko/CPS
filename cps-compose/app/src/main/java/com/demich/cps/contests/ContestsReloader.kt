@@ -1,6 +1,6 @@
 package com.demich.cps.contests
 
-import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
@@ -35,7 +35,7 @@ interface ContestsReloader {
     }
 
     suspend fun reload(
-        platforms: Collection<Contest.Platform>,
+        platforms: Collection<ContestPlatform>,
         settings: ContestsSettingsDataStore,
         contestsReceiver: ContestsReceiver
     ) {
@@ -55,7 +55,7 @@ interface ContestsReloader {
     }
 
     fun transform(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         flow: Flow<ContestsFetchResult>
     ): Flow<ContestsFetchResult> {
         return flow
@@ -63,7 +63,7 @@ interface ContestsReloader {
 }
 
 
-private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<Contest.Platform>) =
+private suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<ContestPlatform>) =
     fromSnapshot {
         contestsFetchFlows(
             setup = fetchPriorityLists.value.filterKeys { it in platforms },

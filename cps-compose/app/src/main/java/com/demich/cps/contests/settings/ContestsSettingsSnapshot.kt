@@ -1,6 +1,7 @@
 package com.demich.cps.contests.settings
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -8,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ContestsSettingsSnapshot(
-    val enabledPlatforms: Set<Contest.Platform>,
+    val enabledPlatforms: Set<ContestPlatform>,
     val clistResourcesIds: Set<Int>,
     val contestsDateConstraints: ContestDateRelativeConstraints
 )
@@ -24,13 +25,13 @@ suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
 
 
 class ContestsSettingsSnapshotDiff(
-    val toReload: Set<Contest.Platform>,
-    val toRemove: Set<Contest.Platform>
+    val toReload: Set<ContestPlatform>,
+    val toRemove: Set<ContestPlatform>
 )
 
 fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot): ContestsSettingsSnapshotDiff {
-    val toReload = mutableSetOf<Contest.Platform>()
-    val toRemove: Set<Contest.Platform>
+    val toReload = mutableSetOf<ContestPlatform>()
+    val toRemove: Set<ContestPlatform>
 
     snapshot.enabledPlatforms.let { prev ->
         val current = enabledPlatforms
@@ -41,7 +42,7 @@ fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot):
     snapshot.clistResourcesIds.let { prev ->
         val current = clistResourcesIds
         if (prev != current) {
-            toReload.add(Contest.Platform.unknown)
+            toReload.add(unknown)
         }
     }
 

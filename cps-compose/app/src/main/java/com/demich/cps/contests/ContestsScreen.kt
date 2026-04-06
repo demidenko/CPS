@@ -201,7 +201,7 @@ private fun List<Contest>.filterBy(state: FilterState) =
     filterByTokensAsSubsequence(state.filter) {
         sequence {
             yield(title)
-            if (platform != Contest.Platform.unknown) yield(platform.name)
+            if (platform != unknown) yield(platform.name)
             host?.let { yield(it) }
         }
     }

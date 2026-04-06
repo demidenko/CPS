@@ -168,7 +168,7 @@ private fun ContestItemMenuButton(
 }
 
 private fun Contest.properLink(): String? {
-    if (platform == Contest.Platform.codeforces) {
+    if (platform == codeforces) {
         val contestId = id.toIntOrNull() ?: return link
         return when (phaseAt(time = getSystemTime())) {
             UPCOMING -> CodeforcesUrls.contestPending(contestId = contestId)

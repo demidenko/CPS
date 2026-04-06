@@ -1,14 +1,15 @@
 package com.demich.cps.contests.loading
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.ContestsRepository
 
 fun interface ContestsReceiver {
-    suspend fun save(platform: Contest.Platform, contests: List<Contest>)
+    suspend fun save(platform: ContestPlatform, contests: List<Contest>)
 }
 
 data class ContestsFetchResult(
-    val platform: Contest.Platform,
+    val platform: ContestPlatform,
     val fetchSource: ContestsFetchSource,
     val result: Result<List<Contest>>
 )

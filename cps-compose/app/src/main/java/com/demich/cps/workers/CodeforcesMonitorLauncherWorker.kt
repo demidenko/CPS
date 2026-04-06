@@ -2,7 +2,6 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -133,7 +132,7 @@ private suspend fun CPSPeriodicWork.enqueueToCodeforcesContest(
     workerStartTime: Instant
 ) {
     context.contestsRepository.getContestsNotFinished(
-        platform = Contest.Platform.codeforces,
+        platform = codeforces,
         currentTime = workerStartTime
     ).minOfNotNull {
         when (it.phaseAt(workerStartTime)) {

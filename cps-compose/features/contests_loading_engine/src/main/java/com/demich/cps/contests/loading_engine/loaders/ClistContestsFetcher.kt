@@ -1,6 +1,7 @@
 package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistApi
@@ -17,7 +18,7 @@ class ClistContestsFetcher(
     override val fetchSource get() = ContestsFetchSource.clist_api
 
     override suspend fun getContests(
-        platforms: Set<Contest.Platform>,
+        platforms: Set<ContestPlatform>,
         dateConstraints: ContestDateConstraints
     ) = api.getContests(
         apiAccess = apiAccess,
@@ -35,15 +36,15 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
             return@mapNotNull null
         }
         when (contest.platform) {
-            Contest.Platform.atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
+            atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
             else -> contest
         }
     }
 
 private fun ClistContest.toContest(): Contest {
-    val platform = Contest.platformsExceptUnknown
+    val platform: ContestPlatform = Contest.platformsExceptUnknown
         .find { ClistUtils.getClistApiResourceId(it) == resource_id }
-        ?: Contest.Platform.unknown
+        ?: unknown
 
     return Contest(
         platform = platform,
@@ -53,6 +54,6 @@ private fun ClistContest.toContest(): Contest {
         endTime = ClistUtils.parseContestDate(end),
         duration = duration.seconds,
         link = href,
-        host = host.takeIf { platform == Contest.Platform.unknown }
+        host = host.takeIf { platform == unknown }
     )
 }

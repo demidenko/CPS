@@ -9,7 +9,7 @@ import kotlin.time.Instant
     primaryKeys = ["platform", "id"]
 )
 data class Contest (
-    val platform: Platform,
+    val platform: ContestPlatform,
     val id: String,
     val title: String,
     val startTime: Instant,
@@ -27,7 +27,7 @@ data class Contest (
     }
 
     constructor(
-        platform: Platform,
+        platform: ContestPlatform,
         id: String,
         title: String,
         startTime: Instant,
@@ -46,7 +46,7 @@ data class Contest (
     )
 
     constructor(
-        platform: Platform,
+        platform: ContestPlatform,
         id: String,
         title: String,
         startTime: Instant,
@@ -70,19 +70,9 @@ data class Contest (
         FINISHED
     }
 
-    enum class Platform {
-        unknown,
-        codeforces,
-        atcoder,
-        codechef,
-        topcoder,
-        dmoj
-        ;
-    }
-
     companion object {
-        val platforms: List<Platform> get() = Platform.entries
-        val platformsExceptUnknown: List<Platform> = platforms - Platform.unknown
+        val platforms: List<ContestPlatform> get() = ContestPlatform.entries
+        val platformsExceptUnknown: List<ContestPlatform> = platforms - ContestPlatform.unknown
 
         fun comparatorAt(time: Instant) = Comparator<Contest> { c1, c2 ->
             val phase1 = c1.phaseAt(time)

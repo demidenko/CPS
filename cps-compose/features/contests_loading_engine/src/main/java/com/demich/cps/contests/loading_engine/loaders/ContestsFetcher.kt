@@ -1,6 +1,7 @@
 package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.kotlin_stdlib_boost.toEnumSet
@@ -10,14 +11,14 @@ abstract class ContestsFetcher {
     abstract val fetchSource: ContestsFetchSource
 
     protected open suspend fun getContests(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         return getContests(platform = platform).filterBy(dateConstraints)
     }
 
     protected open suspend fun getContests(
-        platform: Contest.Platform
+        platform: ContestPlatform
     ): List<Contest> {
         return getContests(
             platform = platform,
@@ -26,7 +27,7 @@ abstract class ContestsFetcher {
     }
 
     suspend fun fetchContests(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         require(platform in fetchSource.platforms)
@@ -41,14 +42,14 @@ abstract class ContestsFetcher {
 
 abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
     protected open suspend fun getContests(
-        platforms: Set<Contest.Platform>,
+        platforms: Set<ContestPlatform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         return getContests(platforms = platforms).filterBy(dateConstraints)
     }
 
     protected open suspend fun getContests(
-        platforms: Set<Contest.Platform>
+        platforms: Set<ContestPlatform>
     ): List<Contest> {
         return getContests(
             platforms = platforms,
@@ -57,7 +58,7 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
     }
 
     suspend fun fetchContests(
-        platforms: Collection<Contest.Platform>,
+        platforms: Collection<ContestPlatform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
@@ -72,7 +73,7 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
     }
 
     final override suspend fun getContests(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         dateConstraints: ContestDateConstraints
     ) = getContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }

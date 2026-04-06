@@ -7,11 +7,11 @@ import kotlin.time.Instant
 interface ContestsRepository {
     fun flowOfContests(): Flow<List<Contest>>
 
-    suspend fun getContests(platform: Contest.Platform): List<Contest>
+    suspend fun getContests(platform: ContestPlatform): List<Contest>
 
-    suspend fun getContestsNotFinished(platform: Contest.Platform, currentTime: Instant): List<Contest>
+    suspend fun getContestsNotFinished(platform: ContestPlatform, currentTime: Instant): List<Contest>
 
-    suspend fun replace(platform: Contest.Platform, contests: List<Contest>)
+    suspend fun replace(platform: ContestPlatform, contests: List<Contest>)
 }
 
 val Context.contestsRepository: ContestsRepository

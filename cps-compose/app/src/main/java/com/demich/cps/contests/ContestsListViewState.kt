@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.utils.SafetyLevel
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -15,7 +16,7 @@ import com.sebaslogen.resaca.rememberScoped
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
-typealias ContestCompositeId = Pair<Contest.Platform, String>
+typealias ContestCompositeId = Pair<ContestPlatform, String>
 
 val Contest.compositeId: ContestCompositeId
     get() = platform to id

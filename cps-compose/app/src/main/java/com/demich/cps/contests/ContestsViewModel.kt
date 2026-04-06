@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
@@ -44,10 +44,10 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
                 .distinct()
         }
 
-    private val loadingStatuses = MutableStateFlow(emptyMap<Contest.Platform, LoadingStatus>())
-    private val errors = MutableStateFlow(emptyMap<Contest.Platform, List<Pair<ContestsFetchSource,Throwable>>>())
+    private val loadingStatuses = MutableStateFlow(emptyMap<ContestPlatform, LoadingStatus>())
+    private val errors = MutableStateFlow(emptyMap<ContestPlatform, List<Pair<ContestsFetchSource,Throwable>>>())
 
-    private fun setLoadingStatus(platform: Contest.Platform, loadingStatus: LoadingStatus) =
+    private fun setLoadingStatus(platform: ContestPlatform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
             if (loadingStatus == LOADING) check(this[platform] != LOADING)
             if (loadingStatus == PENDING) remove(platform)
@@ -55,7 +55,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
         }
 
     override fun transform(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         flow: Flow<ContestsFetchResult>
     ) = flow.run {
         var lastStatus: LoadingStatus = PENDING

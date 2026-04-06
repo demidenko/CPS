@@ -2,6 +2,7 @@ package com.demich.cps.contests.settings
 
 import android.content.Context
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistApi
@@ -27,8 +28,8 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
-    private val enabledKnownPlatforms = itemEnumSet<Contest.Platform>(name = "enabled_platforms")
-    suspend fun changeEnabled(platform: Contest.Platform, enabled: Boolean) {
+    private val enabledKnownPlatforms = itemEnumSet<ContestPlatform>(name = "enabled_platforms")
+    suspend fun changeEnabled(platform: ContestPlatform, enabled: Boolean) {
         require(platform != unknown)
         enabledKnownPlatforms.edit {
             if (enabled) add(platform) else remove(platform)

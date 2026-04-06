@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.toGeneralPlatform
 import com.demich.cps.platforms.Platform
@@ -58,7 +59,7 @@ internal fun ContestPlatformsSettingsItem() {
                 enabledPlatforms = enabledPlatforms,
                 clistResources = clistResources,
                 onCheckedChange = { platform, checked ->
-                    require(platform != Contest.Platform.unknown)
+                    require(platform != unknown)
                     scope.launch {
                         context.settingsContests.changeEnabled(
                             platform = platform,
@@ -74,14 +75,14 @@ internal fun ContestPlatformsSettingsItem() {
 @Composable
 context(scope: SettingsContainerScope)
 private fun EnabledPlatformsSubtitle(
-    enabledPlatforms: Set<Contest.Platform>,
+    enabledPlatforms: Set<ContestPlatform>,
     clistResources: List<ClistResource>
 ) {
     Subtitle(
         selected = remember(key1 = enabledPlatforms, key2 = clistResources) {
             buildList {
                 enabledPlatforms.sortedBy { it.ordinal }.forEach {
-                    if (it != Contest.Platform.unknown) add(it.name)
+                    if (it != unknown) add(it.name)
                 }
                 clistResources.forEach { add(it.name) }
             }
@@ -91,9 +92,9 @@ private fun EnabledPlatformsSubtitle(
 
 @Composable
 private fun ContestPlatformsSettingsItemExpandedContent(
-    enabledPlatforms: Set<Contest.Platform>,
+    enabledPlatforms: Set<ContestPlatform>,
     clistResources: List<ClistResource>,
-    onCheckedChange: (Contest.Platform, Boolean) -> Unit
+    onCheckedChange: (ContestPlatform, Boolean) -> Unit
 ) {
     Column {
         Contest.platformsExceptUnknown.forEach { platform ->
@@ -110,7 +111,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
 
 @Composable
 private fun PlatformCheckRow(
-    platform: Contest.Platform,
+    platform: ContestPlatform,
     availableSources: Set<ContestsFetchSource>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -137,7 +138,7 @@ private fun PlatformCheckRow(
 
 @Composable
 private fun FetchSourcesSetupButton(
-    platform: Contest.Platform,
+    platform: ContestPlatform,
     fetchSources: Set<ContestsFetchSource>
 ) {
     var showDialog by remember { mutableStateOf(false) }

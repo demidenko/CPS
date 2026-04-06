@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -31,7 +32,7 @@ fun ContestPlatformIcon(
 
 @Composable
 fun ContestPlatformIcon(
-    platform: Contest.Platform,
+    platform: ContestPlatform,
     modifier: Modifier = Modifier,
     size: TextUnit,
     color: Color
@@ -59,7 +60,7 @@ fun ContestPlatformIcon(
     )
 }
 
-private inline fun Contest.Platform.toGeneralPlatformOr(block: () -> Nothing): Platform =
+private inline fun ContestPlatform.toGeneralPlatformOr(block: () -> Nothing): Platform =
     when (this) {
         unknown -> block()
         codeforces -> codeforces
@@ -69,10 +70,10 @@ private inline fun Contest.Platform.toGeneralPlatformOr(block: () -> Nothing): P
         dmoj -> dmoj
     }
 
-fun Contest.Platform.toGeneralPlatformOrNull(): Platform? =
+fun ContestPlatform.toGeneralPlatformOrNull(): Platform? =
     toGeneralPlatformOr { return null }
 
-fun Contest.Platform.toGeneralPlatform(): Platform =
+fun ContestPlatform.toGeneralPlatform(): Platform =
     toGeneralPlatformOr { throw IllegalArgumentException() }
 
 fun Contest.generalPlatformOrNull(): Platform? =

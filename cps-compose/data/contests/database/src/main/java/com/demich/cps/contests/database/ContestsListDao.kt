@@ -24,9 +24,9 @@ internal abstract class ContestsListDao: ContestsRepository {
     //abstract suspend fun remove(platform: Contest.Platform)
 
     @Query("delete from $contestsTableName where platform = :platform and id not in (:ids)")
-    protected abstract suspend fun __queryRemoveNotIn(platform: Contest.Platform, ids: Set<String>)
+    protected abstract suspend fun __queryRemoveNotIn(platform: ContestPlatform, ids: Set<String>)
 
-    private suspend fun removeNotIn(platform: Contest.Platform, ids: Set<String>) {
+    private suspend fun removeNotIn(platform: ContestPlatform, ids: Set<String>) {
         if (ids.size < SQLITE_MAX_VARIABLE_NUMBER) {
             __queryRemoveNotIn(platform, ids)
         } else {
@@ -35,7 +35,7 @@ internal abstract class ContestsListDao: ContestsRepository {
     }
 
     @Transaction
-    override suspend fun replace(platform: Contest.Platform, contests: List<Contest>) {
+    override suspend fun replace(platform: ContestPlatform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()) { it.id }
         removeNotIn(platform, ids)
@@ -46,9 +46,9 @@ internal abstract class ContestsListDao: ContestsRepository {
     abstract override fun flowOfContests(): Flow<List<Contest>>
 
     @Query("select * from $contestsTableName where platform = :platform")
-    abstract override suspend fun getContests(platform: Contest.Platform): List<Contest>
+    abstract override suspend fun getContests(platform: ContestPlatform): List<Contest>
 
     @Query("select * from $contestsTableName where platform = :platform and endTime > :currentTime")
-    abstract override suspend fun getContestsNotFinished(platform: Contest.Platform, currentTime: Instant): List<Contest>
+    abstract override suspend fun getContestsNotFinished(platform: ContestPlatform, currentTime: Instant): List<Contest>
 
 }

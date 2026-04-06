@@ -42,7 +42,7 @@ private class AtCoderContestParser {
         val duration = Duration.parseHHMM(input = td[2].text())
 
         return Contest(
-            platform = Contest.Platform.atcoder,
+            platform = atcoder,
             title = title.text().trim(),
             id = id,
             link = AtCoderUrls.contest(id),

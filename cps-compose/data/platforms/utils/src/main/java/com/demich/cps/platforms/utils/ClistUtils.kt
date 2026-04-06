@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.utils
 
-import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.profiles.userinfo.ClistUserInfo
@@ -24,7 +24,7 @@ object ClistUtils {
         Instant.parse(str, contestDateFormat)
 
     fun makeResourceIds(
-        platforms: Collection<Contest.Platform>,
+        platforms: Collection<ContestPlatform>,
         additionalResources: Collection<ClistResource> = emptyList()
     ): List<Int> = buildList {
         for (platform in platforms) {
@@ -33,7 +33,7 @@ object ClistUtils {
         }
     }
 
-    fun getClistApiResourceId(platform: Contest.Platform): Int =
+    fun getClistApiResourceId(platform: ContestPlatform): Int =
         when (platform) {
             unknown -> throw IllegalArgumentException("unknown not allowed")
             codeforces -> 1
@@ -43,7 +43,7 @@ object ClistUtils {
             dmoj -> 77
         }
 
-    fun extractContestId(contest: ClistContest, platform: Contest.Platform?): String =
+    fun extractContestId(contest: ClistContest, platform: ContestPlatform?): String =
         when (platform) {
             codeforces -> {
                 contest.href.removePrefixHttp().removePrefix("codeforces.com/contests/")

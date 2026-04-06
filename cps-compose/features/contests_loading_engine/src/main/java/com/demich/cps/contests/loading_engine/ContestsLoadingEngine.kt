@@ -1,6 +1,7 @@
 package com.demich.cps.contests.loading_engine
 
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
@@ -17,10 +18,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 fun contestsFetchFlows(
-    setup: Map<Contest.Platform, List<ContestsFetchSource>>,
+    setup: Map<ContestPlatform, List<ContestsFetchSource>>,
     dateConstraints: ContestDateConstraints,
     createFetcher: (ContestsFetchSource) -> ContestsFetcher
-): Map<Contest.Platform, Flow<ContestsFetchResult>> {
+): Map<ContestPlatform, Flow<ContestsFetchResult>> {
     val memoizer = ContestsFetchMemoizer(setup, dateConstraints, createFetcher)
 
     return setup.mapValues { (platform, priorities) ->
@@ -35,7 +36,7 @@ fun contestsFetchFlows(
 }
 
 private fun List<ContestsFetchSource>.toFetchFlow(
-    platform: Contest.Platform,
+    platform: ContestPlatform,
     memoizer: ContestsFetchMemoizer
 ): Flow<ContestsFetchResult> = flow {
     forEach { fetchSource ->
@@ -58,18 +59,18 @@ private fun Contest.correctTitle(): Contest {
 }
 
 private class ContestsFetchMemoizer(
-    private val setup: Map<Contest.Platform, List<ContestsFetchSource>>,
+    private val setup: Map<ContestPlatform, List<ContestsFetchSource>>,
     private val dateConstraints: ContestDateConstraints,
     private val getFetcher: (ContestsFetchSource) -> ContestsFetcher
 ) {
-    private typealias ContestsResult = Result<Map<Contest.Platform, List<Contest>>>
+    private typealias ContestsResult = Result<Map<ContestPlatform, List<Contest>>>
 
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
     private val fetchers = mutableMapOf<ContestsFetchSource, ContestsFetcher>()
 
     suspend fun getContests(
-        platform: Contest.Platform,
+        platform: ContestPlatform,
         source: ContestsFetchSource
     ): Result<List<Contest>> {
         val fetcher = mutex.withLock {
