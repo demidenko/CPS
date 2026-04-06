@@ -7,14 +7,13 @@ import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 
-class CodeforcesContestsFetcher(val api: CodeforcesApi): ContestsFetcher() {
-    override val fetchSource get() = ContestsFetchSource.codeforces_api
+class CodeforcesContestsFetcher(val api: CodeforcesApi): ContestsSinglePlatformFetcher() {
+    override val platform: ContestPlatform get() = codeforces
 
-    override suspend fun getContests(
-        platform: ContestPlatform,
-        dateConstraints: ContestDateConstraints
-    ) = api.getContests()
-        .mapNotNull {
+    override val fetchSource: ContestsFetchSource get() = codeforces_api
+
+    override suspend fun getContests(dateConstraints: ContestDateConstraints) =
+        api.getContests().mapNotNull {
             if (dateConstraints.check(startTime = it.startTime, duration = it.duration)) {
                 Contest(
                     platform = codeforces,

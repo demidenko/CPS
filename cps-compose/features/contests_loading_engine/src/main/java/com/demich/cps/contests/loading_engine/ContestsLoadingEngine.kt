@@ -7,6 +7,7 @@ import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.loading_engine.loaders.ContestsFetcher
 import com.demich.cps.contests.loading_engine.loaders.ContestsMultiplatformFetcher
+import com.demich.cps.contests.loading_engine.loaders.ContestsSinglePlatformFetcher
 import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -79,22 +80,22 @@ private class ContestsFetchMemoizer(
             }
         }
 
-        if (fetcher is ContestsMultiplatformFetcher) {
-            return mutex.withLock {
-                results.getOrPut(source) {
-                    coroutineScope {
-                        async { fetcher.fetchAllPlatforms() }
-                    }
+        return when (fetcher) {
+            is ContestsSinglePlatformFetcher -> {
+                fetcher.runCatching {
+                    fetchContests(dateConstraints = dateConstraints)
                 }
-            }.await().map {
-                it.getOrElse(platform) { emptyList() }
             }
-        } else {
-            return fetcher.runCatching {
-                fetchContests(
-                    platform = platform,
-                    dateConstraints = dateConstraints
-                )
+            is ContestsMultiplatformFetcher -> {
+                mutex.withLock {
+                    results.getOrPut(source) {
+                        coroutineScope {
+                            async { fetcher.fetchAllPlatforms() }
+                        }
+                    }
+                }.await().map {
+                    it.getOrElse(platform) { emptyList() }
+                }
             }
         }
     }

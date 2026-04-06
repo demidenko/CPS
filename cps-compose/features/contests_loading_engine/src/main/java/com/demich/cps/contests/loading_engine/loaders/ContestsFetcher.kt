@@ -6,41 +6,36 @@ import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.kotlin_stdlib_boost.toEnumSet
 
+sealed interface ContestsFetcher {
+    val fetchSource: ContestsFetchSource
+}
 
-abstract class ContestsFetcher {
-    abstract val fetchSource: ContestsFetchSource
+abstract class ContestsSinglePlatformFetcher: ContestsFetcher {
+
+    abstract val platform: ContestPlatform
 
     protected open suspend fun getContests(
-        platform: ContestPlatform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        return getContests(platform = platform).filterBy(dateConstraints)
+        return getContests().filterBy(dateConstraints)
     }
 
-    protected open suspend fun getContests(
-        platform: ContestPlatform
-    ): List<Contest> {
-        return getContests(
-            platform = platform,
-            dateConstraints = ContestDateConstraints()
-        )
+    protected open suspend fun getContests(): List<Contest> {
+        return getContests(dateConstraints = ContestDateConstraints())
     }
 
     suspend fun fetchContests(
-        platform: ContestPlatform,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         require(platform in fetchSource.platforms)
-        return getContests(
-            platform = platform,
-            dateConstraints = dateConstraints
-        ).apply {
+        return getContests(dateConstraints = dateConstraints).apply {
             check(all { it.platform == platform })
         }
     }
 }
 
-abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
+abstract class ContestsMultiplatformFetcher: ContestsFetcher {
+
     protected open suspend fun getContests(
         platforms: Set<ContestPlatform>,
         dateConstraints: ContestDateConstraints
@@ -71,11 +66,6 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher() {
             check(all { it.platform in platforms })
         }
     }
-
-    final override suspend fun getContests(
-        platform: ContestPlatform,
-        dateConstraints: ContestDateConstraints
-    ) = getContests(platforms = setOf(platform), dateConstraints = dateConstraints)
 }
 
 internal fun ContestDateConstraints.check(contest: Contest): Boolean =
