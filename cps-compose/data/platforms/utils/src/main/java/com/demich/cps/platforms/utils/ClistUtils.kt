@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.profiles.userinfo.ClistUserInfo
@@ -105,4 +106,17 @@ fun ContestPlatform.clistRosourceId(): Int =
         topcoder -> 12
         codechef -> 2
         dmoj -> 77
+    }
+
+fun Platform.clistRosourceId(): Int =
+    when (this) {
+        clist -> throw IllegalArgumentException("clist not allowed")
+        codeforces -> 1
+        atcoder -> 93
+        topcoder -> 12
+        codechef -> 2
+        dmoj -> 77
+        acmp -> 5
+        timus -> 7
+        project_euler -> 65
     }

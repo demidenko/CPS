@@ -1,11 +1,10 @@
 package com.demich.cps.contests.loading
 
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.kotlin_stdlib_boost.toEnumSet
 
 enum class ContestsFetchSource(val platforms: Set<ContestPlatform>) {
-    clist_api(platforms = Contest.platforms.toEnumSet()),
+    clist_api(platforms = ContestPlatform.entries.toEnumSet()),
     codeforces_api(platform = codeforces),
     atcoder_parse(platform = atcoder),
     dmoj_api(platform = dmoj)

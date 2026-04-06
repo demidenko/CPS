@@ -1,6 +1,5 @@
 package com.demich.cps.contests.settings
 
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
@@ -50,7 +49,7 @@ fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot):
         val current = contestsDateConstraints
         if (prev != current) {
             //TODO: delete contests if current in prev
-            toReload.addAll(Contest.platforms)
+            toReload.addAll(ContestPlatform.entries)
         }
     }
 

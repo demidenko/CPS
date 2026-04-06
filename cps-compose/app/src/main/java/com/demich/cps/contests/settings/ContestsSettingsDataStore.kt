@@ -1,7 +1,6 @@
 package com.demich.cps.contests.settings
 
 import android.content.Context
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
@@ -67,7 +66,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         ContestsFetchSource.entries.sortedWith(
             compareByDescending<ContestsFetchSource> { it.platforms.size }.thenBy { it.ordinal }
         ).let { sources ->
-            Contest.platforms.associateWith { platform ->
+            ContestPlatform.entries.associateWith { platform ->
                 sources.filter { platform in it.platforms }
             }
         }

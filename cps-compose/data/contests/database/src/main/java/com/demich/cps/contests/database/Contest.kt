@@ -71,8 +71,7 @@ data class Contest (
     }
 
     companion object {
-        val platforms: List<ContestPlatform> get() = ContestPlatform.entries
-        val platformsExceptUnknown: List<ContestPlatform> = platforms - ContestPlatform.unknown
+        val platformsExceptUnknown: List<ContestPlatform> = ContestPlatform.entries - ContestPlatform.unknown
 
         fun comparatorAt(time: Instant) = Comparator<Contest> { c1, c2 ->
             val phase1 = c1.phaseAt(time)
