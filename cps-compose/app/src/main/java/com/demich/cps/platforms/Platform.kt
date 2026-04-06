@@ -9,7 +9,9 @@ enum class Platform {
     topcoder,
     dmoj,
     project_euler,
-    clist
+    clist,
+    acmp,
+    timus,
 }
 
 fun platformLogoResId(platform: Platform): Int =
@@ -21,4 +23,5 @@ fun platformLogoResId(platform: Platform): Int =
         dmoj -> R.drawable.ic_logo_dmoj
         project_euler -> R.drawable.ic_logo_projecteuler
         clist -> R.drawable.ic_logo_clist
+        acmp, timus -> throw IllegalArgumentException()
     }
