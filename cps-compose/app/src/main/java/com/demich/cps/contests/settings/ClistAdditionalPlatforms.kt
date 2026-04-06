@@ -26,7 +26,7 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.niceMessage
-import com.demich.cps.platforms.utils.clistRosourceId
+import com.demich.cps.platforms.utils.clistResourceId
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle
 import com.demich.cps.ui.LoadingContentBox
@@ -124,7 +124,7 @@ private fun ColumnScope.DialogContent() {
 private suspend fun ClistApi.getResourcesSyncWithSettings(
     settings: ContestsSettingsDataStore
 ): List<ClistResource> {
-    val alreadySupported = Contest.platformsExceptUnknown.mapToSet { it.clistRosourceId() }
+    val alreadySupported = Contest.platformsExceptUnknown.mapToSet { it.clistResourceId() }
     return getResources(apiAccess = settings.clistApiAccess())
         .filter { it.id !in alreadySupported }
         .sortedBy { it.name }

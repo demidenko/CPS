@@ -30,7 +30,7 @@ object ClistUtils {
     ): List<Int> = buildList {
         for (platform in platforms) {
             if (platform == unknown) addAll(additionalResources.map { it.id })
-            else add(platform.clistRosourceId())
+            else add(platform.clistResourceId())
         }
     }
 
@@ -98,7 +98,7 @@ fun ClistContest.extractContestId(platform: ContestPlatform?): String =
 private fun String.removePrefixHttp() =
     removePrefix("http://").removePrefix("https://")
 
-fun ContestPlatform.clistRosourceId(): Int =
+fun ContestPlatform.clistResourceId(): Int =
     when (this) {
         unknown -> throw IllegalArgumentException("unknown not allowed")
         codeforces -> 1
@@ -108,9 +108,9 @@ fun ContestPlatform.clistRosourceId(): Int =
         dmoj -> 77
     }
 
-fun Platform.clistRosourceId(): Int =
-    when (this) {
-        clist -> throw IllegalArgumentException("clist not allowed")
+val Platform.clistResourceId: Int?
+    get() = when (this) {
+        clist -> null
         codeforces -> 1
         atcoder -> 93
         topcoder -> 12
