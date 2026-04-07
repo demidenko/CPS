@@ -71,7 +71,7 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
         return getApiJsonObjects(page = "contest", apiAccess = apiAccess) {
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
-            parameter("resource_id__in", resourceIds.joinToString())
+            parameter("resource_id__in", resourceIds.joinToString(separator = ","))
         }
     }
 
