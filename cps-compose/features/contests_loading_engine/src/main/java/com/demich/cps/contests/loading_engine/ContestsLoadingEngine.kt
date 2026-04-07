@@ -46,6 +46,10 @@ private fun List<ContestsFetchSource>.toFetchFlow(
             fetchSource = fetchSource,
             result = memoizer.getContests(platform, fetchSource).map { it.map { it.correctTitle() } }
         )
+
+        check(result.platform == platform)
+        check(result.fetchSource == fetchSource)
+
         emit(result)
     }
 }
