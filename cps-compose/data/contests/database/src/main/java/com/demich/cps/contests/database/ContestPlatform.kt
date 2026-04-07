@@ -5,7 +5,6 @@ enum class ContestPlatform {
     codeforces,
     atcoder,
     codechef,
-    topcoder,
     dmoj
     ;
 }

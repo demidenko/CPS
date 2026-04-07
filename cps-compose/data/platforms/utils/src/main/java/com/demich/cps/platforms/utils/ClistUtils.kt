@@ -103,7 +103,6 @@ fun ContestPlatform.clistResourceId(): Int =
         unknown -> throw IllegalArgumentException("unknown not allowed")
         codeforces -> 1
         atcoder -> 93
-        topcoder -> 12
         codechef -> 2
         dmoj -> 77
     }

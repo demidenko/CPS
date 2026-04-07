@@ -66,7 +66,6 @@ private inline fun ContestPlatform.toGeneralPlatformOr(block: () -> Nothing): Pl
         codeforces -> codeforces
         atcoder -> atcoder
         codechef -> codechef
-        topcoder -> topcoder
         dmoj -> dmoj
     }
 
@@ -78,8 +77,9 @@ fun ContestPlatform.toGeneralPlatform(): Platform =
 
 fun Contest.generalPlatformOrNull(): Platform? =
     platform.toGeneralPlatformOr {
-        return when {
-            host == "projecteuler.net" -> project_euler
+        return when (host) {
+            "projecteuler.net" -> project_euler
+            "topcoder.com" -> topcoder
             else -> null
         }
     }
