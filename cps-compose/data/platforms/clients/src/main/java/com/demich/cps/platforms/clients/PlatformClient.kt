@@ -34,17 +34,17 @@ internal fun cpsHttpClient(
 ) = HttpClient(OkHttp) {
     expectSuccess = true
 
-    install(HttpTimeout) {
-        connectTimeoutMillis = connectionTimeout.inWholeMilliseconds
-        requestTimeoutMillis = requestTimeout.inWholeMilliseconds
-    }
-
     //careful!!! only one install and retry block is used in ktor
     install(HttpRequestRetry) {
         retryOnExceptionIf(maxRetries = 3) { requestBuilder, throwable ->
             throwable.shouldRetry() || retryOnExceptionIf(throwable)
         }
         delayMillis { 500/*.milliseconds*/ }
+    }
+
+    install(HttpTimeout) {
+        connectTimeoutMillis = connectionTimeout.inWholeMilliseconds
+        requestTimeoutMillis = requestTimeout.inWholeMilliseconds
     }
 
     json?.let {
