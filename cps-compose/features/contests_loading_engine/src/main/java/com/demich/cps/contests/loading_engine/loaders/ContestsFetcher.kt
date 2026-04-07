@@ -12,8 +12,6 @@ sealed interface ContestsFetcher {
 
 abstract class ContestsSinglePlatformFetcher: ContestsFetcher {
 
-    abstract val platform: ContestPlatform
-
     protected open suspend fun getContests(
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
@@ -27,7 +25,6 @@ abstract class ContestsSinglePlatformFetcher: ContestsFetcher {
     suspend fun fetchContests(
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        require(platform in fetchSource.platforms) { "$fetchSource does not supports $platform" }
         return getContests(dateConstraints = dateConstraints)
     }
 }
@@ -55,7 +52,6 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher {
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         if (platforms.isEmpty()) return emptyList()
-        require(fetchSource.platforms.containsAll(platforms)) { "$fetchSource does not supports $platforms" }
         val platforms = platforms.toEnumSet()
         return getContests(
             platforms = platforms,

@@ -1,14 +1,12 @@
 package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.dmoj.DmojApi
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 class DmojContestsFetcher(val api: DmojApi): ContestsSinglePlatformFetcher() {
-    override val platform: ContestPlatform get() = dmoj
 
     override val fetchSource: ContestsFetchSource get() = dmoj_api
 
