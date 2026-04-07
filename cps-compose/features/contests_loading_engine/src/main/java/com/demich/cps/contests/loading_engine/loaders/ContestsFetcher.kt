@@ -28,9 +28,7 @@ abstract class ContestsSinglePlatformFetcher: ContestsFetcher {
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
         require(platform in fetchSource.platforms) { "$fetchSource does not supports $platform" }
-        return getContests(dateConstraints = dateConstraints).apply {
-            check(all { it.platform == platform })
-        }
+        return getContests(dateConstraints = dateConstraints)
     }
 }
 
@@ -62,9 +60,7 @@ abstract class ContestsMultiplatformFetcher: ContestsFetcher {
         return getContests(
             platforms = platforms,
             dateConstraints = dateConstraints
-        ).apply {
-            check(all { it.platform in platforms })
-        }
+        )
     }
 }
 
