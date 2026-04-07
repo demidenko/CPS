@@ -8,7 +8,7 @@ import com.demich.cps.platforms.utils.atcoder.getContests
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 
 class AtCoderContestsFetcher(val api: AtCoderApi): ContestsSinglePlatformFetcher() {
-    override val platform: ContestPlatform get() = codeforces
+    override val platform: ContestPlatform get() = atcoder
 
     override val fetchSource: ContestsFetchSource get() = atcoder_parse
 
