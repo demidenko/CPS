@@ -6,7 +6,7 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 
 @Entity(tableName = cfFollowTableName)
-data class CodeforcesUserBlog(
+data class CodeforcesUserBlogEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
@@ -17,10 +17,10 @@ data class CodeforcesUserBlog(
     internal val blogEntries: Set<Int>?
 )
 
-val CodeforcesUserBlog.blogSize: Int?
+val CodeforcesUserBlogEntity.blogSize: Int?
     get() = blogEntries?.size
 
-val CodeforcesUserBlog.profileResult: ProfileResult<CodeforcesUserInfo>
+val CodeforcesUserBlogEntity.profileResult: ProfileResult<CodeforcesUserInfo>
     get() = when (userInfo) {
         null -> ProfileResult.Failed(userId = handle)
         else -> ProfileResult(userInfo = userInfo)

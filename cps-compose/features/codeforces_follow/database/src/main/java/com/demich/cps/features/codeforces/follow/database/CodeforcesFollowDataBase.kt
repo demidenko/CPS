@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import com.demich.cps.features.room.instanceDelegate
 
 @Database(
-    entities = [CodeforcesUserBlog::class],
+    entities = [CodeforcesUserBlogEntity::class],
     version = 2,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)

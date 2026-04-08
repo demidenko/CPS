@@ -54,7 +54,7 @@ abstract class CodeforcesFollowRepository(
         val handle = result.handle
         if (dao.hasUser(handle)) return
         dao.insert(
-            CodeforcesUserBlog(
+            CodeforcesUserBlogEntity(
                 handle = handle,
                 blogEntries = null,
                 userInfo = result.userInfoOrNull()

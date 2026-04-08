@@ -15,13 +15,13 @@ internal const val cfFollowTableName = "FollowList"
 @Dao
 internal interface CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName")
-    suspend fun getUserBlogs(): List<CodeforcesUserBlog>
+    suspend fun getUserBlogs(): List<CodeforcesUserBlogEntity>
 
     @Query("SELECT * FROM $cfFollowTableName ORDER BY id DESC")
-    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>>
+    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlogEntity>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
-    suspend fun getUserBlog(handle: String): CodeforcesUserBlog?
+    suspend fun getUserBlog(handle: String): CodeforcesUserBlogEntity?
 
     @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
     suspend fun hasUser(handle: String): Boolean
@@ -30,10 +30,10 @@ internal interface CodeforcesFollowDao {
     suspend fun getHandles(): List<String>
 
     @Insert
-    suspend fun insert(blog: CodeforcesUserBlog)
+    suspend fun insert(blog: CodeforcesUserBlogEntity)
 
     @Update
-    suspend fun update(blog: CodeforcesUserBlog)
+    suspend fun update(blog: CodeforcesUserBlogEntity)
 
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
     suspend fun remove(handle: String)
@@ -86,10 +86,10 @@ internal interface CodeforcesFollowDao {
 }
 
 private fun merge(
-    userBlog: CodeforcesUserBlog,
+    userBlog: CodeforcesUserBlogEntity,
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-): CodeforcesUserBlog? {
+): CodeforcesUserBlogEntity? {
     val savedIds = userBlog.blogEntries
 
     // no changes

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlogEntity
 import com.demich.cps.features.codeforces.follow.database.blogSize
 import com.demich.cps.features.codeforces.follow.database.profileResult
 import com.demich.cps.navigation.CPSNavigator
@@ -88,7 +88,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: () -> List<CodeforcesUserBlog>,
+    userBlogs: () -> List<CodeforcesUserBlogEntity>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (String) -> Unit,
     onDeleteUser: (String) -> Unit,
@@ -116,13 +116,13 @@ private fun CodeforcesFollowList(
             }
     }
 
-    var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
+    var showDeleteDialogForBlog: CodeforcesUserBlogEntity? by remember { mutableStateOf(null) }
 
     LazyColumnOfData(
         state = listState,
         modifier = modifier,
         items = userBlogs,
-        key = CodeforcesUserBlog::id
+        key = CodeforcesUserBlogEntity::id
     ) { userBlog ->
         ContentWithCPSDropdownMenu(
             modifier = Modifier.animateItem(),

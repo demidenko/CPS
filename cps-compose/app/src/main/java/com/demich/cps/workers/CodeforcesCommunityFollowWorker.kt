@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlogEntity
 import com.demich.cps.features.codeforces.follow.database.blogSize
 import com.demich.cps.utils.toSystemLocalDate
 import kotlin.time.Duration
@@ -36,10 +36,10 @@ class CodeforcesCommunityFollowWorker(
     private val proceeded = mutableSetOf<String>()
 
     //note that cf can have different lastOnlineTime from api and web sources
-    private fun CodeforcesUserBlog.isUserInactive() =
+    private fun CodeforcesUserBlogEntity.isUserInactive() =
         workerStartTime - userLastOnlineTime() > 2.days
 
-    private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
+    private fun List<CodeforcesUserBlogEntity>.necessaryToUpdate(lastSuccess: Instant?) =
         if (lastSuccess == null || !isSameDay(workerStartTime, lastSuccess)) this
         else filter {
             it.blogSize == null || !it.isUserInactive()
@@ -76,7 +76,7 @@ class CodeforcesCommunityFollowWorker(
     }
 }
 
-private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
+private fun CodeforcesUserBlogEntity.userLastOnlineTime(): Instant =
     userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
 
 private fun isSameDay(a: Instant, b: Instant): Boolean =
