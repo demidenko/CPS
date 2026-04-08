@@ -20,6 +20,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
+import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.profiles.userinfo.handle
+import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
@@ -33,8 +36,7 @@ import kotlin.time.Instant
 
 @Composable
 fun CommunityFollowListItem(
-    handle: String,
-    userInfo: CodeforcesUserInfo?,
+    profile: ProfileResult<CodeforcesUserInfo>,
     blogEntriesCount: Int?,
     modifier: Modifier = Modifier
 ) {
@@ -47,8 +49,7 @@ fun CommunityFollowListItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             UserHandle(
-                handle = handle,
-                userInfo = userInfo,
+                profile = profile,
                 modifier = Modifier.weight(1f)
             )
             if (blogEntriesCount != null) {
@@ -60,9 +61,9 @@ fun CommunityFollowListItem(
                 )
             }
         }
-        if (userInfo != null) {
+        if (profile is ProfileResult.Success) {
             BottomInfo(
-                userInfo = userInfo,
+                userInfo = profile.userInfo,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 14.sp
             )
@@ -72,14 +73,13 @@ fun CommunityFollowListItem(
 
 @Composable
 private fun UserHandle(
-    handle: String,
-    userInfo: CodeforcesUserInfo?,
+    profile: ProfileResult<CodeforcesUserInfo>,
     modifier: Modifier = Modifier
 ) {
     Text(
         text = CodeforcesHandle(
-            handle = userInfo?.handle ?: handle,
-            colorTag = CodeforcesColorTag.fromRating(userInfo?.rating)
+            handle = profile.handle,
+            colorTag = CodeforcesColorTag.fromRating(profile.userInfoOrNull()?.rating)
         ).toHandleSpan(),
         fontSize = CPSFontSize.itemTitle,
         maxLines = 1,

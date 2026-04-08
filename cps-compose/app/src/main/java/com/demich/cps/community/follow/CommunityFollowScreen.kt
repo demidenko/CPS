@@ -20,12 +20,12 @@ import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.blogSize
+import com.demich.cps.features.codeforces.follow.database.profileResult
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.profiles.DialogProfileSelector
 import com.demich.cps.profiles.managers.makeHandleSpan
-import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -128,8 +128,7 @@ private fun CodeforcesFollowList(
             modifier = Modifier.animateItem(),
             content = {
                 CommunityFollowListItem(
-                    handle = userBlog.handle,
-                    userInfo = userBlog.userInfo,
+                    profile = userBlog.profileResult,
                     blogEntriesCount = userBlog.blogSize,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 5.dp)
@@ -158,10 +157,7 @@ private fun CodeforcesFollowList(
     showDeleteDialogForBlog?.let { userBlog ->
         CPSDeleteDialog(
             title = buildAnnotatedString {
-                val result = userBlog.userInfo.let {
-                    if (it == null) ProfileResult.Failed(userId = userBlog.handle)
-                    else ProfileResult(userInfo = it)
-                }
+                val result = userBlog.profileResult
                 append("Delete ")
                 append(LocalCodeforcesProfileManager.current.makeHandleSpan(profileResult = result))
                 append(" from follow list?")
