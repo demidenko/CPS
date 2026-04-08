@@ -12,7 +12,6 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.profiles.userinfo.userInfoOrNull
-import kotlinx.coroutines.flow.map
 
 abstract class CodeforcesFollowRepository(
     private val api: CodeforcesApi,
@@ -23,9 +22,7 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
-    fun flowOfUserBlogs() = dao.flowOfUserBlogs().map {
-        it.sortedByDescending { it.id }
-    }
+    fun flowOfUserBlogs() = dao.flowOfUserBlogs()
 
     suspend fun blogs() = dao.getUserBlogs()
 

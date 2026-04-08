@@ -17,7 +17,7 @@ internal interface CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName")
     suspend fun getUserBlogs(): List<CodeforcesUserBlog>
 
-    @Query("SELECT * FROM $cfFollowTableName")
+    @Query("SELECT * FROM $cfFollowTableName ORDER BY id DESC")
     fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
