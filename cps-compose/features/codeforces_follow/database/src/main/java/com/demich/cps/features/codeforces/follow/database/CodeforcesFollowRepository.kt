@@ -86,7 +86,7 @@ abstract class CodeforcesFollowRepository(
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
     blogs().forEach {
-        if (it.blogSize == null) getAndReloadBlogEntries(handle = it.userProfile.handle)
+        if (it.blogSize == null) getAndReloadBlogEntries(handle = it.handle)
     }
 }
 
