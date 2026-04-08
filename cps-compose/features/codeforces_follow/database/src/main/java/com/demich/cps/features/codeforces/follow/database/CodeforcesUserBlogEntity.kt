@@ -1,5 +1,6 @@
 package com.demich.cps.features.codeforces.follow.database
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
@@ -15,7 +16,13 @@ internal data class CodeforcesUserBlogEntity(
 
     val userInfo: CodeforcesUserInfo?,
 
-    internal val blogEntries: Set<Int>?
+    @Embedded
+    val blogInfo: BlogInfo?
+)
+
+internal data class BlogInfo(
+    val blogSize: Int,
+    val savedIds: Set<Int>
 )
 
 data class CodeforcesUserBlog(
@@ -30,15 +37,9 @@ val CodeforcesUserBlog.handle: String
 internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
     CodeforcesUserBlog(
         id = id,
-        blogSize = blogEntries?.size,
+        blogSize = blogInfo?.blogSize,
         userProfile = when (userInfo) {
             null -> ProfileResult.Failed(userId = handle)
             else -> ProfileResult(userInfo = userInfo)
         }
     )
-
-// TODO: replace blogEntries to this pair
-internal data class BlogInfo(
-    val size: Int,
-    val savedIds: Set<Int>
-)

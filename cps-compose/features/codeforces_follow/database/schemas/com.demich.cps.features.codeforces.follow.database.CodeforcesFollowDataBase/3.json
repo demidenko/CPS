@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "3487dcdfd781a276b2a213cfda8b24c5",
+    "entities": [
+      {
+        "tableName": "FollowList",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `handle` TEXT NOT NULL, `userInfo` TEXT, `blogSize` INTEGER, `savedIds` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "handle",
+            "columnName": "handle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userInfo",
+            "columnName": "userInfo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "blogInfo.blogSize",
+            "columnName": "blogSize",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "blogInfo.savedIds",
+            "columnName": "savedIds",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3487dcdfd781a276b2a213cfda8b24c5')"
+    ]
+  }
+}

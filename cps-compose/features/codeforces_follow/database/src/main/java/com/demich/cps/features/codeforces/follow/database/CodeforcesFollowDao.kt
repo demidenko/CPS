@@ -90,10 +90,13 @@ private fun merge(
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
 ): CodeforcesUserBlogEntity? {
-    val savedIds = userBlog.blogEntries
 
-    // no changes
-    if (savedIds != null && blogEntries.all { it.id in savedIds }) return null
+    userBlog.blogInfo?.run {
+        // no changes
+        if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return null
+    }
+
+    val savedIds = userBlog.blogInfo?.savedIds
 
     val newIds = mutableSetOf<Int>()
     blogEntries.forEach {
@@ -107,5 +110,6 @@ private fun merge(
         newIds += savedIds
     }
 
-    return userBlog.copy(blogEntries = newIds)
+    val newBlogInfo = BlogInfo(savedIds = newIds, blogSize = blogEntries.size)
+    return userBlog.copy(blogInfo = newBlogInfo)
 }

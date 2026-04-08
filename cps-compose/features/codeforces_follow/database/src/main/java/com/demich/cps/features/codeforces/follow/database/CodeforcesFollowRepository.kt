@@ -57,8 +57,8 @@ abstract class CodeforcesFollowRepository(
         dao.insert(
             CodeforcesUserBlogEntity(
                 handle = handle,
-                blogEntries = null,
-                userInfo = result.userInfoOrNull()
+                userInfo = result.userInfoOrNull(),
+                blogInfo = null
             )
         )
         getAndReloadBlogEntries(handle = handle)
