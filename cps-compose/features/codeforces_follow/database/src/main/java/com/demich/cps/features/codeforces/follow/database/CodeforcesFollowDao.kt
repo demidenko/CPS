@@ -66,29 +66,9 @@ internal interface CodeforcesFollowDao {
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ) {
         val userBlog = getUserBlog(handle) ?: return
+        val newUserBlog = merge(userBlog, blogEntries, onNewBlogEntry) ?: return
 
-        val savedIds = userBlog.blogEntries
-
-        // no changes
-        if (savedIds != null && blogEntries.all { it.id in savedIds }) return
-
-        val newIds = mutableSetOf<Int>()
-        blogEntries.forEach {
-            if (savedIds == null || it.id !in savedIds) {
-                newIds.add(it.id)
-                if (savedIds != null) onNewBlogEntry(it)
-            }
-        }
-
-        when {
-            savedIds == null -> {
-                update(userBlog.copy(blogEntries = newIds))
-            }
-            newIds.isNotEmpty() -> {
-                newIds += savedIds
-                update(userBlog.copy(blogEntries = newIds))
-            }
-        }
+        update(newUserBlog)
     }
 
     suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
@@ -103,4 +83,29 @@ internal interface CodeforcesFollowDao {
     suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
         results.forEach { applyProfileResult(handle = it.key, result = it.value) }
     }
+}
+
+private fun merge(
+    userBlog: CodeforcesUserBlog,
+    blogEntries: List<CodeforcesBlogEntry>,
+    onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+): CodeforcesUserBlog? {
+    val savedIds = userBlog.blogEntries
+
+    // no changes
+    if (savedIds != null && blogEntries.all { it.id in savedIds }) return null
+
+    val newIds = mutableSetOf<Int>()
+    blogEntries.forEach {
+        if (savedIds == null || it.id !in savedIds) {
+            newIds.add(it.id)
+            if (savedIds != null) onNewBlogEntry(it)
+        }
+    }
+
+    if (savedIds != null) {
+        newIds += savedIds
+    }
+
+    return userBlog.copy(blogEntries = newIds)
 }
