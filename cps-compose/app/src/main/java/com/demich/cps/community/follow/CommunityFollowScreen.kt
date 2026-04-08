@@ -122,7 +122,7 @@ private fun CodeforcesFollowList(
         state = listState,
         modifier = modifier,
         items = userBlogs,
-        key = CodeforcesUserBlogEntity::id
+        key = { it.id }
     ) { userBlog ->
         ContentWithCPSDropdownMenu(
             modifier = Modifier.animateItem(),
