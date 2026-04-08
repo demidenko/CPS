@@ -41,7 +41,7 @@ abstract class CodeforcesFollowRepository(
                 dao.applyProfileResult(handle = handle, result = newProfile)
             }
             result.onSuccess { blogEntries ->
-                dao.addBlogEntries(
+                dao.updateBlogEntries(
                     handle = newProfile?.handle ?: handle,
                     blogEntries = blogEntries,
                     onNewBlogEntry = ::notifyNewBlogEntry

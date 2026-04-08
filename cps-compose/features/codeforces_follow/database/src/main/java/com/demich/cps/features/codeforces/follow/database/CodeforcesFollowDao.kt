@@ -60,28 +60,28 @@ internal interface CodeforcesFollowDao {
         ))
     }
 
-    suspend fun addBlogEntries(
+    suspend fun updateBlogEntries(
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ) {
         val userBlog = getUserBlog(handle) ?: return
 
-        val currentIds = userBlog.blogEntries
+        val savedIds = userBlog.blogEntries
         val newIds = mutableSetOf<Int>()
         blogEntries.forEach {
-            if (currentIds == null || it.id !in currentIds) {
+            if (savedIds == null || it.id !in savedIds) {
                 newIds.add(it.id)
-                if (currentIds != null) onNewBlogEntry(it)
+                if (savedIds != null) onNewBlogEntry(it)
             }
         }
 
         when {
-            currentIds == null -> {
+            savedIds == null -> {
                 update(userBlog.copy(blogEntries = newIds))
             }
             newIds.isNotEmpty() -> {
-                newIds += currentIds
+                newIds += savedIds
                 update(userBlog.copy(blogEntries = newIds))
             }
         }
