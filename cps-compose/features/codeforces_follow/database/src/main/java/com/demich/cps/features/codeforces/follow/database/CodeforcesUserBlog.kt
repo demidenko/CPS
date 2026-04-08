@@ -8,7 +8,7 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 @Entity(tableName = cfFollowTableName)
 data class CodeforcesUserBlog(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
 
     val handle: String,
 
