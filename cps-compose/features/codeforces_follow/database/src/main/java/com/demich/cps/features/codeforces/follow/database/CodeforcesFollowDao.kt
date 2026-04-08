@@ -68,6 +68,10 @@ internal interface CodeforcesFollowDao {
         val userBlog = getUserBlog(handle) ?: return
 
         val savedIds = userBlog.blogEntries
+
+        // no changes
+        if (savedIds != null && blogEntries.all { it.id in savedIds }) return
+
         val newIds = mutableSetOf<Int>()
         blogEntries.forEach {
             if (savedIds == null || it.id !in savedIds) {
