@@ -18,3 +18,9 @@ data class CodeforcesUserBlog(
 
 val CodeforcesUserBlog.blogSize: Int?
     get() = blogEntries?.size
+
+// TODO: replace blogEntries to this pair
+internal data class BlogInfo(
+    val size: Int,
+    val savedIds: Set<Int>
+)
