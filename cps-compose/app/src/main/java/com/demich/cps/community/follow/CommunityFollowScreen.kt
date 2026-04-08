@@ -18,9 +18,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlogEntity
-import com.demich.cps.features.codeforces.follow.database.blogSize
-import com.demich.cps.features.codeforces.follow.database.profileResult
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -88,7 +87,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: () -> List<CodeforcesUserBlogEntity>,
+    userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (String) -> Unit,
     onDeleteUser: (String) -> Unit,
@@ -116,7 +115,7 @@ private fun CodeforcesFollowList(
             }
     }
 
-    var showDeleteDialogForBlog: CodeforcesUserBlogEntity? by remember { mutableStateOf(null) }
+    var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
     LazyColumnOfData(
         state = listState,
@@ -128,7 +127,7 @@ private fun CodeforcesFollowList(
             modifier = Modifier.animateItem(),
             content = {
                 CommunityFollowListItem(
-                    profile = userBlog.profileResult,
+                    profile = userBlog.userProfile,
                     blogEntriesCount = userBlog.blogSize,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 5.dp)
@@ -157,7 +156,7 @@ private fun CodeforcesFollowList(
     showDeleteDialogForBlog?.let { userBlog ->
         CPSDeleteDialog(
             title = buildAnnotatedString {
-                val result = userBlog.profileResult
+                val result = userBlog.userProfile
                 append("Delete ")
                 append(LocalCodeforcesProfileManager.current.makeHandleSpan(profileResult = result))
                 append(" from follow list?")

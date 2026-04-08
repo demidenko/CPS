@@ -4,9 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.profiles.userinfo.handle
 
 @Entity(tableName = cfFollowTableName)
-data class CodeforcesUserBlogEntity(
+internal data class CodeforcesUserBlogEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
@@ -17,14 +18,24 @@ data class CodeforcesUserBlogEntity(
     internal val blogEntries: Set<Int>?
 )
 
-val CodeforcesUserBlogEntity.blogSize: Int?
-    get() = blogEntries?.size
+data class CodeforcesUserBlog(
+    val userProfile: ProfileResult<CodeforcesUserInfo>,
+    val blogSize: Int?,
+    val id: Long
+)
 
-val CodeforcesUserBlogEntity.profileResult: ProfileResult<CodeforcesUserInfo>
-    get() = when (userInfo) {
-        null -> ProfileResult.Failed(userId = handle)
-        else -> ProfileResult(userInfo = userInfo)
-    }
+val CodeforcesUserBlog.handle: String
+    get() = userProfile.handle
+
+internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
+    CodeforcesUserBlog(
+        id = id,
+        blogSize = blogEntries?.size,
+        userProfile = when (userInfo) {
+            null -> ProfileResult.Failed(userId = handle)
+            else -> ProfileResult(userInfo = userInfo)
+        }
+    )
 
 // TODO: replace blogEntries to this pair
 internal data class BlogInfo(

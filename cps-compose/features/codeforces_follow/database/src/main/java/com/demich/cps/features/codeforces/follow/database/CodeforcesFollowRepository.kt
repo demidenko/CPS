@@ -12,6 +12,7 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.profiles.userinfo.userInfoOrNull
+import kotlinx.coroutines.flow.map
 
 abstract class CodeforcesFollowRepository(
     private val api: CodeforcesApi,
@@ -22,9 +23,9 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
-    fun flowOfUserBlogs() = dao.flowOfUserBlogs()
+    fun flowOfUserBlogs() = dao.flowOfUserBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    suspend fun blogs() = dao.getUserBlogs()
+    suspend fun blogs() = dao.getUserBlogs().map { it.toCodeforcesUserBlog() }
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
@@ -85,7 +86,7 @@ abstract class CodeforcesFollowRepository(
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
     blogs().forEach {
-        if (it.blogSize == null) getAndReloadBlogEntries(handle = it.handle)
+        if (it.blogSize == null) getAndReloadBlogEntries(handle = it.userProfile.handle)
     }
 }
 
