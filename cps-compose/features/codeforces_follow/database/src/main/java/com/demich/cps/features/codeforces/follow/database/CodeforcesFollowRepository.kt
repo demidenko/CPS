@@ -23,6 +23,7 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
+    // TODO: without toCodeforcesUserBlog
     fun flowOfUserBlogs() = dao.flowOfUserBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
     suspend fun blogsShort() = dao.getShortUserBlogs()
