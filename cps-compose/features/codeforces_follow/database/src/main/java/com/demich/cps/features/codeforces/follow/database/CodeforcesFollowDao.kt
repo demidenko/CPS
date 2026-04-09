@@ -68,7 +68,6 @@ internal interface CodeforcesFollowDao {
     ) {
         val userBlog = getUserBlog(handle) ?: return
         val newUserBlog = merge(userBlog, blogEntries, onNewBlogEntry) ?: return
-
         update(newUserBlog)
     }
 
@@ -91,19 +90,20 @@ private fun merge(
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
 ): CodeforcesUserBlogEntity? {
+    val blogInfo = userBlog.blogInfo
 
-    userBlog.blogInfo?.run {
+    blogInfo?.run {
         // no changes
         if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return null
     }
 
-    val savedIds = userBlog.blogInfo?.savedIds
+    val savedIds = blogInfo?.savedIds
 
     val newIds = mutableSetOf<Int>()
     blogEntries.forEach {
         if (savedIds == null || it.id !in savedIds) {
             newIds.add(it.id)
-            if (savedIds != null) onNewBlogEntry(it)
+            if (blogInfo != null) onNewBlogEntry(it)
         }
     }
 
