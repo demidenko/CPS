@@ -36,16 +36,6 @@ class CodeforcesCommunityFollowWorker(
     //save handles between run after fast retry
     private val proceeded = mutableSetOf<String>()
 
-    //note that cf can have different lastOnlineTime from api and web sources
-    private fun CodeforcesUserBlog.isUserInactive() =
-        workerStartTime - userLastOnlineTime() > 2.days
-
-    private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
-        if (lastSuccess == null || !isSameDay(workerStartTime, lastSuccess)) this
-        else filter {
-            it.blogSize == null || !it.isUserInactive()
-        }
-
     override suspend fun runWork(): Result {
         val repository = context.followRepository
 
@@ -57,7 +47,7 @@ class CodeforcesCommunityFollowWorker(
         val blogs = repository.blogs()
 
         blogs
-            .necessaryToUpdate(lastSuccess = lastSuccessItem())
+            .necessaryToUpdate(lastExecTime = lastSuccessItem(), currentTime = workerStartTime)
             .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress {
                 val handle = it.handle
@@ -76,6 +66,16 @@ class CodeforcesCommunityFollowWorker(
         return Result.success()
     }
 }
+
+private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastExecTime: Instant?, currentTime: Instant) =
+    if (lastExecTime == null || !isSameDay(currentTime, lastExecTime)) this
+    else filter {
+        it.blogSize == null || !it.isUserInactive(currentTime)
+    }
+
+//note that cf can have different lastOnlineTime from api and web sources
+private fun CodeforcesUserBlog.isUserInactive(currentTime: Instant) =
+    currentTime - userLastOnlineTime() > 2.days
 
 private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
     userProfile.userInfoOrNull()?.lastOnlineTime ?: Instant.DISTANT_PAST
