@@ -25,7 +25,7 @@ abstract class CodeforcesFollowRepository(
 
     fun flowOfUserBlogs() = dao.flowOfUserBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    suspend fun blogs() = dao.getUserBlogs().map { it.toCodeforcesUserBlog() }
+    suspend fun blogsShort() = dao.getShortUserBlogs()
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
@@ -85,7 +85,7 @@ abstract class CodeforcesFollowRepository(
 }
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
-    blogs().forEach {
+    blogsShort().forEach {
         if (it.blogSize == null) getAndReloadBlogEntries(handle = it.handle)
     }
 }

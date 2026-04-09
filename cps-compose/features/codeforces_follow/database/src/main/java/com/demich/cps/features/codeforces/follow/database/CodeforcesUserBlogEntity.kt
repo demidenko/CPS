@@ -43,3 +43,9 @@ internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
             else -> ProfileResult(userInfo = userInfo)
         }
     )
+
+data class CodeforcesUserBlogShort(
+    val handle: String,
+    val userInfo: CodeforcesUserInfo?,
+    val blogSize: Int?
+)
