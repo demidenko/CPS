@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlogShort
+import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
+import com.demich.cps.features.codeforces.follow.database.handle
+import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.toSystemLocalDate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -35,10 +37,10 @@ class CodeforcesCommunityFollowWorker(
     private val proceeded = mutableSetOf<String>()
 
     //note that cf can have different lastOnlineTime from api and web sources
-    private fun CodeforcesUserBlogShort.isUserInactive() =
+    private fun CodeforcesUserBlog.isUserInactive() =
         workerStartTime - userLastOnlineTime() > 2.days
 
-    private fun List<CodeforcesUserBlogShort>.necessaryToUpdate(lastSuccess: Instant?) =
+    private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastSuccess: Instant?) =
         if (lastSuccess == null || !isSameDay(workerStartTime, lastSuccess)) this
         else filter {
             it.blogSize == null || !it.isUserInactive()
@@ -52,7 +54,7 @@ class CodeforcesCommunityFollowWorker(
         repository.updateUsers()
 
         val lastSuccessItem = hintsDataStore.followLastSuccessTime
-        val blogs = repository.blogsShort()
+        val blogs = repository.blogs()
 
         blogs
             .necessaryToUpdate(lastSuccess = lastSuccessItem())
@@ -75,8 +77,8 @@ class CodeforcesCommunityFollowWorker(
     }
 }
 
-private fun CodeforcesUserBlogShort.userLastOnlineTime(): Instant =
-    userInfo?.lastOnlineTime ?: Instant.DISTANT_PAST
+private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
+    userProfile.userInfoOrNull()?.lastOnlineTime ?: Instant.DISTANT_PAST
 
 private fun isSameDay(a: Instant, b: Instant): Boolean =
     a.toSystemLocalDate() == b.toSystemLocalDate()

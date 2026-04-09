@@ -23,10 +23,10 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
-    // TODO: without toCodeforcesUserBlog
-    fun flowOfUserBlogs() = dao.flowOfUserBlogs().map { it.map { it.toCodeforcesUserBlog() } }
+    // TODO: without toCodeforcesUserBlog?
+    fun flowOfUserBlogs() = dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    suspend fun blogsShort() = dao.getShortUserBlogs()
+    suspend fun blogs() = dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
@@ -86,7 +86,7 @@ abstract class CodeforcesFollowRepository(
 }
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
-    blogsShort().forEach {
+    blogs().forEach {
         if (it.blogSize == null) getAndReloadBlogEntries(handle = it.handle)
     }
 }

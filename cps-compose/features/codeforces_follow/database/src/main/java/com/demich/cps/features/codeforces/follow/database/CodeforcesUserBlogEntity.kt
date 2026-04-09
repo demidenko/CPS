@@ -25,27 +25,28 @@ internal data class BlogInfo(
     val savedIds: Set<Int>
 )
 
+internal class CodeforcesUserBlogEntityShort(
+    val id: Long,
+    val handle: String,
+    val userInfo: CodeforcesUserInfo?,
+    val blogSize: Int?
+)
+
 data class CodeforcesUserBlog(
+    val id: Long,
     val userProfile: ProfileResult<CodeforcesUserInfo>,
-    val blogSize: Int?,
-    val id: Long
+    val blogSize: Int?
 )
 
 val CodeforcesUserBlog.handle: String
     get() = userProfile.handle
 
-internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
+internal fun CodeforcesUserBlogEntityShort.toCodeforcesUserBlog() =
     CodeforcesUserBlog(
         id = id,
-        blogSize = blogInfo?.blogSize,
+        blogSize = blogSize,
         userProfile = when (userInfo) {
             null -> ProfileResult.Failed(userId = handle)
             else -> ProfileResult(userInfo = userInfo)
         }
     )
-
-data class CodeforcesUserBlogShort(
-    val handle: String,
-    val userInfo: CodeforcesUserInfo?,
-    val blogSize: Int?
-)
