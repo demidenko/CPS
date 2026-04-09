@@ -52,13 +52,13 @@ internal interface CodeforcesFollowDao {
     }
 
     @Transaction
-    suspend fun setUserInfo(handle: String, info: CodeforcesUserInfo) {
-        if (info.handle != handle) changeHandle(handle, info.handle)
-        val userBlog = getUserBlog(info.handle) ?: return
-        if (userBlog.userInfo != info) update(userBlog.copy(
-            handle = info.handle,
-            userInfo = info
-        ))
+    suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
+        if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
+        val handle = userInfo.handle
+        val userBlog = getUserBlog(handle) ?: return
+        if (userBlog.userInfo != userInfo) {
+            update(userBlog.copy(handle = handle, userInfo = userInfo))
+        }
     }
 
     suspend fun updateBlogEntries(
