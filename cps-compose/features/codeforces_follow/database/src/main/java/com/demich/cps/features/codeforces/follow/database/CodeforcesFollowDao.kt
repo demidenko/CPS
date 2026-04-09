@@ -67,7 +67,7 @@ internal interface CodeforcesFollowDao {
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ) {
         val userBlog = getUserBlog(handle) ?: return
-        val newUserBlog = merge(userBlog, blogEntries, onNewBlogEntry) ?: return
+        val newUserBlog = userBlog.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return
         update(newUserBlog)
     }
 
@@ -85,32 +85,32 @@ internal interface CodeforcesFollowDao {
     }
 }
 
-private fun merge(
-    userBlog: CodeforcesUserBlogEntity,
+private fun CodeforcesUserBlogEntity.updateBlogInfo(
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
 ): CodeforcesUserBlogEntity? {
-    val blogInfo = userBlog.blogInfo
-
     blogInfo?.run {
         // no changes
         if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return null
     }
 
-    val savedIds = blogInfo?.savedIds
-
-    val newIds = mutableSetOf<Int>()
-    blogEntries.forEach {
-        if (savedIds == null || it.id !in savedIds) {
-            newIds.add(it.id)
-            if (blogInfo != null) onNewBlogEntry(it)
-        }
+    val newToSave = newEntriesToSave(blogEntries)
+    if (blogInfo != null) {
+        newToSave.forEach(onNewBlogEntry)
     }
 
-    if (savedIds != null) {
-        newIds += savedIds
+    val newIds = buildSet {
+        if (blogInfo != null) addAll(blogInfo.savedIds)
+        newToSave.forEach { add(it.id) }
     }
 
-    val newBlogInfo = BlogInfo(savedIds = newIds, blogSize = blogEntries.size)
-    return userBlog.copy(blogInfo = newBlogInfo)
+    return copy(blogInfo = BlogInfo(savedIds = newIds, blogSize = blogEntries.size))
+}
+
+private fun CodeforcesUserBlogEntity.newEntriesToSave(
+    blogEntries: List<CodeforcesBlogEntry>
+): List<CodeforcesBlogEntry> {
+    if (blogInfo == null) return blogEntries
+    val savedIds = blogInfo.savedIds
+    return blogEntries.filter { it.id !in savedIds }
 }
