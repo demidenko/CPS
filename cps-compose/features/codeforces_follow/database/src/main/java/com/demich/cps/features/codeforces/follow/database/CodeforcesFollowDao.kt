@@ -34,7 +34,7 @@ internal abstract class CodeforcesFollowDao {
     abstract suspend fun insert(blog: CodeforcesUserBlogEntity)
 
     @Update
-    abstract suspend fun update(blog: CodeforcesUserBlogEntity)
+    protected abstract suspend fun update(blog: CodeforcesUserBlogEntity)
 
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
     abstract suspend fun remove(handle: String)
@@ -52,7 +52,7 @@ internal abstract class CodeforcesFollowDao {
     }
 
     @Transaction
-    suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
+    protected suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
         if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
         val handle = userInfo.handle
         val userBlog = getUserBlog(handle) ?: return
