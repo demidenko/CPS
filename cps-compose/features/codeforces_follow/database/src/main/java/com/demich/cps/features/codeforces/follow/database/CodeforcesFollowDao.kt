@@ -24,7 +24,7 @@ internal abstract class CodeforcesFollowDao {
     abstract fun flowOfShortBlogs(): Flow<List<CodeforcesUserBlogEntityShort>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
-    abstract suspend fun getUserBlog(handle: String): CodeforcesUserBlogEntity?
+    protected abstract suspend fun getEntity(handle: String): CodeforcesUserBlogEntity?
 
     @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
     abstract suspend fun hasUser(handle: String): Boolean
@@ -43,8 +43,8 @@ internal abstract class CodeforcesFollowDao {
 
     private suspend fun changeHandle(fromHandle: String, toHandle: String) {
         if (fromHandle == toHandle) return
-        val fromUserBlog = getUserBlog(fromHandle) ?: return
-        getUserBlog(toHandle)?.let { toUserBlog ->
+        val fromUserBlog = getEntity(fromHandle) ?: return
+        getEntity(toHandle)?.let { toUserBlog ->
             if (toUserBlog.id != fromUserBlog.id) {
                 remove(fromHandle)
                 return
@@ -57,7 +57,7 @@ internal abstract class CodeforcesFollowDao {
     protected open suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
         if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
         val handle = userInfo.handle
-        val userBlog = getUserBlog(handle) ?: return
+        val userBlog = getEntity(handle) ?: return
         if (userBlog.userInfo != userInfo) {
             update(userBlog.copy(handle = handle, userInfo = userInfo))
         }
@@ -68,7 +68,7 @@ internal abstract class CodeforcesFollowDao {
         blogEntries: List<CodeforcesBlogEntry>,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): CodeforcesUserBlogEntity? {
-        val blogEntity = getUserBlog(handle) ?: return null
+        val blogEntity = getEntity(handle) ?: return null
         val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return blogEntity
         update(newBlogEntity)
         return newBlogEntity
