@@ -65,10 +65,11 @@ internal interface CodeforcesFollowDao {
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-    ) {
-        val userBlog = getUserBlog(handle) ?: return
-        val newUserBlog = userBlog.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return
-        update(newUserBlog)
+    ): CodeforcesUserBlogEntity? {
+        val blogEntity = getUserBlog(handle) ?: return null
+        val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return blogEntity
+        update(newBlogEntity)
+        return newBlogEntity
     }
 
     suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {

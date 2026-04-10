@@ -41,6 +41,16 @@ data class CodeforcesUserBlog(
 val CodeforcesUserBlog.handle: String
     get() = userProfile.handle
 
+internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
+    CodeforcesUserBlog(
+        id = id,
+        blogSize = blogInfo?.blogSize,
+        userProfile = when (userInfo) {
+            null -> ProfileResult.Failed(userId = handle)
+            else -> ProfileResult(userInfo = userInfo)
+        }
+    )
+
 internal fun CodeforcesUserBlogEntityShort.toCodeforcesUserBlog() =
     CodeforcesUserBlog(
         id = id,
