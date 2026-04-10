@@ -26,6 +26,9 @@ internal abstract class CodeforcesFollowDao {
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
     protected abstract suspend fun getEntity(handle: String): CodeforcesUserBlogEntity?
 
+    @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
+    protected abstract suspend fun getUserInfoFields(handle: String): UserInfoFields?
+
     @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
     abstract suspend fun hasUser(handle: String): Boolean
 
@@ -33,10 +36,13 @@ internal abstract class CodeforcesFollowDao {
     abstract suspend fun getHandles(): List<String>
 
     @Insert
-    protected abstract suspend fun insert(blog: CodeforcesUserBlogEntity)
+    protected abstract suspend fun insert(entity: CodeforcesUserBlogEntity)
 
     @Update
-    protected abstract suspend fun update(blog: CodeforcesUserBlogEntity)
+    protected abstract suspend fun update(entity: CodeforcesUserBlogEntity)
+
+    @Update(entity = CodeforcesUserBlogEntity::class)
+    protected abstract suspend fun update(userInfoFields: UserInfoFields)
 
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
     abstract suspend fun remove(handle: String)
@@ -57,9 +63,9 @@ internal abstract class CodeforcesFollowDao {
     protected open suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
         if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
         val handle = userInfo.handle
-        val userBlog = getEntity(handle) ?: return
-        if (userBlog.userInfo != userInfo) {
-            update(userBlog.copy(handle = handle, userInfo = userInfo))
+        val entity = getUserInfoFields(handle) ?: return
+        if (entity.userInfo != userInfo) {
+            update(userInfoFields = entity.copy(handle = handle, userInfo = userInfo))
         }
     }
 
@@ -127,3 +133,9 @@ private fun CodeforcesUserBlogEntity.newEntriesToSave(
     val savedIds = blogInfo.savedIds
     return blogEntries.filter { it.id !in savedIds }
 }
+
+internal data class UserInfoFields(
+    val id: Long,
+    val handle: String,
+    val userInfo: CodeforcesUserInfo?
+)
