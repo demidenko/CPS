@@ -13,31 +13,31 @@ import kotlinx.coroutines.flow.Flow
 internal const val cfFollowTableName = "FollowList"
 
 @Dao
-internal interface CodeforcesFollowDao {
+internal abstract class CodeforcesFollowDao {
 
     @Query("SELECT * FROM $cfFollowTableName")
-    suspend fun getShortBlogs(): List<CodeforcesUserBlogEntityShort>
+    abstract suspend fun getShortBlogs(): List<CodeforcesUserBlogEntityShort>
 
     @Query("SELECT * FROM $cfFollowTableName ORDER BY id DESC")
-    fun flowOfShortBlogs(): Flow<List<CodeforcesUserBlogEntityShort>>
+    abstract fun flowOfShortBlogs(): Flow<List<CodeforcesUserBlogEntityShort>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
-    suspend fun getUserBlog(handle: String): CodeforcesUserBlogEntity?
+    abstract suspend fun getUserBlog(handle: String): CodeforcesUserBlogEntity?
 
     @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
-    suspend fun hasUser(handle: String): Boolean
+    abstract suspend fun hasUser(handle: String): Boolean
 
     @Query("SELECT handle FROM $cfFollowTableName")
-    suspend fun getHandles(): List<String>
+    abstract suspend fun getHandles(): List<String>
 
     @Insert
-    suspend fun insert(blog: CodeforcesUserBlogEntity)
+    abstract suspend fun insert(blog: CodeforcesUserBlogEntity)
 
     @Update
-    suspend fun update(blog: CodeforcesUserBlogEntity)
+    abstract suspend fun update(blog: CodeforcesUserBlogEntity)
 
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
-    suspend fun remove(handle: String)
+    abstract suspend fun remove(handle: String)
 
     private suspend fun changeHandle(fromHandle: String, toHandle: String) {
         if (fromHandle == toHandle) return
