@@ -12,6 +12,7 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.profiles.userinfo.userInfoOrNull
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 abstract class CodeforcesFollowRepository(
@@ -23,10 +24,12 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
-    // TODO: without toCodeforcesUserBlog?
-    fun flowOfUserBlogs() = dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
+    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>> =
+        dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    suspend fun blogs() = dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
+    // TODO: without toCodeforcesUserBlog?
+    suspend fun blogs(): List<CodeforcesUserBlog> =
+        dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
 
     suspend fun getAndReloadBlogEntries(handle: String) =
         getAndReloadBlogEntries(handle = handle, locale = getLocale())
@@ -55,6 +58,7 @@ abstract class CodeforcesFollowRepository(
 
         val handle = result.handle
         if (dao.hasUser(handle)) return
+
         dao.insert(
             CodeforcesUserBlogEntity(
                 handle = handle,
@@ -62,11 +66,13 @@ abstract class CodeforcesFollowRepository(
                 blogInfo = null
             )
         )
+
         getAndReloadBlogEntries(handle = handle)
     }
 
     suspend fun addNewUser(handle: String) {
         if (dao.hasUser(handle)) return
+
         //TODO: sync?? parallel? (addNewUser loads blog without info)
         addNewUser(ProfileResult.Failed(handle))
         dao.applyProfileResult(
@@ -98,9 +104,9 @@ private suspend fun CodeforcesApi.getBlogEntries(
     runCatching {
         getUserBlogEntries(handle = handle, locale = locale)
     }.recoverCatching {
-        when {
-            it is CodeforcesApiNotAllowedReadBlogException -> emptyList()
-            it is CodeforcesApiHandleNotFoundException && it.handle == handle -> {
+        when (it) {
+            is CodeforcesApiNotAllowedReadBlogException -> emptyList()
+            is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
                 val profileResult = getProfile(handle = handle, recoverHandle = true)
                 return Pair(
                     profileResult,
