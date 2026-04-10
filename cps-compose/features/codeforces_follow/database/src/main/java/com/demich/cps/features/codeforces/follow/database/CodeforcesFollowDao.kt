@@ -52,7 +52,7 @@ internal abstract class CodeforcesFollowDao {
     }
 
     @Transaction
-    protected suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
+    protected open suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
         if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
         val handle = userInfo.handle
         val userBlog = getUserBlog(handle) ?: return
@@ -81,7 +81,7 @@ internal abstract class CodeforcesFollowDao {
     }
 
     @Transaction
-    suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
+    open suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
         results.forEach { applyProfileResult(handle = it.key, result = it.value) }
     }
 }
