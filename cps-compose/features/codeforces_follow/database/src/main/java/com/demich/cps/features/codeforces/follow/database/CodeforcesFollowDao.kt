@@ -8,6 +8,8 @@ import androidx.room.Update
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.profiles.userinfo.handle
+import com.demich.cps.profiles.userinfo.userInfoOrNull
 import kotlinx.coroutines.flow.Flow
 
 internal const val cfFollowTableName = "FollowList"
@@ -31,7 +33,7 @@ internal abstract class CodeforcesFollowDao {
     abstract suspend fun getHandles(): List<String>
 
     @Insert
-    abstract suspend fun insert(blog: CodeforcesUserBlogEntity)
+    protected abstract suspend fun insert(blog: CodeforcesUserBlogEntity)
 
     @Update
     protected abstract suspend fun update(blog: CodeforcesUserBlogEntity)
@@ -83,6 +85,16 @@ internal abstract class CodeforcesFollowDao {
     @Transaction
     open suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
         results.forEach { applyProfileResult(handle = it.key, result = it.value) }
+    }
+
+    suspend fun insertWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>) {
+        insert(
+            CodeforcesUserBlogEntity(
+                handle = profileResult.handle,
+                userInfo = profileResult.userInfoOrNull(),
+                blogInfo = null
+            )
+        )
     }
 }
 

@@ -11,7 +11,6 @@ import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
-import com.demich.cps.profiles.userinfo.userInfoOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -59,13 +58,7 @@ abstract class CodeforcesFollowRepository(
         val handle = result.handle
         if (dao.hasUser(handle)) return
 
-        dao.insert(
-            CodeforcesUserBlogEntity(
-                handle = handle,
-                userInfo = result.userInfoOrNull(),
-                blogInfo = null
-            )
-        )
+        dao.insertWithoutBlog(profileResult = result)
 
         getAndReloadBlogEntries(handle = handle)
     }
