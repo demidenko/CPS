@@ -3,6 +3,7 @@ package com.demich.cps.features.codeforces.follow.database
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Update
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -18,15 +19,18 @@ internal const val cfFollowTableName = "FollowList"
 internal abstract class CodeforcesFollowDao {
 
     @Query("SELECT * FROM $cfFollowTableName")
+    @RewriteQueriesToDropUnusedColumns
     abstract suspend fun getShortBlogs(): List<CodeforcesUserBlogEntityShort>
 
     @Query("SELECT * FROM $cfFollowTableName ORDER BY id DESC")
+    @RewriteQueriesToDropUnusedColumns
     abstract fun flowOfShortBlogs(): Flow<List<CodeforcesUserBlogEntityShort>>
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
     protected abstract suspend fun getEntity(handle: String): CodeforcesUserBlogEntity?
 
     @Query("SELECT * FROM $cfFollowTableName WHERE handle LIKE :handle")
+    @RewriteQueriesToDropUnusedColumns
     protected abstract suspend fun getUserInfoFields(handle: String): UserInfoFields?
 
     @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
