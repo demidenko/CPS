@@ -68,12 +68,13 @@ internal fun cpsHttpClient(
     block()
 }
 
-private fun Throwable.shouldRetry(): Boolean {
-    if (this is CancellationException) return false
-    if (this is IOException) return true
-    if (this is ResponseException && response.status.isServerError()) return true
-    return false
-}
+private fun Throwable.shouldRetry(): Boolean =
+    when (this) {
+        is CancellationException -> false
+        is IOException -> true
+        is ResponseException if response.status.isServerError() -> true
+        else -> false
+    }
 
 private val defaultHttpClient = cpsHttpClient { }
 internal val defaultJson = Json { ignoreUnknownKeys = true }
