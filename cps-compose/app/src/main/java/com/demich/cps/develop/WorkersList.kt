@@ -390,6 +390,9 @@ private fun WorkerDialog(
                         append(events.count { it.resultType == SUCCESS })
                         append(" / ")
                         append(events.size)
+                        append(" (")
+                        append(events.sumOfDurations().formatExecTime())
+                        append(")")
                     })
 
                     val cpsColors = cpsColors
@@ -527,3 +530,8 @@ private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int)
         }
     )
 }
+
+private fun List<CPSWorker.ExecutionEvent>.sumOfDurations(): Duration =
+    fold(initial = Duration.ZERO) { sum, event ->
+        event.duration?.let { sum + it } ?: sum
+    }
