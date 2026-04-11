@@ -96,10 +96,10 @@ internal fun darkCPSColors(useOriginalHandleColors: Boolean) = CPSColors(
     when (it) {
         GRAY -> Color(0xFF888888)
         BROWN -> Color(0xFF80461B)
-        GREEN -> Color(0xFF009000)
+        GREEN -> Color(0xFF009600)
         CYAN -> Color(0xFF00A89E)
-        BLUE -> Color(0xFF0F68F0)
-        VIOLET -> Color(0xFFB04ECC)
+        BLUE -> Color(0xFF0F68F0) // TODO: bad contrast https://webaim.org/resources/contrastchecker/?fcolor=0F68F0&bcolor=121212
+        VIOLET -> Color(0xFFBB4ECC)
         YELLOW -> Color(0xFFCCCC00)
         ORANGE -> Color(0xFFFB8000)
         RED -> Color(0xFFED301D)
