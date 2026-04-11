@@ -2,6 +2,7 @@ package com.demich.cps.features.codeforces.follow.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
@@ -39,8 +40,8 @@ internal abstract class CodeforcesFollowDao {
     @Query("SELECT handle FROM $cfFollowTableName")
     abstract suspend fun getHandles(): List<String>
 
-    @Insert
-    protected abstract suspend fun insert(entity: CodeforcesUserBlogEntity)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    protected abstract suspend fun insert(entity: CodeforcesUserBlogEntity): Long
 
     @Update
     protected abstract suspend fun update(entity: CodeforcesUserBlogEntity)
@@ -97,14 +98,18 @@ internal abstract class CodeforcesFollowDao {
         results.forEach { applyProfileResult(handle = it.key, result = it.value) }
     }
 
-    suspend fun insertWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>) {
-        insert(
+    suspend fun createUserWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>): Boolean {
+        if (profileResult is ProfileResult.NotFound) return false
+
+        val rowId = insert(
             CodeforcesUserBlogEntity(
                 handle = profileResult.handle,
                 userInfo = profileResult.userInfoOrNull(),
                 blogInfo = null
             )
         )
+
+        return rowId != -1L
     }
 }
 

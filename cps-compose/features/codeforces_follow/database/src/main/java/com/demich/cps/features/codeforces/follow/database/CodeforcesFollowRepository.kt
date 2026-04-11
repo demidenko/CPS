@@ -52,26 +52,23 @@ abstract class CodeforcesFollowRepository(
         }
     }
 
-    suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
-        if (result is ProfileResult.NotFound) return
-
-        val handle = result.handle
-        if (dao.hasUser(handle)) return
-
-        dao.insertWithoutBlog(profileResult = result)
-
-        getAndReloadBlogEntries(handle = handle)
+    suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>): Boolean {
+        if (dao.createUserWithoutBlog(profileResult = result)) {
+            getAndReloadBlogEntries(handle = result.handle)
+            return true
+        } else {
+            return false
+        }
     }
 
     suspend fun addNewUser(handle: String) {
-        if (dao.hasUser(handle)) return
-
         //TODO: sync?? parallel? (addNewUser loads blog without info)
-        addNewUser(ProfileResult.Failed(handle))
-        dao.applyProfileResult(
-            handle = handle,
-            result = api.getProfile(handle = handle, recoverHandle = true)
-        )
+        if (addNewUser(ProfileResult.Failed(handle))) {
+            dao.applyProfileResult(
+                handle = handle,
+                result = api.getProfile(handle = handle, recoverHandle = true)
+            )
+        }
     }
 
     suspend fun updateUsers() {
