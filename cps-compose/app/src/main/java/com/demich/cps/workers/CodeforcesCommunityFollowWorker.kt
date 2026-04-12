@@ -8,10 +8,8 @@ import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
-import com.demich.cps.utils.toSystemLocalDate
 import com.demich.datastore_itemized.edit
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -60,7 +58,6 @@ class CodeforcesCommunityFollowWorker(
         }
 
         blogsToUpdate
-            .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress { blog ->
                 val handle = blog.handle
                 if (handle !in proceeded) {
@@ -78,24 +75,8 @@ class CodeforcesCommunityFollowWorker(
     }
 }
 
-private fun List<CodeforcesUserBlog>.necessaryToUpdate(lastExecTime: Instant?, currentTime: Instant) =
-    if (lastExecTime == null || !isSameDay(currentTime, lastExecTime)) this
-    else filter {
-        it.blogSize == null || !it.isUserInactive(currentTime)
-    }
-
-//note that cf can have different lastOnlineTime from api and web sources
-private fun CodeforcesUserBlog.isUserInactive(currentTime: Instant) =
-    currentTime - userLastOnlineTime() > 2.days
-
-private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
-    userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST
-
 private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
     userProfile.userInfoOrNull()?.lastOnlineTime
-
-private fun isSameDay(a: Instant, b: Instant): Boolean =
-    a.toSystemLocalDate() == b.toSystemLocalDate()
 
 private fun nextEnqueueIn(
     blogsCount: Int,
