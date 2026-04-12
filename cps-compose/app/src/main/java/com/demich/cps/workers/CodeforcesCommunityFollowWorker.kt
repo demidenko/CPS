@@ -8,6 +8,7 @@ import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.toSystemLocalDate
+import com.demich.datastore_itemized.edit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -44,15 +45,17 @@ class CodeforcesCommunityFollowWorker(
         repository.updateUsers()
 
         val lastSuccessItem = hintsDataStore.followLastSuccessTime
+        val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
         val blogs = repository.blogs()
 
         blogs
             .necessaryToUpdate(lastExecTime = lastSuccessItem(), currentTime = workerStartTime)
             .sortedByDescending { it.userLastOnlineTime() }
-            .forEachWithProgress {
-                val handle = it.handle
+            .forEachWithProgress { blog ->
+                val handle = blog.handle
                 if (handle !in proceeded) {
                     repository.getAndReloadBlogEntries(handle).getOrThrow()
+                    lastOnlineItem.edit { this[blog.id] = blog.userLastOnlineTime() }
                     proceeded.add(handle)
                 }
             }
