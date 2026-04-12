@@ -44,10 +44,9 @@ class CodeforcesCommunityFollowWorker(
         val blogsToUpdate = lastOnlineItem().let { last ->
             blogs.filter {
                 // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
-                val canSkip = profiles[it.handle]?.let { profile ->
+                val canSkip = profiles[it.handle].let { profile ->
                     profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == last[it.id]
-                } ?: false
-
+                }
                 it.blogSize == null || !canSkip
             }
         }
