@@ -71,10 +71,9 @@ abstract class CodeforcesFollowRepository(
         }
     }
 
-    suspend fun updateUsers() {
-        val profiles = api.getProfiles(handles = dao.getHandles(), recoverHandle = true)
-        dao.applyProfilesResults(profiles)
-    }
+    suspend fun updateUsers() =
+        api.getProfiles(handles = dao.getHandles(), recoverHandle = true)
+            .also { dao.applyProfilesResults(it) }
 
     protected abstract suspend fun getLocale(): CodeforcesLocale
 

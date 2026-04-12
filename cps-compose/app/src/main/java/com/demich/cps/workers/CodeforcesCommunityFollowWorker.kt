@@ -6,6 +6,7 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.handle
+import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.toSystemLocalDate
 import com.demich.datastore_itemized.edit
@@ -42,20 +43,30 @@ class CodeforcesCommunityFollowWorker(
 
         //TODO: consider skip this if blogs.size is small
         //update userInfo to keep fresh lastOnlineTime
-        repository.updateUsers()
+        val profiles = repository.updateUsers()
 
         val lastSuccessItem = hintsDataStore.followLastSuccessTime
         val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
         val blogs = repository.blogs()
 
-        blogs
-            .necessaryToUpdate(lastExecTime = lastSuccessItem(), currentTime = workerStartTime)
+
+        val blogsToUpdate = lastOnlineItem().let { last ->
+            blogs.filter {
+                val canSkip = profiles[it.handle]?.let { profile ->
+                    profile is ProfileResult.Success && profile.userInfo.lastOnlineTime != last[it.id]
+                } ?: false
+
+                it.blogSize == null || !canSkip
+            }
+        }
+
+        blogsToUpdate
             .sortedByDescending { it.userLastOnlineTime() }
             .forEachWithProgress { blog ->
                 val handle = blog.handle
                 if (handle !in proceeded) {
                     repository.getAndReloadBlogEntries(handle).getOrThrow()
-                    lastOnlineItem.edit { this[blog.id] = blog.userLastOnlineTime() }
+                    lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTime()) }
                     proceeded.add(handle)
                 }
             }
