@@ -31,9 +31,6 @@ class CodeforcesCommunityFollowWorker(
         }
     }
 
-    //save handles between run after fast retry
-    private val proceeded = mutableSetOf<String>()
-
     override suspend fun runWork(): Result {
         val repository = context.followRepository
 
@@ -57,12 +54,8 @@ class CodeforcesCommunityFollowWorker(
 
         blogsToUpdate
             .forEachWithProgress { blog ->
-                val handle = blog.handle
-                if (handle !in proceeded) {
-                    repository.getAndReloadBlogEntries(handle).getOrThrow()
-                    lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
-                    proceeded.add(handle)
-                }
+                repository.getAndReloadBlogEntries(handle = blog.handle).getOrThrow()
+                lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
             }
 
         return Result.success()
