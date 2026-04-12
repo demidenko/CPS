@@ -11,5 +11,6 @@ fun platformLogoResId(platform: Platform): Int =
         dmoj -> R.drawable.ic_logo_dmoj
         project_euler -> R.drawable.ic_logo_projecteuler
         clist -> R.drawable.ic_logo_clist
+        leetcode -> R.drawable.ic_logo_leetcode
         acmp, timus -> throw IllegalArgumentException()
     }

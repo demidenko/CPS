@@ -118,4 +118,5 @@ val Platform.clistResourceId: Int?
         acmp -> 5
         timus -> 7
         project_euler -> 65
+        leetcode -> 102
     }

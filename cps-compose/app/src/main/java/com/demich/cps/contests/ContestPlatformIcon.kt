@@ -80,6 +80,7 @@ fun Contest.generalPlatformOrNull(): Platform? =
         return when (host) {
             "projecteuler.net" -> project_euler
             "topcoder.com" -> topcoder
+            "leetcode.com" -> leetcode
             else -> null
         }
     }
