@@ -14,18 +14,21 @@ internal fun Element.selectSequence(cssQuery: String): Sequence<Element> =
 internal fun Element.selectSequence(evaluator: Evaluator): Sequence<Element> =
     selectStream(evaluator).asSequence()
 
-internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean): String? {
-    // return classNames().firstOrNull(predicate)
-    // classNames() is terribly inefficient so do manually
+internal inline fun Element.classNames(block: (String) -> Unit) {
     val s = className()
     var i = 0
     while (i < s.length) {
         while (i < s.length && s[i].isWhitespace()) ++i
         val p = i
         while (i < s.length && !s[i].isWhitespace()) ++i
-        val name = s.substring(p, i)
-        if (predicate(name)) return name
+        block(s.substring(p, i))
     }
+}
+
+internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean): String? {
+    // return classNames().firstOrNull(predicate)
+    // classNames() is terribly inefficient so do manually
+    classNames { if (predicate(it)) return it }
     return null
 }
 
