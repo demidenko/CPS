@@ -19,7 +19,7 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
     val followLastSuccessTime = jsonCPS.itemNullable<Instant>(name = "follow_last_success")
 
     //TODO: clean up unused ids sometimes
-    val followLastUserOnlineTime = jsonCPS.itemMap<Long, Instant>(name = "follow_last_online")
+    val followLastUserOnlineTime = jsonCPS.itemMap<Long, Instant?>(name = "follow_last_online")
 
     val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 

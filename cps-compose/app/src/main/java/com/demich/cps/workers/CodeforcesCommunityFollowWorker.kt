@@ -45,13 +45,12 @@ class CodeforcesCommunityFollowWorker(
         //update userInfo to keep fresh lastOnlineTime
         val profiles = repository.updateUsers()
 
-        val lastSuccessItem = hintsDataStore.followLastSuccessTime
-        val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
         val blogs = repository.blogs()
 
-
+        val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
         val blogsToUpdate = lastOnlineItem().let { last ->
             blogs.filter {
+                // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
                 val canSkip = profiles[it.handle]?.let { profile ->
                     profile is ProfileResult.Success && profile.userInfo.lastOnlineTime != last[it.id]
                 } ?: false
@@ -66,7 +65,7 @@ class CodeforcesCommunityFollowWorker(
                 val handle = blog.handle
                 if (handle !in proceeded) {
                     repository.getAndReloadBlogEntries(handle).getOrThrow()
-                    lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTime()) }
+                    lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
                     proceeded.add(handle)
                 }
             }
@@ -74,8 +73,6 @@ class CodeforcesCommunityFollowWorker(
         work.enqueueInIfEarlier(
             duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
         )
-
-        lastSuccessItem.setValue(workerStartTime)
 
         return Result.success()
     }
@@ -92,7 +89,10 @@ private fun CodeforcesUserBlog.isUserInactive(currentTime: Instant) =
     currentTime - userLastOnlineTime() > 2.days
 
 private fun CodeforcesUserBlog.userLastOnlineTime(): Instant =
-    userProfile.userInfoOrNull()?.lastOnlineTime ?: Instant.DISTANT_PAST
+    userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST
+
+private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
+    userProfile.userInfoOrNull()?.lastOnlineTime
 
 private fun isSameDay(a: Instant, b: Instant): Boolean =
     a.toSystemLocalDate() == b.toSystemLocalDate()
