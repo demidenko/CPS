@@ -9,9 +9,7 @@ import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.datastore_itemized.edit
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 
@@ -27,7 +25,7 @@ class CodeforcesCommunityFollowWorker(
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityFollowWorker>(
-                    repeatInterval = 6.hours,
+                    repeatInterval = 4.hours,
                     batteryNotLow = true
                 )
         }
@@ -67,20 +65,9 @@ class CodeforcesCommunityFollowWorker(
                 }
             }
 
-        work.enqueueInIfEarlier(
-            duration = nextEnqueueIn(blogsCount = blogs.size, proceeded = proceeded.size).coerceAtLeast(2.hours)
-        )
-
         return Result.success()
     }
 }
 
 private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
     userProfile.userInfoOrNull()?.lastOnlineTime
-
-private fun nextEnqueueIn(
-    blogsCount: Int,
-    proceeded: Int
-): Duration {
-    return 30.minutes * proceeded
-}
