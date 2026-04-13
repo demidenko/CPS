@@ -21,7 +21,7 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-private val javaVersion = JavaVersion.toVersion(21)
+private val javaVersion = JavaVersion.toVersion(25)
 
 fun CommonExtension.baseAndroidConfig() {
     val apiLevel = 36
