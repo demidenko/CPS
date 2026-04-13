@@ -1,6 +1,6 @@
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -23,9 +23,9 @@ tasks.register<Delete>("clean") {
 
 private val javaVersion = JavaVersion.toVersion(21)
 
-fun BaseExtension.baseAndroidConfig() {
+fun CommonExtension.baseAndroidConfig() {
     val apiLevel = 36
-    compileSdkVersion(apiLevel = apiLevel)
+    compileSdk { version = release(version = apiLevel) }
 
     defaultConfig.apply {
         minSdk = 26
@@ -52,7 +52,7 @@ fun Project.configureKotlin() {
 
 subprojects {
     pluginManager.withPlugin("com.android.application") {
-        configure<AppExtension> {
+        configure<ApplicationExtension> {
             baseAndroidConfig()
         }
         configureKotlin()
