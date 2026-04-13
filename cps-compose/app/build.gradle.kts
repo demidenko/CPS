@@ -42,11 +42,15 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
 
-    applicationVariants.all {
-        outputs.filterIsInstance<com.android.build.gradle.internal.api.BaseVariantOutputImpl>()
-            .forEach {
-                it.outputFileName = "cps-${versionCode}-${buildType.name}.apk"
+androidComponents {
+    onVariants { variant ->
+        val appName = "cps"
+        variant.outputs.filterIsInstance<com.android.build.api.variant.impl.VariantOutputImpl>()
+            .forEach { output ->
+                val name = "$appName-${output.versionCode.get()}-${variant.buildType}.apk"
+                output.outputFileName.set(name)
             }
     }
 }
