@@ -28,7 +28,7 @@ interface ContestsReloader {
         contestsReceiver: ContestsReceiver
     ) {
         reload(
-            platforms = settings.enabledPlatforms(),
+            platforms = settings.enabledContestPlatforms(),
             settings = settings,
             contestsReceiver = contestsReceiver
         )

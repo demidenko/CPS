@@ -44,7 +44,7 @@ internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
+    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledContestPlatforms }
     val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
     Expandable(

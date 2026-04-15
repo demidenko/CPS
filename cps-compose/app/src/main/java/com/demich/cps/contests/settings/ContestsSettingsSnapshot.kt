@@ -16,7 +16,7 @@ class ContestsSettingsSnapshot(
 suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
     fromSnapshot {
         ContestsSettingsSnapshot(
-            enabledPlatforms = enabledPlatforms.value,
+            enabledPlatforms = enabledContestPlatforms.value,
             clistResourcesIds = clistAdditionalResources.value.mapToSet { it.id },
             contestsDateConstraints = contestsDateConstraints.value
         )

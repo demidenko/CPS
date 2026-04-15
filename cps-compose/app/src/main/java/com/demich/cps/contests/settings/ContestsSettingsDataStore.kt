@@ -30,23 +30,23 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
-    private val enabledKnownPlatforms = itemEnumSet<ContestPlatform>(name = "enabled_platforms")
+    private val enabledPlatforms = itemEnumSet<ContestPlatform>(name = "enabled_platforms")
     suspend fun changeEnabled(platform: ContestPlatform, enabled: Boolean) {
         require(platform != unknown)
-        enabledKnownPlatforms.edit {
+        enabledPlatforms.edit {
             if (enabled) add(platform) else remove(platform)
         }
     }
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
-    val enabledPlatforms = combine {
-        enabledKnownPlatforms.value.toEnumSet().apply {
+    val enabledContestPlatforms = combine {
+        enabledPlatforms.value.toEnumSet().apply {
             if (clistAdditionalResources.value.isNotEmpty()) add(unknown)
         }
     }
 
     val anyPlatformEnabled = combine {
-        enabledKnownPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
+        enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
     }
 
     val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
