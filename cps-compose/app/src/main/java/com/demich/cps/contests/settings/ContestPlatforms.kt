@@ -50,7 +50,7 @@ internal fun ContestPlatformsSettingsItem() {
         title = "Platforms",
         collapsedContent = {
             EnabledPlatformsSubtitle(
-                enabledPlatforms = enabledPlatforms,
+                enabledPlatforms = enabledPlatforms.map { it.toGeneralPlatform() },
                 clistResources = clistResources
             )
         },
@@ -75,15 +75,13 @@ internal fun ContestPlatformsSettingsItem() {
 @Composable
 context(scope: SettingsContainerScope)
 private fun EnabledPlatformsSubtitle(
-    enabledPlatforms: Set<ContestPlatform>,
-    clistResources: List<ClistResource>
+    enabledPlatforms: Collection<Platform>,
+    clistResources: Collection<ClistResource>
 ) {
     Subtitle(
         selected = remember(key1 = enabledPlatforms, key2 = clistResources) {
             buildList {
-                enabledPlatforms.sortedBy { it.ordinal }.forEach {
-                    if (it != unknown) add(it.name)
-                }
+                enabledPlatforms.sortedBy { it.ordinal }.forEach { add(it.name) }
                 clistResources.forEach { add(it.name) }
             }
         }
