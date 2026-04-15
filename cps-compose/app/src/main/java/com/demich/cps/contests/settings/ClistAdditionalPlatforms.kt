@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
@@ -124,9 +123,9 @@ private fun ColumnScope.DialogContent() {
 private suspend fun ClistApi.getResourcesSyncWithSettings(
     settings: ContestsSettingsDataStore
 ): List<ClistResource> {
-    val alreadySupported = Contest.platformsExceptUnknown.mapToSet { it.clistResourceId() }
+    val alreadySupportedIds = contestPlatforms.mapToSet { it.clistResourceId }
     return getResources(apiAccess = settings.clistApiAccess())
-        .filter { it.id !in alreadySupported }
+        .filter { it.id !in alreadySupportedIds }
         .sortedBy { it.name }
         .also { list ->
             val res = list.associateBy { it.id }

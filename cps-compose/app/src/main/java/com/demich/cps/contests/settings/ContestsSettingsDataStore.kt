@@ -1,9 +1,12 @@
 package com.demich.cps.contests.settings
 
 import android.content.Context
+import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.utils.jsonCPS
@@ -74,6 +77,9 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     val autoUpdateInterval = jsonCPS.itemNullable<Duration>(name = "autoupdate_interval")
 }
+
+val contestPlatforms: List<Platform> =
+    Contest.platformsExceptUnknown.map { it.toGeneralPlatform() }
 
 @Serializable
 data class ContestDateRelativeConstraints(
