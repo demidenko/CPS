@@ -47,29 +47,45 @@ import kotlinx.coroutines.launch
 internal fun ClistAdditionalResourcesDialog(
     onDismissRequest: () -> Unit
 ) {
-    CPSDialog(
-        modifier = Modifier.fillMaxWidth(),
-        onDismissRequest = onDismissRequest
-    ) {
-        DialogContent()
-    }
-}
-
-@Composable
-private fun ColumnScope.DialogContent() {
     val context = context
-    val scope = rememberCoroutineScope()
+    val item = remember { context.settingsContests.clistAdditionalResources }
+    val selected by collectItemAsState { item }
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
-    val resourcesResult by viewModel
+    val fetchResult by viewModel
         .flowOfResourcesResult(settings = context.settingsContests, key = dataKey)
         .collectAsState()
 
-    val item = remember { context.settingsContests.clistAdditionalResources }
-    val selected by collectItemAsState { item }
+    val scope = rememberCoroutineScope()
 
+    CPSDialog(
+        modifier = Modifier.fillMaxWidth(),
+        onDismissRequest = onDismissRequest
+    ) {
+        DialogContent(
+            fetchResult = { fetchResult },
+            onFetchRetry = { dataKey = randomUuid() },
+            selected = { selected },
+            onSelectResource = {
+                scope.launch { item.edit { add(index = 0, element = it) } }
+            },
+            onUnselectResource = {
+                scope.launch { item.edit { remove(it) } }
+            }
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.DialogContent(
+    fetchResult: () -> Result<List<ClistResource>>?,
+    onFetchRetry: () -> Unit,
+    selected: () -> List<ClistResource>,
+    onSelectResource: (ClistResource) -> Unit,
+    onUnselectResource: (ClistResource) -> Unit
+) {
     var searchFilter by remember { mutableStateOf("") }
 
     Column(
@@ -78,29 +94,25 @@ private fun ColumnScope.DialogContent() {
     ) {
         ListTitle(text = "selected:")
         ClistResourcesList(
-            resources = { filter(selected, searchFilter) },
+            resources = { filter(selected(), searchFilter) },
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .heightIn(max = 200.dp),
-            onItemClick = { resource ->
-                scope.launch { item.edit { remove(resource) } }
-            }
+            onItemClick = onUnselectResource
         )
 
         ListTitle(text = "available:")
         LoadingContentBox(
-            dataResult = { resourcesResult?.map { it - selected.toSet() } },
+            dataResult = { fetchResult()?.map { it - selected().toSet() } },
             failedText = { it.niceMessage ?: "Failed to load resources" },
-            onRetry = { dataKey = randomUuid() },
+            onRetry = onFetchRetry,
             modifier = Modifier
                 .padding(bottom = 5.dp)
                 .fillMaxWidth()
         ) { resources ->
             ClistResourcesList(
                 resources = { filter(resources, searchFilter) },
-                onItemClick = { resource ->
-                    scope.launch { item.edit { add(index = 0, element = resource) } }
-                }
+                onItemClick = onSelectResource
             )
         }
     }
