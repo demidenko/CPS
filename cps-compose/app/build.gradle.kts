@@ -64,6 +64,7 @@ composeCompiler {
 dependencies {
     implementation(project(":kotlin-stdlib-boost"))
     implementation(project(":datastore_itemized"))
+    implementation(project(":platforms"))
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:clients"))
     implementation(project(":data:platforms:utils"))

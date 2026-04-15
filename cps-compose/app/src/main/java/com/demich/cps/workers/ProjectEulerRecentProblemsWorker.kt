@@ -8,8 +8,8 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.ProjectEulerClient
-import com.demich.cps.platforms.platformLogoResId
 import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.cps.ui.platformLogoResId
 import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
