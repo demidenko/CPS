@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.toGeneralPlatform
+import com.demich.cps.contests.database.toGeneralPlatformOrNull
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -50,7 +51,7 @@ internal fun ContestPlatformsSettingsItem() {
         title = "Platforms",
         collapsedContent = {
             EnabledPlatformsSubtitle(
-                enabledPlatforms = enabledPlatforms.map { it.toGeneralPlatform() },
+                enabledPlatforms = enabledPlatforms.mapNotNull { it.toGeneralPlatformOrNull() },
                 clistResources = clistResources
             )
         },
