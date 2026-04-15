@@ -17,8 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FetchPriorityListDialog(
-    platform: ContestPlatform,
+    platform: Platform,
     availableOptions: Set<ContestsFetchSource>,
     onDismissRequest: () -> Unit
 ) {
@@ -42,6 +43,7 @@ fun FetchPriorityListDialog(
 
     val settings = remember { context.settingsContests }
     val priorityList by collectAsState {
+        val platform = platform.toContestPlatform()
         settings.fetchPriorityLists.asFlow().map { it.getValue(platform) }
     }
 
@@ -57,7 +59,7 @@ fun FetchPriorityListDialog(
             onListChange = { newList ->
                 scope.launch {
                     settings.fetchPriorityLists.edit {
-                        this[platform] = newList
+                        this[platform.toContestPlatform()] = newList
                     }
                 }
             }

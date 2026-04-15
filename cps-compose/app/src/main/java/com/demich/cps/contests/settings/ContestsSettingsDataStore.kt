@@ -3,6 +3,7 @@ package com.demich.cps.contests.settings
 import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
@@ -13,7 +14,6 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
-import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.serialization.Serializable
@@ -30,17 +30,11 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         private val Context.contests_settings_dataStore by dataStoreWrapper("contests_settings")
     }
 
-    private val enabledPlatforms = itemEnumSet<ContestPlatform>(name = "enabled_platforms")
-    suspend fun changeEnabled(platform: ContestPlatform, enabled: Boolean) {
-        require(platform != unknown)
-        enabledPlatforms.edit {
-            if (enabled) add(platform) else remove(platform)
-        }
-    }
+    val enabledPlatforms = itemEnumSet<Platform>(name = "enabled_platforms")
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
     val enabledContestPlatforms = combine {
-        enabledPlatforms.value.toEnumSet().apply {
+        enabledPlatforms.value.map { it.toContestPlatform() }.toEnumSet().apply {
             if (clistAdditionalResources.value.isNotEmpty()) add(unknown)
         }
     }

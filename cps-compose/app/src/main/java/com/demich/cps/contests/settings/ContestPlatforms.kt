@@ -16,10 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.contests.database.toGeneralPlatform
-import com.demich.cps.contests.database.toGeneralPlatformOrNull
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -35,6 +32,7 @@ import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
@@ -44,14 +42,14 @@ internal fun ContestPlatformsSettingsItem() {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledContestPlatforms }
+    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
     val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
 
     Expandable(
         title = "Platforms",
         collapsedContent = {
             EnabledPlatformsSubtitle(
-                enabledPlatforms = enabledPlatforms.mapNotNull { it.toGeneralPlatformOrNull() },
+                enabledPlatforms = enabledPlatforms,
                 clistResources = clistResources
             )
         },
@@ -60,12 +58,10 @@ internal fun ContestPlatformsSettingsItem() {
                 enabledPlatforms = enabledPlatforms,
                 clistResources = clistResources,
                 onCheckedChange = { platform, checked ->
-                    require(platform != unknown)
                     scope.launch {
-                        context.settingsContests.changeEnabled(
-                            platform = platform,
-                            enabled = checked
-                        )
+                        context.settingsContests.enabledPlatforms.edit {
+                            if (checked) add(platform) else remove(platform)
+                        }
                     }
                 }
             )
@@ -91,15 +87,18 @@ private fun EnabledPlatformsSubtitle(
 
 @Composable
 private fun ContestPlatformsSettingsItemExpandedContent(
-    enabledPlatforms: Set<ContestPlatform>,
+    enabledPlatforms: Set<Platform>,
     clistResources: List<ClistResource>,
-    onCheckedChange: (ContestPlatform, Boolean) -> Unit
+    onCheckedChange: (Platform, Boolean) -> Unit
 ) {
     Column {
-        Contest.platformsExceptUnknown.forEach { platform ->
+        contestPlatforms.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableSources = ContestsFetchSource.entries.filter { platform in it.platforms }.toEnumSet(),
+                availableSources = remember(platform) {
+                    val platform = platform.toContestPlatform()
+                    ContestsFetchSource.entries.filter { platform in it.platforms }.toEnumSet()
+                },
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
@@ -110,13 +109,13 @@ private fun ContestPlatformsSettingsItemExpandedContent(
 
 @Composable
 private fun PlatformCheckRow(
-    platform: ContestPlatform,
+    platform: Platform,
     availableSources: Set<ContestsFetchSource>,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        LeadingIcon(platform = platform.toGeneralPlatform())
+        LeadingIcon(platform = platform)
         Text(
             text = platform.name,
             style = CPSDefaults.MonospaceTextStyle,
@@ -137,7 +136,7 @@ private fun PlatformCheckRow(
 
 @Composable
 private fun FetchSourcesSetupButton(
-    platform: ContestPlatform,
+    platform: Platform,
     fetchSources: Set<ContestsFetchSource>
 ) {
     var showDialog by remember { mutableStateOf(false) }
