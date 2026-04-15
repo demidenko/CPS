@@ -323,7 +323,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     )
 
     val anyPlatformEnabled = remember {
-        context.settingsContests.enabledPlatforms.getValueBlocking().isNotEmpty()
+        context.settingsContests.anyPlatformEnabled.getValueBlocking()
     }
 
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }

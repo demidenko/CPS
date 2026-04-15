@@ -45,6 +45,10 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
         }
     }
 
+    val anyPlatformEnabled = combine {
+        enabledKnownPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
+    }
+
     val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
     val clistApiKey = itemString(name = "clist_api_key", defaultValue = "")
     val clistApiAccess = combine {
