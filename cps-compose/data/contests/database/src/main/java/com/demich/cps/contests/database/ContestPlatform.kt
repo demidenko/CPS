@@ -35,3 +35,12 @@ fun Contest.generalPlatformOrNull(): Platform? =
             else -> null
         }
     }
+
+fun Platform.toContestPlatform(): ContestPlatform =
+    when (this) {
+        codeforces -> codeforces
+        atcoder -> atcoder
+        codechef -> codechef
+        dmoj -> dmoj
+        else -> unknown
+    }
