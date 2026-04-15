@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -99,24 +100,18 @@ private fun String.removePrefixHttp() =
     removePrefix("http://").removePrefix("https://")
 
 fun ContestPlatform.clistResourceId(): Int =
-    when (this) {
-        unknown -> throw IllegalArgumentException("unknown not allowed")
-        codeforces -> 1
-        atcoder -> 93
-        codechef -> 2
-        dmoj -> 77
-    }
+    requireNotNull(toGeneralPlatform().clistResourceId)
 
 val Platform.clistResourceId: Int?
     get() = when (this) {
-        clist -> null
         codeforces -> 1
-        atcoder -> 93
-        topcoder -> 12
         codechef -> 2
-        dmoj -> 77
         acmp -> 5
         timus -> 7
+        topcoder -> 12
         project_euler -> 65
+        dmoj -> 77
+        atcoder -> 93
         leetcode -> 102
+        clist -> null
     }
