@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.generalPlatformOrNull
+import com.demich.cps.contests.database.toGeneralPlatformOrNull
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -59,28 +61,3 @@ fun ContestPlatformIcon(
         color = color
     )
 }
-
-private inline fun ContestPlatform.toGeneralPlatformOr(block: () -> Nothing): Platform =
-    when (this) {
-        unknown -> block()
-        codeforces -> codeforces
-        atcoder -> atcoder
-        codechef -> codechef
-        dmoj -> dmoj
-    }
-
-fun ContestPlatform.toGeneralPlatformOrNull(): Platform? =
-    toGeneralPlatformOr { return null }
-
-fun ContestPlatform.toGeneralPlatform(): Platform =
-    toGeneralPlatformOr { throw IllegalArgumentException() }
-
-fun Contest.generalPlatformOrNull(): Platform? =
-    platform.toGeneralPlatformOr {
-        return when (host) {
-            "projecteuler.net" -> project_euler
-            "topcoder.com" -> topcoder
-            "leetcode.com" -> leetcode
-            else -> null
-        }
-    }

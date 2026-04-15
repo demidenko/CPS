@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.contests.loading.ContestsFetchSource
-import com.demich.cps.contests.toGeneralPlatform
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.ui.CPSCheckBox

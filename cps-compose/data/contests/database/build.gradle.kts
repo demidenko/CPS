@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":platforms"))
     implementation(project(":features:room_base"))
 
     implementation(libs.androidx.room.ktx)
