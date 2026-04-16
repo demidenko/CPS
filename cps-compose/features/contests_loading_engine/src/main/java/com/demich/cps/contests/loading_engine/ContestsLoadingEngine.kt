@@ -21,13 +21,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-suspend fun ContestsRepository.collectResults(
-    flows: Map<ContestPlatform, Flow<ContestsFetchResult>>
+suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectTo(
+    repository: ContestsRepository
 ) {
-    if (flows.isEmpty()) return
+    if (isEmpty()) return
 
     coroutineScope {
-        flows.forEach { (platform, flow) ->
+        forEach { (platform, flow) ->
             launch {
                 val last = flow.transformWhile {
                     emit(it)
@@ -35,7 +35,7 @@ suspend fun ContestsRepository.collectResults(
                 }.last()
 
                 last.result.onSuccess {
-                    setContests(platform = platform, contests = it)
+                    repository.setContests(platform = platform, contests = it)
                 }
             }
         }

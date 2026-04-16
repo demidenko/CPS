@@ -9,7 +9,7 @@ import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.fetching.ContestsFetchSource
-import com.demich.cps.contests.loading_engine.collectResults
+import com.demich.cps.contests.loading_engine.collectTo
 import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
@@ -57,21 +57,20 @@ class ContestsViewModel: ViewModel() {
             else this[platform] = loadingStatus
         }
 
-    private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> =
-        run {
-            var lastStatus: LoadingStatus = PENDING
-            onStart {
-                setLoadingStatus(platform, LOADING)
-                errors.edit { remove(platform) }
-            }.onEach { (platform, source, result) ->
-                result.onFailure { error ->
-                    errors.edit { edit(platform) { add(source to error) } }
-                }
-                lastStatus = result.toLoadingStatus()
-            }.onCompletion {
-                setLoadingStatus(platform, lastStatus)
+    private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
+        var lastStatus: LoadingStatus = PENDING
+        return onStart {
+            setLoadingStatus(platform, LOADING)
+            errors.edit { remove(platform) }
+        }.onEach { (platform, source, result) ->
+            result.onFailure { error ->
+                errors.edit { edit(platform) { add(source to error) } }
             }
+            lastStatus = result.toLoadingStatus()
+        }.onCompletion {
+            setLoadingStatus(platform, lastStatus)
         }
+    }
 
     private fun Map<ContestPlatform, Flow<ContestsFetchResult>>.trackLoadingStatuses() =
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
@@ -79,9 +78,9 @@ class ContestsViewModel: ViewModel() {
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
-            context.contestsRepository.collectResults(
-                flows = context.settingsContests.contestsFetchFlows().trackLoadingStatuses()
-            )
+
+            context.settingsContests.contestsFetchFlows()
+                .trackLoadingStatuses().collectTo(context.contestsRepository)
         }
     }
 
@@ -103,9 +102,8 @@ class ContestsViewModel: ViewModel() {
                 setLoadingStatus(platform, PENDING)
             }
 
-            repository.collectResults(
-                flows = settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload()).trackLoadingStatuses()
-            )
+            settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload())
+                .trackLoadingStatuses().collectTo(repository)
         }
     }
 }

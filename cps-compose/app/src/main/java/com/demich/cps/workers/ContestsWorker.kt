@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.contestsFetchFlows
 import com.demich.cps.contests.database.contestsRepository
-import com.demich.cps.contests.loading_engine.collectResults
+import com.demich.cps.contests.loading_engine.collectTo
 import com.demich.cps.contests.settings.settingsContests
 
 class ContestsWorker(
@@ -30,8 +30,8 @@ class ContestsWorker(
 
     override suspend fun runWork(): Result {
         // usual reload
-        context.contestsRepository.collectResults(
-            flows = context.settingsContests.contestsFetchFlows()
+        context.settingsContests.contestsFetchFlows().collectTo(
+            repository = context.contestsRepository
         )
 
         return Result.success()
