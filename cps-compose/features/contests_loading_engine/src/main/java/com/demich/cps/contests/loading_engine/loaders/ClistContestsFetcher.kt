@@ -2,9 +2,11 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.database.toGeneralPlatformOrNull
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -52,9 +54,9 @@ private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: Contest
     }
 
 private fun ClistContest.toContest(): Contest {
-    val platform: ContestPlatform = Contest.platformsExceptUnknown
-        .find { it.clistResourceId() == resource_id }
-        ?: unknown
+    val platform: ContestPlatform =
+        Platform.entries.find { it.clistResourceId == resource_id }
+            ?.toContestPlatform() ?: unknown
 
     return Contest(
         platform = platform,

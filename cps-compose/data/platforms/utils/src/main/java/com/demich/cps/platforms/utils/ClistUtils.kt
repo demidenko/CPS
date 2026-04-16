@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -96,9 +95,6 @@ fun ClistContest.extractContestId(platform: ContestPlatform?): String =
 
 private fun String.removePrefixHttp() =
     removePrefix("http://").removePrefix("https://")
-
-fun ContestPlatform.clistResourceId(): Int =
-    requireNotNull(toGeneralPlatform().clistResourceId)
 
 val Platform.clistResourceId: Int?
     get() = when (this) {
