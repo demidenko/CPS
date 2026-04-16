@@ -163,20 +163,24 @@ private class CListResourcesLoadingViewModel: ViewModel() {
 
     fun flowOfResourcesResult(settings: ContestsSettingsDataStore, key: Any) =
         loader.execute(key = key) {
-            ClistClient.getResourcesSyncWithSettings(settings)
+            ClistClient.getResourcesSyncWithSettings(
+                clistApiAccess = settings.clistApiAccess(),
+                item = settings.clistAdditionalResources
+            )
         }
 }
 
 private suspend fun ClistApi.getResourcesSyncWithSettings(
-    settings: ContestsSettingsDataStore
+    clistApiAccess: ClistApi.ApiAccess,
+    item: DataStoreItem<List<ClistResource>>
 ): List<ClistResource> {
     val mainIds = contestPlatforms.mapToSet { it.clistResourceId }
-    return getResources(apiAccess = settings.clistApiAccess())
+    return getResources(apiAccess = clistApiAccess)
         .filter { it.id !in mainIds }
         .sortedBy { it.name }
         .also { list ->
             val res = list.associateBy { it.id }
-            settings.clistAdditionalResources.update {
+            item.update {
                 it.mapNotNull { res[it.id] }
             }
         }
