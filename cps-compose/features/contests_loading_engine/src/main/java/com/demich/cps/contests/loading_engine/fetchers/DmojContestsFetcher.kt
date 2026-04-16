@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loading_engine.fetchers
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.api.dmoj.DmojApi
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant

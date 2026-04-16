@@ -1,8 +1,8 @@
 package com.demich.cps.contests.loading_engine.fetchers
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestDateConstraints
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 

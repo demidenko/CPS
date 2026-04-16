@@ -2,9 +2,9 @@ package com.demich.cps.contests.loading_engine
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.contests.loading.ContestDateConstraints
-import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestDateConstraints
+import com.demich.cps.contests.fetching.ContestsFetchResult
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.contests.loading_engine.fetchers.ContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsMultiplatformFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsSinglePlatformFetcher

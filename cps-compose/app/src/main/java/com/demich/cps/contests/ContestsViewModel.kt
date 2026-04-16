@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.database.toContestPlatform
-import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestsFetchResult
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot

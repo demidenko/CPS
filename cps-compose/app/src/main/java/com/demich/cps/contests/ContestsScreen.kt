@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.contests.list_items.ContestItem
-import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.contestId

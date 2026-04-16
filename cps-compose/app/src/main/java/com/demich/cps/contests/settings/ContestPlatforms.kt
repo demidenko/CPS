@@ -17,7 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.toContestPlatform
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.ui.CPSCheckBox

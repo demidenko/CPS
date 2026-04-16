@@ -1,7 +1,7 @@
 package com.demich.cps.contests.loading_engine.fetchers
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.api.atcoder.AtCoderApi
 import com.demich.cps.platforms.utils.atcoder.getContests
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets

@@ -2,7 +2,7 @@ package com.demich.cps.contests
 
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.ContestsRepository
-import com.demich.cps.contests.loading.ContestsFetchResult
+import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
 import com.demich.cps.contests.loading_engine.fetchers.AtCoderContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ClistContestsFetcher

@@ -1,4 +1,4 @@
-package com.demich.cps.contests.loading
+package com.demich.cps.contests.fetching
 
 import kotlin.time.Duration
 import kotlin.time.Instant

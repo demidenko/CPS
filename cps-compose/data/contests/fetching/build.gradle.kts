@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.demich.cps.contests.loading"
+    namespace = "com.demich.cps.contests.fetching"
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

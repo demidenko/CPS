@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.database.toContestPlatform
-import com.demich.cps.contests.loading.ContestsFetchSource
+import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.CPSIcons
