@@ -56,23 +56,26 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             else this[platform] = loadingStatus
         }
 
+    private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> =
+        run {
+            var lastStatus: LoadingStatus = PENDING
+            onStart {
+                setLoadingStatus(platform, LOADING)
+                errors.edit { remove(platform) }
+            }.onEach { (platform, source, result) ->
+                result.onFailure { error ->
+                    errors.edit { edit(platform) { add(source to error) } }
+                }
+                lastStatus = result.toLoadingStatus()
+            }.onCompletion {
+                setLoadingStatus(platform, lastStatus)
+            }
+        }
+
     override fun transform(
         platform: ContestPlatform,
         flow: Flow<ContestsFetchResult>
-    ) = flow.run {
-        var lastStatus: LoadingStatus = PENDING
-        onStart {
-            setLoadingStatus(platform, LOADING)
-            errors.edit { remove(platform) }
-        }.onEach { (platform, source, result) ->
-            result.onFailure { error ->
-                errors.edit { edit(platform) { add(source to error) } }
-            }
-            lastStatus = result.toLoadingStatus()
-        }.onCompletion {
-            setLoadingStatus(platform, lastStatus)
-        }
-    }
+    ) = flow.trackLoadingStatus(platform)
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
