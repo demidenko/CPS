@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.ContestsReloader
 import com.demich.cps.contests.database.contestsRepository
-import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.settingsContests
 
 class ContestsWorker(
@@ -32,7 +31,7 @@ class ContestsWorker(
         //usual reload
         reloadEnabledPlatforms(
             settings = context.settingsContests,
-            contestsReceiver = context.contestsRepository.asContestsReceiver()
+            repository = context.contestsRepository
         )
 
         return Result.success()

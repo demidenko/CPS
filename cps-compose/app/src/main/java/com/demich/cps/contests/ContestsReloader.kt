@@ -1,8 +1,8 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.ContestsRepository
 import com.demich.cps.contests.loading.ContestsFetchResult
-import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
 import com.demich.cps.contests.loading_engine.fetchers.AtCoderContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ClistContestsFetcher
@@ -25,19 +25,19 @@ import kotlinx.coroutines.launch
 interface ContestsReloader {
     suspend fun reloadEnabledPlatforms(
         settings: ContestsSettingsDataStore,
-        contestsReceiver: ContestsReceiver
+        repository: ContestsRepository
     ) {
         reload(
             platforms = settings.enabledContestPlatforms(),
             settings = settings,
-            contestsReceiver = contestsReceiver
+            repository = repository
         )
     }
 
     suspend fun reload(
         platforms: Collection<ContestPlatform>,
         settings: ContestsSettingsDataStore,
-        contestsReceiver: ContestsReceiver
+        repository: ContestsRepository
     ) {
         if (platforms.isEmpty()) {
             return
@@ -48,7 +48,7 @@ interface ContestsReloader {
                 .forEach { (platform, resultsFlow) ->
                     launch {
                         val last = transform(platform, resultsFlow).last()
-                        last.result.onSuccess { contestsReceiver.save(platform, it) }
+                        last.result.onSuccess { repository.setContests(platform, it) }
                     }
                 }
         }

@@ -9,7 +9,6 @@ import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
-import com.demich.cps.contests.loading.asContestsReceiver
 import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
@@ -80,7 +79,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
             reloadEnabledPlatforms(
                 settings = context.settingsContests,
-                contestsReceiver = context.contestsRepository.asContestsReceiver()
+                repository = context.contestsRepository
             )
         }
     }
@@ -106,7 +105,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             reload(
                 platforms = diff.contestPlatformsToReload(),
                 settings = settings,
-                contestsReceiver = repository.asContestsReceiver()
+                repository = repository
             )
         }
     }
