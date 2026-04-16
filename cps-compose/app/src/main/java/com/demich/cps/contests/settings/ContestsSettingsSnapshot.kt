@@ -1,6 +1,6 @@
 package com.demich.cps.contests.settings
 
-import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.platforms.Platform
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class ContestsSettingsSnapshot(
-    val enabledPlatforms: Set<ContestPlatform>,
+    val enabledPlatforms: Set<Platform>,
     val clistResourcesIds: Set<Int>,
     val contestsDateConstraints: ContestDateRelativeConstraints
 )
@@ -16,7 +16,7 @@ class ContestsSettingsSnapshot(
 suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
     fromSnapshot {
         ContestsSettingsSnapshot(
-            enabledPlatforms = enabledContestPlatforms.value,
+            enabledPlatforms = enabledPlatforms.value,
             clistResourcesIds = clistAdditionalResources.value.mapToSet { it.id },
             contestsDateConstraints = contestsDateConstraints.value
         )
@@ -24,13 +24,14 @@ suspend fun ContestsSettingsDataStore.makeSnapshot(): ContestsSettingsSnapshot =
 
 
 class ContestsSettingsSnapshotDiff(
-    val toReload: Set<ContestPlatform>,
-    val toRemove: Set<ContestPlatform>
+    val toReload: Set<Platform>,
+    val toRemove: Set<Platform>,
+    val clistReload: Boolean
 )
 
 fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot): ContestsSettingsSnapshotDiff {
-    val toReload = mutableSetOf<ContestPlatform>()
-    val toRemove: Set<ContestPlatform>
+    val toReload = mutableSetOf<Platform>()
+    val toRemove: Set<Platform>
 
     snapshot.enabledPlatforms.let { prev ->
         val current = enabledPlatforms
@@ -38,23 +39,23 @@ fun ContestsSettingsSnapshot.differenceFrom(snapshot: ContestsSettingsSnapshot):
         toReload.addAll(current - prev)
     }
 
-    snapshot.clistResourcesIds.let { prev ->
+    var clistReload = snapshot.clistResourcesIds.let { prev ->
         val current = clistResourcesIds
-        if (prev != current) {
-            toReload.add(unknown)
-        }
+        prev != current
     }
 
     snapshot.contestsDateConstraints.let { prev ->
         val current = contestsDateConstraints
         if (prev != current) {
             //TODO: delete contests if current in prev
-            toReload.addAll(ContestPlatform.entries)
+            toReload.addAll(contestPlatforms)
+            clistReload = true
         }
     }
 
     return ContestsSettingsSnapshotDiff(
         toReload = toReload.intersect(enabledPlatforms),
-        toRemove = toRemove
+        toRemove = toRemove,
+        clistReload = clistReload
     )
 }

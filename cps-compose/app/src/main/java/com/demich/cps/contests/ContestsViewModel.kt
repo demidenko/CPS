@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.contestsRepository
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.contests.loading.asContestsReceiver
+import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
 import com.demich.cps.contests.settings.settingsContests
@@ -18,6 +20,7 @@ import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.workers.ContestsWorker
+import com.demich.kotlin_stdlib_boost.emptyEnumSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,14 +95,16 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             val diff = settings.makeSnapshot().differenceFrom(snapshot)
 
             val repository = context.contestsRepository
-            diff.toRemove.forEach { platform ->
+            diff.toRemove.forEach {
+                // TODO: replace it to fake fetch flows
+                val platform = it.toContestPlatform()
                 repository.replace(platform, emptyList())
                 errors.edit { remove(platform) }
                 setLoadingStatus(platform, PENDING)
             }
 
             reload(
-                platforms = diff.toReload,
+                platforms = diff.contestPlatformsToReload(),
                 settings = settings,
                 contestsReceiver = repository.asContestsReceiver()
             )
@@ -107,3 +112,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     }
 }
 
+private fun ContestsSettingsSnapshotDiff.contestPlatformsToReload(): Set<ContestPlatform> =
+    emptyEnumSet<ContestPlatform>().apply {
+        toReload.forEach { add(it.toContestPlatform()) }
+        if (clistReload) add(unknown)
+    }
