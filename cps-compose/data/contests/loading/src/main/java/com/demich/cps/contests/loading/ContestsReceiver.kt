@@ -26,5 +26,5 @@ data class ContestsFetchResult(
 
 fun ContestsRepository.asContestsReceiver() =
     ContestsReceiver { platform, contests ->
-        replace(platform = platform, contests = contests)
+        setContests(platform = platform, contests = contests)
     }

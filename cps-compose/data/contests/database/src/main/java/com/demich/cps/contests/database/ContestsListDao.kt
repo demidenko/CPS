@@ -35,7 +35,7 @@ internal abstract class ContestsListDao: ContestsRepository {
     }
 
     @Transaction
-    override suspend fun replace(platform: ContestPlatform, contests: List<Contest>) {
+    override suspend fun setContests(platform: ContestPlatform, contests: List<Contest>) {
         require(contests.all { it.platform == platform })
         val ids = contests.mapTo(mutableSetOf()) { it.id }
         removeNotIn(platform, ids)

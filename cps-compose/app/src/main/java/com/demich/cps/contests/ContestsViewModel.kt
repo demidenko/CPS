@@ -98,7 +98,7 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             diff.toRemove.forEach {
                 // TODO: replace it to fake fetch flows
                 val platform = it.toContestPlatform()
-                repository.replace(platform, emptyList())
+                repository.setContests(platform, emptyList())
                 errors.edit { remove(platform) }
                 setLoadingStatus(platform, PENDING)
             }

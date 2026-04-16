@@ -11,7 +11,7 @@ interface ContestsRepository {
 
     suspend fun getContestsNotFinished(platform: ContestPlatform, currentTime: Instant): List<Contest>
 
-    suspend fun replace(platform: ContestPlatform, contests: List<Contest>)
+    suspend fun setContests(platform: ContestPlatform, contests: List<Contest>)
 }
 
 val Context.contestsRepository: ContestsRepository
