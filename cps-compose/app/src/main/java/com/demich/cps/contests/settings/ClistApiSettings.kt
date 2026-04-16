@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistUrls
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -34,7 +33,6 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberFirstValue
-import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.launch
@@ -42,12 +40,12 @@ import kotlinx.coroutines.launch
 @Composable
 context(scope: SettingsContainerScope)
 internal fun ClistApiAccessSettingsItem(
-    item: DataStoreValue<ClistApi.ApiAccess>
+    settings: ContestsSettingsDataStore
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
         modifier = Modifier.clickable { showDialog = true },
-        item = item,
+        item = settings.clistApiAccess,
         title = "Clist API access"
     ) { (login, key) ->
         if (login.isBlank()) {
@@ -66,16 +64,22 @@ internal fun ClistApiAccessSettingsItem(
     }
 
     if (showDialog) {
-        ClistApiDialog { showDialog = false }
+        ClistApiDialog(
+            settings = settings,
+            onDismissRequest = { showDialog = false }
+        )
     }
 }
 
 @Composable
-private fun ClistApiDialog(onDismissRequest: () -> Unit) {
+private fun ClistApiDialog(
+    settings: ContestsSettingsDataStore,
+    onDismissRequest: () -> Unit
+) {
     val context = context
     val scope = rememberCoroutineScope()
 
-    val initApiAccess = rememberFirstValue { context.settingsContests.clistApiAccess }
+    val initApiAccess = rememberFirstValue { settings.clistApiAccess }
     var login by rememberSaveable { mutableStateOf(initApiAccess.login) }
     var key by rememberSaveable { mutableStateOf(initApiAccess.key) }
 
@@ -117,7 +121,7 @@ private fun ClistApiDialog(onDismissRequest: () -> Unit) {
             modifier = Modifier.padding(top = 8.dp)
         ) {
             scope.launch {
-                context.settingsContests.edit {
+                settings.edit {
                     clistApiLogin.value = login
                     clistApiKey.value = key
                 }

@@ -26,7 +26,7 @@ private fun ContestsSettingsScreen() {
             clistAdditionalResourcesItem = settings.clistAdditionalResources
         )
         DateConstraintsSettingsItem(settings = settings)
-        ClistApiAccessSettingsItem(item = settings.clistApiAccess)
+        ClistApiAccessSettingsItem(settings = settings)
         AutoUpdateSettingsItem(item = settings.autoUpdateInterval)
 
         if (devModeEnabled) {

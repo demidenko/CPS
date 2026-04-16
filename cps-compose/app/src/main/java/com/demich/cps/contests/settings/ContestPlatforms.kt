@@ -59,7 +59,6 @@ internal fun ContestPlatformsSettingsItem(
             ContestPlatformsSettingsItemExpandedContent(
                 enabledPlatforms = enabledPlatforms,
                 clistResources = clistResources,
-                clistAdditionalResourcesItem = clistAdditionalResourcesItem,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
                         enabledPlatformsItem.edit {
@@ -92,7 +91,6 @@ private fun EnabledPlatformsSubtitle(
 private fun ContestPlatformsSettingsItemExpandedContent(
     enabledPlatforms: Set<Platform>,
     clistResources: List<ClistResource>,
-    clistAdditionalResourcesItem: DataStoreItem<List<ClistResource>>,
     onCheckedChange: (Platform, Boolean) -> Unit
 ) {
     Column {
@@ -108,8 +106,7 @@ private fun ContestPlatformsSettingsItemExpandedContent(
             )
         }
         ClistAdditionalRow(
-            resources = clistResources,
-            item = clistAdditionalResourcesItem
+            resources = clistResources
         )
     }
 }
@@ -161,8 +158,7 @@ private fun FetchSourcesSetupButton(
 
 @Composable
 private fun ClistAdditionalRow(
-    resources: List<ClistResource>,
-    item: DataStoreItem<List<ClistResource>>
+    resources: List<ClistResource>
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -183,7 +179,6 @@ private fun ClistAdditionalRow(
 
     if (showDialog) {
         ClistAdditionalResourcesDialog(
-            item = item,
             onDismissRequest = { showDialog = false }
         )
     }

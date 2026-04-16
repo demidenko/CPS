@@ -46,17 +46,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun ClistAdditionalResourcesDialog(
-    item: DataStoreItem<List<ClistResource>>,
     onDismissRequest: () -> Unit
 ) {
     val context = context
+    val settings = remember { context.settingsContests }
+    val item = remember { settings.clistAdditionalResources }
     val selected by collectItemAsState { item }
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
     val fetchResult by viewModel
-        .flowOfResourcesResult(settings = context.settingsContests, key = dataKey)
+        .flowOfResourcesResult(settings = settings, key = dataKey)
         .collectAsState()
 
     val scope = rememberCoroutineScope()
