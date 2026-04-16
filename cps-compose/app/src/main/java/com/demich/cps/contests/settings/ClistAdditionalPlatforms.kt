@@ -38,6 +38,7 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.sebaslogen.resaca.viewModelScoped
@@ -45,10 +46,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun ClistAdditionalResourcesDialog(
+    item: DataStoreItem<List<ClistResource>>,
     onDismissRequest: () -> Unit
 ) {
     val context = context
-    val item = remember { context.settingsContests.clistAdditionalResources }
     val selected by collectItemAsState { item }
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
