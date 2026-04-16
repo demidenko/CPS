@@ -22,6 +22,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":platforms"))
     implementation(project(":data:contests:database"))
     implementation(project(":data:contests:loading"))
     implementation(project(":data:platforms:api"))

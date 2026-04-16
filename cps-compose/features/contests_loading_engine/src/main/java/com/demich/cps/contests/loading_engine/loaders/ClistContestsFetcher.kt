@@ -2,6 +2,7 @@ package com.demich.cps.contests.loading_engine.loaders
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toGeneralPlatformOrNull
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchSource
 import com.demich.cps.platforms.api.clist.ClistApi
@@ -22,12 +23,19 @@ class ClistContestsFetcher(
     override suspend fun getContests(
         platforms: Set<ContestPlatform>,
         dateConstraints: ContestDateConstraints
-    ) = api.getContests(
-        apiAccess = apiAccess,
-        maxStartTime = dateConstraints.maxStartTime,
-        minEndTime = dateConstraints.minEndTime,
-        resourceIds = ClistUtils.makeResourceIds(platforms, resources)
-    ).mapAndFilterResult(dateConstraints)
+    ): List<Contest> {
+        val resourceIds = ClistUtils.makeResourceIds(
+            platforms = platforms.mapNotNull { it.toGeneralPlatformOrNull() },
+            additionalResources = if (platforms.contains(unknown)) resources else emptyList()
+        )
+
+        return api.getContests(
+            apiAccess = apiAccess,
+            maxStartTime = dateConstraints.maxStartTime,
+            minEndTime = dateConstraints.minEndTime,
+            resourceIds = resourceIds
+        ).mapAndFilterResult(dateConstraints)
+    }
 }
 
 

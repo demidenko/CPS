@@ -26,13 +26,11 @@ object ClistUtils {
         Instant.parse(str, contestDateFormat)
 
     fun makeResourceIds(
-        platforms: Collection<ContestPlatform>,
-        additionalResources: Collection<ClistResource> = emptyList()
+        platforms: Collection<Platform>,
+        additionalResources: Collection<ClistResource>
     ): Set<Int> = buildSet {
-        for (platform in platforms) {
-            if (platform == unknown) addAll(additionalResources.map { it.id })
-            else add(platform.clistResourceId())
-        }
+        platforms.forEach { add(requireNotNull(it.clistResourceId)) }
+        additionalResources.forEach { add(it.id) }
     }
 
     fun extractLoginSuggestions(source: String): List<String> =
