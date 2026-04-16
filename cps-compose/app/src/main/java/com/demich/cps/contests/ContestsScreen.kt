@@ -75,8 +75,8 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getSystemTime
-import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.openUrlInBrowser
+import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
@@ -322,9 +322,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         isReloading = isReloading
     )
 
-    val anyPlatformEnabled = remember {
-        context.settingsContests.anyPlatformEnabled.getValueBlocking()
-    }
+    val anyPlatformEnabled = rememberFirstValue { context.settingsContests.anyPlatformEnabled }
 
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
