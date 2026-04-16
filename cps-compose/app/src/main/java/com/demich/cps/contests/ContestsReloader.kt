@@ -4,10 +4,10 @@ import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsReceiver
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
-import com.demich.cps.contests.loading_engine.loaders.AtCoderContestsFetcher
-import com.demich.cps.contests.loading_engine.loaders.ClistContestsFetcher
-import com.demich.cps.contests.loading_engine.loaders.CodeforcesContestsFetcher
-import com.demich.cps.contests.loading_engine.loaders.DmojContestsFetcher
+import com.demich.cps.contests.loading_engine.fetchers.AtCoderContestsFetcher
+import com.demich.cps.contests.loading_engine.fetchers.ClistContestsFetcher
+import com.demich.cps.contests.loading_engine.fetchers.CodeforcesContestsFetcher
+import com.demich.cps.contests.loading_engine.fetchers.DmojContestsFetcher
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ClistClient

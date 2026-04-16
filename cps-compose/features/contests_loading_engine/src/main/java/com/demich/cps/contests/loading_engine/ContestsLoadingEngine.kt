@@ -5,10 +5,10 @@ import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.loading.ContestDateConstraints
 import com.demich.cps.contests.loading.ContestsFetchResult
 import com.demich.cps.contests.loading.ContestsFetchSource
-import com.demich.cps.contests.loading_engine.loaders.ContestsFetcher
-import com.demich.cps.contests.loading_engine.loaders.ContestsMultiplatformFetcher
-import com.demich.cps.contests.loading_engine.loaders.ContestsSinglePlatformFetcher
-import com.demich.cps.contests.loading_engine.loaders.correctAtCoderTitle
+import com.demich.cps.contests.loading_engine.fetchers.ContestsFetcher
+import com.demich.cps.contests.loading_engine.fetchers.ContestsMultiplatformFetcher
+import com.demich.cps.contests.loading_engine.fetchers.ContestsSinglePlatformFetcher
+import com.demich.cps.contests.loading_engine.fetchers.correctAtCoderTitle
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
