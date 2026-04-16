@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
-class ContestsViewModel: ViewModel(), ContestsReloader {
+class ContestsViewModel: ViewModel() {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }
@@ -75,11 +75,6 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
 
     private fun Map<ContestPlatform, Flow<ContestsFetchResult>>.trackLoadingStatuses() =
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
-
-    override fun transform(
-        platform: ContestPlatform,
-        flow: Flow<ContestsFetchResult>
-    ) = flow.trackLoadingStatus(platform)
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
