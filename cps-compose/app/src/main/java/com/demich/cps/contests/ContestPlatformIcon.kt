@@ -6,9 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.generalPlatformOrNull
-import com.demich.cps.contests.database.toGeneralPlatformOrNull
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -26,21 +24,6 @@ fun ContestPlatformIcon(
             null -> rememberVectorPainter(CPSIcons.Contest)
             else -> platformLogoPainter(platform)
         },
-        size = size,
-        modifier = modifier,
-        color = color
-    )
-}
-
-@Composable
-fun ContestPlatformIcon(
-    platform: ContestPlatform,
-    modifier: Modifier = Modifier,
-    size: TextUnit,
-    color: Color
-) {
-    ContestPlatformIcon(
-        platform = platform.toGeneralPlatformOrNull(),
         size = size,
         modifier = modifier,
         color = color
