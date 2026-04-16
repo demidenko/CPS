@@ -9,6 +9,7 @@ import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.fetching.ContestsFetchSource
+import com.demich.cps.contests.loading_engine.collectResults
 import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.makeSnapshot
@@ -72,6 +73,9 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
             }
         }
 
+    private fun Map<ContestPlatform, Flow<ContestsFetchResult>>.trackLoadingStatuses() =
+        mapValues { it.value.trackLoadingStatus(platform = it.key) }
+
     override fun transform(
         platform: ContestPlatform,
         flow: Flow<ContestsFetchResult>
@@ -80,9 +84,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
-            reloadEnabledPlatforms(
-                settings = context.settingsContests,
-                repository = context.contestsRepository
+            context.contestsRepository.collectResults(
+                flows = context.settingsContests.contestsFetchFlows().trackLoadingStatuses()
             )
         }
     }
@@ -105,10 +108,8 @@ class ContestsViewModel: ViewModel(), ContestsReloader {
                 setLoadingStatus(platform, PENDING)
             }
 
-            reload(
-                platforms = diff.contestPlatformsToReload(),
-                settings = settings,
-                repository = repository
+            repository.collectResults(
+                flows = settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload()).trackLoadingStatuses()
             )
         }
     }
