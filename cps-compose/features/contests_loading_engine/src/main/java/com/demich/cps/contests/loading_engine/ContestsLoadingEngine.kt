@@ -2,6 +2,7 @@ package com.demich.cps.contests.loading_engine
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.ContestsRepository
 import com.demich.cps.contests.fetching.ContestDateConstraints
 import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.fetching.ContestsFetchSource
@@ -14,9 +15,25 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+suspend fun ContestsRepository.collectResults(
+    flows: Map<ContestPlatform, Flow<ContestsFetchResult>>
+) {
+    if (flows.isEmpty()) return
+
+    coroutineScope {
+        flows.forEach { (platform, flow) ->
+            launch {
+                flow.last().result.onSuccess { setContests(platform, it) }
+            }
+        }
+    }
+}
 
 fun contestsFetchFlows(
     setup: Map<ContestPlatform, List<ContestsFetchSource>>,

@@ -2,8 +2,9 @@ package com.demich.cps.workers
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.demich.cps.contests.ContestsReloader
+import com.demich.cps.contests.contestsFetchFlows
 import com.demich.cps.contests.database.contestsRepository
+import com.demich.cps.contests.loading_engine.collectResults
 import com.demich.cps.contests.settings.settingsContests
 
 class ContestsWorker(
@@ -12,7 +13,7 @@ class ContestsWorker(
 ): CPSWorker(
     work = getWork(context),
     parameters = parameters
-), ContestsReloader {
+) {
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "contests", context = context) {
             private val settings get() = context.settingsContests
@@ -28,10 +29,9 @@ class ContestsWorker(
     }
 
     override suspend fun runWork(): Result {
-        //usual reload
-        reloadEnabledPlatforms(
-            settings = context.settingsContests,
-            repository = context.contestsRepository
+        // usual reload
+        context.contestsRepository.collectResults(
+            flows = context.settingsContests.contestsFetchFlows()
         )
 
         return Result.success()
