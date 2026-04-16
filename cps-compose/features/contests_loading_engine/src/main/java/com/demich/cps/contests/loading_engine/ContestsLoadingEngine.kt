@@ -29,7 +29,14 @@ suspend fun ContestsRepository.collectResults(
     coroutineScope {
         flows.forEach { (platform, flow) ->
             launch {
-                flow.last().result.onSuccess { setContests(platform, it) }
+                val last = flow.transformWhile {
+                    emit(it)
+                    it.result.isFailure
+                }.last()
+
+                last.result.onSuccess {
+                    setContests(platform = platform, contests = it)
+                }
             }
         }
     }
@@ -46,10 +53,7 @@ fun contestsFetchFlows(
         priorities.toFetchFlow(
             platform = platform,
             memoizer = memoizer
-        ).transformWhile {
-            emit(it)
-            it.result.isFailure
-        }
+        )
     }
 }
 
