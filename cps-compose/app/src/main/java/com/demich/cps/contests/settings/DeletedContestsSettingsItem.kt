@@ -9,43 +9,38 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.demich.cps.contests.ContestsInfoDataStore
+import com.demich.cps.contests.ContestCompositeId
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SubtitledByValue
-import com.demich.cps.ui.settingsUI
-import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.context
+import com.demich.cps.utils.TimedCollection
 import com.demich.cps.utils.emptyTimedCollection
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.setValueIn
 
 @Composable
 context(scope: SettingsContainerScope)
-internal fun DeletedContestsSettingsItem() {
-    val context = context
+internal fun DeletedContestsSettingsItem(
+    item: DataStoreItem<TimedCollection<ContestCompositeId>>
+) {
     val scope = rememberCoroutineScope()
 
-    val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
-    val settings = remember { ContestsInfoDataStore(context) }
+    var showDialog by remember { mutableStateOf(false) }
+    SubtitledByValue(
+        modifier = Modifier.clickable { showDialog = true },
+        item = item,
+        title = "Ignored contests"
+    ) {
+        Text(text = it.size.toString())
+    }
 
-    if (devModeEnabled) {
-        var showDialog by remember { mutableStateOf(false) }
-        SubtitledByValue(
-            modifier = Modifier.clickable { showDialog = true },
-            item = settings.ignoredContests,
-            title = "Ignored contests"
-        ) {
-            Text(text = it.size.toString())
-        }
-
-        if (showDialog) {
-            CPSYesNoDialog(
-                title = { Text("Reset ignored?") },
-                onDismissRequest = { showDialog = false },
-                onConfirmRequest = {
-                    settings.ignoredContests.setValueIn(scope, emptyTimedCollection())
-                }
-            )
-        }
+    if (showDialog) {
+        CPSYesNoDialog(
+            title = { Text("Reset ignored?") },
+            onDismissRequest = { showDialog = false },
+            onConfirmRequest = {
+                item.setValueIn(scope, emptyTimedCollection())
+            }
+        )
     }
 }

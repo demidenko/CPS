@@ -9,7 +9,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistUrls
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -34,20 +34,20 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberFirstValue
+import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.launch
 
 @Composable
 context(scope: SettingsContainerScope)
-internal fun ClistApiAccessSettingsItem() {
-    val context = context
-    val settings = remember { context.settingsContests }
-
+internal fun ClistApiAccessSettingsItem(
+    item: DataStoreValue<ClistApi.ApiAccess>
+) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
         modifier = Modifier.clickable { showDialog = true },
-        item = settings.clistApiAccess,
+        item = item,
         title = "Clist API access"
     ) { (login, key) ->
         if (login.isBlank()) {

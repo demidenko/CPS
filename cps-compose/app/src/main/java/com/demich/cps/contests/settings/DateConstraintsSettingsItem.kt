@@ -30,7 +30,6 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.context
 import com.demich.datastore_itemized.setValueIn
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -38,11 +37,11 @@ import kotlin.time.Duration.Companion.hours
 
 @Composable
 context(scope: SettingsContainerScope)
-internal fun DateConstraintsSettingsItem() {
-    val context = context
+internal fun DateConstraintsSettingsItem(
+    settings: ContestsSettingsDataStore
+) {
     val scope = rememberCoroutineScope()
 
-    val settings = remember { context.settingsContests }
     val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
 
     Expandable(

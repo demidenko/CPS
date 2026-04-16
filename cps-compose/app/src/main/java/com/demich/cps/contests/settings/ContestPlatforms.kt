@@ -31,19 +31,21 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.context
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
 @Composable
 context(scope: SettingsContainerScope)
-internal fun ContestPlatformsSettingsItem() {
-    val context = context
+internal fun ContestPlatformsSettingsItem(
+    enabledPlatformsItem: DataStoreItem<Set<Platform>>,
+    clistAdditionalResourcesItem: DataStoreItem<List<ClistResource>>
+) {
     val scope = rememberCoroutineScope()
 
-    val enabledPlatforms by collectItemAsState { context.settingsContests.enabledPlatforms }
-    val clistResources by collectItemAsState { context.settingsContests.clistAdditionalResources }
+    val enabledPlatforms by collectItemAsState { enabledPlatformsItem }
+    val clistResources by collectItemAsState { clistAdditionalResourcesItem }
 
     Expandable(
         title = "Platforms",
@@ -59,7 +61,7 @@ internal fun ContestPlatformsSettingsItem() {
                 clistResources = clistResources,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
-                        context.settingsContests.enabledPlatforms.edit {
+                        enabledPlatformsItem.edit {
                             if (checked) add(platform) else remove(platform)
                         }
                     }
