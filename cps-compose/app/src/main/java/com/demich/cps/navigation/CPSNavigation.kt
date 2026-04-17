@@ -1,5 +1,6 @@
 package com.demich.cps.navigation
 
+import android.content.Context
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -23,7 +25,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.demich.cps.ui.CPSMenuBuilder
-import com.demich.cps.ui.StartScreenDataStore
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.theme.cpsColors
@@ -32,12 +33,20 @@ import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
+import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.utils.writeOnlyProperty
+import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun rememberCPSNavigator(): CPSNavigator {
@@ -132,9 +141,8 @@ class CPSNavigator(
         builder: NavGraphBuilder.() -> Unit
     ) {
         val context = context
-        val startScreen: Screen = rememberFirstValue {
-            StartScreenDataStore(context).startRootScreen
-        }
+        val startScreenItem = remember { StartScreenDataStore(context).startRootScreen }
+        val startScreen: Screen = rememberFirstValue { startScreenItem }
 
         androidx.navigation.compose.NavHost(
             navController = navController,
@@ -144,6 +152,16 @@ class CPSNavigator(
             exitTransition = { fadeOut(tween(500)) },
             builder = builder
         )
+
+        LaunchedEffect(startScreenItem) {
+            flowOfCurrentScreen()
+                .filterNotNull()
+                .debounce(500.milliseconds)
+                .distinctUntilChangedBy { it.rootScreen }
+                .collect {
+                    startScreenItem.setValueIn(this, it.rootScreen)
+                }
+        }
     }
 
     @Composable
@@ -189,3 +207,10 @@ inline fun <reified T: Screen> CPSNavigator.navEntry(
     }
 }
 
+private class StartScreenDataStore(context: Context): ItemizedDataStore(context.dataStore) {
+    companion object {
+        private val Context.dataStore by dataStoreWrapper(name = "start_screen")
+    }
+
+    val startRootScreen = jsonCPS.item<Screen.RootScreen>(name = "start_root_screen", defaultValue = Screen.Profiles)
+}

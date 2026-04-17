@@ -1,7 +1,6 @@
 package com.demich.cps.ui
 
 import android.content.Context
-import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.profilePlatforms
 import com.demich.cps.ui.bottombar.NavigationLayoutType
@@ -38,12 +37,4 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     }
 
     val navigationLayoutType = itemEnum(name = "navigation_bar_layout", defaultValue = NavigationLayoutType.start)
-}
-
-class StartScreenDataStore(context: Context): ItemizedDataStore(context.dataStore) {
-    companion object {
-        private val Context.dataStore by dataStoreWrapper(name = "start_screen")
-    }
-
-    val startRootScreen = jsonCPS.item<Screen.RootScreen>(name = "start_root_screen", defaultValue = Screen.Profiles)
 }

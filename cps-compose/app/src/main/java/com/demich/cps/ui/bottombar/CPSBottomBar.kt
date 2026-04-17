@@ -18,7 +18,6 @@ import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.StartScreenDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
@@ -39,7 +37,6 @@ import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ignoreInputEvents
-import com.demich.datastore_itemized.setValueIn
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
@@ -123,10 +120,6 @@ private fun BottomBarBodyMain(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
-    val startScreenItem = remember {
-        StartScreenDataStore(context).startRootScreen
-    }
 
     val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
     val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
@@ -146,10 +139,7 @@ private fun BottomBarBodyMain(
         selectedRootScreen = { if (settingsEnabled) null else selectedRootScreen() },
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
-        onSelect = { screen ->
-            startScreenItem.setValueIn(scope, screen)
-            onNavigateToScreen(screen)
-        },
+        onSelect = onNavigateToScreen,
         onLongPress = onEnableSettings
     )
 }
