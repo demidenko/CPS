@@ -14,7 +14,6 @@ suspend fun LazyListState.autoScrollToTop(
 ) {
     trackFirstVisibleChanges(predicate).collect {
         if (it) animationScope.launch {
-            println("launch!")
             animateScrollToItem(index = 0)
         }
     }

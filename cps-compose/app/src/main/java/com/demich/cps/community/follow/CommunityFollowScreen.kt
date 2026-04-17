@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,28 +88,6 @@ private fun CodeforcesFollowList(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
-    val animationScope = rememberCoroutineScope()
-
-    LaunchedEffect(listState, animationScope) {
-        /* Cases:
-            1) delete not first -> removing animation [ok by default]
-            2) delete first + no scroll -> removing animation [ok by default]
-            3) delete first + scroll on top -> removing animation [ok by default]
-            4) delete first + scroll not top -> ?? (whatever) [ok by default]
-            5) add first -> adding animation + scroll to top [NO by default]
-         */
-
-        /*snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
-            .distinctUntilChangedBy { it.second } //wait for first id changed
-            .drop(1) //ignore first because of first composition
-            .collect { (listSize, _) ->
-                snapshotFlow { listState.layoutInfo.totalItemsCount }
-                    .takeWhile { it != listSize }.collect() //wait for listState have same size
-                with(listState) {
-                    if (firstVisibleItemIndex > 0) animateScrollToItem(index = 0)
-                }
-            }*/
-    }
 
     var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
 
