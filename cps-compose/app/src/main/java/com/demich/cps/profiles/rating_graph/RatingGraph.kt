@@ -110,7 +110,7 @@ private fun RatingGraphWithHeader(
 
     val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 
-    val scope = rememberCoroutineScope()
+    val animationScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
@@ -120,7 +120,7 @@ private fun RatingGraphWithHeader(
                 ?: FilterHeader(filterType, ratingChanges, currentTime),
             onHeaderChange = { header ->
                 if (header is FilterHeader) {
-                    scope.launch {
+                    animationScope.launch {
                         viewPortState.animateToViewPort(
                             createBounds(ratingChanges = ratingChanges, filterType = header.filterType, now = currentTime)
                         )

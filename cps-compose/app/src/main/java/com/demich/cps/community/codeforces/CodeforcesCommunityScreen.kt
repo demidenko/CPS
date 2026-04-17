@@ -106,7 +106,7 @@ private fun CodeforcesPagerHeader(
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
+    val animationScope = rememberCoroutineScope()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -138,7 +138,7 @@ private fun CodeforcesPagerHeader(
                     title = title,
                     controller = controller,
                     modifier = Modifier.clickableNoRipple {
-                        scope.launch { controller.scrollTo(title) }
+                        animationScope.launch { controller.scrollTo(title) }
                     }
                 )
             }

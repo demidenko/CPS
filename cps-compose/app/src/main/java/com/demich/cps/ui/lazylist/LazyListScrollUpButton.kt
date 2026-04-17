@@ -27,7 +27,7 @@ fun LazyListScrollUpButton(
     enter: EnterTransition,
     exit: ExitTransition
 ) {
-    val scope = rememberCoroutineScope()
+    val animationScope = rememberCoroutineScope()
 
     val visible by remember(listState) {
         derivedStateOf {
@@ -46,7 +46,7 @@ fun LazyListScrollUpButton(
         ScrollUpButton(
             backgroundColor = cpsColors.backgroundAdditional,
             onClick = {
-                scope.launch { listState.animateScrollToItem(0) }
+                animationScope.launch { listState.animateScrollToItem(0) }
             }
         )
     }
