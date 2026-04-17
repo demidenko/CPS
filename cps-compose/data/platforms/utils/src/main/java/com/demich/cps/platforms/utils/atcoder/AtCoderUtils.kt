@@ -30,9 +30,9 @@ object AtCoderUtils {
         }
     }
 
-    class NewsPost(
+    data class NewsPost(
         val title: String,
-        val time: Instant?,
+        val time: Instant,
         override val id: String
     ): NewsPostEntry
 
@@ -40,7 +40,7 @@ object AtCoderUtils {
     fun extractNews(source: String): List<NewsPost?> =
         Jsoup.parse(source).select("div.panel.panel-default, div.panel.panel-info")
             .mapNotNull { it.extractNewsFromPanel() }
-            .sortedByDescending { it.id }
+            .sortedByDescending { it.time }
 
     private fun Element.extractNewsFromPanel(): NewsPost? {
         val header = selectFirst("div.panel-heading") ?: return null

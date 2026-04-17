@@ -66,7 +66,7 @@ class NewsWorker(
                 subText = "atcoder news"
                 bigContent = post.title.trim() //TODO: title + content html
                 smallIcon = R.drawable.ic_community
-                post.time?.let { time = it }
+                time = post.time
                 url = AtCoderUrls.post(post.id)
                 //setColor
                 autoCancel = true
