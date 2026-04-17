@@ -143,7 +143,7 @@ private fun BottomBarBodyMain(
     BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
-        selectedRootScreen = if (settingsEnabled) null else selectedRootScreen(),
+        selectedRootScreen = { if (settingsEnabled) null else selectedRootScreen() },
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = layoutType,
         onSelect = { screen ->
@@ -166,7 +166,7 @@ private val Screen.RootScreen.bottomBarIcon: ImageVector
 private fun BottomBarNavigationItems(
     modifier: Modifier = Modifier,
     rootScreens: List<Screen.RootScreen>,
-    selectedRootScreen: Screen.RootScreen?,
+    selectedRootScreen: () -> Screen.RootScreen?,
     indication: Indication?,
     layoutType: NavigationLayoutType,
     onSelect: (Screen.RootScreen) -> Unit,
@@ -179,9 +179,9 @@ private fun BottomBarNavigationItems(
         rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
                 icon = screen.bottomBarIcon,
-                isSelected = screen == selectedRootScreen,
+                isSelected = screen == selectedRootScreen(),
                 onClick = {
-                    if (screen != selectedRootScreen) onSelect(screen)
+                    if (screen != selectedRootScreen()) onSelect(screen)
                 },
                 onLongPress = onLongPress,
                 indication = indication,
