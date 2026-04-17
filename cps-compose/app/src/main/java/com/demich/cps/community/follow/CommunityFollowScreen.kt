@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,18 +32,17 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
-import kotlinx.coroutines.launch
+import com.demich.cps.utils.launchData
 
 @Composable
 private fun CommunityFollowScreen(
     onShowBlogScreen: (String) -> Unit
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
 
-    val communityViewModel = codeforcesCommunityViewModel()
+    val viewModel = codeforcesCommunityViewModel()
 
-    val followLoadingStatus by collectAsState { communityViewModel.flowOfFollowUpdateLoadingStatus() }
+    val followLoadingStatus by collectAsState { viewModel.flowOfFollowUpdateLoadingStatus() }
 
     val userBlogs by collectAsStateWithLifecycle { context.followRepository.flowOfUserBlogs() }
 
@@ -54,7 +52,7 @@ private fun CommunityFollowScreen(
             isRefreshing = { followLoadingStatus == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { handle ->
-                scope.launch {
+                viewModel.launchData {
                     context.followRepository.remove(handle)
                 }
             },
