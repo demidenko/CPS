@@ -9,17 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
-import kotlin.time.measureTimedValue
 
-
-fun<T> debugRunBlocking(block: suspend CoroutineScope.() -> T): T =
-    measureTimedValue { runBlocking(block = block) }.apply {
-        println("!!! ($duration) $value")
-    }.value
 
 inline fun<K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
     update { it.toMutableMap().apply(block) }
