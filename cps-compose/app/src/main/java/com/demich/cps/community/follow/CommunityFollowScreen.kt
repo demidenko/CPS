@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
@@ -35,10 +34,6 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,8 +89,9 @@ private fun CodeforcesFollowList(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
+    val animationScope = rememberCoroutineScope()
 
-    LaunchedEffect(listState, userBlogs) {
+    LaunchedEffect(listState, animationScope) {
         /* Cases:
             1) delete not first -> removing animation [ok by default]
             2) delete first + no scroll -> removing animation [ok by default]
@@ -103,7 +99,8 @@ private fun CodeforcesFollowList(
             4) delete first + scroll not top -> ?? (whatever) [ok by default]
             5) add first -> adding animation + scroll to top [NO by default]
          */
-        snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
+
+        /*snapshotFlow { userBlogs().let { it.size to it.firstOrNull()?.id } }
             .distinctUntilChangedBy { it.second } //wait for first id changed
             .drop(1) //ignore first because of first composition
             .collect { (listSize, _) ->
@@ -112,7 +109,7 @@ private fun CodeforcesFollowList(
                 with(listState) {
                     if (firstVisibleItemIndex > 0) animateScrollToItem(index = 0)
                 }
-            }
+            }*/
     }
 
     var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
@@ -120,6 +117,7 @@ private fun CodeforcesFollowList(
     LazyColumnOfData(
         state = listState,
         modifier = modifier,
+        autoScrollPredicate = { _, _ -> true },
         items = userBlogs,
         key = { it.id }
     ) { userBlog ->

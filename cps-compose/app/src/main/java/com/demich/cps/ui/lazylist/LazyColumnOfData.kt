@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,6 +24,7 @@ inline fun <T> LazyColumnOfData(
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
     scrollUpButtonEnabled: Boolean = false,
+    noinline autoScrollPredicate: (LazyListItemInfo, LazyListItemInfo) -> Boolean = { prev, cur -> prev.index == 0 && prev.offset == 0 },
     crossinline items: () -> List<T>,
     noinline key: ((item: T) -> Any)? = null,
     noinline contentType: (item: T) -> Any? = { null },
@@ -53,6 +56,13 @@ inline fun <T> LazyColumnOfData(
                         bottom = 8.dp,
                         end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth }
                     )
+            )
+        }
+
+        LaunchedEffect(state, autoScrollPredicate) {
+            state.autoScrollToTop(
+                predicate = autoScrollPredicate,
+                animationScope = this
             )
         }
     }
