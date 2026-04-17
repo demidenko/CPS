@@ -7,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
@@ -16,36 +15,38 @@ import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getType
+import com.demich.cps.utils.launchData
 import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 
 interface NewEntriesState {
     val types: NewEntriesMap
-    suspend fun markSeen(ids: List<Int>)
+    fun markSeen(ids: List<Int>)
     fun markOpened(id: Int)
 }
 
 @Composable
 fun rememberNewEntriesState(): NewEntriesState {
     val context = context
-    val scope = rememberCoroutineScope()
+    val viewModel = codeforcesCommunityViewModel()
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
     val typesState = collectItemAsState { item }
-    return remember(scope, item, typesState) {
+    return remember(viewModel, item, typesState) {
         object : NewEntriesState {
             override val types by typesState
 
-            override suspend fun markSeen(ids: List<Int>) {
-                item.markAtLeast(ids, SEEN)
+            override fun markSeen(ids: List<Int>) {
+                viewModel.launchData {
+                    item.markAtLeast(ids, SEEN)
+                }
             }
 
             override fun markOpened(id: Int) {
-                scope.launch {
+                viewModel.launchData {
                     item.markAtLeast(id, OPENED)
                 }
             }
