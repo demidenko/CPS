@@ -12,7 +12,7 @@ configure<ApplicationExtension> {
     defaultConfig {
         applicationId = "com.demich.cps"
 
-        versionCode = 491
+        versionCode = 492
         versionName = "1.9.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
