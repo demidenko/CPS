@@ -1,7 +1,6 @@
 package com.demich.cps.contests.monitors
 
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +33,7 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.formatTimerShort
+import com.demich.cps.utils.springIntLow
 import com.demich.cps.utils.systemTimeAsState
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -301,7 +301,7 @@ private fun Rank(
         else -> {
             val rank by animateIntAsState(
                 targetValue = contestantRank.rank,
-                animationSpec = tween()
+                animationSpec = springIntLow()
             )
 
             val rankText = buildString {

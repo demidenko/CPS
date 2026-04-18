@@ -6,8 +6,11 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -239,6 +242,9 @@ fun enterInColumn(): EnterTransition = expandVertically() + fadeIn()
 
 @Stable
 fun exitInColumn(): ExitTransition = shrinkVertically() + fadeOut()
+
+@Stable
+fun springIntLow() = spring(stiffness = Spring.StiffnessLow, visibilityThreshold = Int.VisibilityThreshold)
 
 
 @Composable
