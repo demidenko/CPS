@@ -305,12 +305,13 @@ private fun Rank(
             )
 
             val rankText = buildString {
+                append("rank: ")
                 if (contestantRank.isOutOfCompetition) append('*')
                 append(rank)
             }
 
             Text(
-                text = "rank: $rankText",
+                text = rankText,
                 modifier = modifier,
             )
         }
