@@ -20,6 +20,7 @@ import com.demich.cps.platforms.clients.RateLimitPlugin
 import com.demich.cps.platforms.clients.cpsHttpClient
 import com.demich.cps.platforms.clients.defaultJson
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
@@ -43,60 +44,12 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
-    override val client = cpsHttpClient(
-        json = defaultJson,
-        useCookies = true,
-        retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
-    ) {
-        defaultRequest {
-            url(CodeforcesUrls.main)
-        }
-
-        HttpResponseValidator {
-            validateResponse { response ->
-                if (response.status == HttpStatusCode.OK) {
-                    val text = response.bodyAsText()
-
-                    if (isTemporarilyUnavailable(text)) {
-                        throw CodeforcesTemporarilyUnavailableException()
-                    }
-
-                    //TODO: rework this to plugin
-                    if (isBrowserChecker(text)) {
-                        response.setCookie().firstOrNull { it.name == "pow" }?.let {
-                            val pow = it.value
-                            val url = response.request.url
-                            println("pow = $pow for $url")
-                            throw CodeforcesPOWException(pow)
-                        }
-                    }
-                }
-            }
-            handleResponseExceptionWithRequest { exception, _ ->
-                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
-                val response = exception.response
-                runCatching { response.body<CodeforcesAPIErrorResponse>() }
-                    .onSuccess { throw it.toApiException() }
-            }
-        }
-
-        install(RateLimitPlugin) {
-            if (BuildConfig.DEBUG) {
-                1 per 1.seconds
-            } else {
-                3 per 1.seconds
-            }
-            1 per 50.milliseconds
-        }
-    }
-
-    private class CodeforcesPOWException(val pow: String): Throwable("pow = $pow")
+    override val client get() = codeforcesHttpClient
 
     private val semaphore = when {
         BuildConfig.DEBUG -> Semaphore(permits = 3)
         else -> Semaphore(permits = 4)
     }
-
 
     private suspend inline fun getWithPermit(block: HttpRequestBuilder.() -> Unit) =
         semaphore.withPermit { client.get(block) }
@@ -265,6 +218,55 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         getCodeforcesPage(path = "groups", locale = locale)
 }
 
+private val codeforcesHttpClient: HttpClient =
+    cpsHttpClient(
+        json = defaultJson,
+        useCookies = true,
+        retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
+    ) {
+        defaultRequest {
+            url(CodeforcesUrls.main)
+        }
+
+        HttpResponseValidator {
+            validateResponse { response ->
+                if (response.status == HttpStatusCode.OK) {
+                    val text = response.bodyAsText()
+
+                    if (isTemporarilyUnavailable(text)) {
+                        throw CodeforcesTemporarilyUnavailableException()
+                    }
+
+                    //TODO: rework this to plugin
+                    if (isBrowserChecker(text)) {
+                        response.setCookie().firstOrNull { it.name == "pow" }?.let {
+                            val pow = it.value
+                            val url = response.request.url
+                            println("pow = $pow for $url")
+                            throw CodeforcesPOWException(pow)
+                        }
+                    }
+                }
+            }
+
+            handleResponseExceptionWithRequest { exception, _ ->
+                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
+                val response = exception.response
+                runCatching { response.body<CodeforcesAPIErrorResponse>() }
+                    .onSuccess { throw it.toApiException() }
+            }
+        }
+
+        install(RateLimitPlugin) {
+            if (BuildConfig.DEBUG) {
+                1 per 1.seconds
+            } else {
+                3 per 1.seconds
+            }
+            1 per 50.milliseconds
+        }
+    }
+
 private enum class CodeforcesAPIStatus {
     OK, FAILED
 }
@@ -303,6 +305,9 @@ private fun isTemporarilyUnavailable(str: String): Boolean {
 }
 
 //TODO: is cloudflare (just a moment...)
+
+
+private class CodeforcesPOWException(val pow: String): Throwable("pow = $pow")
 
 private fun proofOfWork(pow: String): String {
     repeat(Int.MAX_VALUE) {
