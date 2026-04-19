@@ -14,8 +14,6 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CancellationException
-import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -70,8 +68,9 @@ internal fun cpsHttpClient(
 
 private fun Throwable.shouldRetry(): Boolean =
     when (this) {
-        is CancellationException -> false
-        is IOException -> true
+        is kotlinx.coroutines.CancellationException -> false
+        is java.net.UnknownHostException -> false
+        is kotlinx.io.IOException -> true
         is ResponseException if response.status.isServerError() -> true
         else -> false
     }
