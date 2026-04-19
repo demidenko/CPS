@@ -193,8 +193,9 @@ private fun CodeforcesApi.withBlogEntriesCache(
     onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
 ): CodeforcesApi {
     val origin = this
-    val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
     return object : CodeforcesApi by origin {
+        private val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
+
         private suspend inline fun getOrPut(id: Int, blogEntry: () -> CodeforcesBlogEntry): CodeforcesBlogEntry =
             cache.getOrPut(key = id) {
                 blogEntry().also { onNewBlogEntry(it) }
@@ -254,7 +255,6 @@ private suspend inline fun findSuspects(
     }
 
     val hint = hintStorage.run {
-        // TODO: `.invoke()` instead of `()` https://youtrack.jetbrains.com/issue/KT-74111/
         val hint = getHint()
         //ensure hint in case isNew logic changes
         if (hint != null && isNew(hint.creationTime)) {
