@@ -9,14 +9,14 @@ import kotlin.time.Instant
 @Serializable
 data class TimedCollection<T>(
     private val m: Map<T, Instant> = emptyMap()
-): Collection<T> by m.keys {
+): Set<T> by m.keys {
     fun valuesSortedByTime(): List<T> =
         m.entries.sortedBy { it.value }.map { it.key }
 
     fun plus(value: T, time: Instant): TimedCollection<T> =
         TimedCollection(m.plus(value to time))
 
-    fun internalFilterByTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
+    fun filterTime(predicate: (Instant) -> Boolean): TimedCollection<T> =
         TimedCollection(m.filterValues(predicate))
 
     fun filterValues(predicate: (T) -> Boolean): TimedCollection<T> =
@@ -36,5 +36,5 @@ fun <T> DataStoreItem<TimedCollection<T>>.removeOlderThan(time: Instant) {
 
 context(scope: DataStoreEditScope)
 inline fun <T> DataStoreItem<TimedCollection<T>>.removeOld(crossinline isOld: (Instant) -> Boolean) {
-    value = value.internalFilterByTime { time -> !isOld(time) }
+    value = value.filterTime { time -> !isOld(time) }
 }
