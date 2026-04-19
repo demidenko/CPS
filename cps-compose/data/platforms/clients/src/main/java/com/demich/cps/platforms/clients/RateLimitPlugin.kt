@@ -1,9 +1,12 @@
 package com.demich.cps.platforms.clients
 
+import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Instant
@@ -26,6 +29,8 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
         return runsInCurrentWindow < limit.count
     }
 
+    val semaphore = Semaphore(permits = 4)
+
     //TODO: do not delay on connection errors (no onResponse call)
     onRequest { request, _ ->
         mutex.withLock {
@@ -43,6 +48,12 @@ internal val RateLimitPlugin = createClientPlugin(name = "RateLimitPlugin", ::Ra
             }
 
             recentRuns.addLast(currentTime())
+        }
+    }
+
+    on(Send) {
+        semaphore.withPermit {
+            proceed(it)
         }
     }
 
