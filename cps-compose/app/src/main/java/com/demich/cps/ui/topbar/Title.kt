@@ -74,7 +74,7 @@ private fun SubTitle(
 
     LazyRow(modifier = modifier) {
         items(
-            items = titleState.value.listItems,
+            items = titleState.value,
             key = { it }
         ) {
             Text(
@@ -88,13 +88,15 @@ private fun SubTitle(
 private data class TitleChars(
     val title: String,
     val ids: List<Uuid>
-) {
+): AbstractList<Pair<Char, Uuid>>() {
+
     init {
         require(title.length == ids.size)
     }
 
-    val listItems: List<Pair<Char, Uuid>> =
-        title.asIterable().zip(ids)
+    override val size: Int get() = title.length
+
+    override fun get(index: Int) = Pair(title[index], ids[index])
 }
 
 
