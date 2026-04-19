@@ -7,9 +7,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -53,29 +54,27 @@ private fun SubTitle(
     modifier: Modifier = Modifier,
     text: () -> String
 ) {
-    val chars: List<Pair<Char, Uuid>> by remember(text) {
-        var prev = ""
-        var ids = arrayOf<Uuid>()
-        derivedStateOf {
-            val cur = text()
-            val prefix = longestCommonPrefix(cur, prev)
-            val newIds = Array(cur.length) { if (it < prefix) ids[it] else Uuid.random() }
-            subsetIndices(
-                a = prev.substring(startIndex = prefix),
-                b = cur.substring(startIndex = prefix)
-            ) { i, j ->
-                newIds[prefix + j] = ids[prefix + i]
+    val titleState = remember { mutableStateOf(TitleChars("", emptyList())) }
+
+    LaunchedEffect(text) {
+        snapshotFlow { text() }
+            .collect { cur ->
+                val (prev, prevIds) = titleState.value
+                val prefix = longestCommonPrefix(cur, prev)
+                val ids = Array(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
+                subsetIndices(
+                    a = prev.substring(startIndex = prefix),
+                    b = cur.substring(startIndex = prefix)
+                ) { i, j ->
+                    ids[prefix + j] = prevIds[prefix + i]
+                }
+                titleState.value = TitleChars(title = cur, ids = ids.asList())
             }
-            cur.asIterable().zip(newIds.asIterable()).also {
-                prev = cur
-                ids = newIds
-            }
-        }
     }
 
     LazyRow(modifier = modifier) {
         items(
-            items = chars,
+            items = titleState.value.listItems,
             key = { it }
         ) {
             Text(
@@ -84,6 +83,18 @@ private fun SubTitle(
             )
         }
     }
+}
+
+private data class TitleChars(
+    val title: String,
+    val ids: List<Uuid>
+) {
+    init {
+        require(title.length == ids.size)
+    }
+
+    val listItems: List<Pair<Char, Uuid>> =
+        title.asIterable().zip(ids)
 }
 
 
