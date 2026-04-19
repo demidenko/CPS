@@ -37,8 +37,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -46,20 +44,12 @@ import kotlin.time.Duration.Companion.seconds
 object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
     override val client get() = codeforcesHttpClient
 
-    private val semaphore = when {
-        BuildConfig.DEBUG -> Semaphore(permits = 3)
-        else -> Semaphore(permits = 4)
-    }
-
-    private suspend inline fun getWithPermit(block: HttpRequestBuilder.() -> Unit) =
-        semaphore.withPermit { client.get(block) }
-
     //TODO: find proper solution (intercept / retry plugins not works)
     private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
         try {
-            return getWithPermit(block)
+            return client.get(block)
         } catch (exception: CodeforcesPOWException) {
-            return getWithPermit {
+            return client.get {
                 cookie(name = "pow", value = proofOfWork(exception.pow))
                 block()
             }
