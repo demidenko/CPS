@@ -41,7 +41,9 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
+class CodeforcesClient(
+    val locale: CodeforcesLocale = EN
+): PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
     override val client get() = codeforcesHttpClient
 
     //TODO: find proper solution (intercept / retry plugins not works)
@@ -63,6 +65,7 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         return getCodeforces {
             url.appendPathSegments("api", method)
             block()
+            parameter("locale", locale)
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
@@ -70,10 +73,9 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         parameter(key = "handles", value = handles.joinToString(separator = ";"))
     }
 
-    override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale): CodeforcesBlogEntry =
+    override suspend fun getBlogEntry(blogEntryId: Int): CodeforcesBlogEntry =
         getCodeforcesApi(method = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
-            parameter("locale", locale)
         }
 
     override suspend fun getContests(): List<CodeforcesContest> =
@@ -122,16 +124,14 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
             parameter("count", 1e9.toInt())
         }
 
-    override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int): List<CodeforcesRecentAction> =
+    override suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction> =
         getCodeforcesApi(method = "recentActions") {
             parameter("maxCount", maxCount.coerceIn(0, 100))
-            parameter("locale", locale)
         }
 
-    override suspend fun getUserBlogEntries(handle: String, locale: CodeforcesLocale): List<CodeforcesBlogEntry> =
+    override suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry> =
         getCodeforcesApi(method = "user.blogEntries") {
             parameter("handle", handle)
-            parameter("locale", locale)
         }
 
     override suspend fun getUsers(
@@ -165,18 +165,8 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         return getCodeforces {
             url(path)
             block()
-        }.bodyAsText()
-    }
-
-    private suspend inline fun getCodeforcesPage(
-        path: String,
-        locale: CodeforcesLocale,
-        block: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return getCodeforcesPage(path = path) {
             parameter("locale", locale)
-            block()
-        }
+        }.bodyAsText()
     }
 
     override suspend fun getHandleSuggestionsPage(str: String) =
@@ -185,27 +175,27 @@ object CodeforcesClient: PlatformClient, CodeforcesApi, CodeforcesPageContentPro
         }
 
     override suspend fun getUserPage(handle: String) =
-        getCodeforcesPage(path = CodeforcesUrls.user(handle), locale = EN)
+        getCodeforcesPage(path = CodeforcesUrls.user(handle))
 
     override suspend fun getContestPage(contestId: Int) =
-        getCodeforcesPage(path = CodeforcesUrls.contest(contestId), locale = EN)
+        getCodeforcesPage(path = CodeforcesUrls.contest(contestId))
 
-    override suspend fun getMainPage(locale: CodeforcesLocale) =
-        getCodeforcesPage(path = "", locale = locale)
+    override suspend fun getMainPage() =
+        getCodeforcesPage(path = "")
 
-    override suspend fun getRecentActionsPage(locale: CodeforcesLocale) =
-        getCodeforcesPage(path = "recent-actions", locale = locale)
+    override suspend fun getRecentActionsPage() =
+        getCodeforcesPage(path = "recent-actions")
 
-    override suspend fun getTopBlogEntriesPage(locale: CodeforcesLocale) =
-        getCodeforcesPage(path = "top", locale = locale)
+    override suspend fun getTopBlogEntriesPage() =
+        getCodeforcesPage(path = "top")
 
-    override suspend fun getTopCommentsPage(locale: CodeforcesLocale, days: Int) =
-        getCodeforcesPage(path = "topComments", locale = locale) {
+    override suspend fun getTopCommentsPage(days: Int) =
+        getCodeforcesPage(path = "topComments") {
             parameter("days", days)
         }
 
-    override suspend fun getGroupsPage(locale: CodeforcesLocale) =
-        getCodeforcesPage(path = "groups", locale = locale)
+    override suspend fun getGroupsPage() =
+        getCodeforcesPage(path = "groups")
 }
 
 private val codeforcesHttpClient: HttpClient =

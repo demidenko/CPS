@@ -1,12 +1,11 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import org.jsoup.Jsoup
 import kotlin.math.max
 
-suspend fun CodeforcesPageContentProvider.getRecentFeed(locale: CodeforcesLocale): CodeforcesRecentFeed =
-    CodeforcesUtils.extractRecentFeed(source = getRecentActionsPage(locale = locale))
+suspend fun CodeforcesPageContentProvider.getRecentFeed(): CodeforcesRecentFeed =
+    CodeforcesUtils.extractRecentFeed(source = getRecentActionsPage())
 
 private fun CodeforcesUtils.extractRecentFeed(source: String): CodeforcesRecentFeed {
     val document = Jsoup.parse(source)

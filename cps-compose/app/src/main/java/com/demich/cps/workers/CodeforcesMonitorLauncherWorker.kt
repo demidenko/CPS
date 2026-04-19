@@ -58,7 +58,7 @@ class CodeforcesMonitorLauncherWorker(
 
             val get: GetResult? = fromSnapshot {
                 handle = profile.value?.userInfoOrNull()?.handle ?: return Result.success()
-                CodeforcesClient.getFirstNewSubmissions(
+                CodeforcesClient().getFirstNewSubmissions(
                     handle = handle,
                     untilId = monitorLastSubmissionId.value,
                     isActual = ::isActual,

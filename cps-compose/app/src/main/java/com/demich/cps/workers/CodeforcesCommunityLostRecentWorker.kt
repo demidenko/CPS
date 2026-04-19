@@ -79,7 +79,7 @@ class CodeforcesCommunityLostRecentWorker(
         minRatingColorTag: CodeforcesColorTag,
         repository: CodeforcesLostRepository
     ) {
-        val recentBlogEntries = CodeforcesClient.getRecentBlogEntries(locale = locale)
+        val recentBlogEntries = CodeforcesClient(locale = locale).getRecentBlogEntries()
         //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
         //get current suspects with removing old ones
@@ -90,10 +90,9 @@ class CodeforcesCommunityLostRecentWorker(
         //catch new suspects from recent actions
         findSuspects(
             blogEntries = recentBlogEntries.filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
-            locale = locale,
             minRatingColorTag = minRatingColorTag,
             isNew = ::isNew,
-            api = CodeforcesClient,
+            api = CodeforcesClient(locale = locale),
             hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage()
         ) {
             repository.insertSuspect(it)
@@ -141,15 +140,15 @@ private suspend fun CodeforcesLostRepository.checkSuspects(
     }
 }
 
-private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(locale: CodeforcesLocale): List<CodeforcesRecentFeedBlogEntry> {
+private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(): List<CodeforcesRecentFeedBlogEntry> {
     suspend fun extractFrom(page: suspend () -> String) =
         CodeforcesUtils.extractRecentBlogEntries(source = page())
 
     // "/groups" has less size than "/recent" and hopefully will be cached by cf
     return runCatching {
-        extractFrom { getGroupsPage(locale) }
+        extractFrom(::getGroupsPage)
     }.getOrElse {
-        extractFrom { getRecentActionsPage(locale) }
+        extractFrom(::getRecentActionsPage)
     }
 }
 
@@ -201,13 +200,13 @@ private fun CodeforcesApi.withBlogEntriesCache(
                 blogEntry().also { onNewBlogEntry(it) }
             }
 
-        override suspend fun getBlogEntry(blogEntryId: Int, locale: CodeforcesLocale) =
+        override suspend fun getBlogEntry(blogEntryId: Int) =
             getOrPut(id = blogEntryId) {
-                origin.getBlogEntry(blogEntryId, locale)
+                origin.getBlogEntry(blogEntryId)
             }
 
-        override suspend fun getRecentActions(locale: CodeforcesLocale, maxCount: Int) =
-            origin.getRecentActions(locale = locale, maxCount = maxCount).apply {
+        override suspend fun getRecentActions(maxCount: Int) =
+            origin.getRecentActions(maxCount = maxCount).apply {
                 forEach {
                     it.blogEntry?.let { blogEntry ->
                         getOrPut(id = blogEntry.id) { blogEntry }
@@ -239,7 +238,6 @@ private inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
 
 private suspend inline fun findSuspects(
     blogEntries: Collection<CodeforcesRecentFeedBlogEntry>,
-    locale: CodeforcesLocale,
     minRatingColorTag: CodeforcesColorTag,
     crossinline isNew: (Instant) -> Boolean,
     hintStorage: CodeforcesLostHintStorage,
@@ -279,11 +277,11 @@ private suspend inline fun findSuspects(
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag = minRatingColorTag, api = api)
         .also {
-            if (it.size > 1) api.getRecentActions(locale = locale)
+            if (it.size > 1) api.getRecentActions()
         }
-        .filterNewEntries(isFinalFilter = true) { isNew(api.getBlogEntry(it.id, locale).creationTime) }
+        .filterNewEntries(isFinalFilter = true) { isNew(api.getBlogEntry(it.id).creationTime) }
         .forEach {
-            val blogEntry = api.getBlogEntry(it.id, locale)
+            val blogEntry = api.getBlogEntry(it.id)
             onSuspect(
                 blogEntry
                     .copy(rating = 0)

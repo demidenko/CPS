@@ -82,10 +82,11 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 .onEach { notifier.apply(it) }
                 .launchIn(this)
 
+            val client = CodeforcesClient()
             monitor.launchIn(
                 scope = this,
-                api = CodeforcesClient,
-                pageContentProvider = CodeforcesClient,
+                api = client,
+                pageContentProvider = client,
                 onRatingChange = { ratingChange ->
                     launch { CodeforcesProfileManager().applyRatingChange(ratingChange, context) }
                 },

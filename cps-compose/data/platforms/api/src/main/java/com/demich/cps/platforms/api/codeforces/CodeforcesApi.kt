@@ -3,7 +3,6 @@ package com.demich.cps.platforms.api.codeforces
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
@@ -13,10 +12,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 interface CodeforcesApi {
     // api methods from https://codeforces.com/apiHelp/methods
 
-    suspend fun getBlogEntry(
-        blogEntryId: Int,
-        locale: CodeforcesLocale
-    ): CodeforcesBlogEntry
+    suspend fun getBlogEntry(blogEntryId: Int): CodeforcesBlogEntry
 
     //TODO: Sequence instead of List?
     suspend fun getContests(): List<CodeforcesContest>
@@ -41,15 +37,9 @@ interface CodeforcesApi {
         handle: String
     ): List<CodeforcesSubmission>
 
-    suspend fun getRecentActions(
-        locale: CodeforcesLocale,
-        maxCount: Int = Int.MAX_VALUE
-    ): List<CodeforcesRecentAction>
+    suspend fun getRecentActions(maxCount: Int = Int.MAX_VALUE): List<CodeforcesRecentAction>
 
-    suspend fun getUserBlogEntries(
-        handle: String,
-        locale: CodeforcesLocale
-    ): List<CodeforcesBlogEntry>
+    suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry>
 
     suspend fun getUsers(
         handles: Collection<String>,

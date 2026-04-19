@@ -138,7 +138,7 @@ private class BlogLoadingViewModel: ViewModel() {
         blogEntriesLoader.execute(key = Pair(handle, key)) {
             val (blogEntries, colorTag) = awaitPair(
                 blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },
-                blockSecond = { CodeforcesClient.getRealColorTagOrNull(handle) ?: BLACK }
+                blockSecond = { CodeforcesClient().getRealColorTagOrNull(handle) ?: BLACK }
             )
             blogEntries.map {
                 it.toWebBlogEntry(colorTag = colorTag)

@@ -38,7 +38,7 @@ private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<Cont
                 apiAccess = clistApiAccess.value,
                 resources = clistAdditionalResources.value
             )
-            codeforces_api -> CodeforcesContestsFetcher(api = CodeforcesClient)
+            codeforces_api -> CodeforcesContestsFetcher(api = CodeforcesClient())
             atcoder_parse -> AtCoderContestsFetcher(api = AtCoderClient)
             dmoj_api -> DmojContestsFetcher(api = DmojClient)
         }

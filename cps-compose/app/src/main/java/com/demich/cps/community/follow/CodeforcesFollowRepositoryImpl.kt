@@ -21,10 +21,11 @@ val Context.followRepository: CodeforcesFollowRepository
 private class CodeforcesFollowRepositoryImpl(
     val context: Context, //TODO: context leak
     val localeItem: DataStoreValue<CodeforcesLocale>
-):
-    CodeforcesFollowRepository(api = CodeforcesClient, context = context) {
+): CodeforcesFollowRepository(context = context) {
 
     override suspend fun getLocale() = localeItem()
+
+    override fun getApi(locale: CodeforcesLocale) = CodeforcesClient(locale = locale)
 
     override fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry) =
         notificationChannels.codeforces.new_blog_entry(blogEntry.id).notify(context) {

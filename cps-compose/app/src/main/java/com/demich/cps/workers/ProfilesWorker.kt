@@ -60,7 +60,7 @@ private suspend fun CodeforcesProfileManager.checkRating(context: Context) {
     val userInfo = profileStorage(context).profile()
         ?.userInfoOrNull() ?: return
 
-    val lastRatingChange = CodeforcesClient.runCatching {
+    val lastRatingChange = CodeforcesClient().runCatching {
         getUserRatingChanges(handle = userInfo.handle)
     }.getOrNull()?.lastOrNull() ?: return
 
@@ -79,7 +79,7 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
         ?.userInfoOrNull() ?: return
 
     val handle = userInfo.handle
-    val newContribution = CodeforcesClient.getProfile(handle = handle, recoverHandle = false)
+    val newContribution = CodeforcesClient().getProfile(handle = handle, recoverHandle = false)
         .userInfoOrNull()?.contribution ?: return
 
     if (newContribution == userInfo.contribution) return

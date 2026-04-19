@@ -68,15 +68,15 @@ class CodeforcesProfileManager :
 
 
     override suspend fun fetchProfile(data: String): ProfileResult<CodeforcesUserInfo> =
-        CodeforcesClient.getProfile(handle = data, recoverHandle = true)
+        CodeforcesClient().getProfile(handle = data, recoverHandle = true)
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        CodeforcesClient.getHandleSuggestions(str = str)
+        CodeforcesClient().getHandleSuggestions(str = str)
             .map { UserSuggestion(title = it.handle, userId = it.handle) }
             .toList()
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        CodeforcesClient.getUserRatingChanges(handle = userId).map { it.toRatingChange() }
+        CodeforcesClient().getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy(mode = NONE) {
         ratingUpperBounds()

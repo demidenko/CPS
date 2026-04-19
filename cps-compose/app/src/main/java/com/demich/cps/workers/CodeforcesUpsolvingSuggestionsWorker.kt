@@ -62,7 +62,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
         val suggestedItem = storage.upsolvingSuggestedProblems
         val suggestedProblems = suggestedItem()
 
-        with(CodeforcesClient) {
+        with(CodeforcesClient()) {
             getUserRatingChanges(handle)
                 .filter { it.ratingUpdateTime >= dateThreshold }
                 .sortedByDescending { it.ratingUpdateTime }

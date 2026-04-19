@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 abstract class CodeforcesFollowRepository(
-    private val api: CodeforcesApi,
     context: Context
 ) {
     private val dao: CodeforcesFollowDao =
@@ -37,7 +36,7 @@ abstract class CodeforcesFollowRepository(
         handle: String,
         locale: CodeforcesLocale
     ): Result<List<CodeforcesBlogEntry>> {
-        api.getBlogEntries(handle = handle, locale = locale).let { (newProfile, result) ->
+        getApi(locale).getBlogEntries(handle = handle).let { (newProfile, result) ->
             newProfile?.let {
                 dao.applyProfileResult(handle = handle, result = newProfile)
             }
@@ -66,16 +65,18 @@ abstract class CodeforcesFollowRepository(
         if (addNewUser(ProfileResult.Failed(handle))) {
             dao.applyProfileResult(
                 handle = handle,
-                result = api.getProfile(handle = handle, recoverHandle = true)
+                result = getApi(EN).getProfile(handle = handle, recoverHandle = true)
             )
         }
     }
 
     suspend fun updateUsers() =
-        api.getProfiles(handles = dao.getHandles(), recoverHandle = true)
+        getApi(EN).getProfiles(handles = dao.getHandles(), recoverHandle = true)
             .also { dao.applyProfilesResults(it) }
 
     protected abstract suspend fun getLocale(): CodeforcesLocale
+
+    protected abstract fun getApi(locale: CodeforcesLocale): CodeforcesApi
 
     protected abstract fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry)
 }
@@ -87,11 +88,10 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
 }
 
 private suspend fun CodeforcesApi.getBlogEntries(
-    handle: String,
-    locale: CodeforcesLocale
+    handle: String
 ): Pair<ProfileResult<CodeforcesUserInfo>?, Result<List<CodeforcesBlogEntry>>> {
     runCatching {
-        getUserBlogEntries(handle = handle, locale = locale)
+        getUserBlogEntries(handle = handle)
     }.recoverCatching {
         when (it) {
             is CodeforcesApiNotAllowedReadBlogException -> emptyList()
@@ -100,7 +100,7 @@ private suspend fun CodeforcesApi.getBlogEntries(
                 return Pair(
                     profileResult,
                     if (profileResult is ProfileResult.Success)
-                        runCatching { getUserBlogEntries(handle = profileResult.handle, locale = locale) }
+                        runCatching { getUserBlogEntries(handle = profileResult.handle) }
                     else Result.failure(it)
                 )
             }

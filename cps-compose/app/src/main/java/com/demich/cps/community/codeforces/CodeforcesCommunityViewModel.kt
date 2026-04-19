@@ -61,7 +61,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
     private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) {
-        CodeforcesClient.getRecentFeed(locale = it)
+        CodeforcesClient(locale = it).getRecentFeed()
     }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
@@ -84,13 +84,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 
     private suspend fun getMainBlogEntries(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient.getMainPage(locale = locale))
+        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient(locale = locale).getMainPage())
 
     private suspend fun getTopBlogEntries(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient.getTopBlogEntriesPage(locale = locale))
+        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient(locale = locale).getTopBlogEntriesPage())
 
     private suspend fun getTopComments(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractComments(source = CodeforcesClient.getTopCommentsPage(locale = locale))
+        CodeforcesUtils.extractComments(source = CodeforcesClient(locale = locale).getTopCommentsPage())
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
