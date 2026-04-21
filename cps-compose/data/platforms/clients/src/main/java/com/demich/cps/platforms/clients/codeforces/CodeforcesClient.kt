@@ -46,26 +46,20 @@ class CodeforcesClient(
 ): PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
     override val client get() = codeforcesHttpClient
 
-    //TODO: find proper solution (intercept / retry plugins not works)
-    private suspend inline fun getCodeforces(block: HttpRequestBuilder.() -> Unit): HttpResponse {
-        try {
-            return client.get(block)
-        } catch (exception: CodeforcesPOWException) {
-            return client.get {
-                cookie(name = "pow", value = proofOfWork(exception.pow))
-                block()
-            }
+    private suspend inline fun codeforcesRequest(block: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return client.getCheckPOW {
+            block()
+            parameter("locale", locale)
         }
     }
 
-    private suspend inline fun <reified T> getCodeforcesApi(
+    private suspend inline fun <reified T> getApi(
         method: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return getCodeforces {
+        return codeforcesRequest {
             url.appendPathSegments("api", method)
             block()
-            parameter("locale", locale)
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
@@ -74,17 +68,17 @@ class CodeforcesClient(
     }
 
     override suspend fun getBlogEntry(blogEntryId: Int): CodeforcesBlogEntry =
-        getCodeforcesApi(method = "blogEntry.view") {
+        getApi(method = "blogEntry.view") {
             parameter("blogEntryId", blogEntryId)
         }
 
     override suspend fun getContests(): List<CodeforcesContest> =
-        getCodeforcesApi(method = "contest.list") {
+        getApi(method = "contest.list") {
             parameter("gym", false)
         }
 
     override suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> =
-        getCodeforcesApi(method = "contest.ratingChanges" ) {
+        getApi(method = "contest.ratingChanges" ) {
             parameter("contestId", contestId)
         }
 
@@ -93,7 +87,7 @@ class CodeforcesClient(
         handles: Collection<String>,
         block: HttpRequestBuilder.() -> Unit = {}
     ): CodeforcesContestStandings =
-        getCodeforcesApi(method = "contest.standings") {
+        getApi(method = "contest.standings") {
             parameter("contestId", contestId)
             handles(handles)
             block()
@@ -118,19 +112,19 @@ class CodeforcesClient(
         }
 
     override suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> =
-        getCodeforcesApi(method = "contest.status") {
+        getApi(method = "contest.status") {
             parameter("contestId", contestId)
             parameter("handle", handle)
             parameter("count", 1e9.toInt())
         }
 
     override suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction> =
-        getCodeforcesApi(method = "recentActions") {
+        getApi(method = "recentActions") {
             parameter("maxCount", maxCount.coerceIn(0, 100))
         }
 
     override suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry> =
-        getCodeforcesApi(method = "user.blogEntries") {
+        getApi(method = "user.blogEntries") {
             parameter("handle", handle)
         }
 
@@ -139,63 +133,62 @@ class CodeforcesClient(
         checkHistoricHandles: Boolean
     ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
-        return getCodeforcesApi(method = "user.info") {
+        return getApi(method = "user.info") {
             handles(handles)
             parameter("checkHistoricHandles", checkHistoricHandles)
         }
     }
 
     override suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> =
-        getCodeforcesApi(method = "user.rating") {
+        getApi(method = "user.rating") {
             parameter("handle", handle)
         }
 
     override suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> =
-        getCodeforcesApi(method = "user.status") {
+        getApi(method = "user.status") {
             parameter("handle", handle)
             parameter("count", count)
             parameter("from", from)
         }
 
     // raw pages methods
-    private suspend inline fun getCodeforcesPage(
+    private suspend inline fun getWebPage(
         path: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
-        return getCodeforces {
+        return codeforcesRequest {
             url(path)
             block()
-            parameter("locale", locale)
         }.bodyAsText()
     }
 
     override suspend fun getHandleSuggestionsPage(str: String) =
-        getCodeforcesPage(path = "data/handles") {
+        getWebPage(path = "data/handles") {
             parameter("q", str)
         }
 
     override suspend fun getUserPage(handle: String) =
-        getCodeforcesPage(path = CodeforcesUrls.user(handle))
+        getWebPage(path = CodeforcesUrls.user(handle))
 
     override suspend fun getContestPage(contestId: Int) =
-        getCodeforcesPage(path = CodeforcesUrls.contest(contestId))
+        getWebPage(path = CodeforcesUrls.contest(contestId))
 
     override suspend fun getMainPage() =
-        getCodeforcesPage(path = "")
+        getWebPage(path = "")
 
     override suspend fun getRecentActionsPage() =
-        getCodeforcesPage(path = "recent-actions")
+        getWebPage(path = "recent-actions")
 
     override suspend fun getTopBlogEntriesPage() =
-        getCodeforcesPage(path = "top")
+        getWebPage(path = "top")
 
     override suspend fun getTopCommentsPage(days: Int) =
-        getCodeforcesPage(path = "topComments") {
+        getWebPage(path = "topComments") {
             parameter("days", days)
         }
 
     override suspend fun getGroupsPage() =
-        getCodeforcesPage(path = "groups")
+        getWebPage(path = "groups")
 }
 
 private val codeforcesHttpClient: HttpClient =
@@ -257,13 +250,6 @@ private class CodeforcesAPIResponse<T>(
     val result: T
 )
 
-private fun isBrowserChecker(str: String): Boolean {
-    ifBetweenFirstFirst(str, "<p>", "</p") { msg ->
-        return msg == "Please wait. Your browser is being checked. It may take a few seconds..."
-    }
-    return false
-}
-
 private fun isTemporarilyUnavailable(str: String): Boolean {
     if (str.length > 2000) return false //trick based on full msg length
     ifBetweenFirstFirst(str, "<p>", "</p>") { msg ->
@@ -286,6 +272,25 @@ private fun isTemporarilyUnavailable(str: String): Boolean {
 
 //TODO: is cloudflare (just a moment...)
 
+
+//TODO: find proper solution (intercept / retry plugins not works)
+private suspend inline fun HttpClient.getCheckPOW(block: HttpRequestBuilder.() -> Unit): HttpResponse {
+    try {
+        return get(block)
+    } catch (exception: CodeforcesPOWException) {
+        return get {
+            cookie(name = "pow", value = proofOfWork(exception.pow))
+            block()
+        }
+    }
+}
+
+private fun isBrowserChecker(str: String): Boolean {
+    ifBetweenFirstFirst(str, "<p>", "</p") { msg ->
+        return msg == "Please wait. Your browser is being checked. It may take a few seconds..."
+    }
+    return false
+}
 
 private class CodeforcesPOWException(val pow: String): Throwable("pow = $pow")
 
