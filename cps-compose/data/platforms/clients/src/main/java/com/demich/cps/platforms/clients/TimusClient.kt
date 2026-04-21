@@ -4,7 +4,8 @@ import com.demich.cps.platforms.api.timus.TimusPageContentProvider
 import com.demich.cps.platforms.api.timus.TimusUrls
 import io.ktor.client.request.parameter
 
-object TimusClient: PlatformClient, TimusPageContentProvider {
+object TimusClient: TimusPageContentProvider {
+    private val client get() = defaultHttpClient
 
     override suspend fun getUserPage(id: Int): String {
         return client.getText(urlString = TimusUrls.user(id)) {

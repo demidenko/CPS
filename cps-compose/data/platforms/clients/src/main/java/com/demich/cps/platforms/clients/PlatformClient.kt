@@ -22,6 +22,8 @@ internal interface PlatformClient {
     val client: HttpClient get() = defaultHttpClient
 }
 
+internal val defaultHttpClient = cpsHttpClient { }
+
 internal fun cpsHttpClient(
     json: Json? = null,
     useCookies: Boolean = false,
@@ -75,7 +77,6 @@ private fun Throwable.shouldRetry(): Boolean =
         else -> false
     }
 
-private val defaultHttpClient = cpsHttpClient { }
 internal val defaultJson = Json { ignoreUnknownKeys = true }
 
 

@@ -7,7 +7,8 @@ import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.request.parameter
 
-object AtCoderClient: PlatformClient, AtCoderApi {
+object AtCoderClient: AtCoderApi {
+    private val client get() = defaultHttpClient
     private val json get() = defaultJson
 
     override suspend fun getUserPage(handle: String): String  {
