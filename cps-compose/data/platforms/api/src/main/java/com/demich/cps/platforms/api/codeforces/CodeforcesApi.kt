@@ -53,6 +53,11 @@ interface CodeforcesApi {
         count: Long,
         from: Long
     ): List<CodeforcesSubmission>
+
+    data class ApiAccess(
+        val key: String,
+        val secret: String
+    )
 }
 
 suspend fun CodeforcesApi.getContestStandings(

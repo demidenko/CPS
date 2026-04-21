@@ -42,7 +42,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesClient(
-    val locale: CodeforcesLocale = EN
+    val locale: CodeforcesLocale = EN,
+    val apiAccess: CodeforcesApi.ApiAccess? = null
 ): PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
     override val client get() = codeforcesHttpClient
 
