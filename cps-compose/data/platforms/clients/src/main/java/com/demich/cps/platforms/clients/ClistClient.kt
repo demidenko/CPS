@@ -14,16 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
-    override val client = cpsHttpClient(json = defaultJson) {
-        defaultRequest {
-            url(ClistUrls.main)
-        }
-
-        install(RateLimitPlugin) {
-            10 per 1.minutes // https://clist.by/api/v4/doc/ #Throttle
-            2 per 1.seconds
-        }
-    }
+    override val client get() = clistHttpClient
 
     override suspend fun getUserPage(login: String): String {
         return client.getText(ClistUrls.user(login))
@@ -77,6 +68,17 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
 
     override suspend fun getResources(apiAccess: ClistApi.ApiAccess): List<ClistResource> {
         return getApiJsonObjects(page = "resource", apiAccess = apiAccess)
+    }
+}
+
+private val clistHttpClient = cpsHttpClient(json = defaultJson) {
+    defaultRequest {
+        url(ClistUrls.main)
+    }
+
+    install(RateLimitPlugin) {
+        10 per 1.minutes // https://clist.by/api/v4/doc/ #Throttle
+        2 per 1.seconds
     }
 }
 
