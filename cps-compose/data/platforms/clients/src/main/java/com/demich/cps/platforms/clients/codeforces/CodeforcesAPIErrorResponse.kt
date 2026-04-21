@@ -32,6 +32,11 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
 
      */
 
+    /*
+    auth
+    "contestId: You have to be authenticated to use this method"
+     */
+
     private fun isCountFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "count")
     private fun isFromFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "from")
 
