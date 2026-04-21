@@ -15,7 +15,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
-import com.demich.cps.platforms.clients.PlatformClient
 import com.demich.cps.platforms.clients.RateLimitPlugin
 import com.demich.cps.platforms.clients.cpsHttpClient
 import com.demich.cps.platforms.clients.defaultJson
@@ -44,11 +43,10 @@ import kotlin.time.Duration.Companion.seconds
 class CodeforcesClient(
     val locale: CodeforcesLocale = EN,
     val apiAccess: CodeforcesApi.ApiAccess? = null
-): PlatformClient, CodeforcesApi, CodeforcesPageContentProvider {
-    override val client get() = codeforcesHttpClient
+): CodeforcesApi, CodeforcesPageContentProvider {
 
     private suspend inline fun codeforcesRequest(block: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return client.getCheckPOW {
+        return codeforcesHttpClient.getCheckPOW {
             block()
             parameter("locale", locale)
         }

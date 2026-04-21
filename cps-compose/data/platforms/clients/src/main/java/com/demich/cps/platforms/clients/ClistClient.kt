@@ -15,15 +15,21 @@ import kotlin.time.Instant
 
 class ClistClient(
     val apiAccess: ClistApi.ApiAccess? = null
-): PlatformClient, ClistApi, ClistPageContentProvider {
-    override val client get() = clistHttpClient
+): ClistApi, ClistPageContentProvider {
+
+    private suspend inline fun getWebPage(
+        url: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): String {
+        return clistHttpClient.getText(urlString = url, block = block)
+    }
 
     override suspend fun getUserPage(login: String): String {
-        return client.getText(ClistUrls.user(login))
+        return getWebPage(url = ClistUrls.user(login))
     }
 
     override suspend fun getUsersSearchPage(str: String): String {
-        return client.getText("coders") {
+        return getWebPage(url = "coders") {
             parameter("search", str)
         }
     }
@@ -36,7 +42,7 @@ class ClistClient(
         //TODO: what if meta.total_count changes?
         var offset = 0
         do {
-            val result = client.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$method") {
+            val result = clistHttpClient.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$method") {
                 parameter("format", "json")
                 if (apiAccess != null) {
                     parameter("username", apiAccess.login)
