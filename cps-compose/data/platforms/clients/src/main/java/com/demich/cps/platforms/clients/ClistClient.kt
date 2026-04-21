@@ -29,14 +29,14 @@ class ClistClient(
     }
 
     private suspend inline fun <reified T> getApiJsonObjects(
-        page: String,
+        method: String,
         responseSizeLimit: Int = 1000,
         block: HttpRequestBuilder.() -> Unit = {}
     ): List<T> = buildList {
         //TODO: what if meta.total_count changes?
         var offset = 0
         do {
-            val result = client.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$page") {
+            val result = client.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$method") {
                 parameter("format", "json")
                 if (apiAccess != null) {
                     parameter("username", apiAccess.login)
@@ -61,7 +61,7 @@ class ClistClient(
         minEndTime: Instant
     ): List<ClistContest> {
         if (resourceIds.isEmpty()) return emptyList()
-        return getApiJsonObjects(page = "contest") {
+        return getApiJsonObjects(method = "contest") {
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
             parameter("resource_id__in", resourceIds.joinToString(separator = ","))
@@ -69,7 +69,7 @@ class ClistClient(
     }
 
     override suspend fun getResources(): List<ClistResource> {
-        return getApiJsonObjects(page = "resource")
+        return getApiJsonObjects(method = "resource")
     }
 }
 
