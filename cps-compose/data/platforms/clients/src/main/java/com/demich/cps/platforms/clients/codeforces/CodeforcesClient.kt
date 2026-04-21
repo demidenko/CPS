@@ -38,6 +38,7 @@ import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -61,6 +62,19 @@ class CodeforcesClient(
             url.appendPathSegments("api", method)
             block()
         }.body<CodeforcesAPIResponse<T>>().result
+    }
+
+    private suspend inline fun <reified T> getAuthorizedApi(
+        method: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): T {
+        requireNotNull(apiAccess)
+        return getApi(method = method) {
+            block()
+            parameter("apiKey", apiAccess.key)
+            parameter("time", Clock.System.now().epochSeconds)
+            parameter("apiSig", TODO())
+        }
     }
 
     private fun HttpRequestBuilder.handles(handles: Collection<String>) {
