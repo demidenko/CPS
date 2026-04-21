@@ -16,9 +16,10 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration.Companion.seconds
 
-object DmojClient: PlatformClient, DmojApi, DmojPageContentProvider {
+object DmojClient: DmojApi, DmojPageContentProvider {
     private val json get() = defaultJson
-    override val client = cpsHttpClient(json = json) {
+
+    private val client = cpsHttpClient(json = json) {
         defaultRequest {
             url(DmojUrls.main)
         }

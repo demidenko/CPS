@@ -18,10 +18,6 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-internal interface PlatformClient {
-    val client: HttpClient get() = defaultHttpClient
-}
-
 internal val defaultHttpClient = cpsHttpClient { }
 
 internal fun cpsHttpClient(

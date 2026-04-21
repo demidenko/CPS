@@ -17,10 +17,10 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlin.time.Duration.Companion.seconds
 
-object CodeChefClient: PlatformClient, CodeChefApi, CodeChefPageContentProvider {
+object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
     private val json get() = defaultJson
 
-    override val client = cpsHttpClient(
+    private val client = cpsHttpClient(
         json = json,
         useCookies = true,
         connectionTimeout = 30.seconds,
