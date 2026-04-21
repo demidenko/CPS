@@ -17,7 +17,6 @@ import kotlin.time.Duration.Companion.seconds
 
 class ClistContestsFetcher(
     val api: ClistApi,
-    val apiAccess: ClistApi.ApiAccess,
     val resources: Collection<ClistResource>
 ): ContestsMultiplatformFetcher() {
     override val fetchSource get() = ContestsFetchSource.clist_api
@@ -32,7 +31,6 @@ class ClistContestsFetcher(
         )
 
         return api.getContests(
-            apiAccess = apiAccess,
             maxStartTime = dateConstraints.maxStartTime,
             minEndTime = dateConstraints.minEndTime,
             resourceIds = resourceIds

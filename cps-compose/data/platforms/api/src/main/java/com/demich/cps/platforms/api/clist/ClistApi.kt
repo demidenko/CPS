@@ -5,13 +5,12 @@ import kotlin.time.Instant
 interface ClistApi {
 
     suspend fun getContests(
-        apiAccess: ApiAccess,
         resourceIds: Collection<Int>,
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest>
 
-    suspend fun getResources(apiAccess: ApiAccess): List<ClistResource>
+    suspend fun getResources(): List<ClistResource>
 
     data class ApiAccess(
         val login: String,

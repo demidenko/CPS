@@ -25,7 +25,7 @@ class CListProfileManager :
         ClistUtils.runCatching {
             ProfileResult(
                 userInfo = extractUserInfo(
-                    source = ClistClient.getUserPage(login = data),
+                    source = ClistClient().getUserPage(login = data),
                     login = data
                 )
             )
@@ -35,7 +35,7 @@ class CListProfileManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        ClistUtils.extractLoginSuggestions(source = ClistClient.getUsersSearchPage(str))
+        ClistUtils.extractLoginSuggestions(source = ClistClient().getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
     override fun makeUserInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =

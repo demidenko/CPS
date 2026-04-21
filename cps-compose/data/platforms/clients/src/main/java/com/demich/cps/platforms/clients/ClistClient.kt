@@ -13,7 +13,9 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
-object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
+class ClistClient(
+    val apiAccess: ClistApi.ApiAccess? = null
+): PlatformClient, ClistApi, ClistPageContentProvider {
     override val client get() = clistHttpClient
 
     override suspend fun getUserPage(login: String): String {
@@ -28,7 +30,6 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
 
     private suspend inline fun <reified T> getApiJsonObjects(
         page: String,
-        apiAccess: ClistApi.ApiAccess,
         responseSizeLimit: Int = 1000,
         block: HttpRequestBuilder.() -> Unit = {}
     ): List<T> = buildList {
@@ -37,8 +38,10 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
         do {
             val result = client.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$page") {
                 parameter("format", "json")
-                parameter("username", apiAccess.login)
-                parameter("api_key", apiAccess.key)
+                if (apiAccess != null) {
+                    parameter("username", apiAccess.login)
+                    parameter("api_key", apiAccess.key)
+                }
                 parameter("limit", responseSizeLimit)
                 parameter("offset", offset)
                 parameter("total_count", true)
@@ -53,21 +56,20 @@ object ClistClient: PlatformClient, ClistApi, ClistPageContentProvider {
     }
 
     override suspend fun getContests(
-        apiAccess: ClistApi.ApiAccess,
         resourceIds: Collection<Int>,
         maxStartTime: Instant,
         minEndTime: Instant
     ): List<ClistContest> {
         if (resourceIds.isEmpty()) return emptyList()
-        return getApiJsonObjects(page = "contest", apiAccess = apiAccess) {
+        return getApiJsonObjects(page = "contest") {
             parameter("start__lte", maxStartTime.toString())
             parameter("end__gte", minEndTime.toString())
             parameter("resource_id__in", resourceIds.joinToString(separator = ","))
         }
     }
 
-    override suspend fun getResources(apiAccess: ClistApi.ApiAccess): List<ClistResource> {
-        return getApiJsonObjects(page = "resource", apiAccess = apiAccess)
+    override suspend fun getResources(): List<ClistResource> {
+        return getApiJsonObjects(page = "resource")
     }
 }
 
