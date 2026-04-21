@@ -8,7 +8,7 @@ import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.contests.fetching.ContestDateConstraints
 import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.Platform
-import com.demich.cps.platforms.api.clist.ClistApi
+import com.demich.cps.platforms.api.clist.ClistApiAccess
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -46,7 +46,7 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
     val clistApiKey = itemString(name = "clist_api_key", defaultValue = "")
     val clistApiAccess = combine {
-        ClistApi.ApiAccess(
+        ClistApiAccess(
             login = clistApiLogin.value,
             key = clistApiKey.value
         )

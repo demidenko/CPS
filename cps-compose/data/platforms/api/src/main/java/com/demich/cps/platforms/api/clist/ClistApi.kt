@@ -12,8 +12,9 @@ interface ClistApi {
 
     suspend fun getResources(): List<ClistResource>
 
-    data class ApiAccess(
-        val login: String,
-        val key: String
-    )
 }
+
+data class ClistApiAccess(
+    val login: String,
+    val key: String
+)

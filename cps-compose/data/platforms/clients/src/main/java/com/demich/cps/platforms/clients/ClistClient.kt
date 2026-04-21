@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.clients
 
 import com.demich.cps.platforms.api.clist.ClistApi
+import com.demich.cps.platforms.api.clist.ClistApiAccess
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistPageContentProvider
 import com.demich.cps.platforms.api.clist.ClistResource
@@ -14,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 class ClistClient(
-    val apiAccess: ClistApi.ApiAccess? = null
+    val apiAccess: ClistApiAccess? = null
 ): ClistApi, ClistPageContentProvider {
 
     private suspend inline fun getWebPage(

@@ -2,6 +2,7 @@ package com.demich.cps.platforms.clients.codeforces
 
 import com.demich.cps.platforms.api.BuildConfig
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiAccess
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
@@ -42,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class CodeforcesClient(
     val locale: CodeforcesLocale = EN,
-    val apiAccess: CodeforcesApi.ApiAccess? = null
+    val apiAccess: CodeforcesApiAccess? = null
 ): CodeforcesApi, CodeforcesPageContentProvider {
 
     private suspend inline fun codeforcesRequest(block: HttpRequestBuilder.() -> Unit): HttpResponse {
