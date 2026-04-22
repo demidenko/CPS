@@ -39,7 +39,7 @@ interface CodeforcesApi {
         count: Int
     ): List<CodeforcesSubmission>
 
-    suspend fun getRecentActions(maxCount: Int = Int.MAX_VALUE): List<CodeforcesRecentAction>
+    suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction>
 
     suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry>
 
@@ -98,6 +98,8 @@ suspend fun CodeforcesApi.getContestSubmissions(
         from = 1,
         count = 1e9.toInt()
     )
+
+suspend fun CodeforcesApi.getRecentActions() = getRecentActions(maxCount = 100)
 
 data class CodeforcesApiAccess(
     val key: String,

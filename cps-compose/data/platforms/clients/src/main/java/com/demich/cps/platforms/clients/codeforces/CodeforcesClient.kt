@@ -142,7 +142,7 @@ class CodeforcesClient(
 
     override suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction> =
         getApi(method = "recentActions") {
-            parameter("maxCount", maxCount.coerceIn(0, 100))
+            parameter("maxCount", maxCount)
         }
 
     override suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry> =

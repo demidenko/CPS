@@ -7,6 +7,7 @@ import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
 import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
