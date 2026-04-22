@@ -37,7 +37,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.setCookie
 import korlibs.crypto.sha1
+import korlibs.crypto.sha512
 import kotlinx.serialization.Serializable
+import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -253,6 +255,25 @@ private val codeforcesHttpClient: HttpClient =
             1 per 50.milliseconds
         }
     }
+
+private fun apiSig(
+    method: String,
+    parameters: Map<String, Any?>,
+    secret: String
+): String {
+    val rand = buildString(capacity = 6) {
+        repeat(6) {
+            append(Random.nextInt(10))
+        }
+    }
+
+    val sortedParams = parameters.toList().sortedBy { it.first }
+        .joinToString(separator = "&") { (param, value) -> "${param}=${value}" }
+
+    val str = "$rand/$method?$sortedParams#$secret"
+
+    return rand + str.toByteArray().sha512().hex
+}
 
 private enum class CodeforcesAPIStatus {
     OK, FAILED
