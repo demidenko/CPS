@@ -52,8 +52,8 @@ interface CodeforcesApi {
 
     suspend fun getUserSubmissions(
         handle: String,
-        count: Long,
-        from: Long
+        from: Long,
+        count: Long
     ): List<CodeforcesSubmission>
 }
 

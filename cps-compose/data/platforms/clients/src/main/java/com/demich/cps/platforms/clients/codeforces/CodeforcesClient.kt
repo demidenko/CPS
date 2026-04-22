@@ -166,11 +166,15 @@ class CodeforcesClient(
             parameter("handle", handle)
         }
 
-    override suspend fun getUserSubmissions(handle: String, count: Long, from: Long): List<CodeforcesSubmission> =
+    override suspend fun getUserSubmissions(
+        handle: String,
+        from: Long,
+        count: Long
+    ): List<CodeforcesSubmission> =
         getApi(method = "user.status") {
             parameter("handle", handle)
-            parameter("count", count)
             parameter("from", from)
+            parameter("count", count)
         }
 
     // raw pages methods
