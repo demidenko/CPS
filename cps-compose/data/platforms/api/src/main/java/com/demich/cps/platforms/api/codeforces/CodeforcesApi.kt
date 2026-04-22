@@ -45,7 +45,7 @@ interface CodeforcesApi {
 
     suspend fun getUsers(
         handles: Collection<String>,
-        checkHistoricHandles: Boolean = false
+        checkHistoricHandles: Boolean = true
     ): List<CodeforcesUser>
 
     suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange>
