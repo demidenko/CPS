@@ -98,33 +98,17 @@ class CodeforcesClient(
             parameter("contestId", contestId)
         }
 
-    private suspend inline fun getContestStandings(
+    override suspend fun getContestStandings(
         contestId: Int,
-        handles: Collection<String>,
-        block: HttpRequestBuilder.() -> Unit = {}
+        handles: Collection<String>?,
+        showUnofficial: Boolean?,
+        participantTypes: Collection<CodeforcesParticipationType>?
     ): CodeforcesContestStandings =
         getApi(method = "contest.standings") {
             parameter("contestId", contestId)
-            handles(handles)
-            block()
-        }
-
-    override suspend fun getContestStandings(
-        contestId: Int,
-        handles: Collection<String>,
-        includeUnofficial: Boolean
-    ): CodeforcesContestStandings =
-        getContestStandings(contestId = contestId, handles = handles) {
-            parameter("showUnofficial", includeUnofficial)
-        }
-
-    override suspend fun getContestStandings(
-        contestId: Int,
-        handles: Collection<String>,
-        participantTypes: Collection<CodeforcesParticipationType>
-    ): CodeforcesContestStandings =
-        getContestStandings(contestId = contestId, handles = handles) {
-            parameter("participantTypes", participantTypes.joinToString(separator = ","))
+            if (handles != null) handles(handles)
+            parameter("showUnofficial", showUnofficial)
+            parameter("participantTypes", participantTypes?.joinToString(separator = ","))
         }
 
     override suspend fun getContestSubmissions(

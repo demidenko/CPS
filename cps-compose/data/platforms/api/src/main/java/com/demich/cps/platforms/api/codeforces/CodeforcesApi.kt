@@ -22,14 +22,9 @@ interface CodeforcesApi {
 
     suspend fun getContestStandings(
         contestId: Int,
-        handles: Collection<String>,
-        includeUnofficial: Boolean
-    ): CodeforcesContestStandings
-
-    suspend fun getContestStandings(
-        contestId: Int,
-        handles: Collection<String>,
-        participantTypes: Collection<CodeforcesParticipationType>
+        handles: Collection<String>? = null,
+        showUnofficial: Boolean? = null,
+        participantTypes: Collection<CodeforcesParticipationType>? = null
     ): CodeforcesContestStandings
 
     suspend fun getContestSubmissions(
@@ -56,17 +51,6 @@ interface CodeforcesApi {
         count: Long
     ): List<CodeforcesSubmission>
 }
-
-suspend fun CodeforcesApi.getContestStandings(
-    contestId: Int,
-    handle: String,
-    includeUnofficial: Boolean
-): CodeforcesContestStandings =
-    getContestStandings(
-        contestId = contestId,
-        handles = listOf(handle),
-        includeUnofficial = includeUnofficial
-    )
 
 suspend fun CodeforcesApi.getContestStandings(
     contestId: Int,
