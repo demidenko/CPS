@@ -127,11 +127,17 @@ class CodeforcesClient(
             parameter("participantTypes", participantTypes.joinToString(separator = ","))
         }
 
-    override suspend fun getContestSubmissions(contestId: Int, handle: String): List<CodeforcesSubmission> =
+    override suspend fun getContestSubmissions(
+        contestId: Int,
+        handle: String,
+        from: Int,
+        count: Int
+    ): List<CodeforcesSubmission> =
         getApi(method = "contest.status") {
             parameter("contestId", contestId)
             parameter("handle", handle)
-            parameter("count", 1e9.toInt())
+            parameter("from", from)
+            parameter("count", count)
         }
 
     override suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction> =
