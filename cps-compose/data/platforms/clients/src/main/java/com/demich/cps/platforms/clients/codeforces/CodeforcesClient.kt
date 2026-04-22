@@ -258,7 +258,7 @@ private val codeforcesHttpClient: HttpClient =
 
 private fun apiSig(
     method: String,
-    parameters: Map<String, Any?>,
+    parameters: Set<Map.Entry<String, List<String>>>,
     secret: String
 ): String {
     val rand = buildString(capacity = 6) {
@@ -267,8 +267,14 @@ private fun apiSig(
         }
     }
 
-    val sortedParams = parameters.toList().sortedBy { it.first }
-        .joinToString(separator = "&") { (param, value) -> "${param}=${value}" }
+    val sortedParams = buildList {
+        parameters.forEach { entry ->
+            entry.value.forEach { value ->
+                add(Pair(entry.key, value))
+            }
+        }
+        sortWith(compareBy({ it.first }, { it.second }))
+    }.joinToString(separator = "&") { (param, value) -> "${param}=${value}" }
 
     val str = "$rand/$method?$sortedParams#$secret"
 
