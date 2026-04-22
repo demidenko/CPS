@@ -34,9 +34,9 @@ interface CodeforcesApi {
 
     suspend fun getContestSubmissions(
         contestId: Int,
-        handle: String,
-        from: Int,
-        count: Int
+        handle: String? = null,
+        from: Int? = null,
+        count: Int? = null
     ): List<CodeforcesSubmission>
 
     suspend fun getRecentActions(maxCount: Int): List<CodeforcesRecentAction>
@@ -87,17 +87,6 @@ suspend fun CodeforcesApi.getUser(
         handles = listOf(handle),
         checkHistoricHandles = checkHistoricHandles
     ).first()
-
-suspend fun CodeforcesApi.getContestSubmissions(
-    contestId: Int,
-    handle: String
-): List<CodeforcesSubmission> =
-    getContestSubmissions(
-        contestId = contestId,
-        handle = handle,
-        from = 1,
-        count = 1e9.toInt()
-    )
 
 suspend fun CodeforcesApi.getRecentActions() = getRecentActions(maxCount = 100)
 

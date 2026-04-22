@@ -129,9 +129,9 @@ class CodeforcesClient(
 
     override suspend fun getContestSubmissions(
         contestId: Int,
-        handle: String,
-        from: Int,
-        count: Int
+        handle: String?,
+        from: Int?,
+        count: Int?
     ): List<CodeforcesSubmission> =
         getApi(method = "contest.status") {
             parameter("contestId", contestId)
