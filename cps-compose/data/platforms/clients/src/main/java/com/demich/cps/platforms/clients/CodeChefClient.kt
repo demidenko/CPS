@@ -29,8 +29,8 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
         followRedirects = false
         //BrowserUserAgent()
         HttpResponseValidator {
-            handleResponseExceptionWithRequest { exception, _ ->
-                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
+            handleResponseException { exception ->
+                if (exception !is ResponseException) return@handleResponseException
                 val response = exception.response
                 val text = response.bodyAsText()
                 if (response.status.value == 403 && text == somethingWentWrongMessage) {
@@ -42,6 +42,7 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
 
     private class CodeChefCSRFTokenExpiredException: Throwable()
 
+    //TODO: rewrite this
     private object CSRFToken {
         private var tokenDeferred: Deferred<String>? = null
         fun clear() {
@@ -53,7 +54,6 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
                 println("codechef x-csrf-token start recalc...")
                 extractCSRFToken(source = client.getText("${CodeChefUrls.main}/ratings/all")).also {
                     println("codechef x-csrf-token = $it")
-                    check(it.length == 64)
                 }
             }.also { tokenDeferred = it }
             return d.await()
@@ -70,13 +70,12 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
                 block()
             }
         }
-        return runCatching {
-            callGet()
-        }.getOrElse {
-            if (it is CodeChefCSRFTokenExpiredException) {
-                CSRFToken.clear()
-                callGet()
-            } else throw it
+
+        try {
+            return callGet()
+        } catch (e: CodeChefCSRFTokenExpiredException) {
+            CSRFToken.clear()
+            return callGet()
         }
     }
 
@@ -113,7 +112,9 @@ private fun extractCSRFToken(source: String): String {
     check(i != -1)
     i = source.indexOf('=', i + 1)
     i = source.indexOf('"', i)
-    return source.substring(i+1, source.indexOf('"', i+1))
+    return source.substring(i+1, source.indexOf('"', i+1)).also {
+        check(it.length == 64)
+    }
 }
 
 private const val somethingWentWrongMessage = "{\"status\":\"apierror\",\"message\":\"Something went wrong\"}"
