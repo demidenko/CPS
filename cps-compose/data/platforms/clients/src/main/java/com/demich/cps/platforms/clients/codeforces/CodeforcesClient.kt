@@ -49,34 +49,35 @@ class CodeforcesClient(
     val apiAccess: CodeforcesApiAccess? = null
 ): CodeforcesApi, CodeforcesPageContentProvider {
 
-    private suspend inline fun codeforcesRequest(block: HttpRequestBuilder.() -> Unit): HttpResponse {
+    private suspend inline fun codeforcesRequest(
+        signApiMethod: String? = null,
+        block: HttpRequestBuilder.() -> Unit
+    ): HttpResponse {
         return codeforcesHttpClient.getCheckPOW {
             block()
             parameter("locale", locale)
+            if (signApiMethod != null) {
+                requireNotNull(apiAccess) { "Codeforces api access is null" }
+                parameter("apiKey", apiAccess.key)
+                parameter("time", Clock.System.now().epochSeconds)
+                parameter("apiSig", apiSig(
+                    method = signApiMethod,
+                    parameters = url.parameters.entries(),
+                    secret = apiAccess.secret
+                ))
+            }
         }
     }
 
     private suspend inline fun <reified T> getApi(
         method: String,
+        sign: Boolean = false,
         block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return codeforcesRequest {
+        return codeforcesRequest(method.takeIf { sign }) {
             url.appendPathSegments("api", method)
             block()
         }.body<CodeforcesAPIResponse<T>>().result
-    }
-
-    private suspend inline fun <reified T> getAuthorizedApi(
-        method: String,
-        block: HttpRequestBuilder.() -> Unit = {}
-    ): T {
-        requireNotNull(apiAccess)
-        return getApi(method = method) {
-            block()
-            parameter("apiKey", apiAccess.key)
-            parameter("time", Clock.System.now().epochSeconds)
-            parameter("apiSig", TODO())
-        }
     }
 
     private fun HttpRequestBuilder.handles(handles: Collection<String>) {
