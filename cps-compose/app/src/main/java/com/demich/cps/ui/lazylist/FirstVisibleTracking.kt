@@ -39,6 +39,7 @@ private fun <T, R> Flow<T>.zipWithPrev(
     var prev: Any? = UNDEFINED
     collect {
         prev.let { prev ->
+            @Suppress("UNCHECKED_CAST")
             if (prev !== UNDEFINED) emit(transform(prev as T, it))
         }
         prev = it
