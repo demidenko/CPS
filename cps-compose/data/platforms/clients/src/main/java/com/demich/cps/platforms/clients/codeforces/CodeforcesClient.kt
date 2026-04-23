@@ -232,8 +232,8 @@ private val codeforcesHttpClient: HttpClient =
                 }
             }
 
-            handleResponseExceptionWithRequest { exception, _ ->
-                if (exception !is ResponseException) return@handleResponseExceptionWithRequest
+            handleResponseException { exception ->
+                if (exception !is ResponseException) return@handleResponseException
                 val response = exception.response
                 runCatching { response.body<CodeforcesAPIErrorResponse>() }
                     .onSuccess { throw it.toApiException() }
