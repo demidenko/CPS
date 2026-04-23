@@ -12,7 +12,7 @@ ktor = "3.4.3" # https://github.com/ktorio/ktor/releases
 core = "1.18.0" # https://developer.android.com/jetpack/androidx/releases/core
 work = "2.11.2" # https://developer.android.com/jetpack/androidx/releases/work
 
-compose-bom = "2026.03.01" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
+compose-bom = "2026.04.01" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 
 activity-compose = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/activity
 navigation-compose = "2.9.8" # https://developer.android.com/jetpack/androidx/releases/navigation
