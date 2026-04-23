@@ -10,7 +10,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
 import com.demich.cps.platforms.utils.codeforces.parseCodeforcesHtml
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
@@ -23,12 +22,10 @@ fun htmlToAnnotatedString(html: String): AnnotatedString {
     val builder = AnnotatedString.Builder()
     parseCodeforcesHtml(
         html = html,
-        parser = CodeforcesHtmlParser(
-            builder = CodeforcesHtmlStringBuilderImpl(
-                builder = builder,
-                cpsColors = cpsColors,
-                manager = LocalCodeforcesProfileManager.current
-            )
+        builder = CodeforcesHtmlStringBuilderImpl(
+            builder = builder,
+            cpsColors = cpsColors,
+            manager = LocalCodeforcesProfileManager.current
         )
     )
     return builder.toAnnotatedString()
@@ -46,8 +43,8 @@ private class CodeforcesHtmlStringBuilderImpl(
 
     override fun append(text: String) = builder.append(text)
 
-    override fun appendRatedSpan(handle: String, tag: CodeforcesColorTag) {
-        builder.append(manager.makeHandleSpan(handle = handle, tag = tag, cpsColors = cpsColors))
+    override fun appendRatedSpan(text: String, tag: CodeforcesColorTag) {
+        builder.append(manager.makeHandleSpan(handle = text, tag = tag, cpsColors = cpsColors))
     }
 
     override fun pop() = builder.pop()

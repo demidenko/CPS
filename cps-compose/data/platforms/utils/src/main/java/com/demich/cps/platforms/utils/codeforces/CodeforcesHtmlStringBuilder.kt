@@ -10,7 +10,7 @@ import org.jsoup.select.NodeVisitor
 interface CodeforcesHtmlStringBuilder {
     val length: Int
     fun append(text: String)
-    fun appendRatedSpan(handle: String, tag: CodeforcesColorTag)
+    fun appendRatedSpan(text: String, tag: CodeforcesColorTag)
     fun pop()
     fun pushLink()
     fun pushBold()
@@ -20,11 +20,11 @@ interface CodeforcesHtmlStringBuilder {
     fun pushStroke()
 }
 
-fun parseCodeforcesHtml(html: String, parser: CodeforcesHtmlParser) {
-    Jsoup.parseBodyFragment(html).body().traverse(parser)
+fun parseCodeforcesHtml(html: String, builder: CodeforcesHtmlStringBuilder) {
+    Jsoup.parseBodyFragment(html).body().traverse(CodeforcesHtmlParser(builder = builder))
 }
 
-class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisitor {
+private class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisitor {
     override fun head(node: Node, depth: Int) {
         //println("+${node.nodeName()}")
         if (node is TextNode) {
@@ -43,7 +43,7 @@ class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisito
 
         if (name.isLink() && e.hasClass("rated-user")) {
             val user = e.extractRatedUser()
-            builder.appendRatedSpan(handle = user.handle, tag = user.colorTag)
+            builder.appendRatedSpan(text = user.handle, tag = user.colorTag)
             e.remove()
             return
         }
