@@ -3,18 +3,20 @@ package com.demich.cps.platforms.clients
 import com.demich.cps.platforms.api.codechef.CodeChefApi
 import com.demich.cps.platforms.api.codechef.CodeChefPageContentProvider
 import com.demich.cps.platforms.api.codechef.CodeChefRatingChange
-import com.demich.cps.platforms.api.codechef.CodeChefSearchResult
 import com.demich.cps.platforms.api.codechef.CodeChefUrls
+import com.demich.cps.platforms.api.codechef.CodeChefUser
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstLast
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
@@ -26,6 +28,10 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
         connectionTimeout = 30.seconds,
         requestTimeout = 60.seconds
     ) {
+        defaultRequest {
+            url(CodeChefUrls.main)
+        }
+
         followRedirects = false
         //BrowserUserAgent()
         HttpResponseValidator {
@@ -52,7 +58,7 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
         suspend operator fun invoke(): String {
             val d = tokenDeferred ?: client.async {
                 println("codechef x-csrf-token start recalc...")
-                extractCSRFToken(source = client.getText("${CodeChefUrls.main}/ratings/all")).also {
+                extractCSRFToken(source = client.getText("/ratings/all")).also {
                     println("codechef x-csrf-token = $it")
                 }
             }.also { tokenDeferred = it }
@@ -83,14 +89,14 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
         return client.getText(CodeChefUrls.user(handle))
     }
 
-    override suspend fun getSuggestions(str: String): CodeChefSearchResult {
-        return getCodeChef("${CodeChefUrls.main}/api/ratings/all") {
+    override suspend fun getUserSuggestions(str: String): List<CodeChefUser> {
+        return getCodeChef<CodeChefRatingList>("/api/ratings/all") {
             parameter("itemsPerPage", 40)
             parameter("order", "asc")
             parameter("page", 1)
             parameter("sortBy", "global_rank")
             parameter("search", str)
-        }
+        }.list
     }
 
     override suspend fun getRatingChanges(handle: String): List<CodeChefRatingChange> {
@@ -106,6 +112,11 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
         return emptyList()
     }
 }
+
+@Serializable
+private class CodeChefRatingList(
+    val list: List<CodeChefUser>
+)
 
 private fun extractCSRFToken(source: String): String {
     var i = source.indexOf("window.csrfToken")

@@ -10,11 +10,6 @@ data class CodeChefUser(
 )
 
 @Serializable
-data class CodeChefSearchResult(
-    val list: List<CodeChefUser>
-)
-
-@Serializable
 data class CodeChefRatingChange(
     val code: String,
     val name: String,

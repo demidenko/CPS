@@ -76,7 +76,7 @@ class CodeChefProfileManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        CodeChefClient.getSuggestions(str).list.map {
+        CodeChefClient.getUserSuggestions(str).map {
             UserSuggestion(
                 userId = it.username,
                 info = it.rating.toString()
