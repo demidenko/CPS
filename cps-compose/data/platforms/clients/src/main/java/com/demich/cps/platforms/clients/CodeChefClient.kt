@@ -38,9 +38,11 @@ object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
             handleResponseException { exception ->
                 if (exception !is ResponseException) return@handleResponseException
                 val response = exception.response
-                val text = response.bodyAsText()
-                if (response.status.value == 403 && text == somethingWentWrongMessage) {
-                    throw CodeChefCSRFTokenExpiredException()
+                if (response.status.value == 403) {
+                    val text = response.bodyAsText()
+                    if (text == somethingWentWrongMessage) {
+                        throw CodeChefCSRFTokenExpiredException()
+                    }
                 }
             }
         }
