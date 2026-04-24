@@ -18,7 +18,7 @@ class ClistClient(
     val apiAccess: ClistApiAccess? = null
 ): ClistApi, ClistPageContentProvider {
 
-    private suspend inline fun getWebPage(
+    private suspend inline fun getPageText(
         url: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): String {
@@ -26,11 +26,11 @@ class ClistClient(
     }
 
     override suspend fun getUserPage(login: String): String {
-        return getWebPage(url = ClistUrls.user(login))
+        return getPageText(url = ClistUrls.user(login))
     }
 
     override suspend fun getUsersSearchPage(str: String): String {
-        return getWebPage(url = "coders") {
+        return getPageText(url = "coders") {
             parameter("search", str)
         }
     }
@@ -69,8 +69,8 @@ class ClistClient(
     ): List<ClistContest> {
         if (resourceIds.isEmpty()) return emptyList()
         return getApiJsonObjects(method = "contest") {
-            parameter("start__lte", maxStartTime.toString())
-            parameter("end__gte", minEndTime.toString())
+            parameter("start__lte", maxStartTime)
+            parameter("end__gte", minEndTime)
             parameter("resource_id__in", resourceIds.joinToString(separator = ","))
         }
     }
