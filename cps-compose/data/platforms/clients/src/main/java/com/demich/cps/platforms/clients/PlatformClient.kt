@@ -3,6 +3,7 @@ package com.demich.cps.platforms.clients
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
@@ -18,6 +19,8 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private val okHttpEngine: HttpClientEngine = OkHttp.create()
+
 internal val defaultHttpClient = cpsHttpClient { }
 
 internal fun cpsHttpClient(
@@ -27,7 +30,7 @@ internal fun cpsHttpClient(
     requestTimeout: Duration = 30.seconds,
     retryOnExceptionIf: (Throwable) -> Boolean = { false },
     block: HttpClientConfig<*>.() -> Unit
-) = HttpClient(OkHttp) {
+) = HttpClient(engine = okHttpEngine) {
     expectSuccess = true
 
     //careful!!! only one install and retry block is used in ktor
