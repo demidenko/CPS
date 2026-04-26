@@ -3,10 +3,7 @@ package com.demich.cps.platforms.clients
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.engine.okhttp.OkHttpConfig
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.ResponseException
@@ -30,7 +27,7 @@ internal fun cpsHttpClient(
     requestTimeout: Duration = 30.seconds,
     retryOnExceptionIf: (Throwable) -> Boolean = { false },
     block: HttpClientConfig<*>.() -> Unit
-) = HttpClient(engineFactory = SingleOkHttpEngineFactory) {
+) = HttpClient(engineFactory = OkHttp) {
     expectSuccess = true
 
     //careful!!! only one install and retry block is used in ktor
@@ -65,14 +62,6 @@ internal fun cpsHttpClient(
     }*/
 
     block()
-}
-
-private object SingleOkHttpEngineFactory: HttpClientEngineFactory<OkHttpConfig> {
-
-    private val okHttpEngine by lazy { OkHttp.create() }
-
-    override fun create(block: OkHttpConfig.() -> Unit): HttpClientEngine =
-        okHttpEngine
 }
 
 private fun Throwable.shouldRetry(): Boolean =
