@@ -6,6 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.demich.cps.R
+import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
@@ -202,5 +204,12 @@ private fun notificationFailure(
     work: CPSPeriodicWork,
     throwable: Throwable
 ) {
-
+    val currentTime = Clock.System.now()
+    notificationChannels.cps.worker_failure(Pair(work.name, currentTime)).notify(work.context) {
+        contentTitle = work.name
+        subText = "worker failure"
+        bigContent = throwable.message.toString()
+        colorResId = R.color.fail
+        time = currentTime
+    }
 }
