@@ -56,7 +56,7 @@ abstract class CPSWorker(
         return result
     }
 
-    protected abstract suspend fun runWork(): Result
+    protected abstract suspend fun runWork()
     private suspend fun smartRunWork(): Result =
         repeatUntilSuccessOrLast(
             times = 2,
@@ -65,7 +65,10 @@ abstract class CPSWorker(
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))
             timeHolder.resetSaved()
-            runCatching { runWork() }.getOrElse {
+            runCatching {
+                runWork()
+                Result.success()
+            }.getOrElse {
                 println("${work.name}: $it")
                 when {
                     it.isResponseException -> Result.retry()

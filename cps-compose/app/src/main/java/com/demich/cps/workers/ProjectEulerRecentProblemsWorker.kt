@@ -53,11 +53,10 @@ class ProjectEulerRecentProblemsWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         scanProblems()
         //TODO: wait if time is close
         enqueueByHint()
-        return Result.success()
     }
 
     private suspend fun scanProblems() {

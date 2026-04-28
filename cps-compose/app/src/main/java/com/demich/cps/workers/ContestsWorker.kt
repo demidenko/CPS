@@ -28,12 +28,10 @@ class ContestsWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         // usual reload
         context.settingsContests.contestsFetchFlows().collectTo(
             repository = context.contestsRepository
         )
-
-        return Result.success()
     }
 }

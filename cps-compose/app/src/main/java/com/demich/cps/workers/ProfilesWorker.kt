@@ -36,7 +36,7 @@ class ProfilesWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         joinAllWithProgress {
             with(CodeforcesProfileManager()) {
                 settingsStorage(context).fromSnapshot {
@@ -51,8 +51,6 @@ class ProfilesWorker(
                 }
             }
         }
-
-        return Result.success()
     }
 }
 

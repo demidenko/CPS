@@ -31,7 +31,7 @@ class CodeforcesCommunityFollowWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         val repository = context.followRepository
 
         //TODO: consider skip this if blogs.size is small
@@ -56,8 +56,6 @@ class CodeforcesCommunityFollowWorker(
                 repository.getAndReloadBlogEntries(handle = blog.handle).getOrThrow()
                 lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
             }
-
-        return Result.success()
     }
 }
 

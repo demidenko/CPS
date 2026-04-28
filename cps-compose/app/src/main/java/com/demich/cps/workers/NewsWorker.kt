@@ -46,15 +46,13 @@ class NewsWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         joinAllWithProgress {
             context.settingsCommunity.enabledNewsFeeds().let { enabled ->
                 if (atcoder_news in enabled) add(::atcoderNews)
                 if (project_euler_news in enabled) add(::projectEulerNews)
             }
         }
-
-        return Result.success()
     }
 
     private suspend fun atcoderNews() {

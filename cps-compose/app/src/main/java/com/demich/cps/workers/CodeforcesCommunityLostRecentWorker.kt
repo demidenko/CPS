@@ -61,7 +61,7 @@ class CodeforcesCommunityLostRecentWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         context.settingsCommunity.fromSnapshot {
             checkRecentActions(
                 locale = codeforcesLocale.value,
@@ -69,8 +69,6 @@ class CodeforcesCommunityLostRecentWorker(
                 repository = context.codeforcesLostRepository
             )
         }
-
-        return Result.success()
     }
 
     private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours

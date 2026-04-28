@@ -44,14 +44,14 @@ class CodeforcesUpsolvingSuggestionsWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         val storage = CodeforcesProfileManager().profileStorage(context)
 
         val handle = storage.profile()
             ?.userInfoOrNull()
             ?.takeIf { it.rating != null }
             ?.handle
-            ?: return Result.success()
+            ?: return
 
         val dateThreshold = workerStartTime - 90.days
 
@@ -84,8 +84,6 @@ class CodeforcesUpsolvingSuggestionsWorker(
                     }
                 }
         }
-
-        return Result.success()
     }
 }
 

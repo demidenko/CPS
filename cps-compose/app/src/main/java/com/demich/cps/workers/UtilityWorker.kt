@@ -27,11 +27,9 @@ class UtilityWorker(
         }
     }
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         removeOldIgnoredContests()
         removeOldCodeforcesNewEntries()
-
-        return Result.success()
     }
 
     private suspend fun removeOldIgnoredContests() {

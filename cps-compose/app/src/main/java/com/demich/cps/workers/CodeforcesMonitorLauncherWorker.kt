@@ -48,7 +48,7 @@ class CodeforcesMonitorLauncherWorker(
 
     private fun isActual(time: Instant) = workerStartTime - time < 24.hours
 
-    override suspend fun runWork(): Result {
+    override suspend fun runWork() {
         //TODO: restart failed monitor
 
         val storage = CodeforcesProfileManager().profileStorage(context)
@@ -57,7 +57,7 @@ class CodeforcesMonitorLauncherWorker(
             val handle: String
 
             val get: GetResult? = fromSnapshot {
-                handle = profile.value?.userInfoOrNull()?.handle ?: return Result.success()
+                handle = profile.value?.userInfoOrNull()?.handle ?: return
                 CodeforcesClient().getFirstNewSubmissions(
                     handle = handle,
                     untilId = monitorLastSubmissionId.value,
@@ -86,8 +86,6 @@ class CodeforcesMonitorLauncherWorker(
         }
 
         work.enqueueToCodeforcesContest(workerStartTime)
-
-        return Result.success()
     }
 }
 
