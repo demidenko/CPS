@@ -29,7 +29,10 @@ class CPSNotificationChannels: NotificationIdProvider(rangeLength = 1 shl 23) {
         val news = channel(nextIdRange(), "news", "News")
     }
 
+    val cps = CPSNotificationsGroup()
+
     val codeforces = CodeforcesNotificationsGroup()
     val atcoder = AtCoderNotificationGroup()
     val project_euler = ProjectEulerNotificationGroup()
+
 }
