@@ -5,6 +5,10 @@ val notificationChannels get() = CPSNotificationChannels()
 
 class CPSNotificationChannels: NotificationIdProvider(rangeLength = 1 shl 23) {
 
+    inner class CPSNotificationsGroup: NotificationChannelGroupInfo("cps", "CPS") {
+        val worker_failure = channel(nextIdRange(), "worker_failure", "Worker failure")
+    }
+
     inner class CodeforcesNotificationsGroup: NotificationChannelGroupInfo("codeforces", "Codeforces") {
         val rating_changes = channel(nextId(), "rating_changes", "Rating changes", Importance.HIGH)
         val contribution_changes = channel(nextId(), "contribution_changes", "Contribution changes", Importance.MIN)
