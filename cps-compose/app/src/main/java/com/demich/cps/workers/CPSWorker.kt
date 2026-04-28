@@ -9,6 +9,7 @@ import androidx.work.workDataOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesTemporarilyUnavailableException
 import com.demich.cps.platforms.clients.isResponseException
+import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.jsonCPS
@@ -53,11 +54,17 @@ abstract class CPSWorker(
             it.toWorkerResult()
         }
 
-        val resultType = result.toType()
-        workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = resultType))
 
-        if (resultType != SUCCESS) {
+        workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = result.toType()))
+
+        resultCatching.onFailure {
             work.enqueueAsap()
+
+            if (result.toType() == FAILURE) {
+                if (UISettingsDataStore(context).devModeEnabled()) {
+                    notificationFailure(work = work, throwable = it)
+                }
+            }
         }
 
         return result
@@ -189,4 +196,11 @@ private class TimeHolder(private val clock: Clock): Clock by clock {
         time = clock.now()
     }
     operator fun getValue(thisRef: Any?, property: KProperty<*>) = time
+}
+
+private fun notificationFailure(
+    work: CPSPeriodicWork,
+    throwable: Throwable
+) {
+
 }
