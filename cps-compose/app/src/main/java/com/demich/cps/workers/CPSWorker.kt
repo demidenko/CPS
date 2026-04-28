@@ -46,10 +46,17 @@ abstract class CPSWorker(
         val workersInfo = CPSWorkersDataStore(context)
         workersInfo.add(work.name, event)
 
-        val result = smartRunWork()
-        workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = result.toType()))
+        val resultCatching = runWorkCatching()
 
-        if (result.toType() != SUCCESS) {
+        val result = resultCatching.map { Result.success() }.getOrElse {
+            println("${work.name} failure: $it")
+            it.toWorkerResult()
+        }
+
+        val resultType = result.toType()
+        workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = resultType))
+
+        if (resultType != SUCCESS) {
             work.enqueueAsap()
         }
 
@@ -57,26 +64,14 @@ abstract class CPSWorker(
     }
 
     protected abstract suspend fun runWork()
-    private suspend fun smartRunWork(): Result =
+    private suspend fun runWorkCatching() =
         repeatUntilSuccessOrLast(
             times = 2,
-            between = { delay(5.seconds) },
-            isSuccess = { it.toType() == SUCCESS }
+            between = { delay(5.seconds) }
         ) {
             setProgressInfo(ProgressBarInfo(total = 0))
             timeHolder.resetSaved()
-            runCatching {
-                runWork()
-                Result.success()
-            }.getOrElse {
-                println("${work.name}: $it")
-                when {
-                    it.isResponseException -> Result.retry()
-                    it is CodeforcesApiException -> Result.failure()
-                    it is CodeforcesTemporarilyUnavailableException -> Result.retry()
-                    else -> Result.failure()
-                }
-            }
+            runWork()
         }
 
     protected suspend fun setProgressInfo(progressInfo: ProgressBarInfo) {
@@ -128,6 +123,14 @@ abstract class CPSWorker(
             else -> null
         }
     }
+
+    private fun Throwable.toWorkerResult(): Result =
+        when {
+            isResponseException -> Result.retry()
+            this is CodeforcesApiException -> Result.failure()
+            this is CodeforcesTemporarilyUnavailableException -> Result.retry()
+            else -> Result.failure()
+        }
 
     @Serializable
     data class ExecutionEvent(
