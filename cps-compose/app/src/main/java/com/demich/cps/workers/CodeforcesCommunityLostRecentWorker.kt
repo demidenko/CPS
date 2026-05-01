@@ -9,7 +9,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
@@ -25,7 +24,6 @@ import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -63,47 +61,52 @@ class CodeforcesCommunityLostRecentWorker(
 
     override suspend fun runWork() {
         context.settingsCommunity.fromSnapshot {
-            checkRecentActions(
-                locale = codeforcesLocale.value,
+            val client = CodeforcesClient(locale = codeforcesLocale.value)
+            val currentTime = workerStartTime
+            context.codeforcesLostRepository.updateEntries(
+                api = client,
+                pageContentProvider = client,
                 minRatingColorTag = codeforcesLostMinRatingTag.value,
-                repository = context.codeforcesLostRepository
+                hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
+                isNew = { currentTime - it < 24.hours },
+                isStale = { currentTime - it > 7.days }
             )
         }
     }
+}
 
-    private fun isNew(blogCreationTime: Instant) = workerStartTime - blogCreationTime < 24.hours
+private suspend inline fun CodeforcesLostRepository.updateEntries(
+    api: CodeforcesApi,
+    pageContentProvider: CodeforcesPageContentProvider,
+    minRatingColorTag: CodeforcesColorTag,
+    hintStorage: CodeforcesLostHintStorage,
+    crossinline isNew: (Instant) -> Boolean,
+    isStale: (Instant) -> Boolean
+) {
+    val recentBlogEntries = pageContentProvider.getRecentBlogEntries()
+    //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
 
-    private suspend fun checkRecentActions(
-        locale: CodeforcesLocale,
-        minRatingColorTag: CodeforcesColorTag,
-        repository: CodeforcesLostRepository
-    ) {
-        val recentBlogEntries = CodeforcesClient(locale = locale).getRecentBlogEntries()
-        //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
-
-        //get current suspects with removing old ones
-        val suspects = repository.getSuspectsRemoveInvalid {
-            isNew(it.creationTime) && it.author.colorTag >= minRatingColorTag
-        }
-
-        //catch new suspects from recent actions
-        findSuspects(
-            blogEntries = recentBlogEntries.filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
-            minRatingColorTag = minRatingColorTag,
-            isNew = ::isNew,
-            api = CodeforcesClient(locale = locale),
-            hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage()
-        ) {
-            repository.insertSuspect(it)
-        }
-
-        repository.checkSuspects(
-            recentBlogEntries = recentBlogEntries,
-            suspects = suspects,
-            currentTime = workerStartTime,
-            staleAfter = 7.days
-        )
+    //get current suspects with removing old ones
+    val suspects = getSuspectsRemoveInvalid {
+        isNew(it.creationTime) && it.author.colorTag >= minRatingColorTag
     }
+
+    //catch new suspects from recent actions
+    findSuspects(
+        blogEntries = recentBlogEntries.filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
+        minRatingColorTag = minRatingColorTag,
+        isNew = isNew,
+        api = api,
+        hintStorage = hintStorage
+    ) {
+        insertSuspect(it)
+    }
+
+    checkSuspects(
+        recentBlogEntries = recentBlogEntries,
+        suspects = suspects,
+        isStale = isStale
+    )
 }
 
 private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
@@ -116,18 +119,17 @@ private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
             valid
         }
 
-private suspend fun CodeforcesLostRepository.checkSuspects(
+private suspend inline fun CodeforcesLostRepository.checkSuspects(
     recentBlogEntries: List<CodeforcesRecentFeedBlogEntry>,
     suspects: List<CodeforcesWebBlogEntry>,
-    currentTime: Instant,
-    staleAfter: Duration
+    isStale: (Instant) -> Boolean
 ) {
     val recentIds = recentBlogEntries.mapToSet { it.id }
 
     //remove from lost
     remove(
         lostEntries().filter {
-            currentTime - it.creationTime > staleAfter || it.id in recentIds
+            isStale(it.creationTime) || it.id in recentIds
         }
     )
 
