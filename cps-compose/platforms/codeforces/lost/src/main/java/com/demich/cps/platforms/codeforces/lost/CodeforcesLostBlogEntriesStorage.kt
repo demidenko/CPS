@@ -3,17 +3,19 @@ package com.demich.cps.platforms.codeforces.lost
 import kotlinx.coroutines.flow.Flow
 
 interface CodeforcesLostBlogEntriesStorage {
-    suspend fun insertSuspect(suspect: CodeforcesLostSuspect)
+    suspend fun addSuspect(suspect: CodeforcesLostSuspect)
 
-    suspend fun insertLost(blogEntry: CodeforcesLostBlogEntry)
-
-    suspend fun remove(ids: Collection<Int>)
+    suspend fun addLost(blogEntry: CodeforcesLostBlogEntry)
 
     fun flowOfLost(): Flow<List<CodeforcesLostBlogEntry>>
 
     fun flowOfSuspects(): Flow<List<CodeforcesLostSuspect>>
 
-    suspend fun lostEntries(): List<CodeforcesLostBlogEntry>
+    suspend fun suspectsRemoveInvalid(
+        isValid: (CodeforcesLostSuspect) -> Boolean
+    ): List<CodeforcesLostSuspect>
 
-    suspend fun suspects(): List<CodeforcesLostSuspect>
+    suspend fun removeInvalidLost(
+        isInvalid: (CodeforcesLostBlogEntry) -> Boolean
+    )
 }
