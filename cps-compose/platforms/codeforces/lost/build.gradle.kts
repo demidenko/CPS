@@ -17,4 +17,5 @@ dependencies {
     implementation(project(":data:platforms:utils"))
 
     implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.coroutines.android)
 }

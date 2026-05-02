@@ -11,6 +11,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHint
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHintStorage
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -23,7 +25,6 @@ import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.combine
-import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -150,27 +151,6 @@ private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(): List<C
         extractFrom(::getGroupsPage)
     }.getOrElse {
         extractFrom(::getRecentActionsPage)
-    }
-}
-
-@Serializable
-data class CodeforcesLostHint(
-    val blogEntryId: Int,
-    val creationTime: Instant
-)
-
-private abstract class CodeforcesLostHintStorage {
-    abstract suspend fun getHint(): CodeforcesLostHint?
-
-    protected abstract suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint)
-
-    abstract suspend fun reset()
-
-    suspend fun update(blogEntryId: Int, time: Instant) {
-        update {
-            if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntryId, time)
-            else it
-        }
     }
 }
 
