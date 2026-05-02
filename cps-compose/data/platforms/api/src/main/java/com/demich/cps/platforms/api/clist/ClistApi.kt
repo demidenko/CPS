@@ -12,6 +12,8 @@ interface ClistApi {
 
     suspend fun getResources(): List<ClistResource>
 
+    suspend fun getResource(resourceId: Int): ClistResource
+
 }
 
 data class ClistApiAccess(

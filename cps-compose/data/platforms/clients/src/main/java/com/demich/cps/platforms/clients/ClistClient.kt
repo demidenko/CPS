@@ -87,6 +87,10 @@ class ClistClient(
     override suspend fun getResources(): List<ClistResource> {
         return getApiJsonObjects(method = "resource")
     }
+
+    override suspend fun getResource(resourceId: Int): ClistResource {
+        return getApi(method = "resource/$resourceId")
+    }
 }
 
 private val clistHttpClient = cpsHttpClient(json = defaultJson) {
