@@ -2,8 +2,8 @@ package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogReadNotAllowedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
@@ -94,7 +94,7 @@ private suspend fun CodeforcesApi.getBlogEntries(
         getUserBlogEntries(handle = handle)
     }.recoverCatching {
         when (it) {
-            is CodeforcesApiNotAllowedReadBlogException -> emptyList()
+            is CodeforcesApiBlogReadNotAllowedException -> emptyList()
             is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
                 val profileResult = getProfile(handle = handle, recoverHandle = true)
                 return Pair(

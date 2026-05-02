@@ -1,12 +1,12 @@
 package com.demich.cps.platforms.clients.codeforces
 
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogReadNotAllowedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingChangesUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiNotAllowedReadBlogException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUnspecifiedException
 import kotlinx.serialization.Serializable
 
@@ -69,7 +69,7 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
             return CodeforcesApiHandleNotFoundException(comment, handle = it)
         }
         when (msg) {
-            "You are not allowed to read that blog" -> return CodeforcesApiNotAllowedReadBlogException(comment)
+            "You are not allowed to read that blog" -> return CodeforcesApiBlogReadNotAllowedException(comment)
             // "Field should contain between 3 and 24 characters, inclusive", "Поле должно содержать от 3 до 24 символов, включительно"
             // "Field should contain only Latin letters, digits, underscore or dash characters", "Поле должно содержать только латинские буквы, цифры, символы подчёркивание или дефис"
         }
