@@ -3,7 +3,7 @@ package com.demich.cps.platforms.api.codeforces
 abstract class CodeforcesApiException
 internal constructor(val comment: String): CodeforcesException(message = comment)
 
-internal class CodeforcesApiUnspecifiedException(comment: String): CodeforcesApiException(comment)
+class CodeforcesApiUnspecifiedException(comment: String): CodeforcesApiException(comment)
 
 class CodeforcesApiCallLimitExceededException(comment: String): CodeforcesApiException(comment)
 
