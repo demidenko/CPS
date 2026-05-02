@@ -9,6 +9,8 @@ class CodeforcesApiCallLimitExceededException(comment: String): CodeforcesApiExc
 
 class CodeforcesApiHandleNotFoundException(comment: String, val handle: String): CodeforcesApiException(comment)
 
+class CodeforcesApiBlogEntryNotFoundException(comment: String, val blogEntryId: Int): CodeforcesApiException(comment)
+
 class CodeforcesApiBlogReadNotAllowedException(comment: String): CodeforcesApiException(comment)
 
 class CodeforcesApiContestRatingChangesUnavailableException(comment: String): CodeforcesApiException(comment)

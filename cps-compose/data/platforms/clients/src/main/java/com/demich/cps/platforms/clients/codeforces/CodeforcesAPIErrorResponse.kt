@@ -1,5 +1,6 @@
 package com.demich.cps.platforms.clients.codeforces
 
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogReadNotAllowedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
@@ -53,11 +54,6 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         if (comment.isField("asManager", "Only contest managers can use \"asManager\" option")) return true
         return false
     }
-
-    private inline fun ifIsBlogEntryNotFound(block: (Int) -> Unit) {
-        comment.ifIntSurrounded("blogEntryId: Blog entry with id ", " not found", block)
-        comment.ifIntSurrounded("Blog entry with id ", " not found", block)
-    }
 }
 
 internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException {
@@ -97,9 +93,19 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
         }
     }
 
+    comment.ifIsFieldMsg("blogEntryId") { msg ->
+        msg.ifIntSurrounded("blogEntryId: Blog entry with id ", " not found") {
+            return CodeforcesApiBlogEntryNotFoundException(comment, blogEntryId = it)
+        }
+    }
+
     when (comment) {
         "Call limit exceeded" -> return CodeforcesApiCallLimitExceededException(comment)
         // "Internal Server Error" -> status 500
+    }
+
+    comment.ifIntSurrounded("Blog entry with id ", " not found") {
+        return CodeforcesApiBlogEntryNotFoundException(comment, blogEntryId = it)
     }
 
     return CodeforcesApiUnspecifiedException(comment)
