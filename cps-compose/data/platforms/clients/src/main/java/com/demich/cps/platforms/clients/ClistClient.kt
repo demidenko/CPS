@@ -35,6 +35,20 @@ class ClistClient(
         }
     }
 
+    private suspend inline fun <reified T> getApi(
+        method: String,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): T {
+        return clistHttpClient.getAs(urlString = "${ClistUrls.api}/$method") {
+            block()
+            parameter("format", "json")
+            if (apiAccess != null) {
+                parameter("username", apiAccess.login)
+                parameter("api_key", apiAccess.key)
+            }
+        }
+    }
+
     private suspend inline fun <reified T> getApiJsonObjects(
         method: String,
         responseSizeLimit: Int = 1000,
@@ -43,12 +57,7 @@ class ClistClient(
         //TODO: what if meta.total_count changes?
         var offset = 0
         do {
-            val result = clistHttpClient.getAs<ClistApiResponse<T>>("${ClistUrls.api}/$method") {
-                parameter("format", "json")
-                if (apiAccess != null) {
-                    parameter("username", apiAccess.login)
-                    parameter("api_key", apiAccess.key)
-                }
+            val result = getApi<ClistApiResponse<T>>(method = method) {
                 parameter("limit", responseSizeLimit)
                 parameter("offset", offset)
                 parameter("total_count", true)
