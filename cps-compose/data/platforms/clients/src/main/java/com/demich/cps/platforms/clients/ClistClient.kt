@@ -88,6 +88,9 @@ private val clistHttpClient = cpsHttpClient(json = defaultJson) {
     install(RateLimitPlugin) {
         10 per 1.minutes // https://clist.by/api/v4/doc/ #Throttle
         2 per 1.seconds
+        if (BuildConfig.DEBUG) {
+            1 per 3.seconds
+        }
     }
 }
 
