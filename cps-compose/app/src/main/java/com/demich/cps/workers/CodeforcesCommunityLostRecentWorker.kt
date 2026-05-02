@@ -21,7 +21,6 @@ import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
-import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
@@ -224,17 +223,16 @@ private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorT
     api: CodeforcesApi
 ) = api.fixHandleColors(this).filter { it.author.colorTag >= minRatingColorTag }
 
-private inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
-    isFinalFilter: Boolean = false,
-    isNew: (CodeforcesRecentFeedBlogEntry) -> Boolean
-) = sortedBy { it.id }.run {
-    val indexOfFirstNew =
-        if (isFinalFilter) {
-            indexOfLast { !isNew(it) } + 1
-        } else {
-            partitionIndex { !isNew(it) }
-        }
-    subList(fromIndex = indexOfFirstNew, toIndex = size)
+private suspend inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
+    api: CodeforcesApi,
+    isNew: (Instant) -> Boolean
+) = sortedBy { it.id }.let {
+    if (it.size > 1) {
+        api.getRecentActions()
+    }
+    it.takeLastWhile {
+        isNew(api.getBlogEntry(it.id).creationTime)
+    }
 }
 
 private suspend inline fun findSuspects(
@@ -277,10 +275,7 @@ private suspend inline fun findSuspects(
     blogEntries
         .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
         .fixAndFilterColorTag(minRatingColorTag = minRatingColorTag, api = api)
-        .also {
-            if (it.size > 1) api.getRecentActions()
-        }
-        .filterNewEntries(isFinalFilter = true) { isNew(api.getBlogEntry(it.id).creationTime) }
+        .filterNewEntries(api = api, isNew = isNew)
         .forEach {
             val blogEntry = api.getBlogEntry(it.id)
             onSuspect(
