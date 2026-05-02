@@ -8,6 +8,7 @@ import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.api.clist.ClistUrls
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
@@ -42,9 +43,10 @@ class ClistClient(
         return clistHttpClient.getAs(urlString = "${ClistUrls.api}/$method") {
             block()
             parameter("format", "json")
-            if (apiAccess != null) {
-                parameter("username", apiAccess.login)
-                parameter("api_key", apiAccess.key)
+            apiAccess?.run {
+                // parameter("username", login)
+                // parameter("api_key", key)
+                header("Authorization", "ApiKey $login:$key")
             }
         }
     }
