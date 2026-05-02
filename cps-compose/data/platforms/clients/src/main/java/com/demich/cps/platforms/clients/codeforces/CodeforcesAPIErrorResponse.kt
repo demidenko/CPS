@@ -94,7 +94,7 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
     }
 
     comment.ifIsFieldMsg("blogEntryId") { msg ->
-        msg.ifIntSurrounded("blogEntryId: Blog entry with id ", " not found") {
+        msg.ifIntSurrounded("Blog entry with id ", " not found") {
             return CodeforcesApiBlogEntryNotFoundException(comment, blogEntryId = it)
         }
     }
