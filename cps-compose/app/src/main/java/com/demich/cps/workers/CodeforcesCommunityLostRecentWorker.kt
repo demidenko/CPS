@@ -6,6 +6,7 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
 import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -216,6 +217,15 @@ private fun CodeforcesApi.withBlogEntriesCache(
     }
 }
 
+// null only if blog entry not found!
+private suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): CodeforcesBlogEntry? {
+    return try {
+        getBlogEntry(blogEntryId = blogEntryId)
+    } catch (e: CodeforcesApiBlogEntryNotFoundException) {
+        null
+    }
+}
+
 private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
 
 private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(
@@ -231,7 +241,8 @@ private suspend inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEn
         api.getRecentActions()
     }
     it.takeLastWhile {
-        isNew(api.getBlogEntry(it.id).creationTime)
+        val blogEntry = api.getBlogEntryOrNull(it.id)
+        blogEntry == null || isNew(blogEntry.creationTime)
     }
 }
 
@@ -277,7 +288,7 @@ private suspend inline fun findSuspects(
         .fixAndFilterColorTag(minRatingColorTag = minRatingColorTag, api = api)
         .filterNewEntries(api = api, isNew = isNew)
         .forEach {
-            val blogEntry = api.getBlogEntry(it.id)
+            val blogEntry = api.getBlogEntryOrNull(it.id) ?: return@forEach
             onSuspect(
                 blogEntry
                     .copy(rating = 0)
