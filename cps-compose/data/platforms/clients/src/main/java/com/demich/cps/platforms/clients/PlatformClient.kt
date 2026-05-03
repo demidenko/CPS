@@ -12,6 +12,7 @@ import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -86,4 +87,10 @@ internal suspend inline fun HttpClient.getText(
     block: HttpRequestBuilder.() -> Unit = {}
 ): String = this.get(urlString = urlString, block = block).bodyAsText()
 
-
+internal fun HttpRequestBuilder.parameterList(
+    key: String,
+    value: Collection<*>?,
+    separator: CharSequence = ","
+) {
+    parameter(key = key, value?.joinToString(separator = separator))
+}

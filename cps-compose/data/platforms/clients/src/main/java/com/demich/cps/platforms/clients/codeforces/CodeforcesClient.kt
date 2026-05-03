@@ -19,6 +19,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.clients.RateLimitPlugin
 import com.demich.cps.platforms.clients.cpsHttpClient
 import com.demich.cps.platforms.clients.defaultJson
+import com.demich.cps.platforms.clients.parameterList
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -80,9 +81,8 @@ class CodeforcesClient(
         }.body<CodeforcesAPIResponse<T>>().result
     }
 
-    private fun HttpRequestBuilder.handles(handles: Collection<String>) {
-        parameter(key = "handles", value = handles.joinToString(separator = ";"))
-    }
+    private fun HttpRequestBuilder.parameterHandles(handles: Collection<String>?) =
+        parameterList(key = "handles", value = handles, separator = ";")
 
     override suspend fun getBlogEntry(blogEntryId: Int): CodeforcesBlogEntry =
         getApi(method = "blogEntry.view") {
@@ -107,9 +107,9 @@ class CodeforcesClient(
     ): CodeforcesContestStandings =
         getApi(method = "contest.standings") {
             parameter("contestId", contestId)
-            if (handles != null) handles(handles)
+            parameterHandles(handles)
             parameter("showUnofficial", showUnofficial)
-            parameter("participantTypes", participantTypes?.joinToString(separator = ","))
+            parameterList("participantTypes", participantTypes)
         }
 
     override suspend fun getContestSubmissions(
@@ -141,7 +141,7 @@ class CodeforcesClient(
     ): List<CodeforcesUser> {
         if (handles.isEmpty()) return emptyList()
         return getApi(method = "user.info") {
-            handles(handles)
+            parameterHandles(handles)
             parameter("checkHistoricHandles", checkHistoricHandles)
         }
     }

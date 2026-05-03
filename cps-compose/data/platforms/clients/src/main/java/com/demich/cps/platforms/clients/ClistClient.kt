@@ -82,7 +82,7 @@ class ClistClient(
         return getApiJsonObjects(method = "contest") {
             parameter("start__lte", maxStartTime)
             parameter("end__gte", minEndTime)
-            parameter("resource_id__in", resourceIds.joinToString(separator = ","))
+            parameterList("resource_id__in", resourceIds)
         }
     }
 
