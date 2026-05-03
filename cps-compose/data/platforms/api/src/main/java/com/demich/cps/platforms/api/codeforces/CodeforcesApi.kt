@@ -76,7 +76,3 @@ suspend fun CodeforcesApi.getUser(
 
 suspend fun CodeforcesApi.getRecentActions() = getRecentActions(maxCount = 100)
 
-data class CodeforcesApiAccess(
-    val key: String,
-    val secret: String
-)
