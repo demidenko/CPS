@@ -67,12 +67,12 @@ suspend fun CodeforcesApi.getContestStandings(
 
 suspend fun CodeforcesApi.getUser(
     handle: String,
-    checkHistoricHandles: Boolean = false
+    checkHistoricHandles: Boolean
 ): CodeforcesUser =
     getUsers(
         handles = listOf(handle),
         checkHistoricHandles = checkHistoricHandles
-    ).first()
+    ).single()
 
 suspend fun CodeforcesApi.getRecentActions() = getRecentActions(maxCount = 100)
 
