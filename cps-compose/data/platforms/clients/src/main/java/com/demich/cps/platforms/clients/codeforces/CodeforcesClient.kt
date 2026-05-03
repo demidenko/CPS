@@ -89,9 +89,9 @@ class CodeforcesClient(
             parameter("blogEntryId", blogEntryId)
         }
 
-    override suspend fun getContests(): List<CodeforcesContest> =
+    override suspend fun getContests(gym: Boolean?): List<CodeforcesContest> =
         getApi(method = "contest.list") {
-            parameter("gym", false)
+            parameter("gym", gym)
         }
 
     override suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange> =

@@ -15,7 +15,9 @@ interface CodeforcesApi {
     suspend fun getBlogEntry(blogEntryId: Int): CodeforcesBlogEntry
 
     //TODO: Sequence instead of List?
-    suspend fun getContests(): List<CodeforcesContest>
+    suspend fun getContests(
+        gym: Boolean? = null
+    ): List<CodeforcesContest>
 
     //TODO: Sequence instead of List
     suspend fun getContestRatingChanges(contestId: Int): List<CodeforcesRatingChange>

@@ -11,7 +11,7 @@ class CodeforcesContestsFetcher(val api: CodeforcesApi): ContestsSinglePlatformF
     override val fetchSource: ContestsFetchSource get() = codeforces_api
 
     override suspend fun getContests(dateConstraints: ContestDateConstraints) =
-        api.getContests().mapNotNull {
+        api.getContests(gym = false).mapNotNull {
             if (dateConstraints.check(startTime = it.startTime, duration = it.duration)) {
                 Contest(
                     platform = codeforces,
