@@ -8,7 +8,7 @@ import com.demich.cps.platforms.api.codeforces.getContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipantType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.endTime
@@ -144,7 +144,7 @@ private class StandingsData(
     val contest: CodeforcesContest,
     val problemResults: List<CodeforcesMonitorProblemResult>,
     val rank: Int?,
-    val participationType: CodeforcesParticipationType?
+    val participantType: CodeforcesParticipantType?
 )
 
 private fun CodeforcesContestStandings.findProperRow(): CodeforcesContestStandings.CodeforcesContestStandingsRow? {
@@ -170,7 +170,7 @@ private fun CodeforcesContestStandings.toStandingsData(): StandingsData {
         contest = contest,
         problemResults = monitorResults,
         rank = row?.rank,
-        participationType = row?.party?.participantType
+        participantType = row?.party?.participantType
     )
 }
 
@@ -180,7 +180,7 @@ private fun CodeforcesMonitorDataStore.saveStandings(
 ) {
     contestInfo.value = standings.contest
     problemResults.value = standings.problemResults
-    participationType.value = standings.participationType
+    participantType.value = standings.participantType
     contestantRank.value = standings.rank
 }
 
@@ -249,10 +249,10 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
 
 
 private fun CodeforcesContest.needCheckSubmissions(
-    participationType: CodeforcesParticipationType?
+    participantType: CodeforcesParticipantType?
 ): Boolean {
     if (type == ICPC) return false
-    return phase.isSystemTestOrFinished() && (participationType != null && participationType.isContestantType())
+    return phase.isSystemTestOrFinished() && (participantType != null && participantType.isContestantType())
 }
 
 private fun CodeforcesMonitorProblemResult.needCheckSubmissions(
@@ -267,7 +267,7 @@ private suspend inline fun CodeforcesMonitorDataStore.ifNeedCheckSubmissions(
     block: (List<CodeforcesMonitorProblemResult>) -> Unit
 ) = fromSnapshot {
     val contestInfo = contestInfo.value ?: return@fromSnapshot
-    if (contestInfo.needCheckSubmissions(participationType = participationType.value)) {
+    if (contestInfo.needCheckSubmissions(participantType = participantType.value)) {
         val problemResults = problemResults.value
         val info = submissionsInfo.value
         if (problemResults.any { it.needCheckSubmissions(info) }) block(problemResults)

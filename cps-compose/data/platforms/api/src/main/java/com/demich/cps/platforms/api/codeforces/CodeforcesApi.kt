@@ -3,7 +3,7 @@ package com.demich.cps.platforms.api.codeforces
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipantType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -26,7 +26,7 @@ interface CodeforcesApi {
         contestId: Int,
         handles: Collection<String>? = null,
         showUnofficial: Boolean? = null,
-        participantTypes: Collection<CodeforcesParticipationType>? = null
+        participantTypes: Collection<CodeforcesParticipantType>? = null
     ): CodeforcesContestStandings
 
     suspend fun getContestSubmissions(
@@ -57,7 +57,7 @@ interface CodeforcesApi {
 suspend fun CodeforcesApi.getContestStandings(
     contestId: Int,
     handle: String,
-    participantTypes: Collection<CodeforcesParticipationType>
+    participantTypes: Collection<CodeforcesParticipantType>
 ): CodeforcesContestStandings =
     getContestStandings(
         contestId = contestId,

@@ -11,7 +11,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipantType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -101,7 +101,7 @@ class CodeforcesClient(
         contestId: Int,
         handles: Collection<String>?,
         showUnofficial: Boolean?,
-        participantTypes: Collection<CodeforcesParticipationType>?
+        participantTypes: Collection<CodeforcesParticipantType>?
     ): CodeforcesContestStandings =
         getApi(method = "contest.standings") {
             parameter("contestId", contestId)

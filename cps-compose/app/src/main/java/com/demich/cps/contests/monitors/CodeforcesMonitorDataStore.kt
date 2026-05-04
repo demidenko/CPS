@@ -2,7 +2,7 @@ package com.demich.cps.contests.monitors
 
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipationType
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesParticipantType
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemStatus
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblemVerdict
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
@@ -30,7 +30,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     internal val contestInfo = jsonCPS.itemNullable<CodeforcesContest>(name = "contest_info")
 
-    internal val participationType = jsonCPS.itemNullable<CodeforcesParticipationType>(name = "participation_type")
+    internal val participantType = jsonCPS.itemNullable<CodeforcesParticipantType>(name = "participant_type")
 
     internal val contestantRank = itemIntNullable(name = "contestant_rank")
 
@@ -108,10 +108,10 @@ private fun CodeforcesMonitorDataStore.contestInfoChecked(): CodeforcesContest? 
 context(scope: DataStoreSnapshot)
 private fun CodeforcesMonitorDataStore.contestRank(): CodeforcesMonitorData.ContestRank? {
     val rank = contestantRank.value ?: return null
-    val participationType = participationType.value ?: return null
+    val participantType = participantType.value ?: return null
     return CodeforcesMonitorData.ContestRank(
         rank = rank,
-        isOutOfCompetition = participationType != CONTESTANT
+        isOutOfCompetition = participantType != CONTESTANT
     )
 }
 

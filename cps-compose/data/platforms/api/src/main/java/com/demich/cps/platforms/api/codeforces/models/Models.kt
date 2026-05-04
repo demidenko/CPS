@@ -81,7 +81,7 @@ data class CodeforcesContestStandings(
 
 @Serializable
 data class CodeforcesContestParticipant(
-    val participantType: CodeforcesParticipationType
+    val participantType: CodeforcesParticipantType
     // TODO: val participantId: Long? (not documented in api)
 )
 
@@ -222,7 +222,7 @@ enum class CodeforcesContestType {
     CF, ICPC, IOI
 }
 
-enum class CodeforcesParticipationType {
+enum class CodeforcesParticipantType {
     CONTESTANT, OUT_OF_COMPETITION, PRACTICE, VIRTUAL, MANAGER
 }
 

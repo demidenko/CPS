@@ -2,7 +2,7 @@ package com.demich.cps.platforms.api.codeforces.models
 
 import kotlin.time.Instant
 
-fun CodeforcesParticipationType.isContestantType(): Boolean =
+fun CodeforcesParticipantType.isContestantType(): Boolean =
     when (this) {
         CONTESTANT, OUT_OF_COMPETITION -> true
         else -> false
