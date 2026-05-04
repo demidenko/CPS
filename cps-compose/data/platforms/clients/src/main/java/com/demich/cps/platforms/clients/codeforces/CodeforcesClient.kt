@@ -17,9 +17,11 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.clients.RateLimitPlugin
+import com.demich.cps.platforms.clients.UrlPrintPlugin
 import com.demich.cps.platforms.clients.cpsHttpClient
 import com.demich.cps.platforms.clients.defaultJson
 import com.demich.cps.platforms.clients.parameterList
+import com.demich.cps.platforms.clients.parametersPrettyPrint
 import com.demich.kotlin_stdlib_boost.ifBetweenFirstFirst
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -208,12 +210,22 @@ private inline fun HttpRequestBuilder.ifIsApiRequest(
     }
 }
 
+private val CodeforcesUrlPrintingPlugin get() = UrlPrintPlugin("Codeforces") {
+    println("codeforces request: ${url.buildString()}")
+    ifIsApiRequest { apiMethod ->
+        println("$apiMethod parameters:")
+        parametersPrettyPrint()
+    }
+}
+
 private val codeforcesHttpClient: HttpClient =
     cpsHttpClient(
         json = defaultJson,
         useCookies = true,
         retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
     ) {
+        install(CodeforcesUrlPrintingPlugin)
+
         defaultRequest {
             url(CodeforcesUrls.main)
         }
