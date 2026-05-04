@@ -51,13 +51,12 @@ class CodeforcesClient(
 ): CodeforcesApi, CodeforcesPageContentProvider {
 
     private suspend inline fun codeforcesRequest(
-        apiMethod: String? = null,
         block: HttpRequestBuilder.() -> Unit
     ): HttpResponse {
         return codeforcesHttpClient.getCheckPOW {
             block()
             parameter("locale", locale)
-            if (apiAccess != null && apiMethod != null) {
+            if (apiAccess != null) ifIsApiRequest { apiMethod ->
                 parameter("apiKey", apiAccess.key)
                 parameter("time", Clock.System.now().epochSeconds)
                 parameter("apiSig", apiSig(
@@ -73,7 +72,7 @@ class CodeforcesClient(
         method: String,
         block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return codeforcesRequest(apiMethod = method) {
+        return codeforcesRequest {
             url.appendPathSegments("api", method)
             block()
         }.body<CodeforcesAPIResponse<T>>().result
@@ -198,6 +197,15 @@ class CodeforcesClient(
 
     override suspend fun getGroupsPage() =
         getWebPage(path = "groups")
+}
+
+private inline fun HttpRequestBuilder.ifIsApiRequest(
+    block: (String) -> Unit
+) {
+    val path = url.pathSegments
+    if (path.isNotEmpty() && path[0] == "api" && path.size > 1) {
+        block(path[1])
+    }
 }
 
 private val codeforcesHttpClient: HttpClient =
