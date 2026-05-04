@@ -224,7 +224,9 @@ private val codeforcesHttpClient: HttpClient =
         useCookies = true,
         retryOnExceptionIf = { it is CodeforcesApiCallLimitExceededException }
     ) {
-        install(CodeforcesUrlPrintingPlugin)
+        if (BuildConfig.DEBUG) {
+            install(CodeforcesUrlPrintingPlugin)
+        }
 
         defaultRequest {
             url(CodeforcesUrls.main)
