@@ -51,18 +51,17 @@ class CodeforcesClient(
 ): CodeforcesApi, CodeforcesPageContentProvider {
 
     private suspend inline fun codeforcesRequest(
-        signApiMethod: String? = null,
+        apiMethod: String? = null,
         block: HttpRequestBuilder.() -> Unit
     ): HttpResponse {
         return codeforcesHttpClient.getCheckPOW {
             block()
             parameter("locale", locale)
-            if (signApiMethod != null) {
-                requireNotNull(apiAccess) { "Codeforces api access is null" }
+            if (apiAccess != null && apiMethod != null) {
                 parameter("apiKey", apiAccess.key)
                 parameter("time", Clock.System.now().epochSeconds)
                 parameter("apiSig", apiSig(
-                    method = signApiMethod,
+                    method = apiMethod,
                     parameters = url.parameters.entries(),
                     secret = apiAccess.secret
                 ))
@@ -72,10 +71,9 @@ class CodeforcesClient(
 
     private suspend inline fun <reified T> getApi(
         method: String,
-        sign: Boolean = false,
         block: HttpRequestBuilder.() -> Unit = {}
     ): T {
-        return codeforcesRequest(method.takeIf { sign }) {
+        return codeforcesRequest(apiMethod = method) {
             url.appendPathSegments("api", method)
             block()
         }.body<CodeforcesAPIResponse<T>>().result
