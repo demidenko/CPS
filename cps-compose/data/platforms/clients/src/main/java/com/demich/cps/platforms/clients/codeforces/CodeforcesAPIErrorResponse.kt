@@ -36,6 +36,9 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
     /*
     auth
     "contestId: You have to be authenticated to use this method"
+
+    apiKey: Specified time is not within 5 minutes before or after current server time
+    apiKey: Incorrect signature
      */
 
     private fun isCountFieldIncorrect(): Boolean = isIntFieldIncorrect(name = "count")
