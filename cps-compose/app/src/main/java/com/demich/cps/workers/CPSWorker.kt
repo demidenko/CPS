@@ -60,13 +60,13 @@ abstract class CPSWorker(
         workersInfo.add(work.name, event.copy(end = timeHolder.now(), resultType = result.toType()))
 
         resultCatching.onFailure {
-            work.enqueueAsap()
-
             if (result.toType() == FAILURE) {
                 if (UISettingsDataStore(context).devModeEnabled()) {
                     notificationFailure(work = work, throwable = it)
                 }
             }
+
+            work.enqueueAsap()
         }
 
         return result
