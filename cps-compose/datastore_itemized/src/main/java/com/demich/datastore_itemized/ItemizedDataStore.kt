@@ -75,7 +75,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
     protected fun itemLongNullable(name: String): DataStoreItem<Long?> =
         itemNullable(longPreferencesKey(name))
 
-    protected fun itemString(name: String, defaultValue: String): DataStoreItem<String> =
+    protected fun itemString(name: String, defaultValue: String = ""): DataStoreItem<String> =
         item(stringPreferencesKey(name), defaultValue)
 
     protected fun itemStringNullable(name: String): DataStoreItem<String?> =
