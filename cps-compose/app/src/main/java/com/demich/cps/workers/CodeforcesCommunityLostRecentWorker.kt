@@ -19,6 +19,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.fromSnapshot
@@ -61,8 +62,12 @@ class CodeforcesCommunityLostRecentWorker(
     }
 
     override suspend fun runWork() {
+        val apiAccess = CodeforcesProfileManager().profileStorage(context).apiAccess()
         context.settingsCommunity.fromSnapshot {
-            val client = CodeforcesClient(locale = codeforcesLocale.value)
+            val client = CodeforcesClient(
+                locale = codeforcesLocale.value,
+                apiAccess = apiAccess
+            )
             val currentTime = workerStartTime
             context.codeforcesLostRepository.updateEntries(
                 api = client,
