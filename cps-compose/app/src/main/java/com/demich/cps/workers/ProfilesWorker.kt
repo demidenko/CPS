@@ -55,15 +55,15 @@ class ProfilesWorker(
 }
 
 private suspend fun CodeforcesProfileManager.checkRating(context: Context) {
-    val storage = profileStorage(context)
-    val userInfo = storage.profile()
-        ?.userInfoOrNull() ?: return
+    profileStorage(context).fromSnapshot {
+        val userInfo = profile.value?.userInfoOrNull() ?: return
 
-    val lastRatingChange = CodeforcesClient().runCatching {
-        getUserRatingChanges(handle = userInfo.handle)
-    }.getOrNull()?.lastOrNull() ?: return
+        val lastRatingChange = CodeforcesClient(apiAccess = apiAccess.value).runCatching {
+            getUserRatingChanges(handle = userInfo.handle)
+        }.getOrNull()?.lastOrNull() ?: return
 
-    storage.applyRatingChange(lastRatingChange)
+        applyRatingChange(lastRatingChange)
+    }
 }
 
 private const val KEY_CF_CONTRIBUTION = "cf_contribution"
