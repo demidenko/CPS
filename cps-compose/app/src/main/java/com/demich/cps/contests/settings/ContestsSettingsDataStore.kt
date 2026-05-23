@@ -46,10 +46,10 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val clistApiLogin = itemString(name = "clist_api_login", defaultValue = "")
     val clistApiKey = itemString(name = "clist_api_key", defaultValue = "")
     val clistApiAccess = combine {
-        ClistApiAccess(
-            login = clistApiLogin.value,
-            key = clistApiKey.value
-        )
+        val login = clistApiLogin.value
+        val key = clistApiKey.value
+        if (login.isBlank() && key.isBlank()) null
+        else ClistApiAccess(login = login, key = key)
     }
 
     val contestMaxDuration = jsonCPS.item(name = "contest_max_duration", defaultValue = 30.days)

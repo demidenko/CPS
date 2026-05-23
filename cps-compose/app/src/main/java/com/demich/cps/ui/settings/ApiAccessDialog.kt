@@ -35,7 +35,7 @@ internal fun <T> ApiAccessSettingsItem(
     itemTitle: String,
     itemSubtitle: @Composable (context(SettingsContainerScope) (T) -> Unit),
     dialogTitle: String,
-    fields: List<Pair<String, KProperty1<T, String>>>,
+    fields: List<Pair<String, KProperty1<T & Any, String>>>,
     onSave: (List<String>) -> Unit,
     onHelp: (() -> Unit)? = null
 ) {
@@ -48,11 +48,13 @@ internal fun <T> ApiAccessSettingsItem(
     )
 
     if (showDialog) {
-        val initValue = rememberFirstValue { item }
+        val init = rememberFirstValue { item }
 
         ApiDialog(
             dialogTitle = dialogTitle,
-            fields = fields.map { Field(title = it.first, initValue = it.second.get(initValue)) },
+            fields = fields.map { (title, prop) ->
+                Field(title = title, initValue = init?.let { prop.get(it) } ?: "")
+            },
             onSave = onSave,
             onDismissRequest = { showDialog = false },
             onHelp = onHelp

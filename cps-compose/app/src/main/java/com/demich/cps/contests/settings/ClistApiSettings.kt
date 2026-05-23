@@ -29,14 +29,14 @@ internal fun ClistApiAccessSettingsItem(
     ApiAccessSettingsItem(
         item = settings.clistApiAccess,
         itemTitle = "Clist API access",
-        itemSubtitle = { (login, key) ->
-            if (login.isBlank()) {
-                Text(text = "click to setup")
+        itemSubtitle = {
+            if (it == null) {
+                Text(text = "undefined")
             } else {
                 Text(
                     text = buildAnnotatedString {
-                        append(login)
-                        if (key.isBlank()) append(" [api-key is empty]", color = cpsColors.error)
+                        append(it.login)
+                        if (it.key.isBlank()) append(" [api-key is empty]", color = cpsColors.error)
                     },
                     fontFamily = FontFamily.Monospace,
                     color = cpsColors.content,
