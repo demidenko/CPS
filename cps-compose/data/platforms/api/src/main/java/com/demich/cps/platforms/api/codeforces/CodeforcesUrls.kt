@@ -20,4 +20,6 @@ object CodeforcesUrls {
     fun submission(submission: CodeforcesSubmission) = contest(submission.contestId) + "/submission/${submission.id}"
 
     fun problem(contestId: Int, problemIndex: String) = contest(contestId) + "/problem/$problemIndex"
+
+    val apiUserSettings get() = "$main/settings/api"
 }

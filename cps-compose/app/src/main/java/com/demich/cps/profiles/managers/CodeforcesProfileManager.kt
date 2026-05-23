@@ -1,8 +1,10 @@
 package com.demich.cps.profiles.managers
 
 import android.content.Context
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,6 +35,7 @@ import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.ui.settings.ApiAccessSettingsItem
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SwitchByProfilesWork
 import com.demich.cps.ui.settings.SwitchByWork
@@ -42,14 +45,17 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
+import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
 
@@ -147,7 +153,8 @@ class CodeforcesProfileManager :
     override fun SettingsItems() {
         val context = context
         CodeforcesSettingsItems(
-            settings = settingsStorage(context)
+            settings = settingsStorage(context),
+            profileStorage = profileStorage(context)
         )
     }
 
@@ -286,7 +293,8 @@ private fun ratingUpperBounds() =
 @Composable
 context(scope: SettingsContainerScope)
 private fun CodeforcesSettingsItems(
-    settings: CodeforcesProfileSettingsDataStore
+    settings: CodeforcesProfileSettingsDataStore,
+    profileStorage: CodeforcesProfileStorage
 ) {
     SwitchByProfilesWork(
         item = settings.observeRating,
@@ -306,5 +314,49 @@ private fun CodeforcesSettingsItems(
     SwitchByProfilesWork(
         item = settings.observeContribution,
         title = "Contribution changes observer"
+    )
+    CodeforcesApiAccessSettingsItem(
+        profileStorage = profileStorage
+    )
+}
+
+@Composable
+context(scope: SettingsContainerScope)
+private fun CodeforcesApiAccessSettingsItem(
+    profileStorage: CodeforcesProfileStorage
+) {
+    val context = context
+    val scope = rememberCoroutineScope()
+
+    ApiAccessSettingsItem(
+        item = profileStorage.apiAccess,
+        itemTitle = "Api access",
+        itemSubtitle = {
+            Text(
+                text = when {
+                    it == null -> "undefined"
+                    it.key.isBlank() -> "key is empty"
+                    it.secret.isBlank() -> "secret is empty"
+                    else -> "ok"
+                }
+            )
+        },
+        dialogTitle = "codeforces::api",
+        fields = listOf(
+            "api-key" to CodeforcesApiAccess::key,
+            "secret" to CodeforcesApiAccess::secret
+        ),
+        onSave = {
+            val (key, secret) = it
+            scope.launch {
+                profileStorage.edit {
+                    apiAccessKey.value = key
+                    apiAccessSecret.value = secret
+                }
+            }
+        },
+        onHelp = {
+            context.openUrlInBrowser(CodeforcesUrls.apiUserSettings)
+        }
     )
 }
