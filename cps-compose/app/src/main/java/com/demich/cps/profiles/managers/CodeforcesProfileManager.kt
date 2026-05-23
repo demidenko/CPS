@@ -15,6 +15,7 @@ import com.demich.cps.R
 import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.Platform
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiAccess
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
@@ -44,6 +45,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
@@ -254,6 +256,15 @@ class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Conte
     val monitorCanceledContests = jsonCPS.item(name = "monitor_canceled", defaultValue = emptyTimedCollection<Int>())
 
     val upsolvingSuggestedProblems = jsonCPS.item(name = "upsolving_suggested_problems", defaultValue = emptyTimedCollection<CodeforcesProblem>())
+
+    val apiAccessKey = itemString(name = "api_key")
+    val apiAccessSecret = itemString(name = "api_secret")
+    val apiAccess = combine {
+        val key = apiAccessKey.value
+        val secret = apiAccessSecret.value
+        if (key.isBlank() && secret.isBlank()) null
+        else CodeforcesApiAccess(key = key, secret = secret)
+    }
 }
 
 class CodeforcesProfileSettingsDataStore(context: Context):
