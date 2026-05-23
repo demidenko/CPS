@@ -205,10 +205,6 @@ class CodeforcesProfileManager :
 
 }
 
-suspend fun CodeforcesProfileManager.applyRatingChange(ratingChange: CodeforcesRatingChange, context: Context) {
-    profileStorage(context).applyRatingChange(ratingChange = ratingChange.toRatingChange())
-}
-
 private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
     when (this) {
         GRAY -> GRAY
@@ -257,6 +253,9 @@ class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Conte
         else CodeforcesApiAccess(key = key, secret = secret)
     }
 }
+
+suspend fun CodeforcesProfileStorage.applyRatingChange(ratingChange: CodeforcesRatingChange) =
+    applyRatingChange(ratingChange = ratingChange.toRatingChange())
 
 class CodeforcesProfileSettingsDataStore(context: Context):
     ItemizedDataStore(context.dataStore)
