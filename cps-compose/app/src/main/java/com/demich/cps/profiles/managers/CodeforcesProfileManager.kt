@@ -145,25 +145,9 @@ class CodeforcesProfileManager :
     @Composable
     context(scope: SettingsContainerScope)
     override fun SettingsItems() {
-        val settings = settingsStorage(context)
-        SwitchByProfilesWork(
-            item = settings.observeRating,
-            title = "Rating changes observer"
-        )
-        SwitchByWork(
-            item = settings.monitorEnabled,
-            title = "Contest monitor",
-            description = stringResource(id = R.string.cf_contest_watcher_description),
-            workProvider = CodeforcesMonitorLauncherWorker
-        )
-        SwitchByWork(
-            item = settings.upsolvingSuggestionsEnabled,
-            title = "Upsolving suggestions",
-            workProvider = CodeforcesUpsolvingSuggestionsWorker
-        )
-        SwitchByProfilesWork(
-            item = settings.observeContribution,
-            title = "Contribution changes observer"
+        val context = context
+        CodeforcesSettingsItems(
+            settings = settingsStorage(context)
         )
     }
 
@@ -298,3 +282,29 @@ private fun ratingUpperBounds() =
         val handleColor = requireNotNull(colorTag.toHandleColor())
         handleColor until rating
     }
+
+@Composable
+context(scope: SettingsContainerScope)
+private fun CodeforcesSettingsItems(
+    settings: CodeforcesProfileSettingsDataStore
+) {
+    SwitchByProfilesWork(
+        item = settings.observeRating,
+        title = "Rating changes observer"
+    )
+    SwitchByWork(
+        item = settings.monitorEnabled,
+        title = "Contest monitor",
+        description = stringResource(id = R.string.cf_contest_watcher_description),
+        workProvider = CodeforcesMonitorLauncherWorker
+    )
+    SwitchByWork(
+        item = settings.upsolvingSuggestionsEnabled,
+        title = "Upsolving suggestions",
+        workProvider = CodeforcesUpsolvingSuggestionsWorker
+    )
+    SwitchByProfilesWork(
+        item = settings.observeContribution,
+        title = "Contribution changes observer"
+    )
+}
