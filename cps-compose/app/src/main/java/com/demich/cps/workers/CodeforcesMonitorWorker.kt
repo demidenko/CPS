@@ -83,7 +83,7 @@ class CodeforcesMonitorWorker(val context: Context, params: WorkerParameters): C
                 .launchIn(this)
 
             val profileStorage = CodeforcesProfileManager().profileStorage(context)
-            val client = CodeforcesClient()
+            val client = CodeforcesClient(apiAccess = profileStorage.apiAccess())
             monitor.launchIn(
                 scope = this,
                 api = client,
