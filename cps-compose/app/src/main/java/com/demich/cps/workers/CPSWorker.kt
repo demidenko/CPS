@@ -210,6 +210,7 @@ private fun notificationFailure(
         subText = "worker failure"
         bigContent = throwable.message.toString()
         colorResId = R.color.fail
+        smallIcon = R.drawable.ic_problem_fail
         time = currentTime
     }
 }
