@@ -36,19 +36,16 @@ abstract class CodeforcesFollowRepository(
         handle: String,
         locale: CodeforcesLocale
     ): Result<List<CodeforcesBlogEntry>> {
-        getApi(locale).getBlogEntries(handle = handle).let { (newProfile, result) ->
-            newProfile?.let {
-                dao.applyProfileResult(handle = handle, result = newProfile)
-            }
-            result.onSuccess { blogEntries ->
-                dao.updateBlogEntries(
-                    handle = newProfile?.handle ?: handle,
-                    blogEntries = blogEntries,
-                    onNewBlogEntry = ::notifyNewBlogEntry
-                )
-            }
-            return result
+        val (newProfile, result) = getApi(locale).getBlogEntries(handle = handle)
+        if (newProfile != null) dao.applyProfileResult(handle = handle, result = newProfile)
+        result.onSuccess { blogEntries ->
+            dao.updateBlogEntries(
+                handle = newProfile?.handle ?: handle,
+                blogEntries = blogEntries,
+                onNewBlogEntry = ::notifyNewBlogEntry
+            )
         }
+        return result
     }
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>): Boolean {
@@ -87,26 +84,32 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
     }
 }
 
+private data class GetBlogEntriesResult(
+    val newProfile: ProfileResult<CodeforcesUserInfo>?,
+    val blogEntries: Result<List<CodeforcesBlogEntry>>
+)
+
 private suspend fun CodeforcesApi.getBlogEntries(
     handle: String
-): Pair<ProfileResult<CodeforcesUserInfo>?, Result<List<CodeforcesBlogEntry>>> {
+): GetBlogEntriesResult {
     runCatching {
         getUserBlogEntries(handle = handle)
     }.recoverCatching {
         when (it) {
             is CodeforcesApiBlogReadNotAllowedException -> emptyList()
             is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
-                val profileResult = getProfile(handle = handle, recoverHandle = true)
-                return Pair(
-                    profileResult,
-                    if (profileResult is ProfileResult.Success)
-                        runCatching { getUserBlogEntries(handle = profileResult.handle) }
-                    else Result.failure(it)
+                val profile = getProfile(handle = handle, recoverHandle = true)
+                return GetBlogEntriesResult(
+                    newProfile = profile,
+                    blogEntries = when (profile) {
+                        is ProfileResult.Success -> runCatching { getUserBlogEntries(handle = profile.handle) }
+                        else -> Result.failure(it)
+                    }
                 )
             }
             else -> throw it
         }
     }.also {
-        return Pair(null, it)
+        return GetBlogEntriesResult(newProfile = null, blogEntries = it)
     }
 }
