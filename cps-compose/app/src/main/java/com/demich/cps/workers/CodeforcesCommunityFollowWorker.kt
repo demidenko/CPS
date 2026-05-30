@@ -42,16 +42,17 @@ class CodeforcesCommunityFollowWorker(
 
         val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
         val blogsToUpdate = lastOnlineItem().let { last ->
-            blogs.filter {
+            blogs.filterNot {
                 // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
                 val canSkip = profiles[it.handle].let { profile ->
                     profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == last[it.id]
                 }
-                it.blogSize == null || !canSkip
+                canSkip && it.blogSize != null
             }
         }
 
         blogsToUpdate
+            .sortedByDescending { it.userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST }
             .forEachWithProgress { blog ->
                 repository.getAndReloadBlogEntries(handle = blog.handle).getOrThrow()
                 lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
