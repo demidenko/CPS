@@ -6,6 +6,18 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
+data class CodeforcesLostBlogEntrySuspect(
+    val blogEntryId: Int,
+    val authorColorTag: CodeforcesColorTag?
+)
+
+@Serializable
+data class CodeforcesLostBlogEntryFresh(
+    val blogEntry: CodeforcesBlogEntry,
+    val authorColorTag: CodeforcesColorTag?
+)
+
+@Serializable
 data class CodeforcesLostBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
     val authorColorTag: CodeforcesColorTag,
