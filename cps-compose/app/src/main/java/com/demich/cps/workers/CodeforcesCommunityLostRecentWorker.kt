@@ -17,10 +17,9 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.getProfiles
+import com.demich.cps.platforms.utils.codeforces.getUsersCatching
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
-import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
@@ -284,13 +283,12 @@ private suspend inline fun findSuspects(
 
 //Required against new year color chaos
 private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<CodeforcesRecentFeedBlogEntry>): List<CodeforcesRecentFeedBlogEntry> {
-    val profiles = getProfiles(handles = blogEntries.map { it.author.handle }, checkHistoricHandles = false)
+    val users = getUsersCatching(handles = blogEntries.map { it.author.handle }, checkHistoricHandles = false)
     return blogEntries.map { blogEntry ->
-        val profile = profiles.getValue(blogEntry.author.handle)
-        require(profile is ProfileResult.Success) { "fixHandleColors: profile result is not success" }
+        val user = users.getValue(blogEntry.author.handle).getOrThrow()
         if (blogEntry.author.colorTag == ADMIN) blogEntry
         else {
-            val colorTag = CodeforcesColorTag.fromRating(profile.userInfo.rating)
+            val colorTag = CodeforcesColorTag.fromRating(user.rating)
             blogEntry.copy(author = blogEntry.author.copy(colorTag = colorTag))
         }
     }
