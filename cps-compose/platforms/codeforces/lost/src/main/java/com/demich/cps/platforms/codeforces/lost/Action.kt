@@ -2,6 +2,7 @@ package com.demich.cps.platforms.codeforces.lost
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import kotlin.time.Instant
@@ -48,7 +49,10 @@ suspend fun CodeforcesLostStorage.updateEntries(
         hint = hint
     )
 
-    // TODO updateFresh
+    updateFresh(
+        api = api,
+        isFresh = isFresh
+    )
 
     // TODO updateLost
 }
@@ -70,9 +74,30 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
 }
 
 private suspend fun CodeforcesLostStorage.updateFresh(
-
+    api: CodeforcesApi,
+    isFresh: (Instant) -> Boolean
 ) {
+    val suspects = getEntries().values
+        .filterIsInstance<CodeforcesLostBlogEntrySuspect>()
+        .sortedBy { it.blogEntryId }
 
+    if (suspects.size > 1) {
+        api.getRecentActions()
+    }
+
+    suspects.forEach { suspect ->
+        val blogEntry = api.getBlogEntryOrNull(blogEntryId = suspect.blogEntryId)
+
+        if (blogEntry != null && isFresh(blogEntry.creationTime)) {
+            CodeforcesLostBlogEntryFresh(
+                blogEntry = blogEntry,
+                authorColorTag = suspect.authorColorTag
+            )
+            // TODO save as fresh entry
+        } else {
+            // TODO remove suspect
+        }
+    }
 }
 
 private suspend fun CodeforcesLostStorage.updateLost(

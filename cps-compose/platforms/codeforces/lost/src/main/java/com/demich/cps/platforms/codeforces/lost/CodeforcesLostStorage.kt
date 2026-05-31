@@ -1,5 +1,19 @@
 package com.demich.cps.platforms.codeforces.lost
 
-interface CodeforcesLostStorage {
+import kotlinx.coroutines.flow.Flow
 
+interface CodeforcesLostStorage {
+    suspend fun updateData(transform: (Map<Int, CodeforcesLostEntry>) -> Map<Int, CodeforcesLostEntry>)
+
+    suspend fun getEntries(): Map<Int, CodeforcesLostEntry>
+
+    suspend fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>>
+}
+
+suspend inline fun CodeforcesLostStorage.edit(
+    crossinline block: MutableMap<Int, CodeforcesLostEntry>.() -> Unit
+) {
+    updateData {
+        it.toMutableMap().apply(block)
+    }
 }
