@@ -2,6 +2,7 @@ package com.demich.cps.platforms.codeforces.lost
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
+import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 
 internal fun CodeforcesApi.withBlogEntriesCache(
@@ -40,3 +41,8 @@ internal suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): Codefor
         null
     }
 }
+
+internal suspend fun CodeforcesApi.getRecentActionsBlogEntries(): List<CodeforcesBlogEntry> =
+    getRecentActions()
+        .mapNotNull { it.blogEntry }
+        .distinctBy { it.id }
