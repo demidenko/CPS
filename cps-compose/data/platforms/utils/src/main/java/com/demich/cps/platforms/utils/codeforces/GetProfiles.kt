@@ -7,10 +7,10 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 
-suspend fun CodeforcesApi.getProfiles(
+suspend fun CodeforcesApi.getUsersCatching(
     handles: Collection<String>,
     recoverHandle: Boolean
-): Map<String, ProfileResult<CodeforcesUserInfo>> =
+): Map<String, Result<CodeforcesUser>> =
     buildMap {
         val handles = handles.toMutableSet()
         while (handles.isNotEmpty()) {
@@ -20,36 +20,46 @@ suspend fun CodeforcesApi.getProfiles(
             }.onFailure {
                 if (it is CodeforcesApiHandleNotFoundException) {
                     val badHandle = it.handle
-                    put(key = badHandle, value = ProfileResult.NotFound(badHandle))
+                    put(key = badHandle, value = Result.failure(it))
                     handles.remove(badHandle)
                     continue
                 }
-                for (handle in handles) put(key = handle, value = ProfileResult.Failed(handle))
+                for (handle in handles) put(key = handle, value = Result.failure(it))
                 break
             }.onSuccess { users ->
                 val iter = users.iterator()
                 for (handle in handles) {
                     val user = iter.next()
-                    put(key = handle, value = ProfileResult(user.toUserInfo()))
+                    put(key = handle, value = Result.success(user))
                 }
                 break
             }
         }
     }
 
+suspend fun CodeforcesApi.getProfiles(
+    handles: Collection<String>,
+    recoverHandle: Boolean
+): Map<String, ProfileResult<CodeforcesUserInfo>> =
+    getUsersCatching(handles = handles, recoverHandle = recoverHandle)
+        .mapValues { it.value.toProfileResult(handle = it.key) }
+
 suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): ProfileResult<CodeforcesUserInfo> {
     // shortcut for getProfiles(setOf(handle), recoverHandle).getValue(handle)
-    return runCatching {
-        val user = getUser(handle = handle, checkHistoricHandles = recoverHandle)
-        ProfileResult(user.toUserInfo())
-    }.getOrElse { e ->
-        if (e is CodeforcesApiHandleNotFoundException && e.handle == handle) {
-            ProfileResult.NotFound(handle)
-        } else {
-            ProfileResult.Failed(handle)
-        }
-    }
+    return runCatching { getUser(handle = handle, checkHistoricHandles = recoverHandle) }
+        .toProfileResult(handle)
 }
+
+private fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
+    fold(
+        onSuccess = {
+            ProfileResult(it.toUserInfo())
+        },
+        onFailure = {
+            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) ProfileResult.NotFound(handle)
+            else ProfileResult.Failed(handle)
+        }
+    )
 
 private fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
     CodeforcesUserInfo(
