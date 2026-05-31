@@ -9,13 +9,13 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 
 suspend fun CodeforcesApi.getUsersCatching(
     handles: Collection<String>,
-    recoverHandle: Boolean
+    checkHistoricHandles: Boolean
 ): Map<String, Result<CodeforcesUser>> =
     buildMap {
         val handles = handles.toMutableSet()
         while (handles.isNotEmpty()) {
             runCatching {
-                getUsers(handles = handles, checkHistoricHandles = recoverHandle)
+                getUsers(handles = handles, checkHistoricHandles = checkHistoricHandles)
                     .also { check(it.size == handles.size) }
             }.onFailure {
                 if (it is CodeforcesApiHandleNotFoundException) {
@@ -39,9 +39,9 @@ suspend fun CodeforcesApi.getUsersCatching(
 
 suspend fun CodeforcesApi.getProfiles(
     handles: Collection<String>,
-    recoverHandle: Boolean
+    checkHistoricHandles: Boolean
 ): Map<String, ProfileResult<CodeforcesUserInfo>> =
-    getUsersCatching(handles = handles, recoverHandle = recoverHandle)
+    getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
 suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): ProfileResult<CodeforcesUserInfo> {

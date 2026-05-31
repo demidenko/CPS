@@ -284,7 +284,7 @@ private suspend inline fun findSuspects(
 
 //Required against new year color chaos
 private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<CodeforcesRecentFeedBlogEntry>): List<CodeforcesRecentFeedBlogEntry> {
-    val profiles = getProfiles(handles = blogEntries.map { it.author.handle }, recoverHandle = false)
+    val profiles = getProfiles(handles = blogEntries.map { it.author.handle }, checkHistoricHandles = false)
     return blogEntries.map { blogEntry ->
         val profile = profiles.getValue(blogEntry.author.handle)
         require(profile is ProfileResult.Success) { "fixHandleColors: profile result is not success" }

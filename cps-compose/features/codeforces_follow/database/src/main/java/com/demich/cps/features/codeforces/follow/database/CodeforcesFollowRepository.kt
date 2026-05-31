@@ -68,7 +68,7 @@ abstract class CodeforcesFollowRepository(
     }
 
     suspend fun updateUsers() =
-        getApi(EN).getProfiles(handles = dao.getHandles(), recoverHandle = true)
+        getApi(EN).getProfiles(handles = dao.getHandles(), checkHistoricHandles = true)
             .also { dao.applyProfilesResults(it) }
 
     protected abstract suspend fun getLocale(): CodeforcesLocale
