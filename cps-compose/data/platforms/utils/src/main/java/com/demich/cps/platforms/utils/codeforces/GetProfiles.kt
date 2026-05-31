@@ -44,9 +44,9 @@ suspend fun CodeforcesApi.getProfiles(
     getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
-suspend fun CodeforcesApi.getProfile(handle: String, recoverHandle: Boolean): ProfileResult<CodeforcesUserInfo> {
-    // shortcut for getProfiles(setOf(handle), recoverHandle).getValue(handle)
-    return runCatching { getUser(handle = handle, checkHistoricHandles = recoverHandle) }
+suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> {
+    // shortcut for getProfiles(setOf(handle), checkHistoricHandles).getValue(handle)
+    return runCatching { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
         .toProfileResult(handle)
 }
 

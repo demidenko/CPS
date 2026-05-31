@@ -78,7 +78,7 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
         ?.userInfoOrNull() ?: return
 
     val handle = userInfo.handle
-    val newContribution = CodeforcesClient().getProfile(handle = handle, recoverHandle = false)
+    val newContribution = CodeforcesClient().getProfile(handle = handle, checkHistoricHandles = false)
         .userInfoOrNull()?.contribution ?: return
 
     if (newContribution == userInfo.contribution) return

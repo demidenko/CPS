@@ -62,7 +62,7 @@ abstract class CodeforcesFollowRepository(
         if (addNewUser(ProfileResult.Failed(handle))) {
             dao.applyProfileResult(
                 handle = handle,
-                result = getApi(EN).getProfile(handle = handle, recoverHandle = true)
+                result = getApi(EN).getProfile(handle = handle, checkHistoricHandles = true)
             )
         }
     }
@@ -98,7 +98,7 @@ private suspend fun CodeforcesApi.getBlogEntries(
         when (it) {
             is CodeforcesApiBlogReadNotAllowedException -> emptyList()
             is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
-                val profile = getProfile(handle = handle, recoverHandle = true)
+                val profile = getProfile(handle = handle, checkHistoricHandles = true)
                 return GetBlogEntriesResult(
                     newProfile = profile,
                     blogEntries = when (profile) {

@@ -76,7 +76,7 @@ class CodeforcesProfileManager :
 
 
     override suspend fun fetchProfile(data: String): ProfileResult<CodeforcesUserInfo> =
-        CodeforcesClient().getProfile(handle = data, recoverHandle = true)
+        CodeforcesClient().getProfile(handle = data, checkHistoricHandles = true)
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
         CodeforcesClient().getHandleSuggestions(str = str)
