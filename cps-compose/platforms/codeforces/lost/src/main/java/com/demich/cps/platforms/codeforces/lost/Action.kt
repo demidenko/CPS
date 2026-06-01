@@ -95,7 +95,7 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     recent: List<CodeforcesRecentFeedBlogEntry>,
     hint: CodeforcesLostHint?
 ) {
-    edit {
+    editEntries {
         entries.removeAll { (id, entry) ->
             entry is CodeforcesLostBlogEntrySuspect && isNotFresh(id, hint)
         }
@@ -117,7 +117,7 @@ private suspend fun CodeforcesLostStorage.addFresh(
 ) {
     if (blogEntries.isEmpty()) return
 
-    edit {
+    editEntries {
         blogEntries.forEach {
             if (it.blogEntryId !in this) put(it)
         }
@@ -128,7 +128,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     api: CodeforcesApi,
     isFresh: (CodeforcesBlogEntry) -> Boolean
 ) {
-    edit {
+    editEntries {
         values.removeAll { entry ->
             entry is CodeforcesLostBlogEntryFresh && !isFresh(entry.blogEntry)
         }
@@ -145,7 +145,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
         val blogEntry = api.getBlogEntryOrNull(blogEntryId = suspect.blogEntryId)
 
         if (blogEntry != null && isFresh(blogEntry)) {
-            edit {
+            editEntries {
                 val fresh = CodeforcesLostBlogEntryFresh(
                     blogEntry = blogEntry,
                     authorColorTag = suspect.authorColorTag
@@ -153,7 +153,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
                 put(fresh)
             }
         } else {
-            edit {
+            editEntries {
                 remove(suspect.blogEntryId)
             }
         }
@@ -168,7 +168,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
 ) {
     val recentIds = recent.map { it.id }
 
-    updateData {
+    update {
         it.mapNotNull { (id, it) ->
             val newEntry = when {
                 it !is CodeforcesLostBlogEntry -> it
@@ -193,7 +193,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
         .filter { it.blogEntryId !in recentIds }
         .let { toLost ->
             if (toLost.isNotEmpty()) {
-                edit {
+                editEntries {
                     toLost.forEach {
                         val lost = CodeforcesLostBlogEntry(
                             blogEntry = it.blogEntry,
@@ -231,7 +231,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
 private suspend fun CodeforcesLostStorage.editNullColorTags(
     colorTag: (CodeforcesLostBlogEntry) -> CodeforcesColorTag?
 ) {
-    edit {
+    editEntries {
         entries.forEach { mapEntry ->
             val it = mapEntry.value
             if (it is CodeforcesLostBlogEntry && it.authorColorTag == null) {

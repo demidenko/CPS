@@ -169,7 +169,7 @@ class CodeforcesLostDataStore(context: Context):
 
     override suspend fun getEntries() = all()
 
-    override suspend fun updateData(transform: (Map<Int, CodeforcesLostEntry>) -> Map<Int, CodeforcesLostEntry>) {
+    override suspend fun update(transform: (Map<Int, CodeforcesLostEntry>) -> Map<Int, CodeforcesLostEntry>) {
         edit {
             val result = transform(all.value).values
             suspects.value = result.mapNotNull { (it as? CodeforcesLostBlogEntrySuspect)?.toPrivate() }
