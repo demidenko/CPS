@@ -147,25 +147,31 @@ private suspend fun CodeforcesLostStorage.updateLost(
 ) {
     val recentIds = recent.map { it.id }
 
-    getEntriesOf<CodeforcesLostBlogEntry>().forEach {
-        if (isStale(it.blogEntry)) {
-            // TODO remove
-        } else if (it.blogEntryId in recentIds) {
-            if (isFresh(it.blogEntry)) {
-                // TODO downgrade to fresh and add
-                CodeforcesLostBlogEntryFresh(
-                    blogEntry = it.blogEntry,
-                    authorColorTag = it.authorColorTag
-                )
-            } else {
-                // TODO remove
+    updateData {
+        it.mapNotNull { (id, it) ->
+            val newEntry = when {
+                it !is CodeforcesLostBlogEntry -> it
+                isStale(it.blogEntry) -> null
+                it.blogEntryId in recentIds -> {
+                    if (isFresh(it.blogEntry)) {
+                        CodeforcesLostBlogEntryFresh(
+                            blogEntry = it.blogEntry,
+                            authorColorTag = it.authorColorTag
+                        )
+                    } else {
+                        null
+                    }
+                }
+                else -> it
             }
-        }
+            if (newEntry == null) null else Pair(id, newEntry)
+        }.toMap()
     }
 
     val toLost = getEntriesOf<CodeforcesLostBlogEntryFresh>()
         .filter { it.blogEntryId !in recentIds }
 
+    // TODO: use this to get colortags for all entries in storage
     val users = api.getUsersCatching(
         handles = toLost.mapNotNull {
             if (it.authorColorTag == null) it.blogEntry.authorHandle
