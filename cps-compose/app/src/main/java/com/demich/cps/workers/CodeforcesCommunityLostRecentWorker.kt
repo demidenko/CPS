@@ -64,17 +64,42 @@ class CodeforcesCommunityLostRecentWorker(
             override fun flowOfInfo() =
                 combine(
                     flow = context.codeforcesLostRepository.flowOfSuspects(),
-                    flow2 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
-                ) { suspects, hint ->
+                    flow2 = CodeforcesLostDataStore(context).flowOfEntries(),
+                    flow3 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
+                ) { suspects, new, hint ->
                     mapOf(
                         "suspects" to suspects.size,
-                        "hint" to hint?.run { "($blogEntryId, $creationTime)" }
+                        "hint" to hint?.run { "($blogEntryId, $creationTime)" },
+                        "new" to new.counters()
                     )
                 }
         }
     }
 
     override suspend fun runWork() {
+        listOf(::runOld, ::runNew).forEachWithProgress {
+            it()
+        }
+    }
+
+    private suspend fun runNew() {
+        val lostStorage: CodeforcesLostStorage = CodeforcesLostDataStore(context)
+
+        val client = CodeforcesClient(
+            locale = context.settingsCommunity.codeforcesLocale()
+        )
+
+        val currentTime = workerStartTime
+        lostStorage.updateEntries(
+            api = client,
+            pageContentProvider = client,
+            hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
+            isFresh = { currentTime - it < 24.hours },
+            isStale = { currentTime - it > 7.days }
+        )
+    }
+
+    private suspend fun runOld() {
         val apiAccess = CodeforcesProfileManager().profileStorage(context).apiAccess()
         context.settingsCommunity.fromSnapshot {
             val client = CodeforcesClient(
