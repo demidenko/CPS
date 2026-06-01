@@ -168,38 +168,57 @@ private suspend fun CodeforcesLostStorage.updateLost(
         }.toMap()
     }
 
-    val toLost = getEntriesOf<CodeforcesLostBlogEntryFresh>()
+    getEntriesOf<CodeforcesLostBlogEntryFresh>()
         .filter { it.blogEntryId !in recentIds }
-
-    // TODO: use this to get colortags for all entries in storage
-    val users = api.getUsersCatching(
-        handles = toLost.mapNotNull {
-            if (it.authorColorTag == null) it.blogEntry.authorHandle
-            else null
-        },
-        checkHistoricHandles = false
-    )
-
-    val lost = toLost.mapNotNull {
-        val colorTag = it.authorColorTag
-                ?: users.getValue(it.blogEntry.authorHandle)
-                    .getOrNull()
-                    ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
-
-        if (colorTag != null) {
-            CodeforcesLostBlogEntry(
-                blogEntry = it.blogEntry,
-                authorColorTag = colorTag,
-                timeStamp = Clock.System.now()
-            )
-        } else {
-            null
+        .let { toLost ->
+            if (toLost.isNotEmpty()) {
+                edit {
+                    toLost.forEach {
+                        val lost = CodeforcesLostBlogEntry(
+                            blogEntry = it.blogEntry,
+                            authorColorTag = it.authorColorTag,
+                            timeStamp = Clock.System.now()
+                        )
+                        put(lost)
+                    }
+                }
+            }
         }
-    }
 
-    if (lost.isNotEmpty()) {
-        edit {
-            lost.forEach { put(it) }
+    val lost = getEntriesOf<CodeforcesLostBlogEntry>()
+
+    if (lost.any { it.authorColorTag == null }) {
+        // TODO: use this to get colortags for all entries in storage
+        val users = api.getUsersCatching(
+            handles = lost.mapNotNull {
+                if (it.authorColorTag == null) it.blogEntry.authorHandle
+                else null
+            },
+            checkHistoricHandles = false
+        )
+
+        editNullColorTags(
+            colorTag = {
+                users[it.blogEntry.authorHandle]
+                    ?.getOrNull()
+                    ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
+            }
+        )
+    }
+}
+
+private suspend fun CodeforcesLostStorage.editNullColorTags(
+    colorTag: (CodeforcesLostBlogEntry) -> CodeforcesColorTag?
+) {
+    edit {
+        entries.forEach { mapEntry ->
+            val it = mapEntry.value
+            if (it is CodeforcesLostBlogEntry && it.authorColorTag == null) {
+                val colorTag = colorTag(it)
+                if (colorTag != null) {
+                    mapEntry.setValue(it.copy(authorColorTag = colorTag))
+                }
+            }
         }
     }
 }
