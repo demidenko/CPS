@@ -29,10 +29,19 @@ suspend fun CodeforcesLostStorage.updateEntries(
     val recentResult = pageContentProvider.getRecentCatching()
 
     recentResult.onFailure {
-        val recentBlogEntries = api.getRecentActionsBlogEntries()
+        val blogEntries = api.getRecentActionsBlogEntries()
+            .mapNotNull {
+                if (isFresh(it.creationTime)) {
+                    CodeforcesLostBlogEntryFresh(
+                        blogEntry = it,
+                        authorColorTag = null
+                    )
+                } else {
+                    null
+                }
+            }
 
-        recentBlogEntries.filter { isFresh(it.creationTime) }
-        // TODO add to fresh
+        addFresh(blogEntries)
     }
 
     val recentBlogEntries = recentResult.getOrThrow()
@@ -99,6 +108,18 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
                 )
                 put(suspect)
             }
+        }
+    }
+}
+
+private suspend fun CodeforcesLostStorage.addFresh(
+    blogEntries: List<CodeforcesLostBlogEntryFresh>
+) {
+    if (blogEntries.isEmpty()) return
+
+    edit {
+        blogEntries.forEach {
+            if (it.blogEntryId !in this) put(it)
         }
     }
 }
