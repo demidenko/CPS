@@ -3,6 +3,7 @@ package com.demich.cps.platforms.codeforces.lost
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
+import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -38,7 +39,7 @@ suspend fun CodeforcesLostStorage.updateEntries(
 
     val hint = hintStorage.run {
         val hint = getHint()
-        //ensure hint in case isFresh logic changes
+        // ensure hint in case isFresh logic changes
         if (hint != null && isFresh(hint.creationTime)) {
             reset()
             null
@@ -47,8 +48,24 @@ suspend fun CodeforcesLostStorage.updateEntries(
         }
     }
 
-    updateSuspects(
+    updateEntries(
+        api = api,
         recent = recentBlogEntries,
+        hint = hint,
+        isFresh = { isFresh(it.creationTime) },
+        isStale = { isStale(it.creationTime) }
+    )
+}
+
+private suspend fun CodeforcesLostStorage.updateEntries(
+    api: CodeforcesApi,
+    recent: List<CodeforcesRecentFeedBlogEntry>,
+    hint: CodeforcesLostHint?,
+    isFresh: (CodeforcesBlogEntry) -> Boolean,
+    isStale: (CodeforcesBlogEntry) -> Boolean
+) {
+    updateSuspects(
+        recent = recent,
         hint = hint
     )
 
@@ -57,7 +74,12 @@ suspend fun CodeforcesLostStorage.updateEntries(
         isFresh = isFresh
     )
 
-    // TODO updateLost
+    updateLost(
+        recent = recent,
+        api = api,
+        isFresh = isFresh,
+        isStale = isStale
+    )
 }
 
 private suspend fun CodeforcesLostStorage.updateSuspects(
@@ -73,12 +95,17 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     }
 
     // TODO add to suspects
-    // TODO filter not fresh suspects
+    // TODO remove not fresh suspects
+
+    updateData {
+        val ids = it.keys
+        TODO()
+    }
 }
 
 private suspend fun CodeforcesLostStorage.updateFresh(
     api: CodeforcesApi,
-    isFresh: (Instant) -> Boolean
+    isFresh: (CodeforcesBlogEntry) -> Boolean
 ) {
     val suspects = getEntriesOf<CodeforcesLostBlogEntrySuspect>()
         .sortedBy { it.blogEntryId }
@@ -90,7 +117,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     suspects.forEach { suspect ->
         val blogEntry = api.getBlogEntryOrNull(blogEntryId = suspect.blogEntryId)
 
-        if (blogEntry != null && isFresh(blogEntry.creationTime)) {
+        if (blogEntry != null && isFresh(blogEntry)) {
             CodeforcesLostBlogEntryFresh(
                 blogEntry = blogEntry,
                 authorColorTag = suspect.authorColorTag
@@ -105,17 +132,16 @@ private suspend fun CodeforcesLostStorage.updateFresh(
 private suspend fun CodeforcesLostStorage.updateLost(
     recent: List<CodeforcesRecentFeedBlogEntry>,
     api: CodeforcesApi,
-    isFresh: (Instant) -> Boolean,
-    isStale: (Instant) -> Boolean
+    isFresh: (CodeforcesBlogEntry) -> Boolean,
+    isStale: (CodeforcesBlogEntry) -> Boolean
 ) {
     val recentIds = recent.map { it.id }
 
     getEntriesOf<CodeforcesLostBlogEntry>().forEach {
-        val creationTime = it.blogEntry.creationTime
-        if (isStale(creationTime)) {
+        if (isStale(it.blogEntry)) {
             // TODO remove
         } else if (it.blogEntryId in recentIds) {
-            if (isFresh(creationTime)) {
+            if (isFresh(it.blogEntry)) {
                 // TODO downgrade to fresh and add
                 CodeforcesLostBlogEntryFresh(
                     blogEntry = it.blogEntry,
@@ -153,7 +179,6 @@ private suspend fun CodeforcesLostStorage.updateLost(
             timeStamp = Clock.System.now()
         )
     }
-
 }
 
 private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<List<CodeforcesRecentFeedBlogEntry>> {
