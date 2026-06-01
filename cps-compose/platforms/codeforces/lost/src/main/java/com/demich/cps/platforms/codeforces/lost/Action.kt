@@ -3,8 +3,11 @@ package com.demich.cps.platforms.codeforces.lost
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.getUsersCatching
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 suspend fun CodeforcesLostStorage.updateEntries(
@@ -77,8 +80,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     api: CodeforcesApi,
     isFresh: (Instant) -> Boolean
 ) {
-    val suspects = getEntries().values
-        .filterIsInstance<CodeforcesLostBlogEntrySuspect>()
+    val suspects = getEntriesOf<CodeforcesLostBlogEntrySuspect>()
         .sortedBy { it.blogEntryId }
 
     if (suspects.size > 1) {
@@ -93,9 +95,9 @@ private suspend fun CodeforcesLostStorage.updateFresh(
                 blogEntry = blogEntry,
                 authorColorTag = suspect.authorColorTag
             )
-            // TODO save as fresh entry
+            // TODO upgrade to fresh
         } else {
-            // TODO remove suspect
+            // TODO remove
         }
     }
 }
@@ -103,9 +105,54 @@ private suspend fun CodeforcesLostStorage.updateFresh(
 private suspend fun CodeforcesLostStorage.updateLost(
     recent: List<CodeforcesRecentFeedBlogEntry>,
     api: CodeforcesApi,
+    isFresh: (Instant) -> Boolean,
     isStale: (Instant) -> Boolean
 ) {
     val recentIds = recent.map { it.id }
+
+    getEntriesOf<CodeforcesLostBlogEntry>().forEach {
+        val creationTime = it.blogEntry.creationTime
+        if (isStale(creationTime)) {
+            // TODO remove
+        } else if (it.blogEntryId in recentIds) {
+            if (isFresh(creationTime)) {
+                // TODO downgrade to fresh and add
+                CodeforcesLostBlogEntryFresh(
+                    blogEntry = it.blogEntry,
+                    authorColorTag = it.authorColorTag
+                )
+            } else {
+                // TODO remove
+            }
+        }
+    }
+
+    val toLost = getEntriesOf<CodeforcesLostBlogEntryFresh>()
+        .filter { it.blogEntryId !in recentIds }
+
+    val users = api.getUsersCatching(
+        handles = toLost.mapNotNull {
+            if (it.authorColorTag == null) it.blogEntry.authorHandle
+            else null
+        },
+        checkHistoricHandles = false
+    )
+
+    toLost.forEach {
+        val colorTag =
+            if (it.authorColorTag != null) it.authorColorTag
+            else {
+                val user = users.getValue(it.blogEntry.authorHandle).getOrNull() ?: return@forEach
+                CodeforcesColorTag.fromRating(user.rating)
+            }
+
+        // TODO upgrade to lost
+        CodeforcesLostBlogEntry(
+            blogEntry = it.blogEntry,
+            authorColorTag = colorTag,
+            timeStamp = Clock.System.now()
+        )
+    }
 
 }
 

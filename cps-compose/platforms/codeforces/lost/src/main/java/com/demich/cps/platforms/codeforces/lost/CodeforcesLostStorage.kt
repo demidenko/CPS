@@ -17,3 +17,6 @@ suspend inline fun CodeforcesLostStorage.edit(
         it.toMutableMap().apply(block)
     }
 }
+
+internal suspend inline fun <reified T: CodeforcesLostEntry> CodeforcesLostStorage.getEntriesOf(): List<T> =
+    getEntries().values.filterIsInstance<T>()
