@@ -11,8 +11,14 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntryFresh
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntrySuspect
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostEntry
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHint
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHintStorage
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
+import com.demich.cps.platforms.codeforces.lost.updateEntries
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
@@ -20,11 +26,19 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getUsersCatching
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
+import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.combine
+import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -78,6 +92,78 @@ class CodeforcesCommunityLostRecentWorker(
             )
         }
     }
+}
+
+@Serializable
+private data class Suspect(
+    val id: Int,
+    val tag: CodeforcesColorTag?
+)
+
+private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = id, authorColorTag = tag)
+private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(id = blogEntryId, tag = authorColorTag)
+
+@Serializable
+private data class Fresh(
+    val blogEntry: CodeforcesBlogEntry,
+    val tag: CodeforcesColorTag?
+)
+
+private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorColorTag = tag)
+private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, tag = authorColorTag)
+
+@Serializable
+private data class Lost(
+    val blogEntry: CodeforcesBlogEntry,
+    val tag: CodeforcesColorTag?,
+    val timeStamp: Instant
+)
+
+private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorColorTag = tag, timeStamp = timeStamp)
+private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, tag = authorColorTag, timeStamp = timeStamp)
+
+class CodeforcesLostDataStore(context: Context):
+    ItemizedDataStore(context.cf_lost_dataStore),
+    CodeforcesLostStorage
+{
+    companion object {
+        private val Context.cf_lost_dataStore by dataStoreWrapper(name = "cf_lost")
+    }
+
+    private val suspects = jsonCPS.itemList<Suspect>(name = "suspects")
+    private val fresh = jsonCPS.itemList<Fresh>(name = "fresh")
+    private val lost = jsonCPS.itemList<Lost>(name = "lost")
+
+    private val all = combine {
+        buildMap<Int, CodeforcesLostEntry> {
+            suspects.value.forEach { put(it.id, it.toPublic()) }
+            fresh.value.forEach { put(it.blogEntry.id, it.toPublic()) }
+            lost.value.forEach { put(it.blogEntry.id, it.toPublic()) }
+        }
+    }
+
+    override suspend fun getEntries() = all()
+
+    override suspend fun updateData(transform: (Map<Int, CodeforcesLostEntry>) -> Map<Int, CodeforcesLostEntry>) {
+        edit {
+            val result = transform(all.value).values
+            suspects.value = result.mapNotNull { (it as? CodeforcesLostBlogEntrySuspect)?.toPrivate() }
+            fresh.value = result.mapNotNull { (it as? CodeforcesLostBlogEntryFresh)?.toPrivate() }
+            lost.value = result.mapNotNull { (it as? CodeforcesLostBlogEntry)?.toPrivate() }
+        }
+    }
+
+    override fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>> =
+        lost.asFlow().map { it.map { it.toPublic() } }
+
+    fun flowOfEntries(): Flow<Collection<CodeforcesLostEntry>> = all.asFlow().map { it.values }
+}
+
+private fun Collection<CodeforcesLostEntry>.counters(): String {
+    val suspects = count { it is CodeforcesLostBlogEntrySuspect }
+    val fresh = count { it is CodeforcesLostBlogEntryFresh }
+    val lost = count { it is CodeforcesLostBlogEntry }
+    return "$suspects / $fresh / $lost"
 }
 
 private suspend inline fun CodeforcesLostRepository.updateEntries(

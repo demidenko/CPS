@@ -7,7 +7,7 @@ interface CodeforcesLostStorage {
 
     suspend fun getEntries(): Map<Int, CodeforcesLostEntry>
 
-    suspend fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>>
+    fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>>
 }
 
 suspend inline fun CodeforcesLostStorage.edit(
