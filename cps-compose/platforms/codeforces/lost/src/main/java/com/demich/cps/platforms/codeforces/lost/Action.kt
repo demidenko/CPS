@@ -124,13 +124,17 @@ private suspend fun CodeforcesLostStorage.updateFresh(
         val blogEntry = api.getBlogEntryOrNull(blogEntryId = suspect.blogEntryId)
 
         if (blogEntry != null && isFresh(blogEntry)) {
-            CodeforcesLostBlogEntryFresh(
-                blogEntry = blogEntry,
-                authorColorTag = suspect.authorColorTag
-            )
-            // TODO upgrade to fresh
+            edit {
+                val fresh = CodeforcesLostBlogEntryFresh(
+                    blogEntry = blogEntry,
+                    authorColorTag = suspect.authorColorTag
+                )
+                put(fresh)
+            }
         } else {
-            // TODO remove
+            edit {
+                remove(suspect.blogEntryId)
+            }
         }
     }
 }
