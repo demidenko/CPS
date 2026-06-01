@@ -86,20 +86,20 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     recent: List<CodeforcesRecentFeedBlogEntry>,
     hint: CodeforcesLostHint?
 ) {
-    val toAdd = recent.mapNotNull { blogEntry ->
-        if (isNotFresh(blogEntry.id, hint)) null
-        else CodeforcesLostBlogEntrySuspect(
-            blogEntryId = blogEntry.id,
-            authorColorTag = blogEntry.author.colorTag.takeIf { it == ADMIN }
-        )
-    }
+    edit {
+        entries.removeAll {
+            it.value is CodeforcesLostBlogEntrySuspect && isNotFresh(it.key, hint)
+        }
 
-    // TODO add to suspects
-    // TODO remove not fresh suspects
-
-    updateData {
-        val ids = it.keys
-        TODO()
+        recent.forEach { blogEntry ->
+            if (!isNotFresh(blogEntry.id, hint) && blogEntry.id !in this) {
+                val suspect = CodeforcesLostBlogEntrySuspect(
+                    blogEntryId = blogEntry.id,
+                    authorColorTag = blogEntry.author.colorTag.takeIf { it == ADMIN }
+                )
+                put(suspect)
+            }
+        }
     }
 }
 

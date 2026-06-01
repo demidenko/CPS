@@ -18,5 +18,9 @@ suspend inline fun CodeforcesLostStorage.edit(
     }
 }
 
+internal fun <T: CodeforcesLostEntry> MutableMap<Int, T>.put(entry: T) {
+    put(key = entry.blogEntryId, value = entry)
+}
+
 internal suspend inline fun <reified T: CodeforcesLostEntry> CodeforcesLostStorage.getEntriesOf(): List<T> =
     getEntries().values.filterIsInstance<T>()
