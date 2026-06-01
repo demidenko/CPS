@@ -87,8 +87,8 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     hint: CodeforcesLostHint?
 ) {
     edit {
-        entries.removeAll {
-            it.value is CodeforcesLostBlogEntrySuspect && isNotFresh(it.key, hint)
+        entries.removeAll { (id, entry) ->
+            entry is CodeforcesLostBlogEntrySuspect && isNotFresh(id, hint)
         }
 
         recent.forEach { blogEntry ->
@@ -107,6 +107,12 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     api: CodeforcesApi,
     isFresh: (CodeforcesBlogEntry) -> Boolean
 ) {
+    edit {
+        values.removeAll { entry ->
+            entry is CodeforcesLostBlogEntryFresh && !isFresh(entry.blogEntry)
+        }
+    }
+
     val suspects = getEntriesOf<CodeforcesLostBlogEntrySuspect>()
         .sortedBy { it.blogEntryId }
 
