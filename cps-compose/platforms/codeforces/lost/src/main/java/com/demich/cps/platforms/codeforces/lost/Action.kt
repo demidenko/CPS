@@ -170,20 +170,27 @@ private suspend fun CodeforcesLostStorage.updateLost(
         checkHistoricHandles = false
     )
 
-    toLost.forEach {
-        val colorTag =
-            if (it.authorColorTag != null) it.authorColorTag
-            else {
-                val user = users.getValue(it.blogEntry.authorHandle).getOrNull() ?: return@forEach
-                CodeforcesColorTag.fromRating(user.rating)
-            }
+    val lost = toLost.mapNotNull {
+        val colorTag = it.authorColorTag
+                ?: users.getValue(it.blogEntry.authorHandle)
+                    .getOrNull()
+                    ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
 
-        // TODO upgrade to lost
-        CodeforcesLostBlogEntry(
-            blogEntry = it.blogEntry,
-            authorColorTag = colorTag,
-            timeStamp = Clock.System.now()
-        )
+        if (colorTag != null) {
+            CodeforcesLostBlogEntry(
+                blogEntry = it.blogEntry,
+                authorColorTag = colorTag,
+                timeStamp = Clock.System.now()
+            )
+        } else {
+            null
+        }
+    }
+
+    if (lost.isNotEmpty()) {
+        edit {
+            lost.forEach { put(it) }
+        }
     }
 }
 
