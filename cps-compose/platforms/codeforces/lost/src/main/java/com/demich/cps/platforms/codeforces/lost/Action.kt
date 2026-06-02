@@ -138,7 +138,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
         .sortedBy { it.blogEntryId }
 
     if (suspects.size > 1) {
-        api.getRecentActions()
+        api.runCatching { getRecentActions() }
     }
 
     suspects.forEach { suspect ->
