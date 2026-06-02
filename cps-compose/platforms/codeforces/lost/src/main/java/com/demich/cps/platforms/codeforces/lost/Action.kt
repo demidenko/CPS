@@ -96,8 +96,8 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     hint: CodeforcesLostHint?
 ) {
     editEntries {
-        entries.removeAll { (id, entry) ->
-            entry is CodeforcesLostBlogEntrySuspect && isNotFresh(id, hint)
+        entries.removeAll { (id, it) ->
+            it is CodeforcesLostBlogEntrySuspect && isNotFresh(id, hint)
         }
 
         recent.forEach { blogEntry ->
@@ -129,8 +129,8 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     isFresh: (CodeforcesBlogEntry) -> Boolean
 ) {
     editEntries {
-        values.removeAll { entry ->
-            entry is CodeforcesLostBlogEntryFresh && !isFresh(entry.blogEntry)
+        values.removeAll {
+            it is CodeforcesLostBlogEntryFresh && !isFresh(it.blogEntry)
         }
     }
 
