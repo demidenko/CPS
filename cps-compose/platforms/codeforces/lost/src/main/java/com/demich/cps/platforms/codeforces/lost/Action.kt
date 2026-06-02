@@ -168,9 +168,9 @@ private suspend fun CodeforcesLostStorage.updateLost(
 ) {
     val recentIds = recent.map { it.id }
 
-    update {
-        it.mapNotNull { (id, it) ->
-            val newEntry = when {
+    editEntries {
+        entries.replaceValues { (id, it) ->
+            when {
                 it !is CodeforcesLostBlogEntry -> it
                 isStale(it.blogEntry) -> null
                 it.blogEntryId in recentIds -> {
@@ -185,8 +185,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
                 }
                 else -> it
             }
-            if (newEntry == null) null else Pair(id, newEntry)
-        }.toMap()
+        }
     }
 
     getEntriesOf<CodeforcesLostBlogEntryFresh>()
@@ -258,3 +257,16 @@ private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<Li
 
 private fun isNotFresh(blogEntryId: Int, hint: CodeforcesLostHint?) =
     hint != null && blogEntryId <= hint.blogEntryId
+
+private fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replaceValues(
+    transform: (Map.Entry<K, V>) -> V?
+) {
+    removeAll {
+        val newValue = transform(it)
+        if (newValue == null) true
+        else {
+            it.setValue(newValue)
+            false
+        }
+    }
+}
