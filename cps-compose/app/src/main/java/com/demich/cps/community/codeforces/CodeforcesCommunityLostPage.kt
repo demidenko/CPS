@@ -12,12 +12,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
+import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.platforms.codeforces.lost.toWebBlogEntries
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.demich.cps.workers.CodeforcesLostDataStore
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -55,7 +58,12 @@ fun CodeforcesCommunityLostPage(
 }
 
 fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
-    context.codeforcesLostRepository.flowOfLost()
+    combine(
+        flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
+        flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()
+    ) { list, minColorTag ->
+        list.toWebBlogEntries(minColorTag)
+    }
 
 @Composable
 private fun TopLabel() {

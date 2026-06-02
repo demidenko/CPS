@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
-import com.demich.cps.features.codeforces.lost.database.codeforcesLostRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
@@ -25,14 +24,12 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getUsersCatching
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
-import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
@@ -64,26 +61,18 @@ class CodeforcesCommunityLostRecentWorker(
 
             override fun flowOfInfo() =
                 combine(
-                    flow = context.codeforcesLostRepository.flowOfSuspects(),
-                    flow2 = CodeforcesLostDataStore(context).flowOfEntries(),
-                    flow3 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
-                ) { suspects, new, hint ->
+                    flow = CodeforcesLostDataStore(context).flowOfEntries(),
+                    flow2 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
+                ) { entries, hint ->
                     mapOf(
-                        "suspects" to suspects.size,
                         "hint" to hint?.run { "($blogEntryId, $creationTime)" },
-                        "new" to new.counters()
+                        "counters" to entries.counters()
                     )
                 }
         }
     }
 
     override suspend fun runWork() {
-        listOf(::runOld, ::runNew).forEachWithProgress {
-            it()
-        }
-    }
-
-    private suspend fun runNew() {
         val lostStorage: CodeforcesLostStorage = CodeforcesLostDataStore(context)
 
         val client = CodeforcesClient(
@@ -98,25 +87,6 @@ class CodeforcesCommunityLostRecentWorker(
             isFresh = { currentTime - it < 24.hours },
             isStale = { currentTime - it > 7.days }
         )
-    }
-
-    private suspend fun runOld() {
-        val apiAccess = CodeforcesProfileManager().profileStorage(context).apiAccess()
-        context.settingsCommunity.fromSnapshot {
-            val client = CodeforcesClient(
-                locale = codeforcesLocale.value,
-                apiAccess = apiAccess
-            )
-            val currentTime = workerStartTime
-            context.codeforcesLostRepository.updateEntries(
-                api = client,
-                pageContentProvider = client,
-                minRatingColorTag = codeforcesLostMinRatingTag.value,
-                hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
-                isNew = { currentTime - it < 24.hours },
-                isStale = { currentTime - it > 7.days }
-            )
-        }
     }
 }
 
