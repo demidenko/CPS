@@ -38,6 +38,7 @@ import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -121,31 +122,31 @@ class CodeforcesCommunityLostRecentWorker(
 
 @Serializable
 private data class Suspect(
-    val id: Int,
-    val tag: CodeforcesColorTag?
+    @SerialName("id") val blogEntryId: Int,
+    @SerialName("tag") val authorColorTag: CodeforcesColorTag?
 )
 
-private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = id, authorColorTag = tag)
-private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(id = blogEntryId, tag = authorColorTag)
+private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = blogEntryId, authorColorTag = authorColorTag)
+private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(blogEntryId = blogEntryId, authorColorTag = authorColorTag)
 
 @Serializable
 private data class Fresh(
-    val blogEntry: CodeforcesBlogEntry,
-    val tag: CodeforcesColorTag?
+    @SerialName("entry") val blogEntry: CodeforcesBlogEntry,
+    @SerialName("tag") val authorColorTag: CodeforcesColorTag?
 )
 
-private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorColorTag = tag)
-private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, tag = authorColorTag)
+private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorColorTag = authorColorTag)
+private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, authorColorTag = authorColorTag)
 
 @Serializable
 private data class Lost(
-    val blogEntry: CodeforcesBlogEntry,
-    val tag: CodeforcesColorTag?,
-    val timeStamp: Instant
+    @SerialName("entry")val blogEntry: CodeforcesBlogEntry,
+    @SerialName("tag") val authorColorTag: CodeforcesColorTag?,
+    @SerialName("stamp") val timeStamp: Instant
 )
 
-private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorColorTag = tag, timeStamp = timeStamp)
-private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, tag = authorColorTag, timeStamp = timeStamp)
+private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorColorTag = authorColorTag, timeStamp = timeStamp)
+private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, authorColorTag = authorColorTag, timeStamp = timeStamp)
 
 class CodeforcesLostDataStore(context: Context):
     ItemizedDataStore(context.cf_lost_dataStore),
@@ -161,7 +162,7 @@ class CodeforcesLostDataStore(context: Context):
 
     private val all = combine {
         buildMap<Int, CodeforcesLostEntry> {
-            suspects.value.forEach { put(it.id, it.toPublic()) }
+            suspects.value.forEach { put(it.blogEntryId, it.toPublic()) }
             fresh.value.forEach { put(it.blogEntry.id, it.toPublic()) }
             lost.value.forEach { put(it.blogEntry.id, it.toPublic()) }
         }
