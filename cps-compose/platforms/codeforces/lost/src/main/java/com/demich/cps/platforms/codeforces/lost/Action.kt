@@ -8,7 +8,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getUsersCatching
-import kotlin.time.Clock
 import kotlin.time.Instant
 
 suspend fun CodeforcesLostStorage.updateEntries(
@@ -33,10 +32,7 @@ suspend fun CodeforcesLostStorage.updateEntries(
         val blogEntries = api.getRecentActionsBlogEntries()
             .mapNotNull {
                 if (isFresh(it.creationTime)) {
-                    CodeforcesLostBlogEntryFresh(
-                        blogEntry = it,
-                        authorColorTag = null
-                    )
+                    it.toFresh(authorColorTag = null)
                 } else {
                     null
                 }
@@ -94,11 +90,7 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
 
         recent.forEach { blogEntry ->
             if (!isNotFresh(blogEntry.id, hint) && blogEntry.id !in this) {
-                val suspect = CodeforcesLostBlogEntrySuspect(
-                    blogEntryId = blogEntry.id,
-                    authorColorTag = blogEntry.author.colorTag.takeIf { it == ADMIN }
-                )
-                put(suspect)
+                put(blogEntry.toSuspect())
             }
         }
     }
@@ -138,11 +130,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
 
         if (blogEntry != null && isFresh(blogEntry)) {
             editEntries {
-                val fresh = CodeforcesLostBlogEntryFresh(
-                    blogEntry = blogEntry,
-                    authorColorTag = suspect.authorColorTag
-                )
-                put(fresh)
+                put(blogEntry.toFresh(authorColorTag = suspect.authorColorTag))
             }
         } else {
             editEntries {
@@ -167,10 +155,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
                 isStale(it.blogEntry) -> null
                 it.blogEntryId in recentIds -> {
                     if (isFresh(it.blogEntry)) {
-                        CodeforcesLostBlogEntryFresh(
-                            blogEntry = it.blogEntry,
-                            authorColorTag = it.authorColorTag
-                        )
+                        it.toFresh()
                     } else {
                         null
                     }
@@ -182,11 +167,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
         // fresh become lost
         entries.replaceValues { (id, it) ->
             if (it is CodeforcesLostBlogEntryFresh && it.blogEntryId !in recentIds) {
-                CodeforcesLostBlogEntry(
-                    blogEntry = it.blogEntry,
-                    authorColorTag = it.authorColorTag,
-                    timeStamp = Clock.System.now()
-                )
+                it.toLost()
             } else {
                 it
             }
