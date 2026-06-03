@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "9.2.1"
 kotlin = "2.3.20"
-ksp = "2.3.7" # https://github.com/google/ksp/releases
+ksp = "2.3.9" # https://github.com/google/ksp/releases
 
 serialization = "1.11.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.8.0" # https://github.com/Kotlin/kotlinx-datetime/releases
@@ -27,7 +27,7 @@ jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
 # Missing class com.google.re2j.Matcher (referenced from: com.google.re2j.Matcher org.jsoup.helper.Re2jRegex$Re2jMatcher.delegate and 3 other contexts)
 # Missing class com.google.re2j.Pattern (referenced from: com.google.re2j.Pattern org.jsoup.helper.Re2jRegex.re2jPattern and 4 other contexts)
 
-resaca = "5.0.0" # https://github.com/sebaslogen/resaca/releases
+resaca = "5.1.0" # https://github.com/sebaslogen/resaca/releases
 
 korlibs = "6.0.1"
 
