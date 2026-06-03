@@ -44,5 +44,5 @@ internal suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): Codefor
 
 internal suspend fun CodeforcesApi.getRecentActionsBlogEntries(): List<CodeforcesBlogEntry> =
     getRecentActions()
+        .distinctBy { it.blogEntry?.id }
         .mapNotNull { it.blogEntry }
-        .distinctBy { it.id }
