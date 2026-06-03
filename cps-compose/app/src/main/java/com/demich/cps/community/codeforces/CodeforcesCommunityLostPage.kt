@@ -13,8 +13,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.codeforces.lost.toWebBlogEntries
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
+import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostDataStore
@@ -63,6 +65,13 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
         flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()
     ) { list, minColorTag ->
         list.toWebBlogEntries(minColorTag)
+    }
+
+private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minColorTag: CodeforcesColorTag): List<CodeforcesWebBlogEntry> =
+    mapNotNull {
+        val colorTag = it.authorColorTag
+        if (colorTag != null && colorTag >= minColorTag) it.blogEntry.toWebBlogEntry(colorTag)
+        else null
     }
 
 @Composable

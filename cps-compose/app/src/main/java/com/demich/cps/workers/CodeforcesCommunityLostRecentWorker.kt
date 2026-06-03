@@ -138,7 +138,7 @@ class CodeforcesLostDataStore(context: Context):
         }
     }
 
-    override fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>> =
+    fun flowOfLostEntries(): Flow<List<CodeforcesLostBlogEntry>> =
         lost.asFlow().map { it.map { it.toPublic() } }
 
     fun flowOfEntries(): Flow<Collection<CodeforcesLostEntry>> = all.asFlow().map { it.values }
