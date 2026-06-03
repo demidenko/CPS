@@ -3,23 +3,42 @@ package com.demich.cps.platforms.codeforces.lost
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
-abstract class CodeforcesLostHintStorage {
-    abstract suspend fun getHint(): CodeforcesLostHint?
-
-    protected abstract suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint)
-
-    abstract suspend fun reset()
-
-    suspend fun update(blogEntryId: Int, time: Instant) {
-        update {
-            if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntryId, time)
-            else it
-        }
-    }
-}
 
 @Serializable
 data class CodeforcesLostHint(
     val blogEntryId: Int,
     val creationTime: Instant
 )
+
+interface CodeforcesLostHintStorage {
+    suspend fun getValue(): CodeforcesLostHint?
+
+    suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint)
+
+    suspend fun reset()
+}
+
+internal class CheckedHintStorage(
+    val storage: CodeforcesLostHintStorage,
+    val isFresh: (Instant) -> Boolean
+) {
+    suspend fun getHint(): CodeforcesLostHint? {
+        val hint = storage.getValue()
+        // ensure hint in case isFresh logic changes
+        if (hint != null && isFresh(hint.creationTime)) {
+            storage.reset()
+            return null
+        } else {
+            return hint
+        }
+    }
+
+    suspend fun update(blogEntryId: Int, time: Instant) {
+        if (!isFresh(time)) {
+            storage.update {
+                if (it == null || it.creationTime < time) CodeforcesLostHint(blogEntryId, time)
+                else it
+            }
+        }
+    }
+}

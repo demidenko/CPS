@@ -18,12 +18,13 @@ suspend fun CodeforcesLostStorage.updateEntries(
     isFresh: (Instant) -> Boolean,
     isStale: (Instant) -> Boolean
 ) {
+    val hintStorage = CheckedHintStorage(
+        storage = hintStorage,
+        isFresh = isFresh
+    )
+
     val api = api.withBlogEntriesCache { blogEntry ->
-        val time = blogEntry.creationTime
-        if (!isFresh(time)) {
-            //save hint
-            hintStorage.update(blogEntry.id, time)
-        }
+        hintStorage.update(blogEntry.id, blogEntry.creationTime)
     }
 
     val recentResult = pageContentProvider.getRecentCatching()
@@ -46,16 +47,7 @@ suspend fun CodeforcesLostStorage.updateEntries(
 
     val recentBlogEntries = recentResult.getOrThrow()
 
-    val hint = hintStorage.run {
-        val hint = getHint()
-        // ensure hint in case isFresh logic changes
-        if (hint != null && isFresh(hint.creationTime)) {
-            reset()
-            null
-        } else {
-            hint
-        }
-    }
+    val hint = hintStorage.getHint()
 
     updateEntries(
         api = api,

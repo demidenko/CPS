@@ -152,8 +152,8 @@ private fun Collection<CodeforcesLostEntry>.counters(): String {
 }
 
 private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHintStorage =
-    object : CodeforcesLostHintStorage() {
-        override suspend fun getHint(): CodeforcesLostHint? {
+    object : CodeforcesLostHintStorage {
+        override suspend fun getValue(): CodeforcesLostHint? {
             return this@asHintStorage.invoke()
         }
 
