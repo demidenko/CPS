@@ -72,7 +72,6 @@ dependencies {
     implementation(project(":data:accounts:userinfo"))
     implementation(project(":data:contests:database"))
     implementation(project(":data:contests:fetching"))
-    implementation(project(":features:codeforces_lost:database"))
     implementation(project(":platforms:codeforces:lost"))
     implementation(project(":features:codeforces_follow:database"))
     implementation(project(":features:contests_loading_engine"))
