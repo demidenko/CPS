@@ -25,5 +25,5 @@ android {
 dependencies {
     implementation(project(":data:platforms:api"))
 
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 }

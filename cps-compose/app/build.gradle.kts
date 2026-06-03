@@ -76,7 +76,7 @@ dependencies {
     implementation(project(":features:codeforces_follow:database"))
     implementation(project(":features:contests_loading_engine"))
 
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.android)
 

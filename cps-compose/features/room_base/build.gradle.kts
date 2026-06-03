@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.room.ktx)
 }

@@ -26,6 +26,6 @@ android {
 dependencies {
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.coroutines.android)
 }

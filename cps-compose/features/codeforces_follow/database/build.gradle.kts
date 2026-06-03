@@ -33,7 +33,7 @@ dependencies {
     implementation(project(":data:platforms:utils"))
     implementation(project(":data:accounts:userinfo"))
 
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

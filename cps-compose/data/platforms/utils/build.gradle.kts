@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":data:contests:database"))
 
     implementation(libs.kotlinx.datetime)
-    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.core)
 
     implementation(libs.jsoup)
 }
