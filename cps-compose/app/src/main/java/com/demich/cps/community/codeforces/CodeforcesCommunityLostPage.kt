@@ -64,7 +64,7 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
         flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
         flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()
     ) { list, minColorTag ->
-        list.toWebBlogEntries(minColorTag)
+        list.sortedByDescending { it.timeStamp }.toWebBlogEntries(minColorTag)
     }
 
 private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minColorTag: CodeforcesColorTag): List<CodeforcesWebBlogEntry> =
