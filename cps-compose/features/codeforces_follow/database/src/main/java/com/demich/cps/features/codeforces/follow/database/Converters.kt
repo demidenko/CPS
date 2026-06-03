@@ -22,21 +22,20 @@ internal class IntCollectionAsBytesConverter {
 
     private fun String.intCollectionSize(): Int = length / 4
 
-    private inline fun String.extractInts(block: (Int) -> Unit) {
-        val s = this
-        indices.step(4).forEach { i ->
+    private fun MutableCollection<Int>.extractInts(s: String) {
+        s.indices.step(4).forEach { i ->
             val int = ((s[i+3].code*256 + s[i+2].code)*256 + s[i+1].code)*256 + s[i].code
-            block(int)
+            add(int)
         }
     }
 
     @TypeConverter
     fun decodeIntList(s: String): List<Int> =
-        buildList(capacity = s.intCollectionSize()) { s.extractInts(::add) }
+        buildList(capacity = s.intCollectionSize()) { extractInts(s) }
 
     @TypeConverter
     fun decodeIntSet(s: String): Set<Int> =
-        buildSet(capacity = s.intCollectionSize()) { s.extractInts(::add) }
+        buildSet(capacity = s.intCollectionSize()) { extractInts(s) }
 }
 
 internal class CodeforcesUserInfoConverter: RoomJsonConverter<CodeforcesUserInfo?>() {
