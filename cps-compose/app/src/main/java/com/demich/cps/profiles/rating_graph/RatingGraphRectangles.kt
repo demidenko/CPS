@@ -6,7 +6,6 @@ import com.demich.cps.profiles.HandleColorBound
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
 import com.demich.cps.utils.forEachRangeEqualBy
-import com.demich.kotlin_stdlib_boost.isSortedWith
 import kotlin.time.Instant
 
 @Immutable
