@@ -178,24 +178,20 @@ private suspend fun CodeforcesLostStorage.updateLost(
                 else -> it
             }
         }
-    }
 
-    getEntriesOf<CodeforcesLostBlogEntryFresh>()
-        .filter { it.blogEntryId !in recentIds }
-        .let { toLost ->
-            if (toLost.isNotEmpty()) {
-                editEntries {
-                    toLost.forEach {
-                        val lost = CodeforcesLostBlogEntry(
-                            blogEntry = it.blogEntry,
-                            authorColorTag = it.authorColorTag,
-                            timeStamp = Clock.System.now()
-                        )
-                        put(lost)
-                    }
-                }
+        // fresh become lost
+        entries.replaceValues { (id, it) ->
+            if (it is CodeforcesLostBlogEntryFresh && it.blogEntryId !in recentIds) {
+                CodeforcesLostBlogEntry(
+                    blogEntry = it.blogEntry,
+                    authorColorTag = it.authorColorTag,
+                    timeStamp = Clock.System.now()
+                )
+            } else {
+                it
             }
         }
+    }
 
     val lost = getEntriesOf<CodeforcesLostBlogEntry>()
 
