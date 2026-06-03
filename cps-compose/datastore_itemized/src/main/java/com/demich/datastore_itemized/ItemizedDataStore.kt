@@ -11,7 +11,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import java.util.EnumSet
 
 
@@ -103,7 +105,7 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = { it.mapTo(EnumSet.noneOf(T::class.java)) { enumValueOf(it) } }
         )
 
-    protected inline fun <reified T> Json.item(
+    protected inline fun <reified T> StringFormat.item(
         name: String,
         noinline defaultValue: () -> T
     ): DataStoreItem<T> =
@@ -114,26 +116,26 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
             decode = ::decodeFromString
         )
 
-    protected inline fun <reified T> Json.item(
+    protected inline fun <reified T> StringFormat.item(
         name: String,
         defaultValue: T
     ): DataStoreItem<T> = item(name = name, defaultValue = { defaultValue })
 
-    protected inline fun <reified T: Any> Json.itemNullable(
+    protected inline fun <reified T: Any> StringFormat.itemNullable(
         name: String
     ): DataStoreItem<T?> = item(name = name, defaultValue = { null })
 
-    protected inline fun <reified T> Json.itemList(
+    protected inline fun <reified T> StringFormat.itemList(
         name: String,
         noinline defaultValue: () -> List<T> = ::emptyList
     ): DataStoreItem<List<T>> = item(name, defaultValue)
 
-    protected inline fun <reified T> Json.itemSet(
+    protected inline fun <reified T> StringFormat.itemSet(
         name: String,
         noinline defaultValue: () -> Set<T> = ::emptySet
     ): DataStoreItem<Set<T>> = item(name, defaultValue)
 
-    protected inline fun <reified K, reified V> Json.itemMap(
+    protected inline fun <reified K, reified V> StringFormat.itemMap(
         name: String,
         noinline defaultValue: () -> Map<K, V> = ::emptyMap
     ): DataStoreItem<Map<K, V>> = item(name, defaultValue)
