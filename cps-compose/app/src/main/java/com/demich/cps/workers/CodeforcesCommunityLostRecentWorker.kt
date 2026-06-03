@@ -3,11 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.lost.database.CodeforcesLostRepository
-import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
-import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
@@ -19,11 +14,6 @@ import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHintStorage
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
 import com.demich.cps.platforms.codeforces.lost.updateEntries
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
-import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.getUsersCatching
-import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -31,7 +21,6 @@ import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
-import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -162,84 +151,6 @@ private fun Collection<CodeforcesLostEntry>.counters(): String {
     return "$suspects / $fresh / $lost"
 }
 
-private suspend inline fun CodeforcesLostRepository.updateEntries(
-    api: CodeforcesApi,
-    pageContentProvider: CodeforcesPageContentProvider,
-    minRatingColorTag: CodeforcesColorTag,
-    hintStorage: CodeforcesLostHintStorage,
-    crossinline isNew: (Instant) -> Boolean,
-    isStale: (Instant) -> Boolean
-) {
-    val recentBlogEntries = pageContentProvider.getRecentBlogEntries()
-    //TODO: use api.recentActions on fail but !![only for findSuspects step]!!
-
-    //get current suspects with removing old ones
-    val suspects = getSuspectsRemoveInvalid {
-        isNew(it.creationTime) && it.author.colorTag >= minRatingColorTag
-    }
-
-    //catch new suspects from recent actions
-    findSuspects(
-        blogEntries = recentBlogEntries.filter { blogEntry -> suspects.none { it.id == blogEntry.id } },
-        minRatingColorTag = minRatingColorTag,
-        isNew = isNew,
-        api = api,
-        hintStorage = hintStorage
-    ) {
-        insertSuspect(it)
-    }
-
-    checkSuspects(
-        recentBlogEntries = recentBlogEntries,
-        suspects = suspects,
-        isStale = isStale
-    )
-}
-
-private suspend inline fun CodeforcesLostRepository.getSuspectsRemoveInvalid(
-    isValid: (CodeforcesWebBlogEntry) -> Boolean
-): List<CodeforcesWebBlogEntry> =
-    suspects()
-        .partition(isValid)
-        .let { (valid, invalid) ->
-            remove(invalid)
-            valid
-        }
-
-private suspend inline fun CodeforcesLostRepository.checkSuspects(
-    recentBlogEntries: List<CodeforcesRecentFeedBlogEntry>,
-    suspects: List<CodeforcesWebBlogEntry>,
-    isStale: (Instant) -> Boolean
-) {
-    val recentIds = recentBlogEntries.mapToSet { it.id }
-
-    //remove from lost
-    remove(
-        lostEntries().filter {
-            isStale(it.creationTime) || it.id in recentIds
-        }
-    )
-
-    //suspect become lost
-    suspects.forEach { blogEntry ->
-        if (blogEntry.id !in recentIds) {
-            insertLost(blogEntry)
-        }
-    }
-}
-
-private suspend fun CodeforcesPageContentProvider.getRecentBlogEntries(): List<CodeforcesRecentFeedBlogEntry> {
-    suspend fun extractFrom(page: suspend () -> String) =
-        CodeforcesUtils.extractRecentBlogEntries(source = page())
-
-    // "/groups" has less size than "/recent" and hopefully will be cached by cf
-    return runCatching {
-        extractFrom(::getGroupsPage)
-    }.getOrElse {
-        extractFrom(::getRecentActionsPage)
-    }
-}
-
 private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHintStorage =
     object : CodeforcesLostHintStorage() {
         override suspend fun getHint(): CodeforcesLostHint? {
@@ -255,123 +166,3 @@ private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHi
         }
     }
 
-private fun CodeforcesApi.withBlogEntriesCache(
-    onNewBlogEntry: suspend (CodeforcesBlogEntry) -> Unit
-): CodeforcesApi {
-    val origin = this
-    return object : CodeforcesApi by origin {
-        private val cache = mutableMapOf<Int, CodeforcesBlogEntry>()
-
-        private suspend inline fun getOrPut(id: Int, blogEntry: () -> CodeforcesBlogEntry): CodeforcesBlogEntry =
-            cache.getOrPut(key = id) {
-                blogEntry().also { onNewBlogEntry(it) }
-            }
-
-        override suspend fun getBlogEntry(blogEntryId: Int) =
-            getOrPut(id = blogEntryId) {
-                origin.getBlogEntry(blogEntryId)
-            }
-
-        override suspend fun getRecentActions(maxCount: Int) =
-            origin.getRecentActions(maxCount = maxCount).apply {
-                forEach {
-                    it.blogEntry?.let { blogEntry ->
-                        getOrPut(id = blogEntry.id) { blogEntry }
-                    }
-                }
-            }
-    }
-}
-
-// null only if blog entry not found!
-private suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): CodeforcesBlogEntry? {
-    return try {
-        getBlogEntry(blogEntryId = blogEntryId)
-    } catch (e: CodeforcesApiBlogEntryNotFoundException) {
-        null
-    }
-}
-
-private fun Collection<CodeforcesRecentFeedBlogEntry>.filterIdGreaterThan(id: Int) = filter { it.id > id }
-
-private suspend fun Collection<CodeforcesRecentFeedBlogEntry>.fixAndFilterColorTag(
-    minRatingColorTag: CodeforcesColorTag,
-    api: CodeforcesApi
-) = api.fixHandleColors(this).filter { it.author.colorTag >= minRatingColorTag }
-
-private suspend inline fun Collection<CodeforcesRecentFeedBlogEntry>.filterNewEntries(
-    api: CodeforcesApi,
-    isNew: (Instant) -> Boolean
-) = sortedBy { it.id }.let {
-    if (it.size > 1) {
-        api.getRecentActions()
-    }
-    it.takeLastWhile {
-        val blogEntry = api.getBlogEntryOrNull(it.id)
-        blogEntry == null || isNew(blogEntry.creationTime)
-    }
-}
-
-private suspend inline fun findSuspects(
-    blogEntries: Collection<CodeforcesRecentFeedBlogEntry>,
-    minRatingColorTag: CodeforcesColorTag,
-    crossinline isNew: (Instant) -> Boolean,
-    hintStorage: CodeforcesLostHintStorage,
-    api: CodeforcesApi,
-    onSuspect: (CodeforcesWebBlogEntry) -> Unit
-) {
-    val api = api.withBlogEntriesCache { blogEntry ->
-        val time = blogEntry.creationTime
-        if (!isNew(time)) {
-            //save hint
-            hintStorage.update(blogEntry.id, time)
-        }
-    }
-
-    val hint = hintStorage.run {
-        val hint = getHint()
-        //ensure hint in case isNew logic changes
-        if (hint != null && isNew(hint.creationTime)) {
-            reset()
-            null
-        } else {
-            hint
-        }
-    }
-
-    /*
-    These 3 filters can be in arbitrary order but
-    .filterIdGreaterThen should be before .filterNewEntries
-    so there is three ways:
-    #1 .fixAndFilterColorTag .filterIdGreaterThen .filterNewEntries
-    #2 .filterIdGreaterThen .fixAndFilterColorTag .filterNewEntries
-    #3 .filterIdGreaterThen .filterNewEntries .fixAndFilterColorTag
-    additionally #2 is not worse than #1
-    So as result choose #2 or #3
-     */
-    blogEntries
-        .filterIdGreaterThan(hint?.blogEntryId ?: Int.MIN_VALUE)
-        .fixAndFilterColorTag(minRatingColorTag = minRatingColorTag, api = api)
-        .filterNewEntries(api = api, isNew = isNew)
-        .forEach {
-            val blogEntry = api.getBlogEntryOrNull(it.id) ?: return@forEach
-            onSuspect(
-                blogEntry
-                    .copy(rating = 0)
-                    .toWebBlogEntry(colorTag = it.author.colorTag)
-            )
-        }
-}
-
-//Required against new year color chaos
-private suspend fun CodeforcesApi.fixHandleColors(blogEntries: Collection<CodeforcesRecentFeedBlogEntry>): List<CodeforcesRecentFeedBlogEntry> {
-    val users = getUsersCatching(handles = blogEntries.map { it.author.handle }, checkHistoricHandles = false)
-    return blogEntries.map { blogEntry ->
-        val user = users.getValue(blogEntry.author.handle).getOrThrow()
-        if (blogEntry.author.colorTag == ADMIN) blogEntry
-        else {
-            val colorTag = CodeforcesColorTag.fromRating(user.rating)
-            blogEntry.copy(author = blogEntry.author.copy(colorTag = colorTag))
-        }
-    }
-}
