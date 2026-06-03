@@ -32,4 +32,5 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
 
     implementation(libs.jsoup)
+    compileOnly(libs.jspecify)
 }

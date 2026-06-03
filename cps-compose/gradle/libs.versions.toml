@@ -26,6 +26,7 @@ jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
 # 1.22.1:
 # Missing class com.google.re2j.Matcher (referenced from: com.google.re2j.Matcher org.jsoup.helper.Re2jRegex$Re2jMatcher.delegate and 3 other contexts)
 # Missing class com.google.re2j.Pattern (referenced from: com.google.re2j.Pattern org.jsoup.helper.Re2jRegex.re2jPattern and 4 other contexts)
+jspecify = "1.0.0"
 
 resaca = "5.1.0" # https://github.com/sebaslogen/resaca/releases
 
@@ -68,6 +69,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 resaca = { module = "io.github.sebaslogen:resaca", version.ref = "resaca" }
 korlibs-crypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
 
