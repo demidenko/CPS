@@ -121,23 +121,43 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     }
 
     val suspects = getEntriesOf<CodeforcesLostBlogEntrySuspect>()
-        .sortedBy { it.blogEntryId }
 
     if (suspects.size > 1) {
         api.runCatching { getRecentActions() }
     }
 
-    suspects.forEach { suspect ->
-        val blogEntry = api.getBlogEntryOrNull(blogEntryId = suspect.blogEntryId)
+    suspects.upgradeToFresh(
+        getBlogEntry = { api.getBlogEntryOrNull(blogEntryId = it) },
+        isFresh = isFresh,
+        upgrade = {
+            editEntries { put(it) }
+        },
+        remove = {
+            editEntries { remove(it.blogEntryId) }
+        }
+    )
+}
 
-        if (blogEntry != null && isFresh(blogEntry)) {
-            editEntries {
-                put(blogEntry.toFresh(authorColorTag = suspect.authorColorTag))
-            }
+private inline fun List<CodeforcesLostBlogEntrySuspect>.upgradeToFresh(
+    getBlogEntry: (Int) -> CodeforcesBlogEntry?,
+    isFresh: (CodeforcesBlogEntry) -> Boolean,
+    upgrade: (CodeforcesLostBlogEntryFresh) -> Unit,
+    remove: (CodeforcesLostBlogEntrySuspect) -> Unit
+) {
+    var notFresh = false
+    sortedByDescending { it.blogEntryId }.forEach { suspect ->
+        if (notFresh) {
+            remove(suspect)
         } else {
-            editEntries {
-                remove(suspect.blogEntryId)
+            val blogEntry = getBlogEntry(suspect.blogEntryId)
+
+            if (blogEntry != null && isFresh(blogEntry)) {
+                upgrade(blogEntry.toFresh(authorColorTag = suspect.authorColorTag))
+            } else {
+                remove(suspect)
             }
+
+            if (blogEntry != null && !isFresh(blogEntry)) notFresh = true
         }
     }
 }
