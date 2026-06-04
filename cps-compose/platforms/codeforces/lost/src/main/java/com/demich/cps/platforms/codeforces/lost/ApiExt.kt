@@ -33,6 +33,23 @@ internal fun CodeforcesApi.withBlogEntriesCache(
     }
 }
 
+internal fun CodeforcesApi.withBeforeGetCall(
+    beforeGet: suspend () -> Unit
+): CodeforcesApi {
+    val origin = this
+    return object : CodeforcesApi by origin {
+        override suspend fun getBlogEntry(blogEntryId: Int) = run {
+            beforeGet()
+            origin.getBlogEntry(blogEntryId = blogEntryId)
+        }
+
+        override suspend fun getRecentActions(maxCount: Int) = run {
+            beforeGet()
+            origin.getRecentActions(maxCount = maxCount)
+        }
+    }
+}
+
 // null only if blog entry not found!
 internal suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): CodeforcesBlogEntry? {
     return try {

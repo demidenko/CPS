@@ -22,9 +22,13 @@ suspend fun CodeforcesLostStorage.updateEntries(
         isFresh = isFresh
     )
 
-    val api = api.withBlogEntriesCache { blogEntry ->
-        hintStorage.update(blogEntry.id, blogEntry.creationTime)
-    }
+    val delayedStorage = DelayedTransactionsLostStorage(this)
+
+    val api = api
+        .withBeforeGetCall { delayedStorage.pushChanges() }
+        .withBlogEntriesCache { blogEntry ->
+            hintStorage.update(blogEntry.id, blogEntry.creationTime)
+        }
 
     val recentResult = pageContentProvider.getRecentCatching()
 
@@ -41,17 +45,15 @@ suspend fun CodeforcesLostStorage.updateEntries(
         addFresh(blogEntries)
     }
 
-    val recentBlogEntries = recentResult.getOrThrow()
-
-    val hint = hintStorage.getHint()
-
-    updateEntries(
-        api = api,
-        recent = recentBlogEntries,
-        hint = hint,
-        isFresh = { isFresh(it.creationTime) },
-        isStale = { isStale(it.creationTime) }
-    )
+    delayedStorage.use {
+        updateEntries(
+            api = api,
+            recent = recentResult.getOrThrow(),
+            hint = hintStorage.getHint(),
+            isFresh = { isFresh(it.creationTime) },
+            isStale = { isStale(it.creationTime) }
+        )
+    }
 }
 
 private suspend fun CodeforcesLostStorage.updateEntries(
@@ -237,5 +239,38 @@ private fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replace
             it.setValue(newValue)
             false
         }
+    }
+}
+
+private class DelayedTransactionsLostStorage(
+    private val origin: CodeforcesLostStorage
+): CodeforcesLostStorage {
+    private typealias UpdateLambda = (Map<Int, CodeforcesLostEntry>) -> Map<Int, CodeforcesLostEntry>
+    private var blocks = mutableListOf<UpdateLambda>()
+
+    override suspend fun update(transform: UpdateLambda) {
+        blocks.add(transform)
+    }
+
+    override suspend fun getEntries(): Map<Int, CodeforcesLostEntry> {
+        pushChanges()
+        return origin.getEntries()
+    }
+
+    suspend fun pushChanges() {
+        if (blocks.isNotEmpty()) {
+            origin.update {
+                blocks.fold(initial = it) { map, block -> block(map) }
+            }
+            blocks.clear()
+        }
+    }
+}
+
+private suspend inline fun DelayedTransactionsLostStorage.use(block: DelayedTransactionsLostStorage.() -> Unit) {
+    try {
+        block()
+    } finally {
+        pushChanges()
     }
 }
