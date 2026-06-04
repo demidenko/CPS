@@ -229,19 +229,6 @@ private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<Li
 private fun isNotFresh(blogEntryId: Int, hint: CodeforcesLostHint?) =
     hint != null && blogEntryId <= hint.blogEntryId
 
-private fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replaceValues(
-    transform: (Map.Entry<K, V>) -> V?
-) {
-    removeAll {
-        val newValue = transform(it)
-        if (newValue == null) true
-        else {
-            it.setValue(newValue)
-            false
-        }
-    }
-}
-
 private class DelayedTransactionsLostStorage(
     private val origin: CodeforcesLostStorage
 ): CodeforcesLostStorage {
