@@ -29,8 +29,18 @@ internal fun MutableMap<Int, CodeforcesLostEntry>.upsert(entry: CodeforcesLostEn
 private fun merge(a: CodeforcesLostEntry, b: CodeforcesLostEntry): CodeforcesLostEntry {
     require(a.blogEntryId == b.blogEntryId) { "merge entries with different ids" }
 
-    val authorColorTag = b.authorColorTag ?: a.authorColorTag
+    val colorTag = b.authorColorTag ?: a.authorColorTag
 
-    // TODO: do merge
-    return b
+    return when (b) {
+        is CodeforcesLostBlogEntry -> b.copy(authorColorTag = colorTag)
+        is CodeforcesLostBlogEntryFresh -> when (a) {
+            is CodeforcesLostBlogEntry -> a.copy(blogEntry = b.blogEntry, authorColorTag = colorTag)
+            is CodeforcesLostBlogEntryFresh, is CodeforcesLostBlogEntrySuspect -> b.copy(authorColorTag = colorTag)
+        }
+        is CodeforcesLostBlogEntrySuspect -> when (a) {
+            is CodeforcesLostBlogEntry -> a.copy(authorColorTag = colorTag)
+            is CodeforcesLostBlogEntryFresh -> a.copy(authorColorTag = colorTag)
+            is CodeforcesLostBlogEntrySuspect -> b.copy(authorColorTag = colorTag)
+        }
+    }
 }
