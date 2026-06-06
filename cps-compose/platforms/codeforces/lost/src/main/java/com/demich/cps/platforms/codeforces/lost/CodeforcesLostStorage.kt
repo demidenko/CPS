@@ -16,20 +16,3 @@ suspend inline fun CodeforcesLostStorage.editEntries(
         it.toMutableMap().apply(block)
     }
 }
-
-internal fun <T: CodeforcesLostEntry> MutableMap<Int, T>.put(entry: T) {
-    put(key = entry.blogEntryId, value = entry)
-}
-
-internal fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replaceValues(
-    transform: (Map.Entry<K, V>) -> V?
-) {
-    removeAll {
-        val newValue = transform(it)
-        if (newValue == null) true
-        else {
-            it.setValue(newValue)
-            false
-        }
-    }
-}
