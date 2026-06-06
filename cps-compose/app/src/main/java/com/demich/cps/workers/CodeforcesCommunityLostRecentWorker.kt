@@ -74,7 +74,8 @@ class CodeforcesCommunityLostRecentWorker(
             pageContentProvider = client,
             hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
             isFresh = { currentTime - it < 24.hours },
-            isStale = { currentTime - it > 7.days }
+            isStale = { currentTime - it > 7.days },
+            trustColorTags = false
         )
     }
 }

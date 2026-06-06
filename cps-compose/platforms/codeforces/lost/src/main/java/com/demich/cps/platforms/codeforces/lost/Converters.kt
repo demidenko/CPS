@@ -5,10 +5,12 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import kotlin.time.Clock
 
-internal fun CodeforcesRecentFeedBlogEntry.toSuspect(): CodeforcesLostBlogEntrySuspect =
+internal fun CodeforcesRecentFeedBlogEntry.toSuspect(
+    trustColorTag: Boolean
+): CodeforcesLostBlogEntrySuspect =
     CodeforcesLostBlogEntrySuspect(
         blogEntryId = id,
-        authorColorTag = author.colorTag.takeIf { it == ADMIN }
+        authorColorTag = author.colorTag.takeIf { trustColorTag || it == ADMIN }
     )
 
 internal fun CodeforcesBlogEntry.toFresh(authorColorTag: CodeforcesColorTag?): CodeforcesLostBlogEntryFresh =

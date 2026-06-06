@@ -15,7 +15,8 @@ suspend fun CodeforcesLostStorage.updateEntries(
     pageContentProvider: CodeforcesPageContentProvider,
     hintStorage: CodeforcesLostHintStorage,
     isFresh: (Instant) -> Boolean,
-    isStale: (Instant) -> Boolean
+    isStale: (Instant) -> Boolean,
+    trustColorTags: Boolean
 ) {
     val hintStorage = CheckedHintStorage(
         storage = hintStorage,
@@ -51,7 +52,8 @@ suspend fun CodeforcesLostStorage.updateEntries(
             recent = recentResult.getOrThrow(),
             hint = hintStorage.getHint(),
             isFresh = { isFresh(it.creationTime) },
-            isStale = { isStale(it.creationTime) }
+            isStale = { isStale(it.creationTime) },
+            trustColorTags = trustColorTags
         )
     }
 }
@@ -61,11 +63,13 @@ private suspend fun CodeforcesLostStorage.updateEntries(
     recent: List<CodeforcesRecentFeedBlogEntry>,
     hint: CodeforcesLostHint?,
     isFresh: (CodeforcesBlogEntry) -> Boolean,
-    isStale: (CodeforcesBlogEntry) -> Boolean
+    isStale: (CodeforcesBlogEntry) -> Boolean,
+    trustColorTags: Boolean
 ) {
     updateSuspects(
         recent = recent,
-        hint = hint
+        hint = hint,
+        trustColorTags = trustColorTags
     )
 
     updateFresh(
@@ -83,7 +87,8 @@ private suspend fun CodeforcesLostStorage.updateEntries(
 
 private suspend fun CodeforcesLostStorage.updateSuspects(
     recent: List<CodeforcesRecentFeedBlogEntry>,
-    hint: CodeforcesLostHint?
+    hint: CodeforcesLostHint?,
+    trustColorTags: Boolean
 ) {
     editEntries {
         entries.removeAll { (id, it) ->
@@ -92,7 +97,7 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
 
         recent.forEach { blogEntry ->
             if (!isNotFresh(blogEntry.id, hint) && blogEntry.id !in this) {
-                put(blogEntry.toSuspect())
+                put(blogEntry.toSuspect(trustColorTag = trustColorTags))
             }
         }
     }
