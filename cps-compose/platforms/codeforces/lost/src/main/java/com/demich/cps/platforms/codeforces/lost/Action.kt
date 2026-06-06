@@ -206,7 +206,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
     if (entries.any { it is CodeforcesLostBlogEntry && it.authorColorTag == null }) {
         val users = api.getUsersCatching(
             handles = entries.mapNotNull {
-                if (it.authorColorTag == null) it.handleOrNull()
+                if (it.authorColorTag == null) it.authorHandle
                 else null
             },
             checkHistoricHandles = false
@@ -214,7 +214,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
 
         editNullColorTags(
             colorTag = {
-                users[it.handleOrNull()]
+                users[it.authorHandle]
                     ?.getOrNull()
                     ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
             }
@@ -243,11 +243,12 @@ private suspend fun CodeforcesLostStorage.editNullColorTags(
     }
 }
 
-private fun CodeforcesLostEntry.handleOrNull() = when (this) {
-    is CodeforcesLostBlogEntrySuspect -> null
-    is CodeforcesLostBlogEntryFresh -> blogEntry.authorHandle
-    is CodeforcesLostBlogEntry -> blogEntry.authorHandle
-}
+private val CodeforcesLostEntry.authorHandle
+    get() = when (this) {
+        is CodeforcesLostBlogEntrySuspect -> null
+        is CodeforcesLostBlogEntryFresh -> blogEntry.authorHandle
+        is CodeforcesLostBlogEntry -> blogEntry.authorHandle
+    }
 
 private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<List<CodeforcesRecentFeedBlogEntry>> {
     suspend fun extractFrom(page: suspend () -> String) =
