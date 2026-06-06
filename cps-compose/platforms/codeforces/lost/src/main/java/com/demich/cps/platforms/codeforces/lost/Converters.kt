@@ -21,7 +21,7 @@ internal fun CodeforcesBlogEntry.toFresh(authorColorTag: CodeforcesColorTag?): C
 
 internal fun CodeforcesLostBlogEntryFresh.toLost(): CodeforcesLostBlogEntry =
     CodeforcesLostBlogEntry(
-        blogEntry = blogEntry,
+        blogEntry = blogEntry.copy(rating = 0),
         authorColorTag = authorColorTag,
         timeStamp = Clock.System.now()
     )
