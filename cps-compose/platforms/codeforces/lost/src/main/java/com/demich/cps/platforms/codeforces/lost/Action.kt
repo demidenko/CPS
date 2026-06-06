@@ -201,13 +201,12 @@ private suspend fun CodeforcesLostStorage.updateLost(
         }
     }
 
-    val lost = getEntriesOf<CodeforcesLostBlogEntry>()
+    val entries = getEntries().values
 
-    if (lost.any { it.authorColorTag == null }) {
-        // TODO: use this to get colortags for all entries in storage
+    if (entries.any { it is CodeforcesLostBlogEntry && it.authorColorTag == null }) {
         val users = api.getUsersCatching(
-            handles = lost.mapNotNull {
-                if (it.authorColorTag == null) it.blogEntry.authorHandle
+            handles = entries.mapNotNull {
+                if (it.authorColorTag == null) it.handleOrNull()
                 else null
             },
             checkHistoricHandles = false
