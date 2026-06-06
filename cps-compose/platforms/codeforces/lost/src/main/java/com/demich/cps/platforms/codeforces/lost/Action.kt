@@ -215,7 +215,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
 
         editNullColorTags(
             colorTag = {
-                users[it.blogEntry.authorHandle]
+                users[it.handleOrNull()]
                     ?.getOrNull()
                     ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
             }
@@ -224,19 +224,30 @@ private suspend fun CodeforcesLostStorage.updateLost(
 }
 
 private suspend fun CodeforcesLostStorage.editNullColorTags(
-    colorTag: (CodeforcesLostBlogEntry) -> CodeforcesColorTag?
+    colorTag: (CodeforcesLostEntry) -> CodeforcesColorTag?
 ) {
     editEntries {
         entries.forEach { mapEntry ->
             val it = mapEntry.value
-            if (it is CodeforcesLostBlogEntry && it.authorColorTag == null) {
+            if (it.authorColorTag == null) {
                 val colorTag = colorTag(it)
                 if (colorTag != null) {
-                    mapEntry.setValue(it.copy(authorColorTag = colorTag))
+                    val entry = when (it) {
+                        is CodeforcesLostBlogEntry -> it.copy(authorColorTag = colorTag)
+                        is CodeforcesLostBlogEntryFresh -> it.copy(authorColorTag = colorTag)
+                        is CodeforcesLostBlogEntrySuspect -> it.copy(authorColorTag = colorTag)
+                    }
+                    mapEntry.setValue(entry)
                 }
             }
         }
     }
+}
+
+private fun CodeforcesLostEntry.handleOrNull() = when (this) {
+    is CodeforcesLostBlogEntrySuspect -> null
+    is CodeforcesLostBlogEntryFresh -> blogEntry.authorHandle
+    is CodeforcesLostBlogEntry -> blogEntry.authorHandle
 }
 
 private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<List<CodeforcesRecentFeedBlogEntry>> {
