@@ -96,8 +96,8 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
         }
 
         recent.forEach { blogEntry ->
-            if (!isNotFresh(blogEntry.id, hint) && blogEntry.id !in this) {
-                put(blogEntry.toSuspect(trustColorTag = trustColorTags))
+            if (!isNotFresh(blogEntry.id, hint)) {
+                upsert(blogEntry.toSuspect(trustColorTag = trustColorTags))
             }
         }
     }
@@ -110,7 +110,7 @@ private suspend fun CodeforcesLostStorage.addFresh(
 
     editEntries {
         blogEntries.forEach {
-            if (it.blogEntryId !in this) put(it)
+            upsert(it)
         }
     }
 }
