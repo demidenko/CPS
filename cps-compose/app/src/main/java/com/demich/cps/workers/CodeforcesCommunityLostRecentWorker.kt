@@ -158,12 +158,8 @@ private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHi
             return this@asHintStorage.invoke()
         }
 
-        override suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint) {
+        override suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint?) {
             this@asHintStorage.update(transform)
-        }
-
-        override suspend fun reset() {
-            this@asHintStorage.setValue(null)
         }
     }
 

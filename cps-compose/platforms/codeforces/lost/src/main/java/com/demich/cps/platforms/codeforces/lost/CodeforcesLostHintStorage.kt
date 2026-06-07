@@ -13,20 +13,18 @@ data class CodeforcesLostHint(
 interface CodeforcesLostHintStorage {
     suspend fun getValue(): CodeforcesLostHint?
 
-    suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint)
-
-    suspend fun reset()
+    suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint?)
 }
 
 internal class CheckedHintStorage(
-    val storage: CodeforcesLostHintStorage,
+    private val storage: CodeforcesLostHintStorage,
     val isFresh: (Instant) -> Boolean
 ) {
     suspend fun getHint(): CodeforcesLostHint? {
         val hint = storage.getValue()
         // ensure hint in case isFresh logic changes
         if (hint != null && isFresh(hint.creationTime)) {
-            storage.reset()
+            storage.update { null }
             return null
         } else {
             return hint
