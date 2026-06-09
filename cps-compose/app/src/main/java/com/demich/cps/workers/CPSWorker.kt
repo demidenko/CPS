@@ -15,18 +15,15 @@ import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.repeatUntilSuccessOrLast
 import com.demich.cps.utils.update
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 abstract class CPSWorker(
@@ -74,10 +71,7 @@ abstract class CPSWorker(
 
     protected abstract suspend fun runWork()
     private suspend fun runWorkCatching() =
-        repeatUntilSuccessOrLast(
-            times = 2,
-            between = { delay(5.seconds) }
-        ) {
+        runCatching {
             setProgressInfo(ProgressBarInfo(total = 0))
             timeHolder.resetSaved()
             runWork()
