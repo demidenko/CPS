@@ -34,8 +34,8 @@ internal fun cpsHttpClient(
 
     //careful!!! only one install and retry block is used in ktor
     install(HttpRequestRetry) {
-        retryOnExceptionIf(maxRetries = 3) { requestBuilder, throwable ->
-            throwable.shouldRetry() || retryOnExceptionIf(throwable)
+        retryOnExceptionIf(maxRetries = 3) { requestBuilder, it ->
+            it !is kotlinx.coroutines.CancellationException && (it.shouldRetry() || retryOnExceptionIf(it))
         }
         delayMillis { 500/*.milliseconds*/ }
     }
@@ -72,7 +72,6 @@ internal fun cpsHttpClient(
 
 private fun Throwable.shouldRetry(): Boolean =
     when (this) {
-        is kotlinx.coroutines.CancellationException -> false
         is java.net.UnknownHostException -> false
         is kotlinx.io.IOException -> true
         is ResponseException if response.status.isServerError() -> true
