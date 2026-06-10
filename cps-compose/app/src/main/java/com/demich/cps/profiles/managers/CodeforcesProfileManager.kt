@@ -345,12 +345,14 @@ private fun CodeforcesApiAccessSettingsItem(
             "api-key" to CodeforcesApiAccess::key,
             "secret" to CodeforcesApiAccess::secret
         ),
+        decode = { list ->
+            CodeforcesApiAccess(key = list[0], secret = list[1])
+        },
         onSave = {
-            val (key, secret) = it
             scope.launch {
                 profileStorage.edit {
-                    apiAccessKey.value = key
-                    apiAccessSecret.value = secret
+                    apiAccessKey.value = it.key
+                    apiAccessSecret.value = it.secret
                 }
             }
         },

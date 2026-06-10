@@ -49,12 +49,14 @@ internal fun ClistApiAccessSettingsItem(
             "login" to ClistApiAccess::login,
             "api-key" to ClistApiAccess::key,
         ),
-        onSave = { values ->
+        decode = { list ->
+            ClistApiAccess(login = list[0], key = list[1])
+        },
+        onSave = {
             scope.launch {
-                val (login, key) = values
                 settings.edit {
-                    clistApiLogin.value = login
-                    clistApiKey.value = key
+                    clistApiLogin.value = it.login
+                    clistApiKey.value = it.key
                 }
             }
         },

@@ -36,7 +36,8 @@ internal fun <T> ApiAccessSettingsItem(
     itemSubtitle: @Composable (context(SettingsContainerScope) (T) -> Unit),
     dialogTitle: String,
     fields: List<Pair<String, KProperty1<T & Any, String>>>,
-    onSave: (List<String>) -> Unit,
+    decode: (List<String>) -> T & Any,
+    onSave: (T & Any) -> Unit,
     onHelp: (() -> Unit)? = null
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
@@ -55,6 +56,7 @@ internal fun <T> ApiAccessSettingsItem(
             fields = fields.map { (title, prop) ->
                 Field(title = title, initValue = init?.let { prop.get(it) } ?: "")
             },
+            decode = decode,
             onSave = onSave,
             onDismissRequest = { showDialog = false },
             onHelp = onHelp
@@ -68,10 +70,11 @@ private class Field(
 )
 
 @Composable
-private fun ApiDialog(
+private fun <T> ApiDialog(
     dialogTitle: String,
     fields: List<Field>,
-    onSave: (List<String>) -> Unit,
+    decode: (List<String>) -> T,
+    onSave: (T) -> Unit,
     onDismissRequest: () -> Unit,
     onHelp: (() -> Unit)?
 ) {
@@ -112,7 +115,7 @@ private fun ApiDialog(
             onCancelClick = onDismissRequest,
             modifier = Modifier.padding(top = 8.dp)
         ) {
-            onSave(strings)
+            onSave(decode(strings))
             onDismissRequest()
         }
     }
