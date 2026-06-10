@@ -34,6 +34,7 @@ import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.saver
+import com.demich.cps.utils.toFetchResult
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -63,7 +64,7 @@ fun RatingGraph(
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
     LoadingContentBox(
-        dataResult = ratingChangesResult,
+        dataResult = { ratingChangesResult().toFetchResult() },
         onRetry = onRetry,
         failedText = { "Failed to get rating history" },
         modifier = modifier

@@ -38,6 +38,7 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
+import com.demich.cps.utils.toFetchResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -105,7 +106,7 @@ private fun ColumnScope.DialogContent(
 
         ListTitle(text = "available:")
         LoadingContentBox(
-            dataResult = { fetchResult()?.map { it - selected().toSet() } },
+            dataResult = { fetchResult()?.map { it - selected().toSet() }.toFetchResult() },
             failedText = { it.niceMessage ?: "Failed to load resources" },
             onRetry = onFetchRetry,
             modifier = Modifier

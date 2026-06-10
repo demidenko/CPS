@@ -34,6 +34,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
+import com.demich.cps.utils.toFetchResult
 import com.sebaslogen.resaca.viewModelScoped
 
 @Composable
@@ -106,7 +107,7 @@ private fun CodeforcesUserBlogContent(
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
-        dataResult = blogEntriesResult,
+        dataResult = { blogEntriesResult().toFetchResult() },
         failedText = { it.niceMessage ?: "Blog load error" },
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
