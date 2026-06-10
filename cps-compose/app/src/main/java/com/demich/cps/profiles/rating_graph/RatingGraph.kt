@@ -30,11 +30,11 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.cps.utils.saver
-import com.demich.cps.utils.toFetchResult
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -56,7 +56,7 @@ internal enum class RatingFilterType {
 
 @Composable
 fun RatingGraph(
-    ratingChangesResult: () -> Result<List<RatingChange>>?,
+    ratingChangesResult: () -> FetchResult<List<RatingChange>>,
     onRetry: () -> Unit,
     manager: RatedProfileManager<*>,
     modifier: Modifier = Modifier,
@@ -64,7 +64,7 @@ fun RatingGraph(
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
     LoadingContentBox(
-        dataResult = { ratingChangesResult().toFetchResult() },
+        dataResult = ratingChangesResult,
         onRetry = onRetry,
         failedText = { "Failed to get rating history" },
         modifier = modifier

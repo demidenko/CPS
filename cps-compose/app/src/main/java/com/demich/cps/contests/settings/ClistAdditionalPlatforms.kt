@@ -33,12 +33,13 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.map
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
-import com.demich.cps.utils.toFetchResult
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -83,7 +84,7 @@ internal fun ClistAdditionalResourcesDialog(
 
 @Composable
 private fun ColumnScope.DialogContent(
-    fetchResult: () -> Result<List<ClistResource>>?,
+    fetchResult: () -> FetchResult<List<ClistResource>>,
     onFetchRetry: () -> Unit,
     selected: () -> List<ClistResource>,
     onSelectResource: (ClistResource) -> Unit,
@@ -106,7 +107,7 @@ private fun ColumnScope.DialogContent(
 
         ListTitle(text = "available:")
         LoadingContentBox(
-            dataResult = { fetchResult()?.map { it - selected().toSet() }.toFetchResult() },
+            dataResult = { fetchResult().map { it - selected().toSet() } },
             failedText = { it.niceMessage ?: "Failed to load resources" },
             onRetry = onFetchRetry,
             modifier = Modifier

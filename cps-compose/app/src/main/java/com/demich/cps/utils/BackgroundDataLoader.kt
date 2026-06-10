@@ -12,21 +12,21 @@ import kotlinx.coroutines.launch
 
 class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     private var currentKey: Any? = null
-    private val flow = MutableStateFlow<Result<T>?>(null)
+    private val flow = MutableStateFlow<FetchResult<T>>(FetchResult.Loading)
     private var job: Job? = null
 
-    fun flowOfResult(): StateFlow<Result<T>?> = flow
+    fun flowOfResult(): StateFlow<FetchResult<T>> = flow
 
     fun execute(key: Any, block: suspend () -> T) =
         flowOfResult().also {
             if (currentKey != key) {
-                flow.value = null
+                flow.value = FetchResult.Loading
                 currentKey = key
                 job?.cancel()
                 job = scope.launch(Dispatchers.Default) {
                     kotlin.runCatching { block() }.let {
                         ensureActive()
-                        if (currentKey == key) flow.value = it
+                        if (currentKey == key) flow.value = it.toFetchResult()
                     }
                 }
             }

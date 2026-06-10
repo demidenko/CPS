@@ -27,14 +27,15 @@ import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
+import com.demich.cps.utils.map
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
-import com.demich.cps.utils.toFetchResult
 import com.sebaslogen.resaca.viewModelScoped
 
 @Composable
@@ -73,15 +74,15 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    blogEntriesResult: () -> Result<List<CodeforcesWebBlogEntry>>?,
+    blogEntriesResult: () -> FetchResult<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
     LaunchedEffect(filterState, blogEntriesResult) {
         //available = res != null && res.isSuccess && res.value.isNotEmpty()
-        snapshotFlow { blogEntriesResult()?.map { it.isNotEmpty() } }
+        snapshotFlow { blogEntriesResult().map { it.isNotEmpty() } }
             .collect { result ->
-                filterState.available = result?.getOrNull() == true
+                filterState.available = result is FetchResult.Success && result.value
             }
     }
 
@@ -101,13 +102,13 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogContent(
-    blogEntriesResult: () -> Result<List<CodeforcesWebBlogEntry>>?,
+    blogEntriesResult: () -> FetchResult<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
-        dataResult = { blogEntriesResult().toFetchResult() },
+        dataResult = blogEntriesResult,
         failedText = { it.niceMessage ?: "Blog load error" },
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
