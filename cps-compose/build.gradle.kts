@@ -24,7 +24,7 @@ tasks.register<Delete>("clean") {
 private val javaVersion = JavaVersion.toVersion(25)
 
 fun CommonExtension.baseAndroidConfig() {
-    val apiLevel = 36
+    val apiLevel = 37
     compileSdk { version = release(version = apiLevel) }
 
     defaultConfig.apply {

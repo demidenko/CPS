@@ -9,7 +9,7 @@ coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
 
 ktor = "3.5.0" # https://github.com/ktorio/ktor/releases
 
-core = "1.18.0" # https://developer.android.com/jetpack/androidx/releases/core
+core = "1.19.0" # https://developer.android.com/jetpack/androidx/releases/core
 work = "2.11.2" # https://developer.android.com/jetpack/androidx/releases/work
 
 compose-bom = "2026.04.01" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
@@ -48,7 +48,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core" }
+androidx-core-ktx = { module = "androidx.core:core", version.ref = "core" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
 
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
