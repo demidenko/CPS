@@ -5,6 +5,7 @@ import com.demich.cps.platforms.utils.EvaluatorNthTag
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.selectSequence
+import com.demich.cps.platforms.utils.values
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
@@ -72,39 +73,37 @@ object CodeforcesUtils {
     private val evaluatorTopicRating = Evaluator.Class("topic-rating")
     private val evaluator_li2 = EvaluatorNthTag("li", 2)
     private val evaluator_a1 = EvaluatorNthTag("a", 1)
-    private fun extractBlogEntryOrNull(topic: Element): CodeforcesWebBlogEntry? {
-        return kotlin.runCatching {
-            val id: Int
-            val title: String
-            topic.expectFirst(evaluatorDivTitle).expectFirst("a").let {
-                title = it.text()
-                id = it.attr("href").removePrefix("/blog/entry/").toInt()
-            }
+    private fun extractBlogEntry(topic: Element): CodeforcesWebBlogEntry {
+        val id: Int
+        val title: String
+        topic.expectFirst(evaluatorDivTitle).expectFirst("a").let {
+            title = it.text()
+            id = it.attr("href").removePrefix("/blog/entry/").toInt()
+        }
 
-            val author: CodeforcesHandle
-            val creationTime: Instant
-            topic.expectDivInfo().let { info ->
-                author = info.expectRatedUser().extractRatedUser()
-                creationTime = info.expectHumanTime().extractTime()
-            }
+        val author: CodeforcesHandle
+        val creationTime: Instant
+        topic.expectDivInfo().let { info ->
+            author = info.expectRatedUser().extractRatedUser()
+            creationTime = info.expectHumanTime().extractTime()
+        }
 
-            val rating: Int
-            val commentsCount: Int
-            topic.expectFirst(evaluatorMeta).let { bottom ->
-                rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(evaluatorTopicRating).text().toInt()
-                val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst(evaluator_li2)
-                commentsCount = commentsItem.expectFirst(evaluator_a1).text().toInt()
-            }
+        val rating: Int
+        val commentsCount: Int
+        topic.expectFirst(evaluatorMeta).let { bottom ->
+            rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(evaluatorTopicRating).text().toInt()
+            val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst(evaluator_li2)
+            commentsCount = commentsItem.expectFirst(evaluator_a1).text().toInt()
+        }
 
-            CodeforcesWebBlogEntry(
-                id = id,
-                title = title,
-                author = author,
-                creationTime = creationTime,
-                rating = rating,
-                commentsCount = commentsCount
-            )
-        }.getOrNull()
+        return CodeforcesWebBlogEntry(
+            id = id,
+            title = title,
+            author = author,
+            creationTime = creationTime,
+            rating = rating,
+            commentsCount = commentsCount
+        )
     }
 
     private val evaluatorAvatar = Evaluator.Class("avatar")
@@ -177,12 +176,13 @@ object CodeforcesUtils {
     }
 
 
-    internal fun extractBlogEntries(document: Document) =
-        document.expectContent().selectSequence("div.topic")
-            .mapNotNull(::extractBlogEntryOrNull)
+    internal fun extractBlogEntries(document: Document): Sequence<Result<CodeforcesWebBlogEntry>> =
+        document.expectContent()
+            .selectSequence("div.topic")
+            .map { runCatching { extractBlogEntry(it) } }
 
     fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
-        extractBlogEntries(Jsoup.parse(source)).toList()
+        extractBlogEntries(Jsoup.parse(source)).values().toList()
 
     internal fun extractComments(document: Document) =
         document.expectContent().selectSequence(".comment-table")
