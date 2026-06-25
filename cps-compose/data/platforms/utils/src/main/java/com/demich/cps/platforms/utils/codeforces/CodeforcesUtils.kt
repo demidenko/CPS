@@ -109,95 +109,91 @@ object CodeforcesUtils {
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
     private val evaluatorDivTypography = EvaluatorTagWithClass(tag = "div", className = "ttypography")
-    private fun extractCommentOrNull(commentBox: Element): CodeforcesWebComment? {
-        return kotlin.runCatching {
-            val commentator = commentBox.expectFirst(evaluatorAvatar)
-                .expectRatedUser()
-                .extractRatedUser()
+    private fun extractComment(commentBox: Element): CodeforcesWebComment {
+        val commentator = commentBox.expectFirst(evaluatorAvatar)
+            .expectRatedUser()
+            .extractRatedUser()
 
-            val blogEntryId: Int
-            val blogEntryTitle: String
-            val blogEntryAuthor: CodeforcesHandle
-            val commentId: Long
-            val commentCreationTime: Instant
-            val commentRating: Int
-            commentBox.expectDivInfo().let { info ->
-                blogEntryAuthor = info.expectRatedUser().extractRatedUser()
-                commentCreationTime = info.expectHumanTime().extractTime()
-                info.expectFirst(evaluatorHrefBlogEntry).let { commentLink ->
-                    blogEntryTitle = commentLink.text()
-                    commentLink.attr("href").let { url ->
-                        // href="/blog/entry/XXXXXX#comment-YYYYYY"
-                        val j = url.indexOf('#')
-                        val i = url.lastIndexOf('/', j - 1)
-                        blogEntryId = url.substring(i + 1, j).toInt()
-                    }
-                }
-                info.expectFirst(evaluatorAttrCommentId).let { ratingBox ->
-                    commentId = ratingBox.attr("commentid").toLong()
-                    commentRating = ratingBox.text().trim().toInt()
+        val blogEntryId: Int
+        val blogEntryTitle: String
+        val blogEntryAuthor: CodeforcesHandle
+        val commentId: Long
+        val commentCreationTime: Instant
+        val commentRating: Int
+        commentBox.expectDivInfo().let { info ->
+            blogEntryAuthor = info.expectRatedUser().extractRatedUser()
+            commentCreationTime = info.expectHumanTime().extractTime()
+            info.expectFirst(evaluatorHrefBlogEntry).let { commentLink ->
+                blogEntryTitle = commentLink.text()
+                commentLink.attr("href").let { url ->
+                    // href="/blog/entry/XXXXXX#comment-YYYYYY"
+                    val j = url.indexOf('#')
+                    val i = url.lastIndexOf('/', j - 1)
+                    blogEntryId = url.substring(i + 1, j).toInt()
                 }
             }
+            info.expectFirst(evaluatorAttrCommentId).let { ratingBox ->
+                commentId = ratingBox.attr("commentid").toLong()
+                commentRating = ratingBox.text().trim().toInt()
+            }
+        }
 
-            //<span class="notice">Пользователь создал или обновил текст</span>
-            //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
-            //TODO: use outerHtml() to match api response
-            val commentHtml = commentBox.selectFirst(evaluatorDivTypography)?.html().orEmpty()
+        //<span class="notice">Пользователь создал или обновил текст</span>
+        //<span class="notice">Комментарий удален по причине нарушения правил Codeforces</span>
+        //TODO: use outerHtml() to match api response
+        val commentHtml = commentBox.selectFirst(evaluatorDivTypography)?.html().orEmpty()
 
-            CodeforcesWebComment(
-                id = commentId,
-                author = commentator,
-                html = commentHtml,
-                rating = commentRating,
-                creationTime = commentCreationTime,
-                blogEntryId = blogEntryId,
-                blogEntryTitle = blogEntryTitle,
-                blogEntryAuthor = blogEntryAuthor,
-            )
-        }.getOrNull()
+        return CodeforcesWebComment(
+            id = commentId,
+            author = commentator,
+            html = commentHtml,
+            rating = commentRating,
+            creationTime = commentCreationTime,
+            blogEntryId = blogEntryId,
+            blogEntryTitle = blogEntryTitle,
+            blogEntryAuthor = blogEntryAuthor,
+        )
     }
 
-    private fun extractRecentBlogEntryOrNull(item: Element): CodeforcesRecentFeedBlogEntry? {
-        return kotlin.runCatching {
-            val author = item.expectRatedUser().extractRatedUser()
-            val blogEntryId: Int
-            val blogEntryTitle: String
-            item.expectFirst(evaluatorHrefBlogEntry).let {
-                blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
-                blogEntryTitle = it.text()
-            }
-            CodeforcesRecentFeedBlogEntry(
-                id = blogEntryId,
-                title = blogEntryTitle,
-                author = author,
-                isLowRated = false
-            )
-        }.getOrNull()
+    private fun extractRecentBlogEntry(item: Element): CodeforcesRecentFeedBlogEntry {
+        val author = item.expectRatedUser().extractRatedUser()
+        val blogEntryId: Int
+        val blogEntryTitle: String
+        item.expectFirst(evaluatorHrefBlogEntry).let {
+            blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
+            blogEntryTitle = it.text()
+        }
+
+        return CodeforcesRecentFeedBlogEntry(
+            id = blogEntryId,
+            title = blogEntryTitle,
+            author = author,
+            isLowRated = false
+        )
     }
 
 
     internal fun extractBlogEntries(document: Document): Sequence<Result<CodeforcesWebBlogEntry>> =
-        document.expectContent()
-            .selectSequence("div.topic")
+        document.expectContent().selectSequence("div.topic")
             .map { runCatching { extractBlogEntry(it) } }
 
     fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
         extractBlogEntries(Jsoup.parse(source)).values().toList()
 
-    internal fun extractComments(document: Document) =
+    internal fun extractComments(document: Document): Sequence<Result<CodeforcesWebComment>> =
         document.expectContent().selectSequence(".comment-table")
-            .mapNotNull(::extractCommentOrNull)
+            .map { runCatching { extractComment(it) } }
 
     fun extractComments(source: String): List<CodeforcesWebComment> =
-        extractComments(Jsoup.parse(source)).toList()
+        extractComments(Jsoup.parse(source)).values().toList()
 
-    internal fun extractRecentBlogEntries(document: Document) =
+    internal fun extractRecentBlogEntries(document: Document): Sequence<Result<CodeforcesRecentFeedBlogEntry>> =
         document.expectSidebar().expectFirst("div.recent-actions")
             .selectSequence("li")
-            .mapNotNull(::extractRecentBlogEntryOrNull)
+            .map { runCatching { extractRecentBlogEntry(it) } }
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
-        extractRecentBlogEntries(Jsoup.parse(source)).toList()
+        extractRecentBlogEntries(Jsoup.parse(source)).values().toList()
 
     private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
         val sidebar = Jsoup.parse(source).selectSidebar() ?: return
