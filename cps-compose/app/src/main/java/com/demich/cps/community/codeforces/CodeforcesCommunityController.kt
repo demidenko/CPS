@@ -90,12 +90,12 @@ class CodeforcesCommunityController(
 
     // relies that tabs are always fixed!
     // not saved/restored!
-    //TODO: incorrect!!!!
+    //TODO: incorrect?????
     val visitedTabs by tabs.toMutableList().let { list ->
         derivedStateOf {
             val pos = list.indexOf(currentTab)
             for (i in pos downTo 1) list.swap(i, i-1)
-            list
+            list.toList()
         }
     }
 
