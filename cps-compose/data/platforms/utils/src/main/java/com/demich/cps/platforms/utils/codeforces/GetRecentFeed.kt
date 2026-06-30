@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.values
 import org.jsoup.Jsoup
 import kotlin.math.max
 
@@ -9,8 +10,8 @@ suspend fun CodeforcesPageContentProvider.getRecentFeed(): CodeforcesRecentFeed 
 
 private fun CodeforcesUtils.extractRecentFeed(source: String): CodeforcesRecentFeed {
     val document = Jsoup.parse(source)
-    val comments = extractComments(document).toList()
-    val blogEntries = extractRecentBlogEntries(document).toMutableList()
+    val comments = extractComments(document).values().toList()
+    val blogEntries = extractRecentBlogEntries(document).values().toMutableList()
     //blog entry with low rating disappeared from blogEntries but has comments, need to merge
     val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
     val usedIds = mutableSetOf<Int>()
