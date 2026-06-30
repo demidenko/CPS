@@ -35,12 +35,12 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.openUrlInBrowser
-import com.demich.cps.utils.saver
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -50,7 +50,7 @@ fun CodeforcesUserInfoExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
     modifier: Modifier
 ) {
-    var showItem: ItemType? by rememberSaveable(stateSaver = jsonCPS.saver()) {
+    var showItem: ItemType? by rememberSaveable(stateSaver = jsonCPS.asSaver()) {
         mutableStateOf(null)
     }
 

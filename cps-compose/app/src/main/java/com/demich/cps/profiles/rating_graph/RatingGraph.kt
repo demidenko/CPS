@@ -31,10 +31,10 @@ import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.minOfWithIndex
-import com.demich.cps.utils.saver
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -107,7 +107,7 @@ private fun RatingGraphWithHeader(
     }
 
     var selectedRatingChange: RatingChange?
-            by rememberSaveable(stateSaver = jsonCPS.saver()) { mutableStateOf(null) }
+            by rememberSaveable(stateSaver = jsonCPS.asSaver()) { mutableStateOf(null) }
 
     val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 
