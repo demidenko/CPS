@@ -70,10 +70,11 @@ private fun <U: UserInfo> ProfileExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit
 ) {
     val context = context
-    val profileResult by collectItemAsState { manager.profileStorage(context).profile }
-    profileResult?.let {
+    val state = collectItemAsState { manager.profileStorage(context).profile }
+
+    state.value?.let { profile ->
         manager.ExpandedContent(
-            profileResult = it,
+            profileResult = profile,
             setBottomBarContent = setBottomBarContent,
             modifier = Modifier
                 .padding(all = 10.dp)
