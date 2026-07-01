@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,6 +7,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.platform.UriHandler
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.NewEntriesMap
@@ -16,7 +16,6 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getType
 import com.demich.cps.utils.launchData
-import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -59,9 +58,9 @@ abstract class CodeforcesBlogEntriesState {
     abstract val blogEntries: List<CodeforcesWebBlogEntry>
 
     protected open fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) = Unit
-    fun openBlogEntry(blogEntry: CodeforcesWebBlogEntry, context: Context) {
+    fun openBlogEntry(blogEntry: CodeforcesWebBlogEntry, handler: UriHandler) {
         onOpenBlogEntry(blogEntry)
-        context.openUrlInBrowser(url = CodeforcesUrls.blogEntry(blogEntryId = blogEntry.id))
+        handler.openUri(CodeforcesUrls.blogEntry(blogEntryId = blogEntry.id))
     }
 
     open fun isNew(id: Int): Boolean = false

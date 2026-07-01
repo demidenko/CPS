@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,6 @@ import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
-import com.demich.cps.utils.context
 import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.plusIf
 
@@ -46,7 +46,8 @@ fun CodeforcesBlogEntries(
     onLongClick: ((CodeforcesWebBlogEntry) -> Unit)? = null,
     label: (@Composable (CodeforcesWebBlogEntry) -> Unit)? = null
 ) {
-    val context = context
+    val uriHandler = LocalUriHandler.current
+
     LazyColumnOfData(
         state = lazyListState,
         modifier = modifier,
@@ -64,7 +65,7 @@ fun CodeforcesBlogEntries(
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { blogEntriesState.openBlogEntry(blogEntry, context) },
+                        onClick = { blogEntriesState.openBlogEntry(blogEntry, uriHandler) },
                         onLongClick = onLongClick?.let { { it(blogEntry) } }
                     )
                     .padding(
