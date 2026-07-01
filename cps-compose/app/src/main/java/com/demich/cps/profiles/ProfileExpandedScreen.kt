@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -40,7 +39,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     screenTitle = ScreenStaticTitleState("profiles", platform.name)
 
     menu = profileExpandedMenuBuilder(
-        platform = platform,
+        manager = manager,
         onShowDeleteDialog = { showDeleteDialog = true },
         onOpenSettings = onOpenSettings
     )
@@ -84,7 +83,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
 }
 
 private fun profileExpandedMenuBuilder(
-    platform: Platform,
+    manager: ProfileManager<*>,
     onOpenSettings: () -> Unit,
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
@@ -95,11 +94,9 @@ private fun profileExpandedMenuBuilder(
     CPSDropdownMenuItem(title = "Settings", icon = CPSIcons.Settings, onClick = onOpenSettings)
     CPSDropdownMenuItem(title = "Origin", icon = CPSIcons.Origin) {
         scope.launch {
-            profileManagerOf(platform)
-                .profileStorage(context).profile()
+            manager.profileStorage(context).profile()
                 ?.userInfoOrNull()
-                ?.userPageUrl
-                ?.let { url -> context.openUrlInBrowser(url) }
+                ?.let { context.openUrlInBrowser(it.userPageUrl) }
         }
     }
 }
