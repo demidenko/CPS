@@ -43,6 +43,7 @@ fun Project.configureKotlin() {
             jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
 
             freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+            freeCompilerArgs.add("-Xreturn-value-checker=full")
         }
     }
 }
