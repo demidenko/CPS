@@ -15,6 +15,7 @@ import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
 import com.demich.cps.platforms.codeforces.lost.updateEntries
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.toSystemLocalDate
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
@@ -24,8 +25,10 @@ import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Month
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -75,7 +78,7 @@ class CodeforcesCommunityLostRecentWorker(
             hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
             isFresh = { currentTime - it < 24.hours },
             isStale = { currentTime - it > 7.days },
-            trustColorTags = false
+            trustColorTags = isCFMagicSafeMonth()
         )
     }
 }
@@ -163,3 +166,5 @@ private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHi
         }
     }
 
+private fun isCFMagicSafeMonth(): Boolean =
+    Clock.System.now().toSystemLocalDate().month in Month.MARCH .. Month.OCTOBER
