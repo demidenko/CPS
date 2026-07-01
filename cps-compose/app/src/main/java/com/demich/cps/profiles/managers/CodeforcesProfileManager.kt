@@ -7,6 +7,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -45,7 +46,6 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.workers.CodeforcesMonitorLauncherWorker
 import com.demich.cps.workers.CodeforcesUpsolvingSuggestionsWorker
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -324,7 +324,7 @@ context(scope: SettingsContainerScope)
 private fun CodeforcesApiAccessSettingsItem(
     profileStorage: CodeforcesProfileStorage
 ) {
-    val context = context
+    val uriHandler = LocalUriHandler.current
     val scope = rememberCoroutineScope()
 
     ApiAccessSettingsItem(
@@ -357,7 +357,7 @@ private fun CodeforcesApiAccessSettingsItem(
             }
         },
         onHelp = {
-            context.openUrlInBrowser(CodeforcesUrls.apiUserSettings)
+            uriHandler.openUri(CodeforcesUrls.apiUserSettings)
         }
     )
 }

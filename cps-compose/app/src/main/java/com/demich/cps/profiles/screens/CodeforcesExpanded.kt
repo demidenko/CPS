@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,6 @@ import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -141,6 +141,8 @@ private fun UpsolvingSuggestionsList(
     modifier: Modifier = Modifier
 ) {
     val context = context
+    val uriHandler = LocalUriHandler.current
+
     val problems by collectAsState {
         CodeforcesProfileManager().profileStorage(context)
             .upsolvingSuggestedProblems.asFlow()
@@ -160,12 +162,7 @@ private fun UpsolvingSuggestionsList(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .clickable {
-                    context.openUrlInBrowser(
-                        CodeforcesUrls.problem(
-                            contestId = it.contestId,
-                            problemIndex = it.index
-                        )
-                    )
+                    uriHandler.openUri(CodeforcesUrls.problem(contestId = it.contestId, problemIndex = it.index))
                 }
                 .padding(horizontal = 2.dp)
                 .padding(vertical = 4.dp)

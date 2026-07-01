@@ -10,6 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -24,7 +25,6 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,6 +89,7 @@ private fun profileExpandedMenuBuilder(
     onShowDeleteDialog: () -> Unit
 ): CPSMenuBuilder = {
     val context = context
+    val uriHandler = LocalUriHandler.current
     val scope = rememberCoroutineScope()
 
     CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete, onClick = onShowDeleteDialog)
@@ -97,7 +98,7 @@ private fun profileExpandedMenuBuilder(
         scope.launch {
             manager.profileStorage(context).profile()
                 ?.userInfoOrNull()
-                ?.let { context.openUrlInBrowser(it.userPageUrl) }
+                ?.let { uriHandler.openUri(it.userPageUrl) }
         }
     }
 }

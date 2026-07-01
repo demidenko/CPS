@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
@@ -26,11 +27,9 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.SafetyLevel
-import com.demich.cps.utils.context
 import com.demich.cps.utils.formatTimerFull
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.localCurrentTime
-import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
 internal fun ContestExpandedItemContent(
@@ -141,8 +140,10 @@ private fun ContestItemMenuButton(
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    val context = context
+    val uriHandler = LocalUriHandler.current
+
     var showDeleteDialog by remember { mutableStateOf(false) }
+
     CPSDropdownMenuButton(
         icon = CPSIcons.More,
         color = cpsColors.contentAdditional,
@@ -151,7 +152,7 @@ private fun ContestItemMenuButton(
     ) {
         if (contest.link != null) {
             CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser) {
-                contest.properLink()?.let { context.openUrlInBrowser(it) }
+                contest.properLink()?.let { uriHandler.openUri(it) }
             }
         }
         CPSDropdownMenuItem(title = "Delete", icon = CPSIcons.Delete) {

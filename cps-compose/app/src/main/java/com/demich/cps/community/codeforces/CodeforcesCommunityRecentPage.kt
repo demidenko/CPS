@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
@@ -20,13 +21,14 @@ import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.openUrlInBrowser
 
 @Composable
 fun CodeforcesCommunityRecentPage(
     controller: CodeforcesCommunityController
 ) {
     val context = context
+    val uriHandler = LocalUriHandler.current
+
     val recent by collectAsState { controller.flowOfRecent(context) }
 
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -62,12 +64,11 @@ fun CodeforcesCommunityRecentPage(
                         recent = { recent },
                         modifier = Modifier.fillMaxSize(),
                         onBrowseComment = { blogEntry, comment ->
-                            context.openUrlInBrowser(CodeforcesUrls.comment(
-                                blogEntryId = blogEntry.id,
-                                commentId = comment.id
-                            ))
+                            uriHandler.openUri(CodeforcesUrls.comment(blogEntryId = blogEntry.id, commentId = comment.id))
                         },
-                        onBrowseBlogEntry = { context.openUrlInBrowser(CodeforcesUrls.blogEntry(it.id)) },
+                        onBrowseBlogEntry = {
+                            uriHandler.openUri(CodeforcesUrls.blogEntry(it.id))
+                        },
                         onOpenComments = { controller.recentPageType = RecentPageType.BlogEntryRecentComments(it) }
                     )
                 }

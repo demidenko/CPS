@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +76,6 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getSystemTime
-import com.demich.cps.utils.openUrlInBrowser
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
@@ -440,6 +440,7 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val context = context
+    val uriHandler = LocalUriHandler.current
     val monitor = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = collectAsStateWithLifecycle {
@@ -463,7 +464,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
             requestFailed = requestFailed,
             modifier = modifier,
             onOpenInBrowser = {
-                context.openUrlInBrowser(url = CodeforcesUrls.contest(contestId))
+                uriHandler.openUri(CodeforcesUrls.contest(contestId))
             },
             onStop = {
                 scope.launch {

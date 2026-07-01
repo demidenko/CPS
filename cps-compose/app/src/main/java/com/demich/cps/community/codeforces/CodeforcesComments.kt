@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -39,10 +40,8 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.htmlToAnnotatedString
-import com.demich.cps.utils.openUrlInBrowser
 import kotlin.math.roundToInt
 
 @Composable
@@ -52,7 +51,8 @@ fun CodeforcesComments(
     lazyListState: LazyListState = rememberLazyListState(),
     showTitle: Boolean = true
 ) {
-    val context = context
+    val uriHandler = LocalUriHandler.current
+
     LazyColumnOfData(
         state = lazyListState,
         scrollUpButtonEnabled = true,
@@ -66,9 +66,7 @@ fun CodeforcesComments(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    context.openUrlInBrowser(
-                        CodeforcesUrls.comment(blogEntryId = comment.blogEntryId, commentId = comment.id)
-                    )
+                    uriHandler.openUri(CodeforcesUrls.comment(blogEntryId = comment.blogEntryId, commentId = comment.id))
                 }
                 .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
                 .animateContentSize()
