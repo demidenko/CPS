@@ -14,8 +14,6 @@ fun Context.showToast(title: String) = Toast.makeText(this, title, Toast.LENGTH_
 
 private fun intentActionView(url: String) = Intent(Intent.ACTION_VIEW, url.toUri())
 
-fun Context.openUrlInBrowser(url: String) = startActivity(intentActionView(url))
-
 fun makePendingIntentOpenUrl(url: String, context: Context): PendingIntent =
     PendingIntent.getActivity(
         context,
