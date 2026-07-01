@@ -28,7 +28,7 @@ jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
 # Missing class com.google.re2j.Pattern (referenced from: com.google.re2j.Pattern org.jsoup.helper.Re2jRegex.re2jPattern and 4 other contexts)
 jspecify = "1.0.0"
 
-resaca = "5.1.0" # https://github.com/sebaslogen/resaca/releases
+resaca = "5.1.1" # https://github.com/sebaslogen/resaca/releases
 
 korlibs = "6.0.1"
 
