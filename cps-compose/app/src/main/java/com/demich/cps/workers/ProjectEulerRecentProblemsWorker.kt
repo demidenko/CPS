@@ -41,6 +41,7 @@ class ProjectEulerRecentProblemsWorker(
                 }
         }
 
+        @IgnorableReturnValue
         suspend fun extractAndSaveHint(
             rssPage: String,
             context: Context

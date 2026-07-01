@@ -202,6 +202,7 @@ internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder)
 private val PeriodicWorkRequest.Companion.minPeriodicInterval: Duration
     get() = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
 
+@IgnorableReturnValue
 private fun PeriodicWorkRequest.Builder.setNextScheduleTimeOverride(instant: Instant) =
     setNextScheduleTimeOverride(instant.toEpochMilliseconds())
 
