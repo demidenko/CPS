@@ -8,6 +8,8 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -54,6 +56,25 @@ private fun SubTitle(
     modifier: Modifier = Modifier,
     text: () -> String
 ) {
+    val titleChars by rememberTitleCharsState(text)
+
+    LazyRow(modifier = modifier) {
+        items(
+            items = titleChars,
+            key = { it }
+        ) {
+            Text(
+                text = "${it.first}",
+                modifier = Modifier.animateItem()
+            )
+        }
+    }
+}
+
+@Composable
+private fun rememberTitleCharsState(
+    text: () -> String
+): State<List<Pair<Char, Uuid>>> {
     val titleState = remember { mutableStateOf(TitleChars("", emptyList())) }
 
     LaunchedEffect(text) {
@@ -72,17 +93,7 @@ private fun SubTitle(
             }
     }
 
-    LazyRow(modifier = modifier) {
-        items(
-            items = titleState.value,
-            key = { it }
-        ) {
-            Text(
-                text = "${it.first}",
-                modifier = Modifier.animateItem()
-            )
-        }
-    }
+    return titleState
 }
 
 private data class TitleChars(
