@@ -1,5 +1,11 @@
 package com.demich.kotlin_stdlib_boost
 
+fun String.commonPrefixLengthWith(b: String): Int {
+    var i = 0
+    while (i < this.length && i < b.length && this[i] == b[i]) ++i
+    return i
+}
+
 fun trailingBracketsStart(title: String): Int {
     if (title.isEmpty()) return title.length
     val closed = title.last()

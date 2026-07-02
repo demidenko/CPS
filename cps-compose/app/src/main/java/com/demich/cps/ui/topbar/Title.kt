@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.kotlin_stdlib_boost.commonPrefixLengthWith
 import com.demich.kotlin_stdlib_boost.takeRandom
 import kotlin.math.max
 import kotlin.uuid.Uuid
@@ -81,7 +82,7 @@ private fun rememberTitleCharsState(
         snapshotFlow { text() }
             .collect { cur ->
                 val (prev, prevIds) = titleState.value
-                val prefix = longestCommonPrefix(cur, prev)
+                val prefix = cur.commonPrefixLengthWith(prev)
                 val ids = Array(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
                 subsetIndices(
                     a = prev.substring(startIndex = prefix),
@@ -163,10 +164,4 @@ private inline fun zip(
 ) {
     require(a.size == b.size)
     repeat(a.size) { block(a[it], b[it]) }
-}
-
-private fun longestCommonPrefix(a: String, b: String): Int {
-    var i = 0
-    while (i < a.length && i < b.length && a[i] == b[i]) ++i
-    return i
 }
