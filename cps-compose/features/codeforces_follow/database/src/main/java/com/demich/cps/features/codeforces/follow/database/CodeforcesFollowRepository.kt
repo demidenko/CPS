@@ -69,7 +69,8 @@ abstract class CodeforcesFollowRepository(
         }
     }
 
-    suspend fun updateUsers() =
+    @IgnorableReturnValue
+    suspend fun updateProfiles() =
         getApi(EN).getProfiles(handles = dao.getHandles(), checkHistoricHandles = true)
             .also { dao.applyProfilesResults(it) }
 

@@ -36,7 +36,7 @@ class CodeforcesCommunityFollowWorker(
 
         //TODO: consider skip this if blogs.size is small
         //update userInfo to keep fresh lastOnlineTime
-        val profiles = repository.updateUsers()
+        val profiles = repository.updateProfiles()
 
         val blogs = repository.blogs()
 

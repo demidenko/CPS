@@ -111,7 +111,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         viewModelScope.launch(Dispatchers.Default) {
             if (!followLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
             context.followRepository.run {
-                updateUsers()
+                updateProfiles()
                 updateFailedBlogEntries()
             }
             followLoadingStatus.value = PENDING
