@@ -8,6 +8,8 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
+import com.demich.cps.platforms.utils.codeforces.getUserCatching
+import com.demich.cps.platforms.utils.codeforces.toProfileResult
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
@@ -98,13 +100,11 @@ private suspend fun CodeforcesApi.getBlogEntries(
         when (it) {
             is CodeforcesApiBlogReadNotAllowedException -> emptyList()
             is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
-                val profile = getProfile(handle = handle, checkHistoricHandles = true)
+                val result = getUserCatching(handle = handle, checkHistoricHandles = true)
+                val profile = result.toProfileResult(handle)
                 return GetBlogEntriesResult(
                     newProfile = profile,
-                    blogEntries = when (profile) {
-                        is ProfileResult.Success -> runCatching { getUserBlogEntries(handle = profile.handle) }
-                        else -> Result.failure(it)
-                    }
+                    blogEntries = result.mapCatching { getUserBlogEntries(handle = profile.handle) }
                 )
             }
             else -> throw it

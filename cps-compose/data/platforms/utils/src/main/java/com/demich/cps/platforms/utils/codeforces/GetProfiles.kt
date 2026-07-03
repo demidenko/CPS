@@ -44,13 +44,13 @@ suspend fun CodeforcesApi.getProfiles(
     getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
-suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> {
-    // shortcut for getProfiles(setOf(handle), checkHistoricHandles).getValue(handle)
-    return runCatching { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
-        .toProfileResult(handle)
-}
+suspend fun CodeforcesApi.getUserCatching(handle: String, checkHistoricHandles: Boolean): Result<CodeforcesUser> =
+    runCatching { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
 
-private fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
+suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
+    getUserCatching(handle = handle, checkHistoricHandles = checkHistoricHandles).toProfileResult(handle)
+
+fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
     fold(
         onSuccess = {
             ProfileResult(it.toUserInfo())
