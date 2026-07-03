@@ -74,6 +74,7 @@ internal abstract class CodeforcesFollowDao {
         }
     }
 
+    @IgnorableReturnValue
     suspend fun updateBlogEntries(
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
@@ -98,6 +99,7 @@ internal abstract class CodeforcesFollowDao {
         results.forEach { applyProfileResult(handle = it.key, result = it.value) }
     }
 
+    @IgnorableReturnValue
     suspend fun createUserWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>): Boolean {
         if (profileResult is ProfileResult.NotFound) return false
 
