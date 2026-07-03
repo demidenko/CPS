@@ -95,21 +95,28 @@ private suspend fun CodeforcesApi.getBlogEntries(
     handle: String
 ): GetBlogEntriesResult {
     runCatching {
-        getUserBlogEntries(handle = handle)
-    }.recoverCatching {
+        getUserBlogEntriesChecked(handle = handle)
+    }.recoverCatching { //TODO: useless recover
         when (it) {
-            is CodeforcesApiBlogReadNotAllowedException -> emptyList()
             is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
                 val result = getUserCatching(handle = handle, checkHistoricHandles = true)
                 val profile = result.toProfileResult(handle)
                 return GetBlogEntriesResult(
                     newProfile = profile,
-                    blogEntries = result.mapCatching { getUserBlogEntries(handle = profile.handle) }
+                    blogEntries = result.mapCatching { getUserBlogEntriesChecked(handle = profile.handle) }
                 )
             }
             else -> throw it
         }
     }.also {
         return GetBlogEntriesResult(newProfile = null, blogEntries = it)
+    }
+}
+
+private suspend fun CodeforcesApi.getUserBlogEntriesChecked(handle: String): List<CodeforcesBlogEntry> {
+    return try {
+        getUserBlogEntries(handle = handle)
+    } catch (e: CodeforcesApiBlogReadNotAllowedException) {
+        emptyList()
     }
 }
