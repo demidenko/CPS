@@ -5,7 +5,7 @@ import com.demich.cps.contests.database.ContestPlatform
 
 data class ContestsFetchResult(
     val platform: ContestPlatform,
-    val fetchSource: ContestsFetchSource,
+    val fetchSource: ContestsFetchSource?,
     val result: Result<List<Contest>>
 ) {
     init {

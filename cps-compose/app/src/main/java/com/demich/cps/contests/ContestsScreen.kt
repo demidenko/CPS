@@ -495,7 +495,7 @@ private fun loadingErrorsMessageState(): State<String> {
         combine(
             flow = viewModel.flowOfLoadingErrors(),
             flow2 = context.settingsUI.devModeEnabled.asFlow(),
-        ) { errors: List<Pair<ContestsFetchSource, Throwable>>, exposeAll: Boolean ->
+        ) { errors: List<Pair<ContestsFetchSource?, Throwable>>, exposeAll: Boolean ->
             when {
                 errors.isEmpty() -> ""
                 else -> errors.groupBy(

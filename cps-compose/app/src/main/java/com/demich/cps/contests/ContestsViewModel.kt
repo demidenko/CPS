@@ -39,7 +39,7 @@ class ContestsViewModel: ViewModel() {
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }
 
-    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource,Throwable>>> =
+    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
         combine(loadingStatuses, errors) { loadingStatuses, errors ->
             loadingStatuses
                 .filter { it.value == FAILED }
@@ -48,7 +48,7 @@ class ContestsViewModel: ViewModel() {
         }
 
     private val loadingStatuses = MutableStateFlow(emptyMap<ContestPlatform, LoadingStatus>())
-    private val errors = MutableStateFlow(emptyMap<ContestPlatform, List<Pair<ContestsFetchSource,Throwable>>>())
+    private val errors = MutableStateFlow(emptyMap<ContestPlatform, List<Pair<ContestsFetchSource?, Throwable>>>())
 
     private fun setLoadingStatus(platform: ContestPlatform, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
