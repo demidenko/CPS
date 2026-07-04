@@ -97,17 +97,14 @@ private suspend fun CodeforcesApi.getBlogEntries(
 ): GetBlogEntriesResult {
     runCatching {
         getUserBlogEntriesChecked(handle = handle)
-    }.recoverCatching { //TODO: useless recover
-        when (it) {
-            is CodeforcesApiHandleNotFoundException if it.handle == handle -> {
-                val result = getUserCatching(handle = handle, checkHistoricHandles = true)
-                val profile = result.toProfileResult(handle)
-                return GetBlogEntriesResult(
-                    newProfile = profile,
-                    blogEntries = result.mapCatching { getUserBlogEntriesChecked(handle = profile.handle) }
-                )
-            }
-            else -> throw it
+    }.onFailure {
+        if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
+            val result = getUserCatching(handle = handle, checkHistoricHandles = true)
+            val profile = result.toProfileResult(handle)
+            return GetBlogEntriesResult(
+                newProfile = profile,
+                blogEntries = result.mapCatching { getUserBlogEntriesChecked(handle = profile.handle) }
+            )
         }
     }.also {
         return GetBlogEntriesResult(newProfile = null, blogEntries = it)
