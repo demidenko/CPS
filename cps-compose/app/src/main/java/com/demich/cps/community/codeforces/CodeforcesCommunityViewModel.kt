@@ -110,7 +110,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 }
 
-private class CodeforcesDataLoader<T: Any>(
+private class CodeforcesDataLoader<T>(
     val scope: CoroutineScope,
     init: T,
     val getData: suspend (CodeforcesPageContentProvider) -> T
@@ -149,7 +149,7 @@ private class CodeforcesDataLoader<T: Any>(
     }
 }
 
-private fun <T: Any> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
+private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
 
 
