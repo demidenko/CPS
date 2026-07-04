@@ -50,18 +50,15 @@ abstract class CodeforcesFollowRepository(
         return result
     }
 
-    suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>): Boolean {
-        if (dao.createUserWithoutBlog(profileResult = result)) {
-            getAndReloadBlogEntries(handle = result.handle)
-            return true
-        } else {
-            return false
-        }
-    }
+    suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
+        if (!dao.createUserWithoutBlog(profileResult = result)) return
 
-    suspend fun addNewUser(handle: String) {
-        //TODO: sync?? parallel? (addNewUser loads blog without info)
-        if (addNewUser(ProfileResult.Failed(handle))) {
+        val handle = result.handle
+        getAndReloadBlogEntries(handle = handle)
+
+        // TODO: parallel?
+        // TODO: reload can change handle
+        if (result is ProfileResult.Failed) {
             dao.applyProfileResult(
                 handle = handle,
                 result = getApi(EN).getProfile(handle = handle, checkHistoricHandles = true)
@@ -86,6 +83,9 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
         if (it.blogSize == null) getAndReloadBlogEntries(handle = it.handle)
     }
 }
+
+suspend fun CodeforcesFollowRepository.addNewUser(handle: String) =
+    addNewUser(result = ProfileResult.Failed(handle))
 
 private data class GetBlogEntriesResult(
     val newProfile: ProfileResult<CodeforcesUserInfo>?,
