@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -93,17 +94,20 @@ class ContestsViewModel: ViewModel() {
             val settings = context.settingsContests
             val diff = settings.makeSnapshot().differenceFrom(snapshot)
 
-            val repository = context.contestsRepository
-            diff.toRemove.forEach {
-                // TODO: replace it to fake fetch flows
+            val fakeResults = diff.toRemove.map {
                 val platform = it.toContestPlatform()
-                repository.setContests(platform, emptyList())
-                errors.edit { remove(platform) }
-                setLoadingStatus(platform, PENDING)
+                val result = ContestsFetchResult(
+                    platform = platform,
+                    fetchSource = null,
+                    result = Result.success(emptyList())
+                )
+                platform to flowOf(result)
             }
 
             settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload())
-                .trackLoadingStatuses().collectTo(repository)
+                .plus(pairs = fakeResults)
+                .trackLoadingStatuses()
+                .collectTo(repository = context.contestsRepository)
         }
     }
 }
