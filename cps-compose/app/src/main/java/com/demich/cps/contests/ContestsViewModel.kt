@@ -73,18 +73,16 @@ class ContestsViewModel: ViewModel() {
         }
     }
 
-    private fun Map<ContestPlatform, Flow<ContestsFetchResult>>.trackLoadingStatuses() =
+    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectToRepository(context: Context) =
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
-
-    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collect(context: Context) =
-        trackLoadingStatuses().collectTo(repository = context.contestsRepository)
+        .collectTo(repository = context.contestsRepository)
 
     fun reloadEnabledPlatforms(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
 
             context.settingsContests.contestsFetchFlows()
-                .collect(context = context)
+                .collectToRepository(context = context)
         }
     }
 
@@ -109,7 +107,7 @@ class ContestsViewModel: ViewModel() {
 
             settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload())
                 .plus(pairs = fakeResults)
-                .collect(context = context)
+                .collectToRepository(context = context)
         }
     }
 }
