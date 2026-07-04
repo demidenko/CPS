@@ -8,6 +8,7 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.addNewUser
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
@@ -52,18 +53,16 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val mainBlogEntries = dataLoader(emptyList()) { getMainBlogEntries(locale = it) }
+    private val mainBlogEntries = dataLoader(emptyList()) { it.getMainBlogEntries() }
     override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
 
-    private val topBlogEntries = dataLoader(emptyList()) { getTopBlogEntries(locale = it) }
+    private val topBlogEntries = dataLoader(emptyList()) { it.getTopBlogEntries() }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
-    private val topComments = dataLoader(emptyList()) { getTopComments(locale = it) }
+    private val topComments = dataLoader(emptyList()) { it.getTopComments() }
     override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
-    private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) {
-        CodeforcesClient(locale = it).getRecentFeed()
-    }
+    private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { it.getRecentFeed() }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
     private fun reload(title: CodeforcesTitle, localeItem: DataStoreValue<CodeforcesLocale>) {
@@ -83,15 +82,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         val localeItem = context.settingsCommunity.codeforcesLocale
         titles.forEach { reload(title = it, localeItem = localeItem) }
     }
-
-    private suspend fun getMainBlogEntries(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient(locale = locale).getMainPage())
-
-    private suspend fun getTopBlogEntries(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractBlogEntries(source = CodeforcesClient(locale = locale).getTopBlogEntriesPage())
-
-    private suspend fun getTopComments(locale: CodeforcesLocale) =
-        CodeforcesUtils.extractComments(source = CodeforcesClient(locale = locale).getTopCommentsPage())
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
@@ -123,7 +113,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 private class CodeforcesDataLoader<T: Any>(
     val scope: CoroutineScope,
     init: T,
-    val getData: suspend (CodeforcesLocale) -> T
+    val getData: suspend (CodeforcesPageContentProvider) -> T
 ) {
     private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
 
@@ -139,6 +129,7 @@ private class CodeforcesDataLoader<T: Any>(
     private val loadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     val loadingStatusFlow: StateFlow<LoadingStatus> get() = loadingStatus
 
+    // TODO: provider instead of localeItem
     fun launchLoadIfActive(localeItem: DataStoreValue<CodeforcesLocale>) {
         if (inactive) return
         loadingStatus.update {
@@ -147,8 +138,7 @@ private class CodeforcesDataLoader<T: Any>(
         }
         scope.launch(Dispatchers.Default) {
             runCatching {
-                val locale = localeItem()
-                getData(locale)
+                getData(CodeforcesClient(locale = localeItem()))
             }.onFailure {
                 loadingStatus.value = FAILED
             }.onSuccess {
@@ -159,5 +149,15 @@ private class CodeforcesDataLoader<T: Any>(
     }
 }
 
-private fun <T: Any> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesLocale) -> T) =
+private fun <T: Any> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
+
+
+private suspend fun CodeforcesPageContentProvider.getMainBlogEntries() =
+    CodeforcesUtils.extractBlogEntries(source = getMainPage())
+
+private suspend fun CodeforcesPageContentProvider.getTopBlogEntries() =
+    CodeforcesUtils.extractBlogEntries(source = getTopBlogEntriesPage())
+
+private suspend fun CodeforcesPageContentProvider.getTopComments() =
+    CodeforcesUtils.extractComments(source = getTopCommentsPage())
