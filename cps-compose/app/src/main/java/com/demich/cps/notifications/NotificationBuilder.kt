@@ -24,8 +24,7 @@ class NotificationBuilder internal constructor(
 
     fun build(): Notification = builder.build()
 
-    @JvmName("notifyCustom")
-    fun notify() {
+    fun buildAndPush() {
         if (!notificationManager.areNotificationsEnabled()) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
