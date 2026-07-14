@@ -65,12 +65,11 @@ class ContestsListViewState(
     }
 
     fun syncExpanded(contests: SortedContests) {
-        val prev = expandedContests
-        expandedContestsState.value = buildMap {
-            contests.contests.forEach { contest ->
-                val id = contest.compositeId
-                if (id in prev) put(key = id, value = contest)
-            }
+        expandedContestsState.update { prev ->
+            // not efficient but whatever
+            contests.contests
+                .filter { it.compositeId in prev }
+                .associateBy { it.compositeId }
         }
         notFinishedIds = contests.runningOrUpcoming.mapToSet { it.compositeId }
     }
@@ -105,6 +104,12 @@ class ContestsListViewState(
     }
 }
 
+private inline fun <T> MutableState<T>.update(transform: (T) -> T) {
+    value = transform(value)
+}
+
 private inline fun <K, V> MutableState<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) {
-    value = value.toMutableMap().apply(block)
+    update {
+        it.toMutableMap().apply(block)
+    }
 }
