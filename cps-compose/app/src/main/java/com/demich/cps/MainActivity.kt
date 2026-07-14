@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -40,7 +39,7 @@ class MainActivity: ComponentActivity() {
         enableEdgeToEdge()
 
         lifecycleScope.launch(Dispatchers.Default) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            lifecycle.repeatOnLifecycle(state = CREATED) {
                 appStartUp(this@MainActivity)
             }
         }
