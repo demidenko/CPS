@@ -22,10 +22,7 @@ room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
 
 datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/datastore
 
-jsoup = "1.21.2" # https://github.com/jhy/jsoup/releases
-# 1.22.1:
-# Missing class com.google.re2j.Matcher (referenced from: com.google.re2j.Matcher org.jsoup.helper.Re2jRegex$Re2jMatcher.delegate and 3 other contexts)
-# Missing class com.google.re2j.Pattern (referenced from: com.google.re2j.Pattern org.jsoup.helper.Re2jRegex.re2jPattern and 4 other contexts)
+jsoup = "1.22.2" # https://github.com/jhy/jsoup/releases
 jspecify = "1.0.0"
 
 resaca = "5.1.1" # https://github.com/sebaslogen/resaca/releases
