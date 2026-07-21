@@ -43,7 +43,7 @@ private class AtCoderContestParser {
 
         return Contest(
             platform = atcoder,
-            title = title.text().trim(),
+            title = title.text(),
             id = id,
             link = AtCoderUrls.contest(id),
             startTime = startTime,

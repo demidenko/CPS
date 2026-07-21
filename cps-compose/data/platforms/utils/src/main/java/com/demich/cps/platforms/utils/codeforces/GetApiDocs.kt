@@ -33,7 +33,7 @@ private fun extractMethods(page: String): List<CodeforcesApiHelpMethod> {
     }
 
     return h3.zip(tables).map { (h3, table) ->
-        val name = h3.text().trim()
+        val name = h3.text()
 
         val parameters = table.select("tbody > tr").map { tr ->
             val cols = tr.select("td")
@@ -42,8 +42,8 @@ private fun extractMethods(page: String): List<CodeforcesApiHelpMethod> {
             }
 
             CodeforcesApiHelpMethodParameter(
-                name = cols[0].expectFirst("strong").text().trim(),
-                description = cols[1].text().trim()
+                name = cols[0].expectFirst("strong").text(),
+                description = cols[1].text()
             )
         }
 

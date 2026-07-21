@@ -26,12 +26,12 @@ private inline fun extractProblemWithAcceptedCount(
 ) {
     val td = problemRow.select("td")
     if (td.isEmpty()) return //th row
-    val acceptedCount = td[3].text().trim().run {
+    val acceptedCount = td[3].text().run {
         if (!startsWith('x')) return
         drop(1).toInt()
     }
     val problem = CodeforcesProblem(
-        index = td[0].text().trim(),
+        index = td[0].text(),
         name = td[1].expectFirst("a").text(),
         contestId = contestId
     )
