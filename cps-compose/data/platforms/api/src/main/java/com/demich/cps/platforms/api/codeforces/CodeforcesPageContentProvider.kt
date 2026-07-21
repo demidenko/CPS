@@ -16,4 +16,6 @@ interface CodeforcesPageContentProvider {
     suspend fun getTopCommentsPage(days: Int = 2): String
 
     suspend fun getGroupsPage(): String
+
+    suspend fun getApiHelpMethodsPage(): String
 }

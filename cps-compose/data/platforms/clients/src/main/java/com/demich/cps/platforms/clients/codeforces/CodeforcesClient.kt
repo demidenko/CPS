@@ -197,6 +197,9 @@ class CodeforcesClient(
 
     override suspend fun getGroupsPage() =
         getWebPage(path = "groups")
+
+    override suspend fun getApiHelpMethodsPage() =
+        getWebPage(path = "apiHelp/methods")
 }
 
 private inline fun HttpRequestBuilder.ifIsApiRequest(
