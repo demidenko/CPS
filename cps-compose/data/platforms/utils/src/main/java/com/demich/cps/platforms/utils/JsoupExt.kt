@@ -1,9 +1,16 @@
 package com.demich.cps.platforms.utils
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import org.jsoup.select.Selector
 import kotlin.streams.asSequence
+
+internal fun String.parseDocument(): Document = Jsoup.parse(this)
+
+// TODO: find cheapest way
+internal fun String.parseHtmlElement(): Element = Jsoup.parse(this)
 
 internal fun Element.expectFirst(evaluator: Evaluator): Element =
     requireNotNull(selectFirst(evaluator))
