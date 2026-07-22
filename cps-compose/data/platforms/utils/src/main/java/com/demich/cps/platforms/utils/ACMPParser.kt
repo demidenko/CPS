@@ -33,8 +33,7 @@ class ACMPParser {
             .select("tr.white")
             .map { row ->
                 val cols = row.select("td")
-                val userId = cols[1].expectFirst("a")
-                    .attr("href").removePrefix("/?main=user&id=")
+                val userId = cols[1].expectFirst("a").href.removePrefix("/?main=user&id=")
                 val userName = cols[1].text()
                 val tasks = cols[3].text()
                 UserSuggestion(

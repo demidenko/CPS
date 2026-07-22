@@ -3,6 +3,7 @@ package com.demich.cps.platforms.utils.atcoder
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.atcoder.AtCoderApi
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
+import com.demich.cps.platforms.utils.href
 import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.selectSequence
 import kotlinx.datetime.LocalDate
@@ -34,7 +35,7 @@ private class AtCoderContestParser {
         val td = row.select("td")
 
         val title = td[1].expectFirst("a")
-        val id = title.attr("href").removePrefix("/contests/")
+        val id = title.href.removePrefix("/contests/")
 
         val timeString = timeElement.text()
         val startTime = Instant.parse(timeString, contestDateTimeFormat)

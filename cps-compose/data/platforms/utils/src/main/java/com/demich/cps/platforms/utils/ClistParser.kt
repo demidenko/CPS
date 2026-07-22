@@ -35,9 +35,9 @@ class ClistParser {
             ?.select("tr")
             ?.forEach { row ->
                 val cols = row.select("td")
-                val href = cols[0].getElementsByAttribute("href").attr("href")
+                val href = cols[0].getElementsByAttribute("href")[0].href
                 val resource = href.removePrefix("/resource/").removeSuffix("/")
-                val link = cols[3].getElementsByAttribute("href").attr("href")
+                val link = cols[3].getElementsByAttribute("href")[0].href
                 val userName = cols[2].select("span").map { it.text() }.firstOrNull { it.isNotBlank() } ?: return@forEach
                 accounts[resource] = userName to link
             }
@@ -46,9 +46,9 @@ class ClistParser {
         body.getElementsByClass("account btn-group btn-group-sm").forEach { button ->
             val a = button.select("a")
             if (a.isEmpty()) return@forEach
-            val href = a[0].attr("href")
+            val href = a[0].href
             val resource = href.removePrefix("/resource/").removeSuffix("/")
-            val link = button.getElementsByClass("btn-xs").first()?.attr("href") ?: ""
+            val link = button.getElementsByClass("btn-xs").first()?.href ?: ""
             val span = a[1].selectFirst("span") ?: return@forEach
             val userName = span.run {
                 val attr = "title"

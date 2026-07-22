@@ -33,7 +33,7 @@ class TimusParser {
             .select("td.name")
             .mapNotNull { nameColumn ->
                 val userId = nameColumn.selectFirst("a")
-                    ?.attr("href")
+                    ?.href
                     ?.let {
                         it.substring(it.indexOf("id=")+3)
                     } ?: return@mapNotNull null

@@ -4,6 +4,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.utils.EvaluatorNthTag
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
+import com.demich.cps.platforms.utils.href
 import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.parseHtmlElement
 import com.demich.cps.platforms.utils.selectSequence
@@ -81,7 +82,7 @@ object CodeforcesUtils {
         val title: String
         topic.expectFirst(evaluatorDivTitle).expectFirst("a").let {
             title = it.text()
-            id = it.attr("href").removePrefix("/blog/entry/").toInt()
+            id = it.href.removePrefix("/blog/entry/").toInt()
         }
 
         val author: CodeforcesHandle
@@ -128,7 +129,7 @@ object CodeforcesUtils {
             commentCreationTime = info.expectHumanTime().extractTime()
             info.expectFirst(evaluatorHrefBlogEntry).let { commentLink ->
                 blogEntryTitle = commentLink.text()
-                commentLink.attr("href").let { url ->
+                commentLink.href.let { url ->
                     // href="/blog/entry/XXXXXX#comment-YYYYYY"
                     val j = url.indexOf('#')
                     val i = url.lastIndexOf('/', j - 1)
@@ -163,7 +164,7 @@ object CodeforcesUtils {
         val blogEntryId: Int
         val blogEntryTitle: String
         item.expectFirst(evaluatorHrefBlogEntry).let {
-            blogEntryId = it.attr("href").removePrefix("/blog/entry/").toInt()
+            blogEntryId = it.href.removePrefix("/blog/entry/").toInt()
             blogEntryTitle = it.text()
         }
 
