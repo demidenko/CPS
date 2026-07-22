@@ -17,10 +17,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
-private fun Element.expectContent(): Element = expectFirst("div.content-with-sidebar")
+private fun Document.expectContent(): Element = expectFirst("div.content-with-sidebar")
 
-private fun Element.selectSidebar(): Element? = selectFirst("div#sidebar")
-private fun Element.expectSidebar(): Element = requireNotNull(selectSidebar())
+private fun Document.selectSidebar(): Element? = selectFirst("div#sidebar")
+private fun Document.expectSidebar(): Element = requireNotNull(selectSidebar())
 
 private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
@@ -34,37 +34,39 @@ private fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
 
-object CodeforcesUtils {
-    private object DateTimeParser {
-        private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
+private object CodeforcesDateTimeParser {
+    private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
 
-        private val dateTimeFormat = LocalDateTime.Format {
-            alternativeParsing({
-                //RU format: "dd.MM.yyyy HH:mm"
-                day()
-                char('.')
-                monthNumber()
-                char('.')
-                year()
-            }) {
-                //EN format: "MMM/dd/yyyy HH:mm"
-                monthName(MonthNames.ENGLISH_ABBREVIATED)
-                char('/')
-                day()
-                char('/')
-                year()
-            }
-            char(' ')
-            hour()
-            char(':')
-            minute()
+    private val dateTimeFormat = LocalDateTime.Format {
+        alternativeParsing({
+            //RU format: "dd.MM.yyyy HH:mm"
+            day()
+            char('.')
+            monthNumber()
+            char('.')
+            year()
+        }) {
+            //EN format: "MMM/dd/yyyy HH:mm"
+            monthName(MonthNames.ENGLISH_ABBREVIATED)
+            char('/')
+            day()
+            char('/')
+            year()
         }
-
-        fun parse(input: String): Instant =
-            LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
+        char(' ')
+        hour()
+        char(':')
+        minute()
     }
 
-    private fun Element.extractTime(): Instant = DateTimeParser.parse(attr("title"))
+    fun parse(input: String): Instant =
+        LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
+}
+
+private fun Element.extractTime(): Instant = CodeforcesDateTimeParser.parse(attr("title"))
+
+
+object CodeforcesUtils {
 
     private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
     private val evaluatorMeta = Evaluator.Class("meta")
