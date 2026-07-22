@@ -3,7 +3,7 @@ package com.demich.cps.platforms.utils
 import com.demich.cps.profiles.userinfo.ACMPUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 
-object ACMPUtils {
+class ACMPParser {
     fun extractUserInfo(source: String, id: String): ACMPUserInfo =
         with(source.parseDocument()) {
             val userName = title()

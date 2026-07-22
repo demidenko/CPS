@@ -8,7 +8,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.acmp.ACMPUrls
 import com.demich.cps.platforms.clients.ACMPClient
 import com.demich.cps.platforms.clients.isRedirect
-import com.demich.cps.platforms.utils.ACMPUtils
+import com.demich.cps.platforms.utils.ACMPParser
 import com.demich.cps.profiles.SmallProfilePanelTypeArchive
 import com.demich.cps.profiles.userinfo.ACMPUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -27,9 +27,9 @@ class ACMPProfileManager :
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
     override suspend fun fetchProfile(data: String): ProfileResult<ACMPUserInfo> {
-        return ACMPUtils.runCatching {
+        return runCatching {
             ProfileResult(
-                userInfo = extractUserInfo(
+                userInfo = ACMPParser().extractUserInfo(
                     source = ACMPClient.getUserPage(id = data.toInt()),
                     id = data
                 )
@@ -42,7 +42,7 @@ class ACMPProfileManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return ACMPUtils.extractUsersSuggestions(source = ACMPClient.getUsersSearch(str))
+        return ACMPParser().extractUsersSuggestions(source = ACMPClient.getUsersSearch(str))
     }
 
     override fun makeUserInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =
