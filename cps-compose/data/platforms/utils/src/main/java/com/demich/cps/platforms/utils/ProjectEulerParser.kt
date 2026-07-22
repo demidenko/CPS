@@ -14,7 +14,7 @@ import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
 class ProjectEulerParser {
-    fun extractRecentProblems(source: String): List<ProjectEulerRecentProblem?> {
+    fun parseRecentProblems(source: String): List<ProjectEulerRecentProblem?> {
         val format = LocalDateTime.Format {
             //5th April 2025, 02:00 pm
             day(padding = Padding.NONE)
@@ -71,7 +71,7 @@ class ProjectEulerRssParser {
     private fun String.parseRssItems() =
         parseDocument().selectSequence("item").map { RssItem(it) }
 
-    fun extractNews(rssPage: String): List<ProjectEulerNewsPost> =
+    fun parseNews(rssPage: String): List<ProjectEulerNewsPost> =
         rssPage.parseRssItems().mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
                 ProjectEulerNewsPost(
@@ -82,7 +82,7 @@ class ProjectEulerRssParser {
             }
         }.toList()
 
-    fun extractProblems(rssPage: String): List<Pair<Int, Instant>> {
+    fun parseProblems(rssPage: String): List<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
             //04 Apr 2025 23:00:00 +0100
             day(padding = Padding.NONE)

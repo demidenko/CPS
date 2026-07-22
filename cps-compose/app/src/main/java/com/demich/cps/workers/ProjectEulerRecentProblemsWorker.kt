@@ -49,7 +49,7 @@ class ProjectEulerRecentProblemsWorker(
         ): Instant? {
             val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
             val currentTime = getSystemTime()
-            return ProjectEulerRssParser().extractProblems(rssPage)
+            return ProjectEulerRssParser().parseProblems(rssPage)
                 .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 ?.also { item.setValue(it) }
         }
@@ -64,7 +64,7 @@ class ProjectEulerRecentProblemsWorker(
     private suspend fun scanProblems() {
         hintsDataStore.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
-            posts = ProjectEulerParser().extractRecentProblems(ProjectEulerClient.getRecentPage())
+            posts = ProjectEulerParser().parseRecentProblems(ProjectEulerClient.getRecentPage())
         ) { post ->
             val problemId = post.id.toInt()
             notificationChannels.project_euler.problems(problemId).notify(context) {
