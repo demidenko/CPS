@@ -14,8 +14,6 @@ import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
 class ProjectEulerParser {
-    private val peUtcOffset get() = UtcOffset(hours = +1)
-
     fun extractRecentProblems(source: String): List<ProjectEulerRecentProblem?> {
         val format = LocalDateTime.Format {
             //5th April 2025, 02:00 pm
@@ -36,6 +34,8 @@ class ProjectEulerParser {
             char(' ')
             amPmMarker(am = "am", pm = "pm")
         }
+
+        val peUtcOffset = UtcOffset(hours = +1)
 
         return source.parseDocument().expectFirst("#problems_table").select("td.id_column")
             .map { idCell ->
