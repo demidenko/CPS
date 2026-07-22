@@ -11,7 +11,6 @@ import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.utils.ClistContestDateParser
-import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.platforms.utils.clistResourceId
 import com.demich.cps.platforms.utils.extractContestId
 import kotlin.time.Duration.Companion.seconds
@@ -26,7 +25,7 @@ class ClistContestsFetcher(
         platforms: Set<ContestPlatform>,
         dateConstraints: ContestDateConstraints
     ): List<Contest> {
-        val resourceIds = ClistUtils.makeResourceIds(
+        val resourceIds = makeResourceIds(
             platforms = platforms.mapNotNull { it.toGeneralPlatformOrNull() },
             additionalResources = if (platforms.contains(unknown)) resources else emptyList()
         )
@@ -39,6 +38,13 @@ class ClistContestsFetcher(
     }
 }
 
+private fun makeResourceIds(
+    platforms: Collection<Platform>,
+    additionalResources: Collection<ClistResource>
+): Set<Int> = buildSet {
+    platforms.forEach { add(requireNotNull(it.clistResourceId)) }
+    additionalResources.forEach { add(it.id) }
+}
 
 private fun Collection<ClistContest>.mapAndFilterResult(
     dateConstraints: ContestDateConstraints

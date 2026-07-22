@@ -3,7 +3,6 @@ package com.demich.cps.platforms.utils
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistContest
-import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -11,16 +10,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import kotlin.time.Instant
-
-object ClistUtils {
-    fun makeResourceIds(
-        platforms: Collection<Platform>,
-        additionalResources: Collection<ClistResource>
-    ): Set<Int> = buildSet {
-        platforms.forEach { add(requireNotNull(it.clistResourceId)) }
-        additionalResources.forEach { add(it.id) }
-    }
-}
 
 class ClistParser {
     fun extractLoginSuggestions(source: String): List<String> =
