@@ -1,7 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import org.jsoup.Jsoup
+import com.demich.cps.platforms.utils.parseHtmlElement
 import kotlin.time.Instant
 
 data class CodeforcesWebBlogEntry(
@@ -14,7 +14,7 @@ data class CodeforcesWebBlogEntry(
 )
 
 fun CodeforcesBlogEntry.extractTitle(): String =
-    Jsoup.parse(title).text()
+    title.parseHtmlElement().text()
 
 fun CodeforcesBlogEntry.toWebBlogEntry(colorTag: CodeforcesColorTag) =
     CodeforcesWebBlogEntry(

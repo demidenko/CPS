@@ -1,8 +1,8 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.parseDocument
 import kotlinx.serialization.Serializable
-import org.jsoup.Jsoup
 
 @Serializable
 data class CodeforcesApiHelpMethod(
@@ -21,7 +21,7 @@ suspend fun CodeforcesPageContentProvider.getApiHelpMethods(): List<CodeforcesAp
 }
 
 private fun extractMethods(page: String): List<CodeforcesApiHelpMethod> {
-    val main = Jsoup.parse(page)
+    val main = page.parseDocument()
         .expectFirst("#pageContent")
         .expectFirst("div.ttypography")
 

@@ -2,7 +2,7 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
-import org.jsoup.Jsoup
+import com.demich.cps.platforms.utils.parseDocument
 import org.jsoup.nodes.Element
 
 suspend fun CodeforcesPageContentProvider.getContestAcceptedStatistics(
@@ -10,7 +10,7 @@ suspend fun CodeforcesPageContentProvider.getContestAcceptedStatistics(
 ): List<Pair<CodeforcesProblem, Int>> {
     val page = getContestPage(contestId = contestId)
     return buildList {
-        Jsoup.parse(page).expectFirst("table.problems").select("tr")
+        page.parseDocument().expectFirst("table.problems").select("tr")
             .forEach {
                 extractProblemWithAcceptedCount(it, contestId) { problem, count ->
                     add(Pair(problem, count))

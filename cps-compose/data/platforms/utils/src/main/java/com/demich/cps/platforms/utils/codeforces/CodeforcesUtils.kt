@@ -4,6 +4,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.utils.EvaluatorNthTag
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
+import com.demich.cps.platforms.utils.parseDocument
+import com.demich.cps.platforms.utils.parseHtmlElement
 import com.demich.cps.platforms.utils.selectSequence
 import com.demich.cps.platforms.utils.values
 import kotlinx.datetime.LocalDateTime
@@ -11,7 +13,6 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
@@ -180,14 +181,14 @@ object CodeforcesUtils {
             .map { runCatching { extractBlogEntry(it) } }
 
     fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
-        extractBlogEntries(Jsoup.parse(source)).values().toList()
+        extractBlogEntries(source.parseDocument()).values().toList()
 
     internal fun extractComments(document: Document): Sequence<Result<CodeforcesWebComment>> =
         document.expectContent().selectSequence(".comment-table")
             .map { runCatching { extractComment(it) } }
 
     fun extractComments(source: String): List<CodeforcesWebComment> =
-        extractComments(Jsoup.parse(source)).values().toList()
+        extractComments(source.parseDocument()).values().toList()
 
     internal fun extractRecentBlogEntries(document: Document): Sequence<Result<CodeforcesRecentFeedBlogEntry>> =
         document.expectSidebar().expectFirst("div.recent-actions")
@@ -195,10 +196,10 @@ object CodeforcesUtils {
             .map { runCatching { extractRecentBlogEntry(it) } }
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
-        extractRecentBlogEntries(Jsoup.parse(source)).values().toList()
+        extractRecentBlogEntries(source.parseDocument()).values().toList()
 
     private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
-        val sidebar = Jsoup.parse(source).selectSidebar() ?: return
+        val sidebar = source.parseDocument().selectSidebar() ?: return
         val phaseText = sidebar.selectFirst("span.contest-state-phase")?.text() ?: return
         val infoText = sidebar.selectFirst("span.contest-state-regular")?.text() ?: return
         block(phaseText, infoText)
@@ -216,7 +217,8 @@ object CodeforcesUtils {
 
 suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
     val page = runCatching { getUserPage(handle) }.getOrElse { return null }
-    return Jsoup.parse(page).selectFirst("div.userbox")
+    return page.parseDocument()
+        .selectFirst("div.userbox")
         ?.selectRatedUser()
         ?.extractRatedUser()
         ?.colorTag
@@ -228,7 +230,7 @@ suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Seq
         .filter { it.isNotEmpty() }
         .mapNotNull {
             val i = it.lastIndexOf('|')
-            Jsoup.parse(it.substring(i + 1))
+            it.substring(i + 1).parseHtmlElement()
                 .selectRatedUser()
                 ?.extractRatedUser()
         }

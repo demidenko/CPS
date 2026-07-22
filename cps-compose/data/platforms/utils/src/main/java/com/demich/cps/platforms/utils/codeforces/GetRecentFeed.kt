@@ -1,15 +1,15 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.values
-import org.jsoup.Jsoup
 import kotlin.math.max
 
 suspend fun CodeforcesPageContentProvider.getRecentFeed(): CodeforcesRecentFeed =
     CodeforcesUtils.extractRecentFeed(source = getRecentActionsPage())
 
 private fun CodeforcesUtils.extractRecentFeed(source: String): CodeforcesRecentFeed {
-    val document = Jsoup.parse(source)
+    val document = source.parseDocument()
     val comments = extractComments(document).values().toList()
     val blogEntries = extractRecentBlogEntries(document).values().toMutableList()
     //blog entry with low rating disappeared from blogEntries but has comments, need to merge
