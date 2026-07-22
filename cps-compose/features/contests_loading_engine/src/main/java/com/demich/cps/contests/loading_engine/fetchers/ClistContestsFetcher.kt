@@ -10,6 +10,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistContest
 import com.demich.cps.platforms.api.clist.ClistResource
+import com.demich.cps.platforms.utils.ClistContestDateParser
 import com.demich.cps.platforms.utils.ClistUtils
 import com.demich.cps.platforms.utils.clistResourceId
 import com.demich.cps.platforms.utils.extractContestId
@@ -39,18 +40,23 @@ class ClistContestsFetcher(
 }
 
 
-private fun Collection<ClistContest>.mapAndFilterResult(dateConstraints: ContestDateConstraints): List<Contest> =
-    mapNotNull { clistContest ->
-        val contest = clistContest.toContest()
-        if (!dateConstraints.check(contest)) {
-            return@mapNotNull null
-        }
-        when (contest.platform) {
-            atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
-            else -> contest
+private fun Collection<ClistContest>.mapAndFilterResult(
+    dateConstraints: ContestDateConstraints
+): List<Contest> =
+    context(ClistContestDateParser()) {
+        mapNotNull { clistContest ->
+            val contest = clistContest.toContest()
+            if (!dateConstraints.check(contest)) {
+                return@mapNotNull null
+            }
+            when (contest.platform) {
+                atcoder -> contest.takeIf { clistContest.host == "atcoder.jp" }
+                else -> contest
+            }
         }
     }
 
+context(parser: ClistContestDateParser)
 private fun ClistContest.toContest(): Contest {
     val platform: ContestPlatform =
         Platform.entries.find { it.clistResourceId == resource_id }
@@ -60,8 +66,8 @@ private fun ClistContest.toContest(): Contest {
         platform = platform,
         id = extractContestId(platform),
         title = event,
-        startTime = ClistUtils.parseContestDate(start),
-        endTime = ClistUtils.parseContestDate(end),
+        startTime = parser.parse(start),
+        endTime = parser.parse(end),
         duration = duration.seconds,
         link = href,
         host = host.takeIf { platform == unknown }

@@ -13,16 +13,6 @@ import kotlinx.datetime.parse
 import kotlin.time.Instant
 
 object ClistUtils {
-    private val contestDateFormat = DateTimeComponents.Format {
-        //YYYY-MM-DDThh:mm:ss
-        date(LocalDate.Formats.ISO)
-        char('T')
-        time(LocalTime.Formats.ISO)
-    }
-
-    fun parseContestDate(str: String): Instant =
-        Instant.parse(str, contestDateFormat)
-
     fun makeResourceIds(
         platforms: Collection<Platform>,
         additionalResources: Collection<ClistResource>
@@ -74,6 +64,18 @@ class ClistParser {
             accounts = accounts
         )
     }
+}
+
+class ClistContestDateParser {
+    private val contestDateFormat = DateTimeComponents.Format {
+        //YYYY-MM-DDThh:mm:ss
+        date(LocalDate.Formats.ISO)
+        char('T')
+        time(LocalTime.Formats.ISO)
+    }
+
+    fun parse(str: String): Instant =
+        Instant.parse(str, contestDateFormat)
 }
 
 fun ClistContest.extractContestId(platform: ContestPlatform?): String =
