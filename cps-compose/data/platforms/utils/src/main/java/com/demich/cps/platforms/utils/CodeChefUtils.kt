@@ -1,11 +1,10 @@
 package com.demich.cps.platforms.utils
 
 import com.demich.cps.profiles.userinfo.CodeChefUserInfo
-import org.jsoup.Jsoup
 
 object CodeChefUtils {
     fun extractUserInfo(source: String, handle: String): CodeChefUserInfo =
-        Jsoup.parse(source).run {
+        source.parseDocument().run {
             val rating = selectFirst("div.widget-rating")
                 ?.selectFirst("div.rating-header > div.rating-number")?.text()?.toInt()
             /*val rating = expectFirst("div.rating-ranks")

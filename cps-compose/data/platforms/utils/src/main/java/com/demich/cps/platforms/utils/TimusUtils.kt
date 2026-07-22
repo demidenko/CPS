@@ -3,11 +3,10 @@ package com.demich.cps.platforms.utils
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.TimusUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
-import org.jsoup.Jsoup
 
 object TimusUtils {
     fun extractProfile(source: String, handle: String): ProfileResult<TimusUserInfo> {
-        with(Jsoup.parse(source)) {
+        with(source.parseDocument()) {
             val userName = selectFirst("h2.author_name")?.text()
                 ?: return ProfileResult.NotFound(userId = handle)
             val rows =
@@ -30,7 +29,7 @@ object TimusUtils {
     }
 
     fun extractUsersSuggestions(source: String): List<UserSuggestion> =
-        Jsoup.parse(source).expectFirst("table.ranklist")
+        source.parseDocument().expectFirst("table.ranklist")
             .select("td.name")
             .mapNotNull { nameColumn ->
                 val userId = nameColumn.selectFirst("a")

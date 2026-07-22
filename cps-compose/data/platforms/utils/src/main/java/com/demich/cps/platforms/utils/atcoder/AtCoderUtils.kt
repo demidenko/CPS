@@ -1,15 +1,15 @@
 package com.demich.cps.platforms.utils.atcoder
 
 import com.demich.cps.platforms.utils.NewsPostEntry
+import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.profiles.userinfo.AtCoderUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
 object AtCoderUtils {
     fun extractUserInfo(source: String): AtCoderUserInfo =
-        with(Jsoup.parse(source)) {
+        with(source.parseDocument()) {
             AtCoderUserInfo(
                 handle = expectFirst("a.username").text(),
                 rating = select("th.no-break").find { it.text() == "Rating" }
@@ -20,7 +20,7 @@ object AtCoderUtils {
         }
 
     fun extractUserSuggestions(source: String): List<UserSuggestion> {
-        val table = Jsoup.parse(source).expectFirst("table.table")
+        val table = source.parseDocument().expectFirst("table.table")
         val ratingIndex = table.select("thead > tr > th").indexOfFirst { it.text() == "Rating" }
         return table.select("tbody > tr").map { row ->
             UserSuggestion(
@@ -38,7 +38,8 @@ object AtCoderUtils {
 
 
     fun extractNews(source: String): List<NewsPost?> =
-        Jsoup.parse(source).select("div.panel.panel-default, div.panel.panel-info")
+        source.parseDocument()
+            .select("div.panel.panel-default, div.panel.panel-info")
             .mapNotNull { it.extractNewsFromPanel() }
             .sortedByDescending { it.time }
 

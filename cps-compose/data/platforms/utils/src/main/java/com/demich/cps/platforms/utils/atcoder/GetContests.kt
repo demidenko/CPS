@@ -3,13 +3,13 @@ package com.demich.cps.platforms.utils.atcoder
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.platforms.api.atcoder.AtCoderApi
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
+import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.selectSequence
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Duration
 import kotlin.time.Instant
@@ -52,7 +52,8 @@ private class AtCoderContestParser {
     }
 
     fun parseContests(source: String): Sequence<Contest> =
-        Jsoup.parse(source).selectSequence("time.fixtime-full")
+        source.parseDocument()
+            .selectSequence("time.fixtime-full")
             .map(::extractContest)
 }
 

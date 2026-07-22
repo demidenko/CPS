@@ -10,7 +10,6 @@ import kotlinx.datetime.format.alternativeParsing
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import kotlinx.datetime.toInstant
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
@@ -44,7 +43,7 @@ object ProjectEulerUtils {
             amPmMarker(am = "am", pm = "pm")
         }
 
-        return Jsoup.parse(source).expectFirst("#problems_table").select("td.id_column")
+        return source.parseDocument().expectFirst("#problems_table").select("td.id_column")
             .map { idCell ->
                 idCell.nextElementSibling()?.let { nameCell ->
                     // title="Published on Saturday, 5th April 2025, 02:00 pm"
@@ -73,7 +72,7 @@ object ProjectEulerUtils {
     }
 
     private fun extractRssItems(rssPage: String) =
-        Jsoup.parse(rssPage).select("item").map { RssItem(it) }
+        rssPage.parseDocument().select("item").map { RssItem(it) }
 
     class NewsPost(
         val title: String,

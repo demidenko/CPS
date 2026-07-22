@@ -2,11 +2,10 @@ package com.demich.cps.platforms.utils
 
 import com.demich.cps.profiles.userinfo.ACMPUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
-import org.jsoup.Jsoup
 
 object ACMPUtils {
     fun extractUserInfo(source: String, id: String): ACMPUserInfo =
-        with(Jsoup.parse(source)) {
+        with(source.parseDocument()) {
             val userName = title()
             val box = body().select("h4").first { it.text() == "Общая статистика" }.parent()
             requireNotNull(box)
@@ -30,7 +29,7 @@ object ACMPUtils {
         }
 
     fun extractUsersSuggestions(source: String): List<UserSuggestion> =
-        Jsoup.parse(source).expectFirst("table.main")
+        source.parseDocument().expectFirst("table.main")
             .select("tr.white")
             .map { row ->
                 val cols = row.select("td")

@@ -10,7 +10,6 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
-import org.jsoup.Jsoup
 import kotlin.time.Instant
 
 object ClistUtils {
@@ -33,12 +32,12 @@ object ClistUtils {
     }
 
     fun extractLoginSuggestions(source: String): List<String> =
-        Jsoup.parse(source).select("td.username").map { it.text() }
+        source.parseDocument().select("td.username").map { it.text() }
 
     fun extractUserInfo(source: String, login: String): ClistUserInfo {
         val accounts = mutableMapOf<String, Pair<String, String>>()
 
-        val body = Jsoup.parse(source).body()
+        val body = source.parseDocument().body()
         //rated table
         body.getElementById("table-accounts")
             ?.select("tr")
