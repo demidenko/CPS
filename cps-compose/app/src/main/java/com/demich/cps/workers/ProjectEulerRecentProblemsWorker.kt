@@ -14,7 +14,6 @@ import com.demich.cps.ui.platformLogoResId
 import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
-import com.demich.kotlin_stdlib_boost.minOfNotNull
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -50,7 +49,8 @@ class ProjectEulerRecentProblemsWorker(
             val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
             val currentTime = getSystemTime()
             return ProjectEulerRssParser().parseProblems(rssPage)
-                .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
+                .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
+                .minOrNull()
                 ?.also { item.setValue(it) }
         }
     }

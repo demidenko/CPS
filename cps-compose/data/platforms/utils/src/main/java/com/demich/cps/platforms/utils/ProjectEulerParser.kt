@@ -71,7 +71,7 @@ class ProjectEulerRssParser {
     private fun String.parseRssItems() =
         parseDocument().selectSequence("item").map { RssItem(it) }
 
-    fun parseNews(rssPage: String): List<ProjectEulerNewsPost> =
+    fun parseNews(rssPage: String): Sequence<ProjectEulerNewsPost> =
         rssPage.parseRssItems().mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
                 ProjectEulerNewsPost(
@@ -80,9 +80,9 @@ class ProjectEulerRssParser {
                     id = id
                 )
             }
-        }.toList()
+        }
 
-    fun parseProblems(rssPage: String): List<Pair<Int, Instant>> {
+    fun parseProblems(rssPage: String): Sequence<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
             //04 Apr 2025 23:00:00 +0100
             day(padding = Padding.NONE)
@@ -105,7 +105,7 @@ class ProjectEulerRssParser {
                 )
                 id.toInt() to date
             }
-        }.toList()
+        }
     }
 }
 

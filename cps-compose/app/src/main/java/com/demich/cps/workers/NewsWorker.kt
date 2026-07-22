@@ -77,7 +77,7 @@ class NewsWorker(
 
         hintsDataStore.scanNewsFeed(
             newsFeed = project_euler_news,
-            posts = ProjectEulerRssParser().parseNews(rssPage = rssPage)
+            posts = ProjectEulerRssParser().parseNews(rssPage = rssPage).toList()
         ) { post ->
             notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
                 subText = "Project Euler news"
