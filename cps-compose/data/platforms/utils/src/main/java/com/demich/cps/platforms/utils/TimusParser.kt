@@ -4,7 +4,7 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.TimusUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 
-object TimusUtils {
+class TimusParser {
     fun extractProfile(source: String, handle: String): ProfileResult<TimusUserInfo> {
         with(source.parseDocument()) {
             val userName = selectFirst("h2.author_name")?.text()

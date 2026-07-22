@@ -6,7 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.timus.TimusUrls
 import com.demich.cps.platforms.clients.TimusClient
-import com.demich.cps.platforms.utils.TimusUtils
+import com.demich.cps.platforms.utils.TimusParser
 import com.demich.cps.profiles.SmallProfilePanelTypeArchive
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.TimusUserInfo
@@ -26,8 +26,8 @@ class TimusProfileManager :
     override fun isValidForSearch(char: Char): Boolean = true
 
     override suspend fun fetchProfile(data: String): ProfileResult<TimusUserInfo> =
-        TimusUtils.runCatching {
-            extractProfile(
+        runCatching {
+            TimusParser().extractProfile(
                 source = TimusClient.getUserPage(data.toInt()),
                 handle = data
             )
@@ -37,7 +37,7 @@ class TimusProfileManager :
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return TimusUtils.extractUsersSuggestions(source = TimusClient.getSearchPage(str))
+        return TimusParser().extractUsersSuggestions(source = TimusClient.getSearchPage(str))
     }
 
     override fun makeUserInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =
