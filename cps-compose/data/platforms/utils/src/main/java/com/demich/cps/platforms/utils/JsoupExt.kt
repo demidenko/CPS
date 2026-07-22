@@ -9,8 +9,7 @@ import kotlin.streams.asSequence
 
 internal fun String.parseDocument(): Document = Jsoup.parse(this)
 
-// TODO: find cheapest way
-internal fun String.parseHtmlElement(): Element = Jsoup.parse(this)
+internal fun String.parseHtmlElement(): Element = Jsoup.parseBodyFragment(this)
 
 internal fun Element.expectFirst(evaluator: Evaluator): Element =
     requireNotNull(selectFirst(evaluator))
