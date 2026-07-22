@@ -7,7 +7,7 @@ import com.demich.cps.profiles.userinfo.UserSuggestion
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
-object AtCoderUtils {
+class AtCoderParser {
     fun extractUserInfo(source: String): AtCoderUserInfo =
         with(source.parseDocument()) {
             AtCoderUserInfo(
@@ -30,28 +30,27 @@ object AtCoderUtils {
         }
     }
 
-    data class NewsPost(
-        val title: String,
-        val time: Instant,
-        override val id: String
-    ): NewsPostEntry
-
-
-    fun extractNews(source: String): List<NewsPost?> =
+    fun extractNews(source: String): List<AtcoderNewsPost?> =
         source.parseDocument()
             .select("div.panel.panel-default, div.panel.panel-info")
             .mapNotNull { it.extractNewsFromPanel() }
             .sortedByDescending { it.time }
 
-    private fun Element.extractNewsFromPanel(): NewsPost? {
+    private fun Element.extractNewsFromPanel(): AtcoderNewsPost? {
         val header = selectFirst("div.panel-heading") ?: return null
         val titleElement = header.expectFirst("h3.panel-title")
         val timeElement = header.selectFirst("span.tooltip-unix") ?: return null
         val id = titleElement.expectFirst("a").attr("href").removePrefix("/posts/")
-        return NewsPost(
+        return AtcoderNewsPost(
             title = titleElement.text(),
             time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
             id = id
         )
     }
 }
+
+data class AtcoderNewsPost(
+    val title: String,
+    val time: Instant,
+    override val id: String
+): NewsPostEntry

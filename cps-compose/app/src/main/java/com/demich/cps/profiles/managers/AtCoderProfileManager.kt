@@ -10,7 +10,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
-import com.demich.cps.platforms.utils.atcoder.AtCoderUtils
+import com.demich.cps.platforms.utils.atcoder.AtCoderParser
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.screens.AtCoderUserInfoExpandedContent
@@ -41,8 +41,8 @@ class AtCoderProfileManager :
     }
 
     override suspend fun fetchProfile(data: String): ProfileResult<AtCoderUserInfo> {
-        return AtCoderUtils.runCatching {
-            ProfileResult(extractUserInfo(AtCoderClient.getUserPage(handle = data)))
+        return runCatching {
+            ProfileResult(AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = data)))
         }.getOrElse { e ->
             if (e.isPageNotFound) ProfileResult.NotFound(data)
             else ProfileResult.Failed(data)
@@ -50,7 +50,7 @@ class AtCoderProfileManager :
     }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        AtCoderUtils.extractUserSuggestions(source = AtCoderClient.getSuggestionsPage(str))
+        AtCoderParser().extractUserSuggestions(source = AtCoderClient.getSuggestionsPage(str))
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
         AtCoderClient.getRatingChanges(handle = userId).map {
