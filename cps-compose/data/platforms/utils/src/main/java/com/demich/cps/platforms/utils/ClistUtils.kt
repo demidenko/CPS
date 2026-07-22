@@ -30,7 +30,9 @@ object ClistUtils {
         platforms.forEach { add(requireNotNull(it.clistResourceId)) }
         additionalResources.forEach { add(it.id) }
     }
+}
 
+class ClistParser {
     fun extractLoginSuggestions(source: String): List<String> =
         source.parseDocument().select("td.username").map { it.text() }
 

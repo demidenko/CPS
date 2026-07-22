@@ -6,7 +6,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.clist.ClistUrls
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.isPageNotFound
-import com.demich.cps.platforms.utils.ClistUtils
+import com.demich.cps.platforms.utils.ClistParser
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserSuggestion
@@ -22,9 +22,9 @@ class CListProfileManager :
     override val urlHomePage = ClistUrls.main
 
     override suspend fun fetchProfile(data: String): ProfileResult<ClistUserInfo> =
-        ClistUtils.runCatching {
+        runCatching {
             ProfileResult(
-                userInfo = extractUserInfo(
+                userInfo = ClistParser().extractUserInfo(
                     source = ClistClient().getUserPage(login = data),
                     login = data
                 )
@@ -35,7 +35,7 @@ class CListProfileManager :
         }
 
     override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
-        ClistUtils.extractLoginSuggestions(source = ClistClient().getUsersSearchPage(str))
+        ClistParser().extractLoginSuggestions(source = ClistClient().getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 
     override fun makeUserInfoSpan(userInfo: ClistUserInfo, cpsColors: CPSColors): AnnotatedString =
