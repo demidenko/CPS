@@ -48,7 +48,7 @@ class ProjectEulerRecentProblemsWorker(
         ): Instant? {
             val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
             val currentTime = getSystemTime()
-            return ProjectEulerRssParser().parseProblems(rssPage)
+            return ProjectEulerRssParser(rssPage).parseProblems()
                 .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also { item.setValue(it) }
