@@ -2,7 +2,7 @@ package com.demich.cps.platforms.utils
 
 import com.demich.cps.profiles.userinfo.CodeChefUserInfo
 
-object CodeChefUtils {
+class CodeChefParser {
     fun extractUserInfo(source: String, handle: String): CodeChefUserInfo =
         source.parseDocument().run {
             val rating = selectFirst("div.widget-rating")

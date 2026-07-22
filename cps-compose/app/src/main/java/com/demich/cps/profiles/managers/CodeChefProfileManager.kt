@@ -24,7 +24,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.codechef.CodeChefUrls
 import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
-import com.demich.cps.platforms.utils.CodeChefUtils
+import com.demich.cps.platforms.utils.CodeChefParser
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.SmallProfilePanelTwoLines
@@ -63,9 +63,9 @@ class CodeChefProfileManager :
     }
 
     override suspend fun fetchProfile(data: String): ProfileResult<CodeChefUserInfo> =
-        CodeChefUtils.runCatching {
+        runCatching {
             ProfileResult(
-                userInfo = extractUserInfo(
+                userInfo = CodeChefParser().extractUserInfo(
                     source = CodeChefClient.getUserPage(handle = data),
                     handle = data
                 )
