@@ -13,16 +13,10 @@ import kotlinx.datetime.toInstant
 import org.jsoup.nodes.Element
 import kotlin.time.Instant
 
-object ProjectEulerUtils {
+class ProjectEulerParser {
     private val peUtcOffset get() = UtcOffset(hours = +1)
 
-    class RecentProblem(
-        val name: String,
-        override val id: String,
-        val date: Instant
-    ): NewsPostEntry
-
-    fun extractRecentProblems(source: String): List<RecentProblem?> {
+    fun extractRecentProblems(source: String): List<ProjectEulerRecentProblem?> {
         val format = LocalDateTime.Format {
             //5th April 2025, 02:00 pm
             day(padding = Padding.NONE)
@@ -49,7 +43,7 @@ object ProjectEulerUtils {
                     // title="Published on Saturday, 5th April 2025, 02:00 pm"
                     val title = nameCell.expectFirst("a").attr("title")
                     val dateStr = title.substring(startIndex = title.indexOf(',')+1).trim()
-                    RecentProblem(
+                    ProjectEulerRecentProblem(
                         name = nameCell.text(),
                         id = idCell.text(),
                         date = format.parse(dateStr).toInstant(peUtcOffset)
@@ -57,11 +51,13 @@ object ProjectEulerUtils {
                 }
             }
     }
+}
 
+class ProjectEulerRssParser {
     private class RssItem(private val item: Element) {
-        val description get() = item.expectFirst("description")
+        fun description() = item.expectFirst("description")
 
-        val title get() = item.expectFirst("title")
+        fun title() = item.expectFirst("title")
 
         inline fun <T> guidOrNull(prefix: String, block: (String) -> T): T? {
             val idFull = item.expectFirst("guid").text()
@@ -71,27 +67,22 @@ object ProjectEulerUtils {
         }
     }
 
-    private fun extractRssItems(rssPage: String) =
-        rssPage.parseDocument().select("item").map { RssItem(it) }
 
-    class NewsPost(
-        val title: String,
-        val descriptionHtml: String,
-        override val id: String
-    ): NewsPostEntry
+    private fun String.parseRssItems() =
+        parseDocument().selectSequence("item").map { RssItem(it) }
 
-    fun extractNewsFromRSSPage(rssPage: String): List<NewsPost> =
-        extractRssItems(rssPage).mapNotNull { item ->
+    fun extractNews(rssPage: String): List<ProjectEulerNewsPost> =
+        rssPage.parseRssItems().mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
-                NewsPost(
-                    title = item.title.text(),
-                    descriptionHtml = item.description.html(),
+                ProjectEulerNewsPost(
+                    title = item.title().text(),
+                    descriptionHtml = item.description().html(),
                     id = id
                 )
             }
-        }
+        }.toList()
 
-    fun extractProblemsFromRssPage(rssPage: String): List<Pair<Int, Instant>> {
+    fun extractProblems(rssPage: String): List<Pair<Int, Instant>> {
         val format = DateTimeComponents.Format {
             //04 Apr 2025 23:00:00 +0100
             day(padding = Padding.NONE)
@@ -104,16 +95,28 @@ object ProjectEulerUtils {
             char(' ')
             offset(UtcOffset.Formats.FOUR_DIGITS)
         }
-        return extractRssItems(rssPage).mapNotNull { item ->
+
+        return rssPage.parseRssItems().mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
-                val description = item.description.text()
+                val description = item.description().text()
                 val date = Instant.parse(
                     input = description.run { substring(startIndex = indexOf(',') + 2) },
                     format = format
                 )
                 id.toInt() to date
             }
-        }
+        }.toList()
     }
 }
 
+class ProjectEulerRecentProblem(
+    val name: String,
+    override val id: String,
+    val date: Instant
+): NewsPostEntry
+
+class ProjectEulerNewsPost(
+    val title: String,
+    val descriptionHtml: String,
+    override val id: String
+): NewsPostEntry

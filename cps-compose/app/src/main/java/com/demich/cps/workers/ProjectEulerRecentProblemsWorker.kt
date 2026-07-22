@@ -8,7 +8,8 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.ProjectEulerClient
-import com.demich.cps.platforms.utils.ProjectEulerUtils
+import com.demich.cps.platforms.utils.ProjectEulerParser
+import com.demich.cps.platforms.utils.ProjectEulerRssParser
 import com.demich.cps.ui.platformLogoResId
 import com.demich.cps.utils.getSystemTime
 import com.demich.datastore_itemized.flowOf
@@ -48,7 +49,7 @@ class ProjectEulerRecentProblemsWorker(
         ): Instant? {
             val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
             val currentTime = getSystemTime()
-            return ProjectEulerUtils.extractProblemsFromRssPage(rssPage)
+            return ProjectEulerRssParser().extractProblems(rssPage)
                 .minOfNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 ?.also { item.setValue(it) }
         }
@@ -63,7 +64,7 @@ class ProjectEulerRecentProblemsWorker(
     private suspend fun scanProblems() {
         hintsDataStore.scanNewsFeed(
             newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
-            posts = ProjectEulerUtils.extractRecentProblems(ProjectEulerClient.getRecentPage())
+            posts = ProjectEulerParser().extractRecentProblems(ProjectEulerClient.getRecentPage())
         ) { post ->
             val problemId = post.id.toInt()
             notificationChannels.project_euler.problems(problemId).notify(context) {
