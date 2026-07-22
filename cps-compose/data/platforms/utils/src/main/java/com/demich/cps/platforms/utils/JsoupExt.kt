@@ -43,8 +43,12 @@ internal val Element.href: String
 
 internal class EvaluatorTagWithClass(val tag: String, val className: String): Evaluator() {
     override fun matches(root: Element, element: Element): Boolean {
-        return element.normalName() == tag && element.hasClass(className)
+        return element.nameIs(tag) && element.hasClass(className)
     }
+
+    override fun toString(): String = "$tag.$className"
+
+    override fun cost(): Int = 8
 }
 
 internal fun EvaluatorNthTag(tag: String, index: Int): Evaluator =
