@@ -27,7 +27,7 @@ private fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
 
 
-object CodeforcesUtils: CodeforcesHtmlParser {
+object CodeforcesUtils: CodeforcesPageParser {
 
     private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
     private val evaluatorMeta = Evaluator.Class("meta")

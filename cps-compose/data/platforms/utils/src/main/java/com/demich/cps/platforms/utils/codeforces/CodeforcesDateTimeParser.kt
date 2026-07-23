@@ -33,6 +33,6 @@ private val dateTimeFormat = LocalDateTime.Format {
     minute()
 }
 
-context(parser: CodeforcesHtmlParser)
+context(parser: CodeforcesPageParser)
 internal fun Element.extractTime(): Instant =
     LocalDateTime.parse(input = attr("title"), format = dateTimeFormat).toInstant(moscowTimeZone)
