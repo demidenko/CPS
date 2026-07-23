@@ -9,20 +9,10 @@ import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.parseHtmlElement
 import com.demich.cps.platforms.utils.selectSequence
 import com.demich.cps.platforms.utils.values
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.alternativeParsing
-import kotlinx.datetime.format.char
-import kotlinx.datetime.toInstant
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import kotlin.time.Instant
-
-private fun Document.expectContent(): Element = expectFirst("div.content-with-sidebar")
-
-private fun Document.selectSidebar(): Element? = selectFirst("div#sidebar")
-private fun Document.expectSidebar(): Element = requireNotNull(selectSidebar())
 
 private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
 private fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
@@ -36,39 +26,8 @@ private fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 
 private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", "/blog/entry/")
 
-private object CodeforcesDateTimeParser {
-    private val moscowTimeZone = kotlinx.datetime.TimeZone.of("Europe/Moscow")
 
-    private val dateTimeFormat = LocalDateTime.Format {
-        alternativeParsing({
-            //RU format: "dd.MM.yyyy HH:mm"
-            day()
-            char('.')
-            monthNumber()
-            char('.')
-            year()
-        }) {
-            //EN format: "MMM/dd/yyyy HH:mm"
-            monthName(MonthNames.ENGLISH_ABBREVIATED)
-            char('/')
-            day()
-            char('/')
-            year()
-        }
-        char(' ')
-        hour()
-        char(':')
-        minute()
-    }
-
-    fun parse(input: String): Instant =
-        LocalDateTime.parse(input, dateTimeFormat).toInstant(moscowTimeZone)
-}
-
-private fun Element.extractTime(): Instant = CodeforcesDateTimeParser.parse(attr("title"))
-
-
-object CodeforcesUtils {
+object CodeforcesUtils: CodeforcesHtmlParser {
 
     private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
     private val evaluatorMeta = Evaluator.Class("meta")
