@@ -198,21 +198,6 @@ object CodeforcesUtils {
 
     fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
         extractRecentBlogEntries(source.parseDocument()).values().toList()
-
-    private inline fun extractContestPhaseInfo(source: String, block: (String, String) -> Unit) {
-        val sidebar = source.parseDocument().selectSidebar() ?: return
-        val phaseText = sidebar.selectFirst("span.contest-state-phase")?.text() ?: return
-        val infoText = sidebar.selectFirst("span.contest-state-regular")?.text() ?: return
-        block(phaseText, infoText)
-    }
-
-    fun extractContestSystemTestingPercentageOrNull(source: String): Int? {
-        extractContestPhaseInfo(source) { phase, text ->
-            if (phase != "System testing") return null
-            return text.removeSuffix("%").toIntOrNull()
-        }
-        return null
-    }
 }
 
 
@@ -236,7 +221,3 @@ suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Seq
                 ?.extractRatedUser()
         }
 
-suspend fun CodeforcesPageContentProvider.getSysTestPercentageOrNull(contestId: Int): Int? =
-    runCatching { getContestPage(contestId = contestId) }
-        .map { CodeforcesUtils.extractContestSystemTestingPercentageOrNull(it) }
-        .getOrNull()
