@@ -11,23 +11,20 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
-import com.demich.cps.platforms.utils.codeforces.parseCodeforcesHtml
+import com.demich.cps.platforms.utils.codeforces.parse
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 @ReadOnlyComposable
-fun htmlToAnnotatedString(html: String): AnnotatedString {
+fun codeforcesHtmlContentToAnnotatedString(html: String): AnnotatedString {
     val builder = AnnotatedString.Builder()
-    parseCodeforcesHtml(
-        html = html,
-        builder = CodeforcesHtmlStringBuilderImpl(
-            builder = builder,
-            cpsColors = cpsColors,
-            manager = LocalCodeforcesProfileManager.current
-        )
-    )
+    CodeforcesHtmlStringBuilderImpl(
+        builder = builder,
+        cpsColors = cpsColors,
+        manager = LocalCodeforcesProfileManager.current
+    ).parse(html)
     return builder.toAnnotatedString()
 }
 

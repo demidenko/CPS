@@ -40,8 +40,8 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.codeforcesHtmlContentToAnnotatedString
 import com.demich.cps.utils.formatTimeAgo
-import com.demich.cps.utils.htmlToAnnotatedString
 import kotlin.math.roundToInt
 
 @Composable
@@ -182,7 +182,7 @@ private fun CommentBox(
             !expanded && linesOverflow
         }
         Text(
-            text = htmlToAnnotatedString(commentHtml),
+            text = codeforcesHtmlContentToAnnotatedString(commentHtml),
             maxLines = if (expanded) Int.MAX_VALUE else maxLines,
             fontSize = fontSize,
             onTextLayout = { result ->

@@ -1,6 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import org.jsoup.Jsoup
+import com.demich.cps.platforms.utils.parseHtmlElement
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -20,11 +20,11 @@ interface CodeforcesHtmlStringBuilder {
     fun pushStroke()
 }
 
-fun parseCodeforcesHtml(html: String, builder: CodeforcesHtmlStringBuilder) {
-    Jsoup.parseBodyFragment(html).body().traverse(CodeforcesHtmlParser(builder = builder))
+fun CodeforcesHtmlStringBuilder.parse(html: String) {
+    html.parseHtmlElement().traverse(CodeforcesNodeVisitor(builder = this))
 }
 
-private class CodeforcesHtmlParser(val builder: CodeforcesHtmlStringBuilder): NodeVisitor {
+private class CodeforcesNodeVisitor(val builder: CodeforcesHtmlStringBuilder): NodeVisitor {
     override fun head(node: Node, depth: Int) {
         //println("+${node.nodeName()}")
         if (node is TextNode) {
