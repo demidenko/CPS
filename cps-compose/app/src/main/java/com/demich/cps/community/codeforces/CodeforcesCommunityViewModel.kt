@@ -11,6 +11,7 @@ import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntrie
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
+import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
@@ -154,10 +155,10 @@ private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageCo
 
 
 private suspend fun CodeforcesPageContentProvider.getMainBlogEntries() =
-    CodeforcesUtils.extractBlogEntries(source = getMainPage())
+    CodeforcesBlogEntriesPageParser().parseBlogEntries(page = getMainPage())
 
 private suspend fun CodeforcesPageContentProvider.getTopBlogEntries() =
-    CodeforcesUtils.extractBlogEntries(source = getTopBlogEntriesPage())
+    CodeforcesBlogEntriesPageParser().parseBlogEntries(page = getTopBlogEntriesPage())
 
 private suspend fun CodeforcesPageContentProvider.getTopComments() =
     CodeforcesUtils.extractComments(source = getTopCommentsPage())

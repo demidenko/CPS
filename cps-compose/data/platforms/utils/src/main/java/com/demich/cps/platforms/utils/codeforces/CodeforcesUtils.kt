@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.utils.EvaluatorNthTag
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.href
@@ -29,45 +28,7 @@ private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href"
 
 object CodeforcesUtils: CodeforcesPageParser {
 
-    private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
-    private val evaluatorMeta = Evaluator.Class("meta")
-    private val evaluatorLeftMeta = Evaluator.Class("left-meta")
-    private val evaluatorRightMeta = Evaluator.Class("right-meta")
-    private val evaluatorTopicRating = Evaluator.Class("topic-rating")
-    private val evaluator_li2 = EvaluatorNthTag("li", 2)
-    private val evaluator_a1 = EvaluatorNthTag("a", 1)
-    private fun extractBlogEntry(topic: Element): CodeforcesWebBlogEntry {
-        val id: Int
-        val title: String
-        topic.expectFirst(evaluatorDivTitle).expectFirst("a").let {
-            title = it.text()
-            id = it.href.removePrefix("/blog/entry/").toInt()
-        }
 
-        val author: CodeforcesHandle
-        val creationTime: Instant
-        topic.expectDivInfo().let { info ->
-            author = info.expectRatedUser().extractRatedUser()
-            creationTime = info.expectHumanTime().extractTime()
-        }
-
-        val rating: Int
-        val commentsCount: Int
-        topic.expectFirst(evaluatorMeta).let { bottom ->
-            rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(evaluatorTopicRating).text().toInt()
-            val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst(evaluator_li2)
-            commentsCount = commentsItem.expectFirst(evaluator_a1).text().toInt()
-        }
-
-        return CodeforcesWebBlogEntry(
-            id = id,
-            title = title,
-            author = author,
-            creationTime = creationTime,
-            rating = rating,
-            commentsCount = commentsCount
-        )
-    }
 
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
@@ -134,14 +95,6 @@ object CodeforcesUtils: CodeforcesPageParser {
             isLowRated = false
         )
     }
-
-
-    internal fun extractBlogEntries(document: Document): Sequence<Result<CodeforcesWebBlogEntry>> =
-        document.expectContent().selectSequence("div.topic")
-            .map { runCatching { extractBlogEntry(it) } }
-
-    fun extractBlogEntries(source: String): List<CodeforcesWebBlogEntry> =
-        extractBlogEntries(source.parseDocument()).values().toList()
 
     internal fun extractComments(document: Document): Sequence<Result<CodeforcesWebComment>> =
         document.expectContent().selectSequence(".comment-table")
