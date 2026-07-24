@@ -115,7 +115,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 }
 
 private suspend fun defaultProvider(context: Context): CodeforcesPageContentProvider =
-    CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale().also { println(it) })
+    CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale())
 
 private class CodeforcesDataLoader<T>(
     val scope: CoroutineScope,
