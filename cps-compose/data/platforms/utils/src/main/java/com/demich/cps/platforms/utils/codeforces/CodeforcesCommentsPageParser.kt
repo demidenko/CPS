@@ -31,12 +31,7 @@ class CodeforcesCommentsPageParser: CodeforcesCommunityPageParser() {
             commentCreationTime = info.expectHumanTime().extractTime()
             info.expectBlogEntryHref().let { commentLink ->
                 blogEntryTitle = commentLink.text()
-                commentLink.href.let { url ->
-                    // href="/blog/entry/XXXXXX#comment-YYYYYY"
-                    val j = url.indexOf('#')
-                    val i = url.lastIndexOf('/', j - 1)
-                    blogEntryId = url.substring(i + 1, j).toInt()
-                }
+                blogEntryId = commentLink.href.extractBlogEntryIdFromBlogEntryHref()
             }
             info.expectFirst(evaluatorAttrCommentId).let { ratingBox ->
                 commentId = ratingBox.attr("commentid").toLong()

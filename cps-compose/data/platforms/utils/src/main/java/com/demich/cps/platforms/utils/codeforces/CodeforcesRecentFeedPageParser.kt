@@ -13,7 +13,7 @@ class CodeforcesRecentFeedPageParser: CodeforcesCommunityPageParser() {
         val blogEntryId: Int
         val blogEntryTitle: String
         expectBlogEntryHref().let {
-            blogEntryId = it.href.removePrefix("/blog/entry/").toInt()
+            blogEntryId = it.href.extractBlogEntryIdFromBlogEntryHref()
             blogEntryTitle = it.text()
         }
 

@@ -26,7 +26,7 @@ class CodeforcesBlogEntriesPageParser: CodeforcesCommunityPageParser() {
         val title: String
         expectFirst(evaluatorDivTitle).expectFirst("a").let {
             title = it.text()
-            id = it.href.removePrefix("/blog/entry/").toInt()
+            id = it.href.extractBlogEntryIdFromBlogEntryHref()
         }
 
         val author: CodeforcesHandle
