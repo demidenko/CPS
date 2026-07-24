@@ -9,7 +9,6 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.addNewUser
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesCommentsPageParser
@@ -20,9 +19,9 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.sharedViewModel
-import com.demich.datastore_itemized.DataStoreValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,22 +65,26 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { it.getRecentFeed() }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
-    private fun reload(title: CodeforcesTitle, localeItem: DataStoreValue<CodeforcesLocale>) {
+    private fun reload(title: CodeforcesTitle, provider: suspend () -> CodeforcesPageContentProvider) {
         when (title) {
-            MAIN -> mainBlogEntries.launchLoadIfActive(localeItem)
+            MAIN -> mainBlogEntries.launchLoadIfActive(provider)
             TOP -> {
-                topBlogEntries.launchLoadIfActive(localeItem)
+                topBlogEntries.launchLoadIfActive(provider)
                 //TODO: set comments inactive after many reloads without showing them
-                topComments.launchLoadIfActive(localeItem)
+                topComments.launchLoadIfActive(provider)
             }
-            RECENT -> recentActions.launchLoadIfActive(localeItem)
+            RECENT -> recentActions.launchLoadIfActive(provider)
             else -> return
         }
     }
 
     override fun reload(titles: List<CodeforcesTitle>, context: Context) {
-        val localeItem = context.settingsCommunity.codeforcesLocale
-        titles.forEach { reload(title = it, localeItem = localeItem) }
+        val provider = viewModelScope.async(
+            context = Dispatchers.Default,
+            start = LAZY,
+            block = { defaultProvider(context) }
+        )
+        titles.forEach { reload(title = it, provider = provider::await) }
     }
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
@@ -111,6 +114,9 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 }
 
+private suspend fun defaultProvider(context: Context): CodeforcesPageContentProvider =
+    CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale().also { println(it) })
+
 private class CodeforcesDataLoader<T>(
     val scope: CoroutineScope,
     init: T,
@@ -122,7 +128,7 @@ private class CodeforcesDataLoader<T>(
     fun flowOfData(context: Context): StateFlow<T> {
         if (inactive) {
             inactive = false
-            launchLoadIfActive(localeItem = context.settingsCommunity.codeforcesLocale)
+            launchLoadIfActive(provider = { defaultProvider(context) })
         }
         return dataFlow
     }
@@ -130,8 +136,7 @@ private class CodeforcesDataLoader<T>(
     private val loadingStatus = MutableStateFlow(LoadingStatus.PENDING)
     val loadingStatusFlow: StateFlow<LoadingStatus> get() = loadingStatus
 
-    // TODO: provider instead of localeItem
-    fun launchLoadIfActive(localeItem: DataStoreValue<CodeforcesLocale>) {
+    fun launchLoadIfActive(provider: suspend () -> CodeforcesPageContentProvider) {
         if (inactive) return
         loadingStatus.update {
             if (it == LOADING) return
@@ -139,7 +144,7 @@ private class CodeforcesDataLoader<T>(
         }
         scope.launch(Dispatchers.Default) {
             runCatching {
-                getData(CodeforcesClient(locale = localeItem()))
+                getData(provider())
             }.onFailure {
                 loadingStatus.value = FAILED
             }.onSuccess {
