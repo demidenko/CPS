@@ -10,7 +10,7 @@ suspend fun CodeforcesPageContentProvider.getRecentFeed(): CodeforcesRecentFeed 
 
 private fun CodeforcesUtils.extractRecentFeed(source: String): CodeforcesRecentFeed {
     val document = source.parseDocument()
-    val comments = extractComments(document).values().toList()
+    val comments = CodeforcesCommentsPageParser().extractComments(document).values().toList()
     val blogEntries = extractRecentBlogEntries(document).values().toMutableList()
     //blog entry with low rating disappeared from blogEntries but has comments, need to merge
     val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }

@@ -12,8 +12,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
+import com.demich.cps.platforms.utils.codeforces.CodeforcesCommentsPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -161,4 +161,4 @@ private suspend fun CodeforcesPageContentProvider.getTopBlogEntries() =
     CodeforcesBlogEntriesPageParser().parseBlogEntries(page = getTopBlogEntriesPage())
 
 private suspend fun CodeforcesPageContentProvider.getTopComments() =
-    CodeforcesUtils.extractComments(source = getTopCommentsPage())
+    CodeforcesCommentsPageParser().parseComments(page = getTopCommentsPage())
