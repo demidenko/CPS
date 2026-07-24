@@ -6,7 +6,7 @@ import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
-import com.demich.cps.platforms.utils.codeforces.CodeforcesUtils
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedPageParser
 import com.demich.cps.platforms.utils.codeforces.getUsersCatching
 import kotlin.time.Instant
 
@@ -252,7 +252,7 @@ private val CodeforcesLostEntry.authorHandle
 
 private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<List<CodeforcesRecentFeedBlogEntry>> {
     suspend fun extractFrom(page: suspend () -> String) =
-        CodeforcesUtils.extractRecentBlogEntries(source = page())
+        CodeforcesRecentFeedPageParser().parseRecentFeedBlogEntries(page = page())
 
     // "/groups" has less size than "/recent" and hopefully will be cached by cf
     return runCatching {

@@ -6,12 +6,12 @@ import com.demich.cps.platforms.utils.values
 import kotlin.math.max
 
 suspend fun CodeforcesPageContentProvider.getRecentFeed(): CodeforcesRecentFeed =
-    CodeforcesUtils.extractRecentFeed(source = getRecentActionsPage())
+    extractRecentFeed(source = getRecentActionsPage())
 
-private fun CodeforcesUtils.extractRecentFeed(source: String): CodeforcesRecentFeed {
+private fun extractRecentFeed(source: String): CodeforcesRecentFeed {
     val document = source.parseDocument()
     val comments = CodeforcesCommentsPageParser().extractComments(document).values().toList()
-    val blogEntries = extractRecentBlogEntries(document).values().toMutableList()
+    val blogEntries = CodeforcesRecentFeedPageParser().extractRecentFeedBlogEntries(document).values().toMutableList()
     //blog entry with low rating disappeared from blogEntries but has comments, need to merge
     val blogEntriesIds = blogEntries.mapTo(mutableSetOf()) { it.id }
     val usedIds = mutableSetOf<Int>()

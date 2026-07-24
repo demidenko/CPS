@@ -3,12 +3,8 @@ package com.demich.cps.platforms.utils.codeforces
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
 import com.demich.cps.platforms.utils.expectFirst
-import com.demich.cps.platforms.utils.href
 import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.parseHtmlElement
-import com.demich.cps.platforms.utils.selectSequence
-import com.demich.cps.platforms.utils.values
-import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 
@@ -27,30 +23,6 @@ private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href"
 
 object CodeforcesUtils: CodeforcesPageParser {
 
-    private fun extractRecentBlogEntry(item: Element): CodeforcesRecentFeedBlogEntry {
-        val author = item.expectRatedUser().extractRatedUser()
-        val blogEntryId: Int
-        val blogEntryTitle: String
-        item.expectFirst(evaluatorHrefBlogEntry).let {
-            blogEntryId = it.href.removePrefix("/blog/entry/").toInt()
-            blogEntryTitle = it.text()
-        }
-
-        return CodeforcesRecentFeedBlogEntry(
-            id = blogEntryId,
-            title = blogEntryTitle,
-            author = author,
-            isLowRated = false
-        )
-    }
-
-    internal fun extractRecentBlogEntries(document: Document): Sequence<Result<CodeforcesRecentFeedBlogEntry>> =
-        document.expectSidebar().expectFirst("div.recent-actions")
-            .selectSequence("li")
-            .map { runCatching { extractRecentBlogEntry(it) } }
-
-    fun extractRecentBlogEntries(source: String): List<CodeforcesRecentFeedBlogEntry> =
-        extractRecentBlogEntries(source.parseDocument()).values().toList()
 }
 
 
