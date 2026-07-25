@@ -244,7 +244,8 @@ private fun <U: UserInfo> profileFetchState(
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
                 emit(ProfileFetchResult(null, true))
-                emit(ProfileFetchResult(manager.fetchProfile(userId), false))
+                val profile = withContext(Dispatchers.Default) { manager.fetchProfile(userId) }
+                emit(ProfileFetchResult(profile, false))
             }
     }.collectAsState(initial = ProfileFetchResult(initial, false))
 
