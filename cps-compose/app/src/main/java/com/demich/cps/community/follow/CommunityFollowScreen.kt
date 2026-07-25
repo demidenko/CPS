@@ -39,17 +39,16 @@ private fun CommunityFollowScreen(
     onShowBlogScreen: (String) -> Unit
 ) {
     val context = context
-
     val viewModel = codeforcesCommunityViewModel()
 
-    val followLoadingStatus by viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
+    val loadingStatusState = viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
 
     val userBlogs by collectAsStateWithLifecycle { context.followRepository.flowOfUserBlogs() }
 
     ProvideSystemTimeEachMinute {
         CodeforcesFollowList(
             userBlogs = { userBlogs },
-            isRefreshing = { followLoadingStatus == LOADING },
+            isRefreshing = { loadingStatusState.value == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { handle ->
                 viewModel.launchData {
