@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformLogoPainter
@@ -35,7 +34,6 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
-import com.demich.cps.utils.rememberFirstValue
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTab {
@@ -44,7 +42,8 @@ enum class CodeforcesTab {
 
 @Composable
 fun CodeforcesCommunityScreen(
-    controller: CodeforcesCommunityController
+    controller: CodeforcesCommunityController,
+    renderAllTabs: Boolean
 ) {
     Column {
         CodeforcesPagerHeader(
@@ -53,6 +52,7 @@ fun CodeforcesCommunityScreen(
         )
         CodeforcesPager(
             controller = controller,
+            renderAllTabs = renderAllTabs,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -77,11 +77,9 @@ fun CodeforcesReloadablePage(
 @Composable
 private fun CodeforcesPager(
     controller: CodeforcesCommunityController,
+    renderAllTabs: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val renderAllTabs = rememberFirstValue { context.settingsCommunity.renderAllTabs }
-
     val newEntriesState = rememberNewEntriesState()
     ProvideSystemTimeEachMinute {
         HorizontalPager(

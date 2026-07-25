@@ -19,13 +19,16 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.rememberFirstValue
 
 @Composable
 private fun CommunityScreen(
-    controller: CodeforcesCommunityController
+    controller: CodeforcesCommunityController,
+    renderAllTabs: Boolean
 ) {
     CodeforcesCommunityScreen(
-        controller = controller
+        controller = controller,
+        renderAllTabs = renderAllTabs
     )
 }
 
@@ -73,6 +76,8 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     val context = context
     val controller = rememberCodeforcesCommunityController()
 
+    val screenSettings = rememberFirstValue { context.settingsCommunity.codeforcesScreenSettings }
+
     screenTitle = remember(controller) {
         ScreenTitleState {
             cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
@@ -87,7 +92,10 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
         }
     )
 
-    CommunityScreen(controller = controller)
+    CommunityScreen(
+        controller = controller,
+        renderAllTabs = screenSettings.renderAllTabs
+    )
 
     bottomBar = communityBottomBarBuilder(
         controller = controller

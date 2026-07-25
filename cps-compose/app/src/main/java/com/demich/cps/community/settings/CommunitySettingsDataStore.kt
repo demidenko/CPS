@@ -7,8 +7,10 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.transform
+import com.demich.datastore_itemized.value
 
 val Context.settingsCommunity: CommunitySettingsDataStore
     get() = CommunitySettingsDataStore(this)
@@ -47,7 +49,17 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds")
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
+
+    val codeforcesScreenSettings = combine {
+        CommunityCodeforcesScreenSettings(
+            renderAllTabs = renderAllTabs.value
+        )
+    }
 }
+
+data class CommunityCodeforcesScreenSettings(
+    val renderAllTabs: Boolean
+)
 
 fun Set<CommunitySettingsDataStore.NewsFeed>.containsSomethingExcept(item: CommunitySettingsDataStore.NewsFeed): Boolean {
     // return (this - item).isNotEmpty()
