@@ -17,7 +17,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFirstValue
 
@@ -47,18 +46,16 @@ private fun communityBottomBarBuilder(
 }
 
 private fun communityMenuBuilder(
+    followEnabled: Boolean,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ): CPSMenuBuilder = {
-    val context = context
-
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
         onClick = onOpenSettings
     )
 
-    val followEnabled by collectItemAsState { context.settingsCommunity.codeforcesFollowEnabled }
     if (followEnabled) {
         CPSDropdownMenuItem(
             title = "Follow List",
@@ -85,6 +82,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     }
 
     menu = communityMenuBuilder(
+        followEnabled = screenSettings.followEnabled,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = {
             controller.updateFollowUsersInfo(context)

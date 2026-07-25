@@ -52,12 +52,14 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val codeforcesScreenSettings = combine {
         CommunityCodeforcesScreenSettings(
+            followEnabled = codeforcesFollowEnabled.value,
             renderAllTabs = renderAllTabs.value
         )
     }
 }
 
 data class CommunityCodeforcesScreenSettings(
+    val followEnabled: Boolean,
     val renderAllTabs: Boolean
 )
 
