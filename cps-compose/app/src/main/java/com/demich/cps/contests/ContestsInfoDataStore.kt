@@ -1,7 +1,7 @@
 package com.demich.cps.contests
 
 import android.content.Context
-import com.demich.cps.contests.settings.ContestsSettingsSnapshot
+import com.demich.cps.contests.settings.ContestsFetchSettingsSnapshot
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -16,5 +16,5 @@ class ContestsInfoDataStore(context: Context): ItemizedDataStore(context.contest
         emptyTimedCollection<ContestCompositeId>()
     }
 
-    val settingsSnapshot = jsonCPS.itemNullable<ContestsSettingsSnapshot>(name = "settings_snapshot")
+    val settingsSnapshot = jsonCPS.itemNullable<ContestsFetchSettingsSnapshot>(name = "settings_snapshot")
 }

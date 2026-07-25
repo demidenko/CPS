@@ -10,9 +10,9 @@ import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.contests.loading_engine.collectTo
-import com.demich.cps.contests.settings.ContestsSettingsSnapshotDiff
+import com.demich.cps.contests.settings.ContestsFetchSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
-import com.demich.cps.contests.settings.makeSnapshot
+import com.demich.cps.contests.settings.fetchSettingsSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
@@ -93,7 +93,7 @@ class ContestsViewModel: ViewModel() {
             infoDataStore.settingsSnapshot.setValue(null)
 
             val settings = context.settingsContests
-            val diff = settings.makeSnapshot().differenceFrom(snapshot)
+            val diff = settings.fetchSettingsSnapshot().differenceFrom(snapshot)
 
             val fakeResults = diff.toRemove.map {
                 val platform = it.toContestPlatform()
@@ -112,7 +112,7 @@ class ContestsViewModel: ViewModel() {
     }
 }
 
-private fun ContestsSettingsSnapshotDiff.contestPlatformsToReload(): Set<ContestPlatform> =
+private fun ContestsFetchSettingsSnapshotDiff.contestPlatformsToReload(): Set<ContestPlatform> =
     emptyEnumSet<ContestPlatform>().apply {
         toReload.forEach { add(it.toContestPlatform()) }
         if (clistReload) add(unknown)
