@@ -3,7 +3,6 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.R
-import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
@@ -28,7 +27,7 @@ class ProjectEulerRecentProblemsWorker(
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "pe_recent", context = context) {
             override suspend fun isEnabled() =
-                context.settingsCommunity.enabledNewsFeeds().contains(CommunitySettingsDataStore.NewsFeed.project_euler_problems)
+                context.settingsCommunity.enabledNewsFeeds().contains(project_euler_problems)
 
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
@@ -63,7 +62,7 @@ class ProjectEulerRecentProblemsWorker(
 
     private suspend fun scanProblems() {
         hintsDataStore.scanNewsFeed(
-            newsFeed = CommunitySettingsDataStore.NewsFeed.project_euler_problems,
+            newsFeed = project_euler_problems,
             posts = ProjectEulerParser().parseRecentProblems(ProjectEulerClient.getRecentPage())
         ) { post ->
             val problemId = post.id.toInt()

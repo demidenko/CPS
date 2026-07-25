@@ -222,23 +222,23 @@ private fun RuEnabledSettingsItem() {
 
 private val NewsFeed.title: String
     get() = when (this) {
-        NewsFeed.atcoder_news -> "AtCoder news"
-        NewsFeed.project_euler_news -> "Project Euler news"
-        NewsFeed.project_euler_problems -> "Project Euler recent problems"
+        atcoder_news -> "AtCoder news"
+        project_euler_news -> "Project Euler news"
+        project_euler_problems -> "Project Euler recent problems"
     }
 
 private val NewsFeed.shortName: String
     get() = when (this) {
-        NewsFeed.atcoder_news -> "atcoder"
-        NewsFeed.project_euler_news -> "pe_news"
-        NewsFeed.project_euler_problems -> "pe_problems"
+        atcoder_news -> "atcoder"
+        project_euler_news -> "pe_news"
+        project_euler_problems -> "pe_problems"
     }
 
 private val NewsFeed.link: String
     get() = when (this) {
-        NewsFeed.atcoder_news -> "atcoder.jp"
-        NewsFeed.project_euler_news -> "projecteuler.net/news"
-        NewsFeed.project_euler_problems -> "projecteuler.net/recent"
+        atcoder_news -> "atcoder.jp"
+        project_euler_news -> "projecteuler.net/news"
+        project_euler_problems -> "projecteuler.net/recent"
     }
 
 
