@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileResultWithManager
 import com.demich.cps.profiles.managers.RatedProfileManager
@@ -104,9 +104,16 @@ fun <U: UserInfo> ProfilePanel(
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         } else {
+            val context = context
             PanelMovingButtons(
                 platform = manager.platform,
                 visibleOrder = visibleOrder,
+                onSwap = { i, j ->
+                    context.settingsUI.profilesOrder.setValueIn(
+                        scope = profilesViewModel.viewModelScope,
+                        value = visibleOrder.toMutableList().apply { swap(i, j) }
+                    )
+                },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
@@ -145,24 +152,17 @@ private fun PanelUIButtons(
 private fun PanelMovingButtons(
     platform: Platform,
     visibleOrder: List<Platform>,
+    onSwap: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val scope = rememberCoroutineScope()
-    fun saveSwapped(i: Int, j: Int) {
-        context.settingsUI.profilesOrder.setValueIn(
-            scope = scope,
-            value = visibleOrder.toMutableList().apply { swap(i, j) }
-        )
-    }
     val index = visibleOrder.indexOf(platform)
     PanelMovingButtons(
         modifier = modifier,
         onUpClick = {
-            saveSwapped(index - 1, index)
+            onSwap(index - 1, index)
         }.takeIf { index > 0 },
         onDownClick = {
-            saveSwapped(index, index + 1)
+            onSwap(index, index + 1)
         }.takeIf { index + 1 < visibleOrder.size }
     )
 }
