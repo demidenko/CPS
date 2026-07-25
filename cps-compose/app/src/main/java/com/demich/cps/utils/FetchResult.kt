@@ -21,3 +21,22 @@ fun <T> Result<T>?.toFetchResult(): FetchResult<T> =
         onSuccess = { FetchResult.Success(it) },
         onFailure = { FetchResult.Failure(it) }
     )
+
+// TODO: better name and signature
+data class FetchValue<T>(
+    val value: T,
+    val lastResult: FetchResult<T>
+)
+
+operator fun <T> FetchValue<T>.plus(result: FetchResult<T>): FetchValue<T> =
+    when (result) {
+        is FetchResult.Success -> FetchValue(value = result.value, lastResult = result)
+        is FetchResult.Failure, is FetchResult.Loading -> copy(lastResult = result)
+    }
+
+fun FetchValue<*>.loadingStatus(): LoadingStatus =
+    when (lastResult) {
+        FetchResult.Loading -> LOADING
+        is FetchResult.Success -> PENDING
+        is FetchResult.Failure -> FAILED
+    }
