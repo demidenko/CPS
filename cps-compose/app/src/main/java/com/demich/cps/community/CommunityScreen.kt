@@ -71,9 +71,11 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val context = context
-    val controller = rememberCodeforcesCommunityController()
-
     val screenSettings = rememberFirstValue { context.settingsCommunity.codeforcesScreenSettings }
+
+    val controller = rememberCodeforcesCommunityController(
+        defaultTab = screenSettings.defaultTab
+    )
 
     screenTitle = remember(controller) {
         ScreenTitleState {

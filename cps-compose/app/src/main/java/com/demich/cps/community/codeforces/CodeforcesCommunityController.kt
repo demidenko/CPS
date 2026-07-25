@@ -23,7 +23,6 @@ import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
@@ -34,15 +33,15 @@ import kotlinx.serialization.json.Json
 
 
 @Composable
-fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
+fun rememberCodeforcesCommunityController(
+    defaultTab: CodeforcesTab
+): CodeforcesCommunityController {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
 
     val tabsState = collectItemAsState { context.settingsCommunity.codeforcesTabs }
 
     val controller = rememberSaveable(saver = controllerSaver(viewModel, tabsState)) {
-        val settings = context.settingsCommunity
-        val defaultTab = settings.codeforcesDefaultTab.getValueBlocking()
         CodeforcesCommunityController(
             dataManager = viewModel,
             tabsState = tabsState,
