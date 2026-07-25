@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -70,7 +71,8 @@ import com.demich.cps.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
@@ -107,6 +109,27 @@ fun <U: UserInfo> DialogProfileSelector(
     }
 }
 
+private enum class TextValueSource {
+    INIT, SELECT, TYPING
+}
+
+private data class TextFieldValueExt(
+    val value: TextFieldValue,
+    val source: TextValueSource
+)
+
+private fun textFieldValueSaver() = Saver<TextFieldValueExt, Any>(
+    save = {
+        with(TextFieldValue.Saver) { save(it.value) }
+    },
+    restore = {
+        TextFieldValueExt(
+            value = with(TextFieldValue.Saver) { restore(it) as TextFieldValue },
+            source = INIT
+        )
+    }
+)
+
 @Composable
 private fun<U: UserInfo> DialogContent(
     manager: ProfileManager<U>,
@@ -117,8 +140,9 @@ private fun<U: UserInfo> DialogContent(
 ) {
     val context = context
 
-    val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(initial?.userId.orEmpty().toTextFieldValue())
+    val textFieldValueState = rememberSaveable(stateSaver = textFieldValueSaver()) {
+        val text = initial?.userId.orEmpty()
+        mutableStateOf(TextFieldValueExt(text.toTextFieldValue(), INIT))
     }
 
     val profileLoading by profileFetchState(
@@ -127,9 +151,7 @@ private fun<U: UserInfo> DialogContent(
         initial = initial
     )
 
-    // TODO: replace bool to enum 'source' (init, select, typing), merge to one state
     var textFieldValue by textFieldValueState
-    var textFieldChangedBySuggestionSelect by remember { mutableStateOf(true) }
 
     val focusRequester = rememberFocusOnCreationRequester()
 
@@ -137,15 +159,17 @@ private fun<U: UserInfo> DialogContent(
         manager = manager,
         profileResult = profileLoading.profile,
         loadingInProgress = profileLoading.isLoading,
-        textFieldValue = textFieldValue,
+        textFieldValue = textFieldValue.value,
         onValueChange = {
-            textFieldChangedBySuggestionSelect = false
+            val it =
             if (it.text.all(charValidator)) {
-                textFieldValue = it
+                it
             } else {
                 // keyboard suggestion can contain invalid char (like space in the end)
-                textFieldValue = it.copy(text = it.text.filter(charValidator))
+                it.copy(text = it.text.filter(charValidator))
             }
+
+            textFieldValue = TextFieldValueExt(it, TYPING)
         },
         modifier = Modifier
             .focusRequester(focusRequester)
@@ -162,7 +186,7 @@ private fun<U: UserInfo> DialogContent(
     }
 
     if (manager is ProfileSuggestionsProvider) {
-        val userId by rememberUpdatedState(newValue = textFieldValue.text)
+        val userIdExt by rememberUpdatedState(newValue = Pair(textFieldValue.value.text, textFieldValue.source))
         var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
         val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
 
@@ -171,16 +195,16 @@ private fun<U: UserInfo> DialogContent(
             isLoading = loadingSuggestionsInProgressState.value,
             modifier = Modifier.fillMaxWidth(),
             onClick = { suggestion ->
-                textFieldChangedBySuggestionSelect = true
-                textFieldValue = suggestion.userId.toTextFieldValue()
+                textFieldValue = TextFieldValueExt(suggestion.userId.toTextFieldValue(), SELECT)
             }
         )
 
         //TODO: rework this to flow
-        LaunchedEffect(userId) {
-             if (textFieldChangedBySuggestionSelect) {
+        LaunchedEffect(userIdExt) {
+             if (userIdExt.second != TYPING) {
                  return@LaunchedEffect
              }
+            val userId = userIdExt.first
             // if (userId.isBlank()) ???
             if (userId.length < suggestionsMinLength) {
                 suggestionsResult = Result.success(emptyList())
@@ -207,13 +231,14 @@ private data class ProfileFetchResult<U: UserInfo>(
 
 @Composable
 private fun <U: UserInfo> profileFetchState(
-    textState: State<TextFieldValue>,
+    textState: State<TextFieldValueExt>,
     manager: ProfileManager<U>,
     initial: ProfileResult<U>?
 ): State<ProfileFetchResult<U>> =
     remember(textState, manager) {
-        snapshotFlow { textState.value.text }
-            .drop(1)
+        snapshotFlow { textState.value }
+            .filter { it.source == TYPING || it.source == SELECT }
+            .map { it.value.text }
             .transformLatest { userId ->
                 emit(ProfileFetchResult(null, false))
                 if (userId.isBlank()) return@transformLatest
