@@ -120,7 +120,6 @@ private fun<U: UserInfo> DialogContent(
     val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(initial?.userId.orEmpty().toTextFieldValue())
     }
-    var textFieldValue by textFieldValueState
 
     val profileLoading by profileFetchState(
         textState = textFieldValueState,
@@ -128,7 +127,9 @@ private fun<U: UserInfo> DialogContent(
         initial = initial
     )
 
-    var blockSuggestionsReload by remember { mutableStateOf(true) }
+    // TODO: replace bool to enum 'source' (init, select, typing), merge to one state
+    var textFieldValue by textFieldValueState
+    var textFieldChangedBySuggestionSelect by remember { mutableStateOf(true) }
 
     val focusRequester = rememberFocusOnCreationRequester()
 
@@ -138,7 +139,7 @@ private fun<U: UserInfo> DialogContent(
         loadingInProgress = profileLoading.isLoading,
         textFieldValue = textFieldValue,
         onValueChange = {
-            blockSuggestionsReload = false
+            textFieldChangedBySuggestionSelect = false
             if (it.text.all(charValidator)) {
                 textFieldValue = it
             } else {
@@ -170,32 +171,30 @@ private fun<U: UserInfo> DialogContent(
             isLoading = loadingSuggestionsInProgressState.value,
             modifier = Modifier.fillMaxWidth(),
             onClick = { suggestion ->
-                blockSuggestionsReload = true
+                textFieldChangedBySuggestionSelect = true
                 textFieldValue = suggestion.userId.toTextFieldValue()
             }
         )
 
         //TODO: rework this to flow
         LaunchedEffect(userId) {
+             if (textFieldChangedBySuggestionSelect) {
+                 return@LaunchedEffect
+             }
             // if (userId.isBlank()) ???
             if (userId.length < suggestionsMinLength) {
                 suggestionsResult = Result.success(emptyList())
                 loadingSuggestionsInProgressState.value = false
-                blockSuggestionsReload = false
                 return@LaunchedEffect
             }
             delay(requestDebounceDelay)
-            if (!blockSuggestionsReload) {
-                loadingSuggestionsInProgressState.value = true
-                val data = withContext(Dispatchers.Default) {
-                    manager.runCatching { fetchSuggestions(userId) }
-                }
-                loadingSuggestionsInProgressState.value = false
-                ensureActive()
-                suggestionsResult = data
-            } else {
-                blockSuggestionsReload = false
+            loadingSuggestionsInProgressState.value = true
+            val data = withContext(Dispatchers.Default) {
+                manager.runCatching { fetchSuggestions(userId) }
             }
+            loadingSuggestionsInProgressState.value = false
+            ensureActive()
+            suggestionsResult = data
         }
     }
 }
