@@ -73,9 +73,11 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val suggestionsMinLength = 3
-private const val requestDebounceDelay: Long = 300
+private val requestDebounceDelay: Duration get()= 300.milliseconds
 
 @Composable
 fun <U: UserInfo> DialogProfileSelector(
