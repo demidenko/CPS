@@ -3,11 +3,11 @@ package com.demich.cps.community.codeforces
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 
 @Composable
@@ -61,7 +61,7 @@ private fun CodeforcesCommunityTopComments(
     controller: CodeforcesCommunityController
 ) {
     val context = context
-    val comments by collectAsState { controller.flowOfTopComments(context) }
+    val comments by controller.flowOfTopComments(context).collectAsState()
     CodeforcesComments(
         comments = { comments },
         modifier = Modifier.fillMaxSize()

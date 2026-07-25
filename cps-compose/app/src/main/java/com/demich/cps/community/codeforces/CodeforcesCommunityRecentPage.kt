@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,7 +20,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 
 @Composable
@@ -27,9 +27,7 @@ fun CodeforcesCommunityRecentPage(
     controller: CodeforcesCommunityController
 ) {
     val context = context
-    val uriHandler = LocalUriHandler.current
-
-    val recent by collectAsState { controller.flowOfRecent(context) }
+    val recent by controller.flowOfRecent(context).collectAsState()
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -60,6 +58,7 @@ fun CodeforcesCommunityRecentPage(
 
             RecentPageType.RecentFeed -> {
                 saveableStateHolder.SaveableStateProvider(key = false) {
+                    val uriHandler = LocalUriHandler.current
                     RecentBlogEntriesPage(
                         recent = { recent },
                         modifier = Modifier.fillMaxSize(),
