@@ -43,20 +43,20 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
     override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         listOf(
-            mainBlogEntries.loadingStatusFlow,
-            topBlogEntries.loadingStatusFlow,
-            topComments.loadingStatusFlow,
-            recentActions.loadingStatusFlow
+            mainBlogEntries.flowOfLoadingStatus(),
+            topBlogEntries.flowOfLoadingStatus(),
+            topComments.flowOfLoadingStatus(),
+            recentActions.flowOfLoadingStatus()
         ).combine()
 
     override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
         return when (title) {
-            MAIN -> mainBlogEntries.loadingStatusFlow
+            MAIN -> mainBlogEntries.flowOfLoadingStatus()
             TOP -> {
-                listOf(topBlogEntries.loadingStatusFlow, topComments.loadingStatusFlow)
+                listOf(topBlogEntries.flowOfLoadingStatus(), topComments.flowOfLoadingStatus())
                     .combine()
             }
-            RECENT -> recentActions.loadingStatusFlow
+            RECENT -> recentActions.flowOfLoadingStatus()
             LOST -> throw IllegalArgumentException(title.name)
         }
     }
@@ -146,8 +146,8 @@ private class CodeforcesDataLoader<T>(
         return dataFlow
     }
 
-    val loadingStatusFlow: Flow<LoadingStatus>
-        get() = flow.map { it.loadingStatus }
+    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
+        flow.map { it.loadingStatus }
 
     fun launchLoadIfActive(provider: suspend () -> CodeforcesPageContentProvider) {
         if (inactive) return
