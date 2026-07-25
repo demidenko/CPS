@@ -39,8 +39,8 @@ operator fun <T> FetchValue<T>.plus(result: FetchResult<T>): FetchValue<T> =
         is FetchResult.Failure, is FetchResult.Loading -> copy(lastResult = result)
     }
 
-fun FetchValue<*>.loadingStatus(): LoadingStatus =
-    when (lastResult) {
+val FetchValue<*>.loadingStatus: LoadingStatus
+    get() = when (lastResult) {
         FetchResult.Loading -> LOADING
         is FetchResult.Success -> PENDING
         is FetchResult.Failure -> FAILED

@@ -16,15 +16,23 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
+import com.demich.cps.utils.loadingStatus
+import com.demich.cps.utils.plus
 import com.demich.cps.utils.sharedViewModel
+import com.demich.cps.utils.toFetchResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -122,7 +130,12 @@ private class CodeforcesDataLoader<T>(
     init: T,
     val getData: suspend (CodeforcesPageContentProvider) -> T
 ) {
-    private val dataFlow: MutableStateFlow<T> = MutableStateFlow(init)
+    private val flow: MutableStateFlow<FetchValue<T>> = MutableStateFlow(FetchValue(init))
+    private val dataFlow: StateFlow<T> = flow.map { it.value }.stateIn(
+        initialValue = init,
+        scope = scope,
+        started = SharingStarted.Eagerly
+    )
 
     private var inactive = true
     fun flowOfData(context: Context): StateFlow<T> {
@@ -133,24 +146,18 @@ private class CodeforcesDataLoader<T>(
         return dataFlow
     }
 
-    private val loadingStatus = MutableStateFlow(LoadingStatus.PENDING)
-    val loadingStatusFlow: StateFlow<LoadingStatus> get() = loadingStatus
+    val loadingStatusFlow: Flow<LoadingStatus>
+        get() = flow.map { it.loadingStatus }
 
     fun launchLoadIfActive(provider: suspend () -> CodeforcesPageContentProvider) {
         if (inactive) return
-        loadingStatus.update {
-            if (it == LOADING) return
-            LOADING
+        flow.update {
+            if (it.loadingStatus == LOADING) return
+            it + FetchResult.Loading
         }
         scope.launch(Dispatchers.Default) {
-            runCatching {
-                getData(provider())
-            }.onFailure {
-                loadingStatus.value = FAILED
-            }.onSuccess {
-                dataFlow.value = it
-                loadingStatus.value = PENDING
-            }
+            val result = runCatching { getData(provider()) }.toFetchResult()
+            flow.update { it + result }
         }
     }
 }
