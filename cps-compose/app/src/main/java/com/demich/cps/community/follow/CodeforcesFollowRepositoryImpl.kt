@@ -10,20 +10,19 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.extractTitle
-import com.demich.datastore_itemized.DataStoreValue
 
 val Context.followRepository: CodeforcesFollowRepository
     get() = CodeforcesFollowRepositoryImpl(
         context = this,
-        localeItem = settingsCommunity.codeforcesLocale
+        currentLocale = settingsCommunity.codeforcesLocale::invoke
     )
 
 private class CodeforcesFollowRepositoryImpl(
     val context: Context, //TODO: context leak
-    val localeItem: DataStoreValue<CodeforcesLocale>
+    val currentLocale: suspend () -> CodeforcesLocale
 ): CodeforcesFollowRepository(context = context) {
 
-    override suspend fun getLocale() = localeItem()
+    override suspend fun getLocale() = currentLocale()
 
     override fun getApi(locale: CodeforcesLocale) = CodeforcesClient(locale = locale)
 
