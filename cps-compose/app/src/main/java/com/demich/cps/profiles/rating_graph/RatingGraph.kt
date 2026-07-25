@@ -33,10 +33,10 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.getSystemTime
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -106,8 +106,9 @@ private fun RatingGraphWithHeader(
         mutableStateOf(RatingFilterType.ALL)
     }
 
-    var selectedRatingChange: RatingChange?
-            by rememberSaveable(stateSaver = jsonCPS.asSaver()) { mutableStateOf(null) }
+    var selectedRatingChange: RatingChange? by rememberSaveable(stateSaver = Json.asSaver()) {
+        mutableStateOf(null)
+    }
 
     val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 

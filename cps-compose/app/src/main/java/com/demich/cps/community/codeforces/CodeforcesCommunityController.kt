@@ -24,13 +24,13 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValueBlocking
-import com.demich.cps.utils.jsonCPS
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 
 @Composable
@@ -148,7 +148,7 @@ private fun controllerSaver(
     tabsState: State<List<CodeforcesTitle>>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
-        jsonCPS.encodeToString(CodeforcesCommunityPagerData(
+        Json.encodeToString(CodeforcesCommunityPagerData(
             selectedTab = it.currentTab,
             topPageType = it.topPageType,
             recentPageType = it.recentPageType
@@ -158,7 +158,7 @@ private fun controllerSaver(
         CodeforcesCommunityController(
             dataManager = dataManager,
             tabsState = tabsState,
-            pagerData = jsonCPS.decodeFromString(it)
+            pagerData = Json.decodeFromString(it)
         )
     }
 )

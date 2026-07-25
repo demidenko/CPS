@@ -40,8 +40,8 @@ import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.jsonCPS
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 
 @Composable
 context(manager: CodeforcesProfileManager)
@@ -50,7 +50,7 @@ fun CodeforcesUserInfoExpandedContent(
     setBottomBarContent: (AdditionalBottomBarBuilder) -> Unit,
     modifier: Modifier
 ) {
-    var showItem: ItemType? by rememberSaveable(stateSaver = jsonCPS.asSaver()) {
+    var showItem: ItemType? by rememberSaveable(stateSaver = Json.asSaver()) {
         mutableStateOf(null)
     }
 
