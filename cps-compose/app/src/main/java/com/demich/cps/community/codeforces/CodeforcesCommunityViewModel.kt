@@ -108,16 +108,17 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val followLoadingStatus = MutableStateFlow(LoadingStatus.PENDING)
-    fun flowOfFollowUpdateLoadingStatus(): StateFlow<LoadingStatus> = followLoadingStatus
+    val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
+        field = MutableStateFlow(LoadingStatus.PENDING)
+
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            if (!followLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
+            if (!flowOfFollowUpdateLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
             context.followRepository.run {
                 updateProfiles()
                 updateFailedBlogEntries()
             }
-            followLoadingStatus.value = PENDING
+            flowOfFollowUpdateLoadingStatus.value = PENDING
         }
     }
 }

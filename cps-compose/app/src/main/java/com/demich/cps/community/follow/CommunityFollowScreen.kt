@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +30,6 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.launchData
@@ -42,7 +42,7 @@ private fun CommunityFollowScreen(
 
     val viewModel = codeforcesCommunityViewModel()
 
-    val followLoadingStatus by collectAsState { viewModel.flowOfFollowUpdateLoadingStatus() }
+    val followLoadingStatus by viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
 
     val userBlogs by collectAsStateWithLifecycle { context.followRepository.flowOfUserBlogs() }
 
