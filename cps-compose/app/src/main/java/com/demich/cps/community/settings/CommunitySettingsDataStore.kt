@@ -50,6 +50,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 }
 
 fun Set<CommunitySettingsDataStore.NewsFeed>.containsSomethingExcept(item: CommunitySettingsDataStore.NewsFeed): Boolean {
-    // TODO: optimize
-    return (this - item).isNotEmpty()
+    // return (this - item).isNotEmpty()
+    if (contains(item)) return size > 1
+    return isNotEmpty()
 }
