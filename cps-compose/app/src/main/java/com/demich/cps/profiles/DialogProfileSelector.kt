@@ -133,7 +133,7 @@ private fun textFieldValueSaver() = Saver<TextFieldValueExt, Any>(
 )
 
 @Composable
-private fun<U: UserInfo> DialogContent(
+private fun <U: UserInfo> DialogContent(
     manager: ProfileManager<U>,
     initial: ProfileResult<U>?,
     onDismissRequest: () -> Unit,
@@ -247,7 +247,7 @@ private fun <U: UserInfo> profileFetchState(
 
 
 @Composable
-private fun<U: UserInfo> UserIdTextField(
+private fun <U: UserInfo> UserIdTextField(
     manager: ProfileManager<U>,
     profileResult: ProfileResult<U>?,
     loadingInProgress: Boolean,

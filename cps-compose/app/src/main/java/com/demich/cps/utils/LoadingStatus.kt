@@ -23,7 +23,7 @@ fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus> =
 fun Iterable<Flow<LoadingStatus>>.combine(): Flow<LoadingStatus> =
     kotlinx.coroutines.flow.combine(this) { it.asIterable().combine() }
 
-fun<T> Result<T>?.toLoadingStatus(): LoadingStatus =
+fun <T> Result<T>?.toLoadingStatus(): LoadingStatus =
     if (this == null) LOADING
     else {
         if (isFailure) FAILED

@@ -282,7 +282,7 @@ fun ListTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun<T> ButtonsSelectRow(
+fun <T> ButtonsSelectRow(
     values: List<T>,
     selectedValue: T,
     modifier: Modifier = Modifier,
@@ -303,7 +303,7 @@ fun<T> ButtonsSelectRow(
 }
 
 @Composable
-fun<T> TextButtonsSelectRow(
+fun <T> TextButtonsSelectRow(
     values: List<T>,
     selectedValue: T,
     modifier: Modifier = Modifier,

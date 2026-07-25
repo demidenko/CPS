@@ -226,7 +226,7 @@ fun <T> CPSDialogSelect(
 }
 
 @Composable
-fun<T: Enum<T>> CPSDialogMultiSelectEnum(
+fun <T: Enum<T>> CPSDialogMultiSelectEnum(
     title: String,
     options: Iterable<T>,
     initSelected: Set<T>,

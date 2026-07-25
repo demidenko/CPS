@@ -14,10 +14,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
 
 
-inline fun<K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
+inline fun <K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
     update { it.toMutableMap().apply(block) }
 
-suspend fun<A, B> awaitPair(
+suspend fun <A, B> awaitPair(
     blockFirst: suspend CoroutineScope.() -> A,
     blockSecond: suspend CoroutineScope.() -> B,
 ): Pair<A, B> {

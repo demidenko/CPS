@@ -248,7 +248,7 @@ fun springIntLow() = spring(stiffness = Spring.StiffnessLow, visibilityThreshold
 
 
 @Composable
-inline fun<reified T: ViewModel> sharedViewModel(): T =
+inline fun <reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
 
 

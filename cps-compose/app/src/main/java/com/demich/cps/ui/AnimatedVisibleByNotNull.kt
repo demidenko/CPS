@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 
 @Composable
-fun<T: Any> AnimatedVisibleByNotNull(
+fun <T: Any> AnimatedVisibleByNotNull(
     value: () -> T?,
     modifier: Modifier = Modifier,
     enter: EnterTransition,

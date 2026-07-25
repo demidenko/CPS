@@ -134,7 +134,7 @@ suspend fun CPSWork.workInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
 
 suspend fun CPSWork.state(): WorkInfo.State = workInfo().stateOrCancelled
 
-internal inline fun<reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
+internal inline fun <reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     repeatInterval: Duration,
     flex: Duration = repeatInterval,
     batteryNotLow: Boolean = false,

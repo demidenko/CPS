@@ -1,24 +1,6 @@
 package com.demich.cps.utils
 
 import kotlinx.serialization.json.Json
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-import kotlin.time.measureTimedValue
-
-
-@OptIn(ExperimentalContracts::class)
-inline fun<T> debugWithDuration(
-    crossinline title: (T) -> String = { "$it" },
-    block: () -> T
-): T {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return measureTimedValue(block).apply {
-        println("[$duration]: ${title(value)}")
-    }.value
-}
 
 
 val jsonCPS = Json {
