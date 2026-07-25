@@ -39,7 +39,7 @@ private fun communityBottomBarBuilder(
 
     val loadingStatus by controller.loadingStatusState()
     CPSReloadingButton(loadingStatus = loadingStatus) {
-        controller.reload(titles = controller.visitedTabs, context = context)
+        controller.reload(tabs = controller.visitedTabs, context = context)
     }
 }
 
