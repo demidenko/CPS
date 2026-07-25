@@ -63,6 +63,8 @@ import com.demich.cps.ui.LoadingIndicator
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
@@ -157,8 +159,8 @@ private fun<U: UserInfo> DialogContent(
 
     UserIdTextField(
         manager = manager,
-        profileResult = profileLoading.profile,
-        loadingInProgress = profileLoading.isLoading,
+        profileResult = profileLoading.value,
+        loadingInProgress = profileLoading.lastResult is FetchResult.Loading,
         textFieldValue = textFieldValue.value,
         onValueChange = {
             val it =
@@ -223,31 +225,25 @@ private fun<U: UserInfo> DialogContent(
     }
 }
 
-
-private data class ProfileFetchResult<U: UserInfo>(
-    val profile: ProfileResult<U>?,
-    val isLoading: Boolean
-)
-
 @Composable
 private fun <U: UserInfo> profileFetchState(
     textState: State<TextFieldValueExt>,
     manager: ProfileManager<U>,
     initial: ProfileResult<U>?
-): State<ProfileFetchResult<U>> =
+): State<FetchValue<ProfileResult<U>?>> =
     remember(textState, manager) {
         snapshotFlow { textState.value }
             .filter { it.source == TYPING || it.source == SELECT }
             .map { it.value.text }
             .transformLatest { userId ->
-                emit(ProfileFetchResult(null, false))
+                emit(FetchValue(null))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                emit(ProfileFetchResult(null, true))
+                emit(FetchValue(null, FetchResult.Loading))
                 val profile = withContext(Dispatchers.Default) { manager.fetchProfile(userId) }
-                emit(ProfileFetchResult(profile, false))
+                emit(FetchValue(profile))
             }
-    }.collectAsState(initial = ProfileFetchResult(initial, false))
+    }.collectAsState(initial = FetchValue(initial))
 
 
 @Composable

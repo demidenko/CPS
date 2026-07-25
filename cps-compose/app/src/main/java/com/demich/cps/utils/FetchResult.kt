@@ -23,10 +23,15 @@ fun <T> Result<T>?.toFetchResult(): FetchResult<T> =
     )
 
 // TODO: better name and signature
-data class FetchValue<T>(
+data class FetchValue<out T>(
     val value: T,
     val lastResult: FetchResult<T>
-)
+) {
+    constructor(value: T): this(
+        value = value,
+        lastResult = FetchResult.Success(value)
+    )
+}
 
 operator fun <T> FetchValue<T>.plus(result: FetchResult<T>): FetchValue<T> =
     when (result) {
