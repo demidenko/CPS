@@ -48,3 +48,8 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
 }
+
+fun Set<CommunitySettingsDataStore.NewsFeed>.containsSomethingExcept(item: CommunitySettingsDataStore.NewsFeed): Boolean {
+    // TODO: optimize
+    return (this - item).isNotEmpty()
+}

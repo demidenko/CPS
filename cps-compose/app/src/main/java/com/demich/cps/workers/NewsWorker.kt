@@ -3,9 +3,7 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.R
-import com.demich.cps.community.settings.CommunitySettingsDataStore
-import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.atcoder_news
-import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed.project_euler_news
+import com.demich.cps.community.settings.containsSomethingExcept
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
@@ -29,8 +27,7 @@ class NewsWorker(
     companion object : CPSPeriodicWorkProvider {
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = "news", context = context) {
             override suspend fun isEnabled(): Boolean {
-                val enabledFeeds = context.settingsCommunity.enabledNewsFeeds() - CommunitySettingsDataStore.NewsFeed.project_euler_problems
-                return enabledFeeds.isNotEmpty()
+                return context.settingsCommunity.enabledNewsFeeds().containsSomethingExcept(project_euler_problems)
             }
 
             override suspend fun requestBuilder() =

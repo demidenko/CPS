@@ -264,11 +264,10 @@ private fun NewsFeedsSettingsItem() {
             }
         },
         onNewSelected = {
-            val pe_recent = NewsFeed.project_euler_problems
-            if ((it - pe_recent).isNotEmpty()) {
+            if (it.containsSomethingExcept(project_euler_problems)) {
                 NewsWorker.getWork(context).startImmediate()
             }
-            if (pe_recent in it) {
+            if (project_euler_problems in it) {
                 ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
             }
         }
