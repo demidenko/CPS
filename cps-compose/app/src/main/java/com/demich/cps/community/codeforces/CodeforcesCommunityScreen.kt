@@ -38,7 +38,7 @@ import com.demich.cps.utils.firstBlocking
 import com.demich.cps.utils.rememberFirstValue
 import kotlinx.coroutines.launch
 
-enum class CodeforcesTitle {
+enum class CodeforcesTab {
     MAIN, TOP, RECENT, LOST
 }
 
@@ -62,14 +62,14 @@ fun CodeforcesCommunityScreen(
 @Composable
 fun CodeforcesReloadablePage(
     controller: CodeforcesCommunityController,
-    title: CodeforcesTitle,
+    tab: CodeforcesTab,
     content: @Composable () -> Unit
 ) {
     val context = context
-    val loadingStatus by controller.loadingStatusState(title = title)
+    val loadingStatus by controller.loadingStatusState(tab = tab)
     CPSSwipeRefreshBox(
         isRefreshing = { loadingStatus == LOADING },
-        onRefresh = { controller.reload(title = title, context = context) },
+        onRefresh = { controller.reload(tab = tab, context = context) },
         content = content
     )
 }
@@ -135,7 +135,7 @@ private fun CodeforcesPagerHeader(
         ) {
             controller.tabs.forEach { title ->
                 CodeforcesCommunityTab(
-                    title = title,
+                    tab = title,
                     controller = controller,
                     modifier = Modifier.clickableNoRipple {
                         animationScope.launch { controller.scrollTo(title) }
@@ -148,10 +148,10 @@ private fun CodeforcesPagerHeader(
 
 
 @Composable
-private fun CodeforcesCommunityController.newEntryCountersState(title: CodeforcesTitle): State<NewEntryTypeCounters?> {
+private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesTab): State<NewEntryTypeCounters?> {
     val context = context
-    val flow = remember(key1 = title, key2 = this) {
-        flowOfNewEntryCounters(tab = title, context = context)
+    val flow = remember(key1 = tab, key2 = this) {
+        flowOfNewEntryCounters(tab = tab, context = context)
     }
 
     return if (flow == null) {
@@ -163,24 +163,24 @@ private fun CodeforcesCommunityController.newEntryCountersState(title: Codeforce
 
 @Composable
 private fun CodeforcesCommunityTab(
-    title: CodeforcesTitle,
+    tab: CodeforcesTab,
     controller: CodeforcesCommunityController,
     modifier: Modifier = Modifier
 ) {
-    val loadingStatus by controller.loadingStatusState(title)
-    val counters by controller.newEntryCountersState(title)
+    val loadingStatus by controller.loadingStatusState(tab)
+    val counters by controller.newEntryCountersState(tab)
     CodeforcesCommunityTab(
-        title = title,
-        index = controller.tabs.indexOf(title),
+        tab = tab,
+        index = controller.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = { controller.badgeCounter(title, counters) },
+        badgeCount = { controller.badgeCounter(tab, counters) },
         pagerState = controller.pagerState,
         modifier = modifier
     )
 }
 
 private fun CodeforcesCommunityController.badgeCounter(
-    tab: CodeforcesTitle,
+    tab: CodeforcesTab,
     counters: NewEntryTypeCounters?
 ): Int? =
     counters?.let {
@@ -190,7 +190,7 @@ private fun CodeforcesCommunityController.badgeCounter(
 
 @Composable
 private fun CodeforcesCommunityTab(
-    title: CodeforcesTitle,
+    tab: CodeforcesTab,
     index: Int,
     loadingStatus: LoadingStatus,
     badgeCount: () -> Int?,
@@ -198,7 +198,7 @@ private fun CodeforcesCommunityTab(
     modifier: Modifier = Modifier
 ) {
     CommunityTab(
-        title = if (loadingStatus != LOADING) title.name else "...",
+        title = if (loadingStatus != LOADING) tab.name else "...",
         index = index,
         badgeCount = badgeCount,
         pagerState = pagerState,

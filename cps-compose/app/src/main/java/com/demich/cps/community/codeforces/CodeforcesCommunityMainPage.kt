@@ -12,7 +12,7 @@ fun CodeforcesCommunityMainPage(
     controller: CodeforcesCommunityController,
     newEntriesState: NewEntriesState
 ) {
-    CodeforcesReloadablePage(controller = controller, title = MAIN) {
+    CodeforcesReloadablePage(controller = controller, tab = MAIN) {
         CodeforcesCommunityMainList(controller, newEntriesState)
     }
 }

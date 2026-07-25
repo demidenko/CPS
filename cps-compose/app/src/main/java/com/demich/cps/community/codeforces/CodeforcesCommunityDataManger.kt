@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface CodeforcesCommunityDataManger {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
-    fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus>
+    fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus>
 
-    fun reload(titles: List<CodeforcesTitle>, context: Context)
+    fun reload(tabs: List<CodeforcesTab>, context: Context)
 
     fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>>
     fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>>
@@ -23,6 +23,6 @@ interface CodeforcesCommunityDataManger {
     fun updateFollowUsersInfo(context: Context)
 }
 
-fun CodeforcesCommunityDataManger.reload(title: CodeforcesTitle, context: Context) {
-    reload(titles = listOf(title), context = context)
+fun CodeforcesCommunityDataManger.reload(tab: CodeforcesTab, context: Context) {
+    reload(tabs = listOf(tab), context = context)
 }

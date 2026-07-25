@@ -49,15 +49,15 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             recentActions.flowOfLoadingStatus()
         ).combine()
 
-    override fun flowOfLoadingStatus(title: CodeforcesTitle): Flow<LoadingStatus> {
-        return when (title) {
+    override fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus> {
+        return when (tab) {
             MAIN -> mainBlogEntries.flowOfLoadingStatus()
             TOP -> {
                 listOf(topBlogEntries.flowOfLoadingStatus(), topComments.flowOfLoadingStatus())
                     .combine()
             }
             RECENT -> recentActions.flowOfLoadingStatus()
-            LOST -> throw IllegalArgumentException(title.name)
+            LOST -> throw IllegalArgumentException(tab.name)
         }
     }
 
@@ -73,8 +73,8 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { it.getRecentFeed() }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
-    private fun reload(title: CodeforcesTitle, provider: suspend () -> CodeforcesPageContentProvider) {
-        when (title) {
+    private fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {
+        when (tab) {
             MAIN -> mainBlogEntries.launchLoadIfActive(provider)
             TOP -> {
                 topBlogEntries.launchLoadIfActive(provider)
@@ -86,13 +86,13 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    override fun reload(titles: List<CodeforcesTitle>, context: Context) {
+    override fun reload(tabs: List<CodeforcesTab>, context: Context) {
         val provider = viewModelScope.async(
             context = Dispatchers.Default,
             start = LAZY,
             block = { defaultProvider(context) }
         )
-        titles.forEach { reload(title = it, provider = provider::await) }
+        tabs.forEach { reload(tab = it, provider = provider::await) }
     }
 
     fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {

@@ -1,7 +1,7 @@
 package com.demich.cps.community.settings
 
 import android.content.Context
-import com.demich.cps.community.codeforces.CodeforcesTitle
+import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.isRuSystemLanguage
@@ -18,7 +18,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
         private val Context.community_settings_dataStore by dataStoreWrapper("community_settings")
     }
 
-    val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTitle.TOP)
+    val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTab.TOP)
     val codeforcesLocale = jsonCPS.item(name = "cf_locale") {
         if (isRuSystemLanguage()) CodeforcesLocale.RU
         else CodeforcesLocale.EN
@@ -30,7 +30,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
 
     val codeforcesTabs = codeforcesLostEnabled.transform { lostEnabled ->
-        buildList<CodeforcesTitle> {
+        buildList<CodeforcesTab> {
             add(MAIN)
             add(TOP)
             add(RECENT)

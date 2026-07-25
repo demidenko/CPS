@@ -64,7 +64,7 @@ fun rememberCodeforcesCommunityController(): CodeforcesCommunityController {
 
 @Serializable
 data class CodeforcesCommunityPagerData(
-    val selectedTab: CodeforcesTitle,
+    val selectedTab: CodeforcesTab,
     val topPageType: CodeforcesCommunityController.TopPageType,
     val recentPageType: CodeforcesCommunityController.RecentPageType
 )
@@ -72,7 +72,7 @@ data class CodeforcesCommunityPagerData(
 @Stable
 class CodeforcesCommunityController(
     dataManager: CodeforcesCommunityDataManger,
-    tabsState: State<List<CodeforcesTitle>>,
+    tabsState: State<List<CodeforcesTab>>,
     pagerData: CodeforcesCommunityPagerData
 ): CodeforcesCommunityDataManger by dataManager {
     val tabs by tabsState
@@ -85,7 +85,7 @@ class CodeforcesCommunityController(
             get() = tabs.size
     }
 
-    val currentTab: CodeforcesTitle
+    val currentTab: CodeforcesTab
         get() = tabs[pagerState.currentPage]
 
     // relies that tabs are always fixed!
@@ -99,9 +99,9 @@ class CodeforcesCommunityController(
         }
     }
 
-    fun isTabVisible(tab: CodeforcesTitle) = tab == currentTab && !pagerState.isScrollInProgress
+    fun isTabVisible(tab: CodeforcesTab) = tab == currentTab && !pagerState.isScrollInProgress
 
-    suspend fun scrollTo(tab: CodeforcesTitle) =
+    suspend fun scrollTo(tab: CodeforcesTab) =
         pagerState.animateScrollToPage(page = tabs.indexOf(tab))
 
 
@@ -128,8 +128,8 @@ fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus> =
     collectAsState { flowOfLoadingStatus() }
 
 @Composable
-fun CodeforcesCommunityDataManger.loadingStatusState(title: CodeforcesTitle): State<LoadingStatus> {
-    if (title == LOST) {
+fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
+    if (tab == LOST) {
         val context = context
         return remember {
             CodeforcesCommunityLostRecentWorker.getWork(context)
@@ -138,14 +138,14 @@ fun CodeforcesCommunityDataManger.loadingStatusState(title: CodeforcesTitle): St
         }.collectAsStateWithLifecycle(initialValue = PENDING)
     }
 
-    return remember(title) { flowOfLoadingStatus(title) }
+    return remember(tab) { flowOfLoadingStatus(tab) }
         .collectAsState(initial = PENDING) //TODO: be sure this fake is ok
 }
 
 
 private fun controllerSaver(
     dataManager: CodeforcesCommunityDataManger,
-    tabsState: State<List<CodeforcesTitle>>
+    tabsState: State<List<CodeforcesTab>>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
         Json.encodeToString(CodeforcesCommunityPagerData(
@@ -163,7 +163,7 @@ private fun controllerSaver(
     }
 )
 
-fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTitle, context: Context): Flow<NewEntryTypeCounters>? {
+fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, context: Context): Flow<NewEntryTypeCounters>? {
     val flow = when (tab) {
         MAIN -> flowOfMainBlogEntries(context)
         LOST -> flowOfLostBlogEntries(context)
