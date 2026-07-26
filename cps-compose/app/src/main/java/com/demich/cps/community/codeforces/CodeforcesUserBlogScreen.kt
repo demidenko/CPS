@@ -27,6 +27,7 @@ import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.awaitPair
@@ -82,7 +83,7 @@ private fun CodeforcesUserBlogScreen(
         //available = res != null && res.isSuccess && res.value.isNotEmpty()
         snapshotFlow { blogEntries().map { it.isNotEmpty() } }
             .collect {
-                filterState.available = it is FetchState.Success && it.value
+                filterState.available = it is FetchResult.Success && it.value
             }
     }
 

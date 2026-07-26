@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideContentColor
 
@@ -26,10 +27,10 @@ fun <T> LoadingContentBox(
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         when (val it = fetchState()) {
-            is FetchState.Success -> {
+            is FetchResult.Success -> {
                 content(it.value)
             }
-            is FetchState.Failure -> {
+            is FetchResult.Failure -> {
                 FailedContent {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = failedText(it.exception))
