@@ -33,8 +33,8 @@ class ProfilesViewModel: ViewModel() {
     fun flowOfLoadingStatus(manager: ProfileManager<*>): Flow<LoadingStatus> =
         loadingStatuses.map { it[manager.platform] ?: PENDING }
 
-    fun flowOfLoadingStatus(managers: Collection<ProfileManager<*>>): Flow<LoadingStatus> =
-        loadingStatuses.map { map -> managers.mapNotNull { map[it.platform] }.combine() }
+    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
+        loadingStatuses.map { it.values.combine() }
 
     private fun setLoadingStatus(manager: ProfileManager<*>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
