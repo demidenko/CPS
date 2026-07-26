@@ -34,7 +34,7 @@ class CListProfileManager :
             else ProfileResult.Failed(data)
         }
 
-    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         ClistParser().extractLoginSuggestions(source = ClistClient().getUsersSearchPage(str))
             .map { UserSuggestion(userId = it) }
 

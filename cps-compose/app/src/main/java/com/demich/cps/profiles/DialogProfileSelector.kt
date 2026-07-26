@@ -216,7 +216,7 @@ private fun <U: UserInfo> DialogContent(
             delay(requestDebounceDelay)
             loadingSuggestionsInProgressState.value = true
             val data = withContext(Dispatchers.Default) {
-                manager.runCatching { fetchSuggestions(userId) }
+                manager.runCatching { getSuggestions(userId) }
             }
             loadingSuggestionsInProgressState.value = false
             ensureActive()

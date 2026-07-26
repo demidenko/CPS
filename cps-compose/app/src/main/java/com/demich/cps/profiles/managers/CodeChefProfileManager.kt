@@ -75,7 +75,7 @@ class CodeChefProfileManager :
             else ProfileResult.Failed(data)
         }
 
-    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         CodeChefClient.getUserSuggestions(str).map {
             UserSuggestion(
                 userId = it.username,

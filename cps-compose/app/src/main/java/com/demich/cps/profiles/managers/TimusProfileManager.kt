@@ -35,7 +35,7 @@ class TimusProfileManager :
             ProfileResult.Failed(data)
         }
 
-    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
         return TimusParser().extractUsersSuggestions(source = TimusClient.getSearchPage(str))
     }

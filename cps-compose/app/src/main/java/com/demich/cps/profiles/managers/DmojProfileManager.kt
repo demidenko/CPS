@@ -45,7 +45,7 @@ class DmojProfileManager :
             else ProfileResult.Failed(data)
         }
 
-    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> {
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         return DmojClient.getSuggestions(str).map {
             UserSuggestion(title = it.text, userId = it.id)
         }

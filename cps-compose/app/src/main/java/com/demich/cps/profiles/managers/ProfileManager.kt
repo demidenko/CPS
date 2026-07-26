@@ -72,7 +72,7 @@ fun profileManagerOf(platform: Platform) =
     ProfileManager.entries().first { it.platform == platform }
 
 interface ProfileSuggestionsProvider {
-    suspend fun fetchSuggestions(str: String): List<UserSuggestion>
+    suspend fun getSuggestions(str: String): List<UserSuggestion>
 
     fun isValidForSearch(char: Char): Boolean = true
 }

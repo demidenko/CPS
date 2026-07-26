@@ -49,7 +49,7 @@ class AtCoderProfileManager :
         }
     }
 
-    override suspend fun fetchSuggestions(str: String): List<UserSuggestion> =
+    override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         AtCoderParser().extractUserSuggestions(source = AtCoderClient.getSuggestionsPage(str))
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
