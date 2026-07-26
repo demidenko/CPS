@@ -6,6 +6,8 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
+// TODO: replace with FetchResult<U?> in runtime?
+
 @Serializable
 sealed interface ProfileResult<out U: UserInfo> {
     val userId: String
