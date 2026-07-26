@@ -34,8 +34,9 @@ data class ProgressBarInfo(
 fun progressBarsViewModel(): ProgressBarsViewModel = sharedViewModel()
 
 class ProgressBarsViewModel: ViewModel() {
-    private val progressesStateFlow = MutableStateFlow(emptyMap<String, ProgressBarInfo>())
-    fun flowOfProgresses(): StateFlow<Map<String, ProgressBarInfo>> = progressesStateFlow
+
+    val flowOfProgresses: StateFlow<Map<String, ProgressBarInfo>>
+        field = MutableStateFlow(emptyMap())
 
     fun doJob(
         id: String,
@@ -49,7 +50,7 @@ class ProgressBarsViewModel: ViewModel() {
                 delay(1.seconds)
                 send(null)
             }.collect { value ->
-                progressesStateFlow.edit {
+                flowOfProgresses.edit {
                     if (value == null) remove(key = id)
                     else put(key = id, value = value)
                 }
@@ -58,7 +59,7 @@ class ProgressBarsViewModel: ViewModel() {
     }
 
     fun flowOfClistImportIsRunning(): Flow<Boolean> =
-        progressesStateFlow.map { clistImportId in it }
+        flowOfProgresses.map { clistImportId in it }
 
     companion object {
         const val clistImportId = "clist_import"

@@ -109,7 +109,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     }
 
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
-        field = MutableStateFlow(LoadingStatus.PENDING)
+        field = MutableStateFlow(PENDING)
 
     override fun updateFollowUsersInfo(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
