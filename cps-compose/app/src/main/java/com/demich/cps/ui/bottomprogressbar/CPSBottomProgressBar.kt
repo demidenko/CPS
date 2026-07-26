@@ -35,7 +35,7 @@ fun CPSBottomProgressBarsColumn(
 ) {
     val progressBarsViewModel = progressBarsViewModel()
     val progresses by collectAsState {
-        progressBarsViewModel.flowOfProgresses().map { it.entries.toList() }
+        progressBarsViewModel.flowOfProgresses.map { it.entries.toList() }
     }
 
     //TODO: still shit animation of top item
