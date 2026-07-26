@@ -11,7 +11,7 @@ import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.toFetchResult
 
 
@@ -67,14 +67,14 @@ abstract class ProfileManager<U: UserInfo> {
 }
 
 // TODO: check CancellationException (or remove it)
-suspend fun <U: UserInfo> ProfileManager<U>.fetchUserInfo(str: String): FetchResult<U?> =
+suspend fun <U: UserInfo> ProfileManager<U>.fetchUserInfo(str: String): FetchState<U?> =
     runCatching { getUserInfo(str) }.toFetchResult()
 
-fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
+fun <U: UserInfo> FetchState<U?>.toProfileResult(userId: String): ProfileResult<U> =
     when (this) {
-        FetchResult.Loading -> throw IllegalArgumentException("can't convert Loading to ProfileResult")
-        is FetchResult.Failure -> ProfileResult.Failed(userId)
-        is FetchResult.Success -> {
+        FetchState.Loading -> throw IllegalArgumentException("can't convert Loading to ProfileResult")
+        is FetchState.Failure -> ProfileResult.Failed(userId)
+        is FetchState.Success -> {
             if (value != null) ProfileResult(value)
             else ProfileResult.NotFound(userId = userId)
         }

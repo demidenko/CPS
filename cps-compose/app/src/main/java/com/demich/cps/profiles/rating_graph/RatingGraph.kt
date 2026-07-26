@@ -30,7 +30,7 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.minOfWithIndex
@@ -56,7 +56,7 @@ internal enum class RatingFilterType {
 
 @Composable
 fun RatingGraph(
-    ratingChangesResult: () -> FetchResult<List<RatingChange>>,
+    ratingChanges: () -> FetchState<List<RatingChange>>,
     onRetry: () -> Unit,
     manager: RatedProfileManager<*>,
     modifier: Modifier = Modifier,
@@ -64,7 +64,7 @@ fun RatingGraph(
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
     LoadingContentBox(
-        dataResult = ratingChangesResult,
+        fetchState = ratingChanges,
         onRetry = onRetry,
         failedText = { "Failed to get rating history" },
         modifier = modifier

@@ -27,7 +27,7 @@ import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.rememberFilterState
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
@@ -61,12 +61,12 @@ private fun CodeforcesUserBlogScreen(
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     var dataKey by rememberUUIDState()
-    val blogEntriesResult by viewModel
-        .flowOfBlogEntriesResult(handle, context, key = dataKey)
+    val blogEntries by viewModel
+        .flowOfFetchBlogEntries(handle, context, key = dataKey)
         .collectAsState()
 
     CodeforcesUserBlogScreen(
-        blogEntriesResult = { blogEntriesResult },
+        blogEntries = { blogEntries },
         onRetry = { dataKey = randomUuid() },
         filterState = filterState
     )
@@ -74,21 +74,21 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    blogEntriesResult: () -> FetchResult<List<CodeforcesWebBlogEntry>>,
+    blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
-    LaunchedEffect(filterState, blogEntriesResult) {
+    LaunchedEffect(filterState, blogEntries) {
         //available = res != null && res.isSuccess && res.value.isNotEmpty()
-        snapshotFlow { blogEntriesResult().map { it.isNotEmpty() } }
-            .collect { result ->
-                filterState.available = result is FetchResult.Success && result.value
+        snapshotFlow { blogEntries().map { it.isNotEmpty() } }
+            .collect {
+                filterState.available = it is FetchState.Success && it.value
             }
     }
 
     Column {
         CodeforcesUserBlogContent(
-            blogEntriesResult = blogEntriesResult,
+            blogEntries = blogEntries,
             onRetry = onRetry,
             filterState = filterState,
             modifier = Modifier.weight(1f)
@@ -102,13 +102,13 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogContent(
-    blogEntriesResult: () -> FetchResult<List<CodeforcesWebBlogEntry>>,
+    blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
-        dataResult = blogEntriesResult,
+        fetchState = blogEntries,
         failedText = { it.niceMessage ?: "Blog load error" },
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
@@ -136,7 +136,7 @@ private class BlogLoadingViewModel: ViewModel() {
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
 
     // TODO: context leak
-    fun flowOfBlogEntriesResult(handle: String, context: Context, key: Any) =
+    fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) =
         blogEntriesLoader.execute(key = Pair(handle, key)) {
             val (blogEntries, colorTag) = awaitPair(
                 blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },

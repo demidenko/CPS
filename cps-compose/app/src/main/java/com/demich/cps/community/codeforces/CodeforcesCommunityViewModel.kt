@@ -16,7 +16,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
@@ -154,11 +154,11 @@ private class CodeforcesDataLoader<T>(
         if (inactive) return
         flow.update {
             if (it.loadingStatus == LOADING) return
-            it + FetchResult.Loading
+            it + FetchState.Loading
         }
         scope.launch(Dispatchers.Default) {
-            val result = runCatching { getData(provider()) }.toFetchResult()
-            flow.update { it + result }
+            val state = runCatching { getData(provider()) }.toFetchResult()
+            flow.update { it + state }
         }
     }
 }

@@ -33,7 +33,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -58,8 +58,8 @@ internal fun ClistAdditionalResourcesDialog(
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
-    val fetchResult by viewModel
-        .flowOfResourcesResult(settings = settings, key = dataKey)
+    val fetchState by viewModel
+        .flowOfFetchResources(settings = settings, key = dataKey)
         .collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -69,7 +69,7 @@ internal fun ClistAdditionalResourcesDialog(
         onDismissRequest = onDismissRequest
     ) {
         DialogContent(
-            fetchResult = { fetchResult },
+            fetchState = { fetchState },
             onFetchRetry = { dataKey = randomUuid() },
             selected = { selected },
             onSelectResource = {
@@ -84,7 +84,7 @@ internal fun ClistAdditionalResourcesDialog(
 
 @Composable
 private fun ColumnScope.DialogContent(
-    fetchResult: () -> FetchResult<List<ClistResource>>,
+    fetchState: () -> FetchState<List<ClistResource>>,
     onFetchRetry: () -> Unit,
     selected: () -> List<ClistResource>,
     onSelectResource: (ClistResource) -> Unit,
@@ -107,7 +107,7 @@ private fun ColumnScope.DialogContent(
 
         ListTitle(text = "available:")
         LoadingContentBox(
-            dataResult = { fetchResult().map { it - selected().toSet() } },
+            fetchState = { fetchState().map { it - selected().toSet() } },
             failedText = { it.niceMessage ?: "Failed to load resources" },
             onRetry = onFetchRetry,
             modifier = Modifier
@@ -164,7 +164,7 @@ private fun ClistResourcesList(
 private class CListResourcesLoadingViewModel: ViewModel() {
     private val loader = backgroundDataLoader<List<ClistResource>>()
 
-    fun flowOfResourcesResult(settings: ContestsSettingsDataStore, key: Any) =
+    fun flowOfFetchResources(settings: ContestsSettingsDataStore, key: Any) =
         loader.execute(key = key) {
             ClistClient(apiAccess = settings.clistApiAccess())
                 .getResourcesSyncWithSettings(

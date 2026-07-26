@@ -65,7 +65,7 @@ import com.demich.cps.ui.LoadingIndicator
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
@@ -162,7 +162,7 @@ private fun <U: UserInfo> DialogContent(
     UserIdTextField(
         manager = manager,
         profileResult = profileLoading.value,
-        loadingInProgress = profileLoading.lastResult is FetchResult.Loading,
+        loadingInProgress = profileLoading.state is FetchState.Loading,
         textFieldValue = textFieldValue.value,
         onValueChange = {
             val it =
@@ -242,7 +242,7 @@ private fun <U: UserInfo> profileFetchState(
                 emit(FetchValue(null))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                emit(FetchValue(null, FetchResult.Loading))
+                emit(FetchValue(null, FetchState.Loading))
                 val profile = withContext(Dispatchers.Default) { manager.fetchUserInfo(userId) }.toProfileResult(userId)
                 emit(FetchValue(profile))
             }

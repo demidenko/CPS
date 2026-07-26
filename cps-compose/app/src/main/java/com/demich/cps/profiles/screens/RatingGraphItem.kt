@@ -23,14 +23,14 @@ internal fun RatingGraphItem(
     val viewModel = viewModelScoped { RatingLoadingViewModel() }
     var dataKey by rememberUUIDState()
 
-    val ratingChangesResult by viewModel
-        .flowOfRatingResult(manager = manager, userId = handle, key = dataKey)
+    val ratingChanges by viewModel
+        .flowOfFetchRatingHistory(manager = manager, userId = handle, key = dataKey)
         .collectAsState()
 
     RatingGraph(
         modifier = modifier,
         manager = manager,
-        ratingChangesResult = { ratingChangesResult },
+        ratingChanges = { ratingChanges },
         onRetry = { dataKey = randomUuid() }
     )
 }
@@ -39,7 +39,7 @@ private class RatingLoadingViewModel: ViewModel() {
 
     private val loader = backgroundDataLoader<List<RatingChange>>()
 
-    fun flowOfRatingResult(manager: RatedProfileManager<*>, userId: String, key: Any) =
+    fun flowOfFetchRatingHistory(manager: RatedProfileManager<*>, userId: String, key: Any) =
         loader.execute(key = Triple(manager.platform, userId, key)) {
             manager.getRatingChangeHistory(userId)
         }

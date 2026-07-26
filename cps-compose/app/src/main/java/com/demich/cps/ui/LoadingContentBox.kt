@@ -13,23 +13,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideContentColor
 
 @Composable
 fun <T> LoadingContentBox(
     modifier: Modifier = Modifier,
-    dataResult: () -> FetchResult<T>,
+    fetchState: () -> FetchState<T>,
     failedText: (Throwable) -> String,
     onRetry: (() -> Unit)? = null,
     content: @Composable (T) -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        when (val it = dataResult()) {
-            is FetchResult.Success -> {
+        when (val it = fetchState()) {
+            is FetchState.Success -> {
                 content(it.value)
             }
-            is FetchResult.Failure -> {
+            is FetchState.Failure -> {
                 FailedContent {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = failedText(it.exception))
@@ -37,7 +37,7 @@ fun <T> LoadingContentBox(
                     }
                 }
             }
-            FetchResult.Loading -> LoadingIndicator()
+            FetchState.Loading -> LoadingIndicator()
         }
     }
 }
