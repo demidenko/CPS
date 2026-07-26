@@ -54,7 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSuggestionsProvider
-import com.demich.cps.profiles.managers.fetchProfile
+import com.demich.cps.profiles.managers.fetchUserInfo
+import com.demich.cps.profiles.managers.toProfileResult
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
@@ -226,6 +227,7 @@ private fun <U: UserInfo> DialogContent(
     }
 }
 
+// TODO: change to State<FetchResult<U?>>
 @Composable
 private fun <U: UserInfo> profileFetchState(
     textState: State<TextFieldValueExt>,
@@ -241,7 +243,7 @@ private fun <U: UserInfo> profileFetchState(
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
                 emit(FetchValue(null, FetchResult.Loading))
-                val profile = withContext(Dispatchers.Default) { manager.fetchProfile(userId) }
+                val profile = withContext(Dispatchers.Default) { manager.fetchUserInfo(userId) }.toProfileResult(userId)
                 emit(FetchValue(profile))
             }
     }.collectAsState(initial = FetchValue(initial))

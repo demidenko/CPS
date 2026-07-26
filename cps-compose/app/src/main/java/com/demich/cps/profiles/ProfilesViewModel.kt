@@ -6,8 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.fetchProfile
+import com.demich.cps.profiles.managers.fetchUserInfo
 import com.demich.cps.profiles.managers.profileManagerOf
+import com.demich.cps.profiles.managers.toProfileResult
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -47,10 +48,10 @@ class ProfilesViewModel: ViewModel() {
         if (loadingStatuses.value[manager.platform] == LOADING) return
         viewModelScope.launch(Dispatchers.Default) {
             val storage = manager.profileStorage(context)
-            val savedProfile = storage.profile() ?: return@launch
+            val userId = storage.profile()?.userId ?: return@launch
 
             setLoadingStatus(manager, LOADING)
-            val profileResult = manager.fetchProfile(savedProfile.userId)
+            val profileResult = manager.fetchUserInfo(userId).toProfileResult(userId)
 
             if (profileResult is ProfileResult.Failed) {
                 setLoadingStatus(manager, FAILED)
@@ -100,7 +101,7 @@ class ProfilesViewModel: ViewModel() {
 }
 
 private suspend fun <U: UserInfo> ProfileManager<U>.fetchAndSaveProfile(userId: String, context: Context) {
-    profileStorage(context).setProfile(fetchProfile(userId))
+    profileStorage(context).setProfile(fetchUserInfo(userId).toProfileResult(userId))
 }
 
 private fun getManager(resource: String, userName: String, link: String): Pair<Platform, String>? =

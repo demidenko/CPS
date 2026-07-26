@@ -42,7 +42,7 @@ abstract class RatedProfileStorage<U: RatedUserInfo>(
         //update userInfo
         val profile = profile() ?: return
 
-        val newProfile = manager.fetchProfile(str = profile.handle)
+        val newProfile = manager.fetchUserInfo(str = profile.handle).toProfileResult(profile.handle)
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
                 val newUserInfo = profile.userInfo.copyRating(rating = ratingChange.rating)
