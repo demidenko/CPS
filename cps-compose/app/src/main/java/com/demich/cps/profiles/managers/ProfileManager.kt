@@ -30,7 +30,7 @@ abstract class ProfileManager<U: UserInfo> {
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    abstract suspend fun fetchProfile(data: String): ProfileResult<U>
+    abstract suspend fun getUserInfo(str: String): U?
 
     abstract fun makeUserInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
@@ -63,6 +63,17 @@ abstract class ProfileManager<U: UserInfo> {
             entries().filterIsInstance<RatedProfileManager<*>>()
     }
 }
+
+// TODO: check CancellationException (or remove it)
+suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(str: String): ProfileResult<U> =
+    runCatching {
+        getUserInfo(str)
+    }.map {
+        if (it == null) ProfileResult.NotFound(userId = str)
+        else ProfileResult(it)
+    }.getOrElse {
+        ProfileResult.Failed(userId = str)
+    }
 
 // used in profile screen
 val profilePlatforms: List<Platform> =

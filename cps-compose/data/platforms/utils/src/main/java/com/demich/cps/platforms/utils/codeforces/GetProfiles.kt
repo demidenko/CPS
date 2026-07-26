@@ -61,7 +61,7 @@ fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<Codefo
         }
     )
 
-private fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
+fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
     CodeforcesUserInfo(
         handle = handle,
         rating = rating,

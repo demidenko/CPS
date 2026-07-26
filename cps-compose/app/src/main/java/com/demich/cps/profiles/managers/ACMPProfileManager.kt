@@ -26,19 +26,16 @@ class ACMPProfileManager :
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
-    override suspend fun fetchProfile(data: String): ProfileResult<ACMPUserInfo> {
-        return runCatching {
-            ProfileResult(
-                userInfo = ACMPParser().extractUserInfo(
-                    source = ACMPClient.getUserPage(id = data.toInt()),
-                    id = data
-                )
+    override suspend fun getUserInfo(str: String): ACMPUserInfo? =
+        try {
+            ACMPParser().extractUserInfo(
+                source = ACMPClient.getUserPage(id = str.toInt()),
+                id = str
             )
-        }.getOrElse {
-            if (it.isRedirect) ProfileResult.NotFound(data)
-            else ProfileResult.Failed(data)
+        } catch (it: Throwable) {
+            if (it.isRedirect) null
+            else throw it
         }
-    }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()

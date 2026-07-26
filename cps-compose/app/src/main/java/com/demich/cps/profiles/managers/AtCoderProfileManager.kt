@@ -40,14 +40,13 @@ class AtCoderProfileManager :
         else -> false
     }
 
-    override suspend fun fetchProfile(data: String): ProfileResult<AtCoderUserInfo> {
-        return runCatching {
-            ProfileResult(AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = data)))
-        }.getOrElse { e ->
-            if (e.isPageNotFound) ProfileResult.NotFound(data)
-            else ProfileResult.Failed(data)
+    override suspend fun getUserInfo(str: String): AtCoderUserInfo? =
+        try {
+            AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = str))
+        } catch (it: Throwable) {
+            if (it.isPageNotFound) null
+            else throw it
         }
-    }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         AtCoderParser().extractUserSuggestions(source = AtCoderClient.getSuggestionsPage(str))

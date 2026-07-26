@@ -1,29 +1,26 @@
 package com.demich.cps.platforms.utils
 
-import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.TimusUserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 
 class TimusParser {
-    fun extractProfile(source: String, handle: String): ProfileResult<TimusUserInfo> {
+    fun extractUserInfo(source: String, handle: String): TimusUserInfo? {
         with(source.parseDocument()) {
             val userName = selectFirst("h2.author_name")?.text()
-                ?: return ProfileResult.NotFound(userId = handle)
+                ?: return null
             val rows =
                 if (selectFirst("div.author_none_solved") != null)
                     listOf("0", "0", "0", "0")
                 else select("td.author_stats_value").map { row ->
                     row.text().let { it.substring(0, it.indexOf(" out of ")) }
                 }
-            return ProfileResult(
-                userInfo = TimusUserInfo(
-                    id = handle,
-                    userName = userName,
-                    rating = rows[3].toInt(),
-                    solvedTasks = rows[1].toInt(),
-                    rankTasks = rows[0].toInt(),
-                    rankRating = rows[2].toInt()
-                )
+            return TimusUserInfo(
+                id = handle,
+                userName = userName,
+                rating = rows[3].toInt(),
+                solvedTasks = rows[1].toInt(),
+                rankTasks = rows[0].toInt(),
+                rankRating = rows[2].toInt()
             )
         }
     }

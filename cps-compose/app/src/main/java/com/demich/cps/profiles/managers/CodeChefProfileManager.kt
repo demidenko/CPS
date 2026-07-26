@@ -62,17 +62,15 @@ class CodeChefProfileManager :
         else -> false
     }
 
-    override suspend fun fetchProfile(data: String): ProfileResult<CodeChefUserInfo> =
-        runCatching {
-            ProfileResult(
-                userInfo = CodeChefParser().extractUserInfo(
-                    source = CodeChefClient.getUserPage(handle = data),
-                    handle = data
-                )
+    override suspend fun getUserInfo(str: String): CodeChefUserInfo? =
+        try {
+            CodeChefParser().extractUserInfo(
+                source = CodeChefClient.getUserPage(handle = str),
+                handle = str
             )
-        }.getOrElse { e ->
-            if (e.isRedirect) ProfileResult.NotFound(data)
-            else ProfileResult.Failed(data)
+        } catch (it: Throwable) {
+            if (it.isRedirect) null
+            else throw it
         }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =

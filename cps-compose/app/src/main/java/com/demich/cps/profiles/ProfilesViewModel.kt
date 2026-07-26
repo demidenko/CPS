@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
+import com.demich.cps.profiles.managers.fetchProfile
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult

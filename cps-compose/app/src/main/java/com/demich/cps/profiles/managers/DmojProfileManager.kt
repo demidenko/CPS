@@ -36,13 +36,13 @@ class DmojProfileManager :
         else -> false
     }
 
-    override suspend fun fetchProfile(data: String): ProfileResult<DmojUserInfo> =
-        DmojClient.runCatching {
-            val res = getUser(handle = data)
-            ProfileResult(DmojUserInfo(handle = res.username, rating = res.rating))
-        }.getOrElse {
-            if (it.isPageNotFound) ProfileResult.NotFound(data)
-            else ProfileResult.Failed(data)
+    override suspend fun getUserInfo(str: String): DmojUserInfo? =
+        try {
+            val res = DmojClient.getUser(handle = str)
+            DmojUserInfo(handle = res.username, rating = res.rating)
+        } catch (it: Throwable) {
+            if (it.isPageNotFound) null
+            else throw it
         }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {

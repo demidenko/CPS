@@ -25,15 +25,11 @@ class TimusProfileManager :
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
     override fun isValidForSearch(char: Char): Boolean = true
 
-    override suspend fun fetchProfile(data: String): ProfileResult<TimusUserInfo> =
-        runCatching {
-            TimusParser().extractProfile(
-                source = TimusClient.getUserPage(data.toInt()),
-                handle = data
-            )
-        }.getOrElse {
-            ProfileResult.Failed(data)
-        }
+    override suspend fun getUserInfo(str: String): TimusUserInfo? =
+        TimusParser().extractUserInfo(
+            source = TimusClient.getUserPage(str.toInt()),
+            handle = str
+        )
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()

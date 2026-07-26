@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSuggestionsProvider
+import com.demich.cps.profiles.managers.fetchProfile
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
