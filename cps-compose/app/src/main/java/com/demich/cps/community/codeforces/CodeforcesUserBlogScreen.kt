@@ -34,7 +34,6 @@ import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
-import com.demich.cps.utils.map
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
@@ -80,10 +79,10 @@ private fun CodeforcesUserBlogScreen(
     filterState: FilterState
 ) {
     LaunchedEffect(filterState, blogEntries) {
-        //available = res != null && res.isSuccess && res.value.isNotEmpty()
-        snapshotFlow { blogEntries().map { it.isNotEmpty() } }
+        // TODO: flow to state to flow to state
+        snapshotFlow { blogEntries() }
             .collect {
-                filterState.available = it is FetchResult.Success && it.value
+                filterState.available = it is FetchResult.Success && it.value.isNotEmpty()
             }
     }
 
