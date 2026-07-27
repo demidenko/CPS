@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration
@@ -32,7 +31,8 @@ suspend fun <A, B> awaitPair(
 suspend fun List<suspend () -> Unit>.joinAllWithCounter(block: suspend (Int) -> Unit) {
     block(0)
     if (isEmpty()) return
-    supervisorScope {
+    // TODO: first crash stop other launches
+    coroutineScope {
         val mutex = Mutex()
         var counter = 0
         forEach { job ->
