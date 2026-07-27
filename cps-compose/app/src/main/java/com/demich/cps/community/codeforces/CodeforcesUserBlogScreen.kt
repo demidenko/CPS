@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.demich.cps.community.follow.followRepository
@@ -61,15 +60,20 @@ private fun CodeforcesUserBlogScreen(
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     var dataKey by rememberUUIDState()
-    val blogEntries by viewModel
-        .flowOfFetchBlogEntries(handle, context, key = dataKey)
-        .collectAsState()
+    val flow = viewModel.flowOfFetchBlogEntries(handle, context, key = dataKey)
+    val blogEntries by flow.collectAsState()
 
     CodeforcesUserBlogScreen(
         blogEntries = { blogEntries },
         onRetry = { dataKey = randomUuid() },
         filterState = filterState
     )
+
+    LaunchedEffect(flow, filterState) {
+        flow.collect {
+            filterState.available = it is FetchResult.Success && it.value.isNotEmpty()
+        }
+    }
 }
 
 @Composable
@@ -78,14 +82,6 @@ private fun CodeforcesUserBlogScreen(
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
-    LaunchedEffect(filterState, blogEntries) {
-        // TODO: flow to state to flow to state
-        snapshotFlow { blogEntries() }
-            .collect {
-                filterState.available = it is FetchResult.Success && it.value.isNotEmpty()
-            }
-    }
-
     Column {
         CodeforcesUserBlogContent(
             blogEntries = blogEntries,
