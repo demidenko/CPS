@@ -46,18 +46,3 @@ inline fun <K, V> MutableMap<K, List<V>>.edit(key: K, block: MutableList<V>.() -
     val list = get(key)?.toMutableList() ?: mutableListOf()
     set(key, list.apply(block))
 }
-
-inline fun <R> repeatUntilSuccessOrLast(
-    times: Int,
-    between: () -> Unit = {},
-    block: () -> R
-): Result<R> {
-    require(times > 0)
-    repeat(times - 1) {
-        runCatching { block() }.let {
-            if (it.isSuccess) return it
-        }
-        between()
-    }
-    return runCatching { block() }
-}
