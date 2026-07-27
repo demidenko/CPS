@@ -3,6 +3,7 @@ package com.demich.cps.utils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 sealed interface FetchState<out T> {
     data object Loading: FetchState<Nothing>
@@ -51,7 +52,16 @@ val FetchValue<*>.loadingStatus: LoadingStatus
     }
 
 fun <T> Flow<T>.toFetchResultFlow(): Flow<FetchResult<T>> =
-    map { FetchResult.Success(it) }
-        .catch<FetchResult<T>> {
+    map<T, FetchResult<T>> { FetchResult.Success(it) }
+        .catch {
+            emit(FetchResult.Failure(it))
+        }
+
+fun <T> Flow<T>.toFetchStateFlow(): Flow<FetchState<T>> =
+    map<T, FetchState<T>> { FetchResult.Success(it) }
+        .onStart {
+            emit(FetchState.Loading)
+        }
+        .catch {
             emit(FetchResult.Failure(it))
         }
