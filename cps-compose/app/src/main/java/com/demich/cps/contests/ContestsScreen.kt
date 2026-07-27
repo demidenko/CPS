@@ -169,10 +169,11 @@ private fun ContestsPager(
     ) = produceSortedContestsWithTime(clock = Clock.System)
 
     LaunchedEffect(contestsState, filterState, viewState) {
+        // TODO: flow -> state -> flow -> state (fix)
         snapshotFlow { contestsState.value }
-            .collect { contests ->
-                filterState.available = contests.contests.isNotEmpty()
-                viewState.syncExpanded(contests)
+            .collect {
+                filterState.available = it.contests.isNotEmpty()
+                viewState.syncExpanded(it)
             }
     }
 
