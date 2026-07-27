@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSuggestionsProvider
-import com.demich.cps.profiles.managers.fetchUserInfo
 import com.demich.cps.profiles.managers.toProfileResult
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -65,6 +64,7 @@ import com.demich.cps.ui.LoadingIndicator
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.ProvideContentColor
@@ -72,10 +72,12 @@ import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
+import com.demich.cps.utils.toFetchStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
@@ -242,9 +244,14 @@ private fun <U: UserInfo> profileFetchState(
                 emit(FetchValue(null))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                emit(FetchValue(null, FetchState.Loading))
-                val profile = withContext(Dispatchers.Default) { manager.fetchUserInfo(userId) }.toProfileResult(userId)
-                emit(FetchValue(profile))
+                flow { emit(withContext(Dispatchers.Default) { manager.getUserInfo(userId) }) }
+                    .toFetchStateFlow()
+                    .collect {
+                        when (it) {
+                            is FetchState.Loading -> emit(FetchValue(null, it))
+                            is FetchResult -> emit(FetchValue(it.toProfileResult(userId)))
+                        }
+                    }
             }
     }.collectAsState(initial = FetchValue(initial))
 
