@@ -8,7 +8,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
@@ -32,11 +31,9 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
                 job?.cancel()
                 job = scope.launch(Dispatchers.Default) {
                     flow(block = block)
-                        .catch {
-                            if (currentKey == key) flowOfFetchState.value = FetchResult.Failure(it)
-                        }
+                        .toFetchResultFlow()
                         .collect {
-                            if (currentKey == key) flowOfFetchState.value = FetchResult.Success(it)
+                            if (currentKey == key) flowOfFetchState.value = it
                         }
                 }
             }
