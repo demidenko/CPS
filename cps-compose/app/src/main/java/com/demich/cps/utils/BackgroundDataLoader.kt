@@ -5,9 +5,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
@@ -18,16 +22,23 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     val flowOfFetchState: StateFlow<FetchState<T>> = flow
 
     fun execute(key: Any, block: suspend () -> T) =
+        executeFlow(key = key) {
+            emit(block())
+        }
+
+    fun executeFlow(key: Any, block: suspend FlowCollector<T>.() -> Unit) =
         flowOfFetchState.also {
             if (currentKey != key) {
                 flow.value = Loading
                 currentKey = key
                 job?.cancel()
                 job = scope.launch(Dispatchers.Default) {
-                    kotlin.runCatching { block() }.let {
-                        ensureActive()
-                        if (currentKey == key) flow.value = it.toFetchResult()
-                    }
+                    flow(block = block)
+                        .catch { flow.value = FetchResult.Failure(it) }
+                        .collect {
+                            currentCoroutineContext().ensureActive()
+                            if (currentKey == key) flow.value = FetchResult.Success(it)
+                        }
                 }
             }
         }
