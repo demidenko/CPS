@@ -29,13 +29,15 @@ import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
-import com.demich.cps.utils.awaitPair
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
@@ -133,13 +135,19 @@ private class BlogLoadingViewModel: ViewModel() {
 
     // TODO: context leak
     fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) =
-        blogEntriesLoader.execute(key = Pair(handle, key)) {
-            val (blogEntries, colorTag) = awaitPair(
-                blockFirst = { context.followRepository.getAndReloadBlogEntries(handle).getOrThrow() },
-                blockSecond = { CodeforcesClient().getRealColorTagOrNull(handle) ?: BLACK }
+        blogEntriesLoader.executeFlow(key = Pair(handle, key)) {
+            emitAll(
+                combine(
+                    flow = flow { emit(context.followRepository.getAndReloadBlogEntries(handle).getOrThrow()) },
+                    flow2 = flow {
+                        emit(null)
+                        emit(CodeforcesClient().getRealColorTagOrNull(handle))
+                    }
+                ) { blogEntries, colorTag ->
+                    blogEntries.map {
+                        it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
+                    }
+                }
             )
-            blogEntries.map {
-                it.toWebBlogEntry(colorTag = colorTag)
-            }
         }
 }
