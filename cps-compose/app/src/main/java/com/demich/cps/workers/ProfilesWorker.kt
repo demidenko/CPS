@@ -58,9 +58,9 @@ private suspend fun CodeforcesProfileManager.checkRating(context: Context) {
     profileStorage(context).fromSnapshot {
         val userInfo = profile.value?.userInfoOrNull() ?: return
 
-        val lastRatingChange = CodeforcesClient(apiAccess = apiAccess.value).runCatching {
-            getUserRatingChanges(handle = userInfo.handle)
-        }.getOrNull()?.lastOrNull() ?: return
+        val lastRatingChange = CodeforcesClient(apiAccess = apiAccess.value)
+            .getUserRatingChanges(handle = userInfo.handle)
+            .lastOrNull() ?: return
 
         applyRatingChange(lastRatingChange)
     }
@@ -101,12 +101,11 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
 
 private suspend fun AtCoderProfileManager.checkRating(context: Context) {
     val storage = profileStorage(context)
-    val userInfo = storage.profile()
-        ?.userInfoOrNull() ?: return
+    val userInfo = storage.profile()?.userInfoOrNull() ?: return
 
-    val lastRatingChange = AtCoderClient.runCatching {
-        getRatingChanges(handle = userInfo.handle)
-    }.getOrNull()?.lastOrNull() ?: return
+    val lastRatingChange = AtCoderClient
+        .getRatingChanges(handle = userInfo.handle)
+        .lastOrNull() ?: return
 
     storage.applyRatingChange(ratingChange = lastRatingChange.toRatingChange(handle = userInfo.handle))
 }
