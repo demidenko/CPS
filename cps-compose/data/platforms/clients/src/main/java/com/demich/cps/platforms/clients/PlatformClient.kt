@@ -78,7 +78,8 @@ private fun Throwable.shouldRetry(): Boolean =
         else -> false
     }
 
-internal val defaultJson = Json { ignoreUnknownKeys = true }
+internal val defaultJson: Json
+    get() = Json { ignoreUnknownKeys = true }
 
 
 internal suspend inline fun <reified T> HttpClient.getAs(
