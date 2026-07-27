@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 
 
 val jsonCPS = Json {
+    encodeDefaults = true
     ignoreUnknownKeys = true
     allowStructuredMapKeys = true
 }
