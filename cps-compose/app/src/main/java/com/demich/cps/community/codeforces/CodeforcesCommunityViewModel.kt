@@ -23,7 +23,7 @@ import com.demich.cps.utils.combine
 import com.demich.cps.utils.loadingStatus
 import com.demich.cps.utils.plus
 import com.demich.cps.utils.sharedViewModel
-import com.demich.cps.utils.toFetchResult
+import com.demich.cps.utils.toFetchResultFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -157,8 +158,11 @@ private class CodeforcesDataLoader<T>(
             it + FetchState.Loading
         }
         scope.launch(Dispatchers.Default) {
-            val state = runCatching { getData(provider()) }.toFetchResult()
-            flow.update { it + state }
+            flow { emit(getData(provider())) }
+                .toFetchResultFlow()
+                .collect { result ->
+                    flow.update { it + result }
+                }
         }
     }
 }
