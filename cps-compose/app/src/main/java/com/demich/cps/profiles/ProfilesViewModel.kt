@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.fetchUserInfo
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.managers.toProfileResult
 import com.demich.cps.profiles.userinfo.ClistUserInfo
@@ -53,16 +52,15 @@ class ProfilesViewModel: ViewModel() {
             val storage = manager.profileStorage(context)
             val userId = storage.profile()?.userId ?: return@launch
 
-            fetchFlowOf { manager.getUserInfo(userId) }
-                .collect {
-                    if (it is FetchResult) {
-                        val profileResult = it.toProfileResult(userId)
-                        if (profileResult !is ProfileResult.Failed) {
-                            storage.setProfile(profileResult)
-                        }
+            fetchFlowOf { manager.getUserInfo(userId) }.collect {
+                if (it is FetchResult) {
+                    val profileResult = it.toProfileResult(userId)
+                    if (profileResult !is ProfileResult.Failed) {
+                        storage.setProfile(profileResult)
                     }
-                    setLoadingStatus(manager, it.toLoadingStatus())
                 }
+                setLoadingStatus(manager, it.toLoadingStatus())
+            }
         }
     }
 
@@ -109,9 +107,16 @@ class ProfilesViewModel: ViewModel() {
             //if userId is same just reload to prevent replace by Failure
             reload(manager, context)
         } else {
-            setLoadingStatus(manager, LOADING)
-            storage.setProfile(manager.fetchUserInfo(userId).toProfileResult(userId))
-            setLoadingStatus(manager, PENDING)
+            fetchFlowOf { manager.getUserInfo(userId) }.collect {
+                when (it) {
+                    is FetchResult -> {
+                        storage.setProfile(it.toProfileResult(userId))
+                        // PENDING even on Failure
+                        setLoadingStatus(manager, PENDING)
+                    }
+                    else -> setLoadingStatus(manager, it.toLoadingStatus())
+                }
+            }
         }
     }
 }
