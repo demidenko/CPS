@@ -20,8 +20,8 @@ data class DmojRatingChange(
     val label: String,
     val rating: Int,
     val ranking: Int,
-    val link: String,
-    val timestamp: Double
+    val timestamp: Double,
+    private val link: String // relative
 )
 
 @Serializable

@@ -45,7 +45,7 @@ internal fun AtCoderRatingChange.toRatingChange(handle: String) =
         rank = Place,
         date = EndTime,
         title = ContestName,
-        url = AtCoderUrls.userContestResult(handle, getContestId())
+        url = AtCoderUrls.userContestResult(handle, contestId())
     )
 
 internal fun CodeChefRatingChange.toRatingChange() =
