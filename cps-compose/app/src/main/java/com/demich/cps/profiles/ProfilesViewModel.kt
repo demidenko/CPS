@@ -86,22 +86,34 @@ class ProfilesViewModel: ViewModel() {
             }
             supported.map { (platform, userId) ->
                 suspend {
-                    val manager = profileManagerOf(platform)
-                    //wait for loading stops
-                    loadingStatuses.takeWhile { it[platform] == LOADING }.collect()
-                    val savedUserId = manager.profileStorage(context).profile()?.userId
-                    if (userId.equals(savedUserId, ignoreCase = true)) {
-                        //if userId is same just reload to prevent replace by FAILED
-                        reload(manager, context)
-                    } else {
-                        setLoadingStatus(manager, LOADING)
-                        manager.fetchAndSaveProfile(userId, context)
-                        setLoadingStatus(manager, PENDING)
-                    }
+                    replaceProfile(
+                        manager = profileManagerOf(platform),
+                        userId = userId,
+                        context = context
+                    )
                 }
             }.joinAllWithProgress(title = "clist import") {
                 send(it)
             }
+        }
+    }
+
+    private suspend fun <U: UserInfo> replaceProfile(
+        manager: ProfileManager<U>,
+        userId: String,
+        context: Context
+    ) {
+        //wait for loading stops
+        loadingStatuses.takeWhile { it[manager.platform] == LOADING }.collect()
+        val storage = manager.profileStorage(context)
+        val savedUserId = storage.profile()?.userId
+        if (userId.equals(savedUserId, ignoreCase = true)) {
+            //if userId is same just reload to prevent replace by Failure
+            reload(manager, context)
+        } else {
+            setLoadingStatus(manager, LOADING)
+            storage.setProfile(manager.fetchUserInfo(userId).toProfileResult(userId))
+            setLoadingStatus(manager, PENDING)
         }
     }
 }
@@ -110,10 +122,6 @@ private const val clistImportId = "clist_import"
 
 fun ProgressBarsViewModel.flowOfClistImportIsRunning(): Flow<Boolean> =
     flowOfProgresses.map { clistImportId in it }
-
-private suspend fun <U: UserInfo> ProfileManager<U>.fetchAndSaveProfile(userId: String, context: Context) {
-    profileStorage(context).setProfile(fetchUserInfo(userId).toProfileResult(userId))
-}
 
 private fun getManager(resource: String, userName: String, link: String): Pair<Platform, String>? =
     when (resource) {
