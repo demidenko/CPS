@@ -74,7 +74,7 @@ class ProfilesViewModel: ViewModel() {
         progressBarsViewModel: ProgressBarsViewModel,
         context: Context
     ) {
-        progressBarsViewModel.doJob(id = ProgressBarsViewModel.clistImportId, coroutineScope = viewModelScope) {
+        progressBarsViewModel.doJob(id = clistImportId, coroutineScope = viewModelScope) {
             val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
                 getManager(resource, userData.first, userData.second)
             }
@@ -99,6 +99,11 @@ class ProfilesViewModel: ViewModel() {
         }
     }
 }
+
+private const val clistImportId = "clist_import"
+
+fun ProgressBarsViewModel.flowOfClistImportIsRunning(): Flow<Boolean> =
+    flowOfProgresses.map { clistImportId in it }
 
 private suspend fun <U: UserInfo> ProfileManager<U>.fetchAndSaveProfile(userId: String, context: Context) {
     profileStorage(context).setProfile(fetchUserInfo(userId).toProfileResult(userId))

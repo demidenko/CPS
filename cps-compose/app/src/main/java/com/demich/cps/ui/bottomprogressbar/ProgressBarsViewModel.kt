@@ -10,11 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,12 +54,5 @@ class ProgressBarsViewModel: ViewModel() {
                 }
             }
         }
-    }
-
-    fun flowOfClistImportIsRunning(): Flow<Boolean> =
-        flowOfProgresses.map { clistImportId in it }
-
-    companion object {
-        const val clistImportId = "clist_import"
     }
 }
