@@ -7,9 +7,14 @@ import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
+import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.toFetchResultFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
 
 fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
     ratingsUpperBounds
@@ -46,4 +51,16 @@ fun <U: RatedUserInfo> RatedProfileManager<U>.makeHandleSpan(profileResult: Prof
         )
     } else {
         AnnotatedString(text = profileResult.handle)
+    }
+
+suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(str: String): ProfileResult<U> =
+    flow { emit(getUserInfo(str)) }.toFetchResultFlow().single().toProfileResult(str)
+
+fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
+    when (this) {
+        is FetchResult.Failure -> ProfileResult.Failed(userId)
+        is FetchResult.Success -> {
+            if (value != null) ProfileResult(value)
+            else ProfileResult.NotFound(userId = userId)
+        }
     }

@@ -11,8 +11,6 @@ import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.theme.CPSColors
-import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.toFetchResult
 
 
 // TODO: rename manager to smth better
@@ -65,19 +63,6 @@ abstract class ProfileManager<U: UserInfo> {
             entries().filterIsInstance<RatedProfileManager<*>>()
     }
 }
-
-// TODO: check CancellationException (or remove it)
-suspend fun <U: UserInfo> ProfileManager<U>.fetchUserInfo(str: String): FetchResult<U?> =
-    runCatching { getUserInfo(str) }.toFetchResult()
-
-fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
-    when (this) {
-        is FetchResult.Failure -> ProfileResult.Failed(userId)
-        is FetchResult.Success -> {
-            if (value != null) ProfileResult(value)
-            else ProfileResult.NotFound(userId = userId)
-        }
-    }
 
 // used in profile screen
 val profilePlatforms: List<Platform> =
