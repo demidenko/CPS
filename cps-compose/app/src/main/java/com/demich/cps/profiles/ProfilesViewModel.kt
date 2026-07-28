@@ -57,13 +57,13 @@ class ProfilesViewModel: ViewModel() {
             flow { emit(manager.getUserInfo(userId)) }
                 .toFetchStateFlow()
                 .collect {
-                    setLoadingStatus(manager, it.toLoadingStatus())
                     if (it is FetchResult) {
                         val profileResult = it.toProfileResult(userId)
                         if (profileResult !is ProfileResult.Failed) {
                             storage.setProfile(profileResult)
                         }
                     }
+                    setLoadingStatus(manager, it.toLoadingStatus())
                 }
         }
     }
