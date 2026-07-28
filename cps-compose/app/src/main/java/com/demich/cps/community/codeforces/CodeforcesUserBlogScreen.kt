@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.demich.cps.community.follow.followRepository
@@ -32,7 +31,6 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
-import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.flow.combine
@@ -61,13 +59,13 @@ private fun CodeforcesUserBlogScreen(
 ) {
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
-    var dataKey by rememberUUIDState()
-    val flow = viewModel.flowOfFetchBlogEntries(handle, context, key = dataKey)
+    val uuidState = rememberUUIDState()
+    val flow = viewModel.flowOfFetchBlogEntries(handle, context, key = uuidState.value)
     val blogEntries by flow.collectAsState()
 
     CodeforcesUserBlogScreen(
         blogEntries = { blogEntries },
-        onRetry = { dataKey = randomUuid() },
+        onRetry = { uuidState.reset() },
         filterState = filterState
     )
 

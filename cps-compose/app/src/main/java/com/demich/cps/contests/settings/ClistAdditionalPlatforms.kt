@@ -38,7 +38,6 @@ import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.map
-import com.demich.cps.utils.randomUuid
 import com.demich.cps.utils.rememberUUIDState
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
@@ -56,10 +55,10 @@ internal fun ClistAdditionalResourcesDialog(
     val selected by collectItemAsState { item }
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
-    var dataKey by rememberUUIDState()
+    val uuidState = rememberUUIDState()
 
     val fetchState by viewModel
-        .flowOfFetchResources(settings = settings, key = dataKey)
+        .flowOfFetchResources(settings = settings, key = uuidState.value)
         .collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -70,7 +69,7 @@ internal fun ClistAdditionalResourcesDialog(
     ) {
         DialogContent(
             fetchState = { fetchState },
-            onFetchRetry = { dataKey = randomUuid() },
+            onFetchRetry = { uuidState.reset() },
             selected = { selected },
             onSelectResource = {
                 scope.launch { item.edit { add(index = 0, element = it) } }

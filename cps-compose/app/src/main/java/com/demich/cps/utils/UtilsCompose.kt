@@ -1,5 +1,6 @@
 package com.demich.cps.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.EnterTransition
@@ -252,11 +253,20 @@ inline fun <reified T: ViewModel> sharedViewModel(): T =
     viewModel(viewModelStoreOwner = context as ComponentActivity)
 
 
-@Composable
-fun rememberUUIDState(): MutableState<Uuid> =
-    rememberSaveable { mutableStateOf(randomUuid()) }
+@JvmInline
+value class ResetableUUIDState(private val state: MutableState<Uuid>): State<Uuid> by state {
+    fun reset() {
+        state.value = Uuid.random()
+    }
+}
 
-fun randomUuid(): Uuid = Uuid.random()
+@Composable
+fun rememberUUIDState(): ResetableUUIDState {
+    val uuidState = rememberSaveable { mutableStateOf(Uuid.random()) }
+
+    @SuppressLint("UnrememberedMutableState")
+    return ResetableUUIDState(state = uuidState)
+}
 
 //TODO: remove it (use default includeFontPadding = false)
 @Composable
