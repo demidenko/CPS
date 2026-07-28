@@ -30,13 +30,20 @@ abstract class ProfileStorage<U: UserInfo>(
     val profile: DataStoreValue<ProfileResult<U>?>
         get() = profileItem
 
-    suspend fun setProfile(profileResult: ProfileResult<U>) {
-        edit {
-            val oldUserId = profileItem.value?.userId
-            if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
-                onResetProfile()
+    suspend fun setProfile(
+        profileResult: ProfileResult<U>,
+        reset: Boolean = true
+    ) {
+        if (!reset) {
+            profileItem.setValue(profileResult)
+        } else {
+            edit {
+                val oldUserId = profileItem.value?.userId
+                if (!oldUserId.equals(profileResult.userId, ignoreCase = true)) {
+                    onResetProfile()
+                }
+                profileItem.value = profileResult
             }
-            profileItem.value = profileResult
         }
     }
 

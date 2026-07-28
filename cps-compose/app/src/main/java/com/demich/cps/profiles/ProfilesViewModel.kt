@@ -56,7 +56,7 @@ class ProfilesViewModel: ViewModel() {
                 if (it is FetchResult) {
                     val profileResult = it.toProfileResult(userId)
                     if (profileResult !is ProfileResult.Failed) {
-                        storage.setProfile(profileResult)
+                        storage.setProfile(profileResult, reset = false)
                     }
                 }
                 setLoadingStatus(manager, it.toLoadingStatus())
