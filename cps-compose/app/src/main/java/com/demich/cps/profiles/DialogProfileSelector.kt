@@ -70,14 +70,13 @@ import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
+import com.demich.cps.utils.fetchFlowOf
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
-import com.demich.cps.utils.toFetchStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
@@ -244,8 +243,7 @@ private fun <U: UserInfo> profileFetchState(
                 emit(FetchValue(null))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                flow { emit(withContext(Dispatchers.Default) { manager.getUserInfo(userId) }) }
-                    .toFetchStateFlow()
+                fetchFlowOf { withContext(Dispatchers.Default) { manager.getUserInfo(userId) } }
                     .collect {
                         when (it) {
                             is FetchState.Loading -> emit(FetchValue(null, it))

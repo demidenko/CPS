@@ -2,6 +2,7 @@ package com.demich.cps.utils
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
@@ -60,7 +61,7 @@ fun <T> Flow<T>.toFetchResultFlow(): Flow<FetchResult<T>> =
             emit(FetchResult.Failure(it))
         }
 
-fun <T> Flow<T>.toFetchStateFlow(): Flow<FetchState<T>> =
+fun <T> Flow<T>.toFetchFlow(): Flow<FetchState<T>> =
     map<T, FetchState<T>> { FetchResult.Success(it) }
         .onStart {
             emit(FetchState.Loading)
@@ -68,3 +69,6 @@ fun <T> Flow<T>.toFetchStateFlow(): Flow<FetchState<T>> =
         .catch {
             emit(FetchResult.Failure(it))
         }
+
+fun <T> fetchFlowOf(block: suspend () -> T): Flow<FetchState<T>> =
+    flow { emit(block()) }.toFetchFlow()
