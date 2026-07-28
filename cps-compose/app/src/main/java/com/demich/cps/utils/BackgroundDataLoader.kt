@@ -23,7 +23,7 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
             emit(block())
         }
 
-    fun executeFlow(key: Any, block: suspend FlowCollector<T>.() -> Unit) =
+    fun executeFlow(key: Any, block: suspend FlowCollector<T>.() -> Unit): StateFlow<FetchState<T>> =
         flowOfFetchState.also {
             if (currentKey != key) {
                 flowOfFetchState.value = Loading
