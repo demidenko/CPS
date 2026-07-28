@@ -23,21 +23,21 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
             emit(block())
         }
 
-    fun executeFlow(key: Any, block: suspend FlowCollector<T>.() -> Unit): StateFlow<FetchState<T>> =
-        flowOfFetchState.also {
-            if (currentKey != key) {
-                flowOfFetchState.value = Loading
-                currentKey = key
-                job?.cancel()
-                job = scope.launch(Dispatchers.Default) {
-                    flow(block = block)
-                        .toFetchResultFlow()
-                        .collect {
-                            if (currentKey == key) flowOfFetchState.value = it
-                        }
-                }
+    fun executeFlow(key: Any, block: suspend FlowCollector<T>.() -> Unit): StateFlow<FetchState<T>>  {
+        if (currentKey != key) {
+            flowOfFetchState.value = Loading
+            currentKey = key
+            job?.cancel()
+            job = scope.launch(Dispatchers.Default) {
+                flow(block = block)
+                    .toFetchResultFlow()
+                    .collect {
+                        if (currentKey == key) flowOfFetchState.value = it
+                    }
             }
         }
+        return flowOfFetchState
+    }
 }
 
 fun <T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)
