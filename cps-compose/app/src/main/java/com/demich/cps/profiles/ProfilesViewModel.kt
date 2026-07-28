@@ -13,15 +13,19 @@ import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.sharedViewModel
+import com.demich.cps.utils.toFetchStateFlow
+import com.demich.cps.utils.toLoadingStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -50,15 +54,17 @@ class ProfilesViewModel: ViewModel() {
             val storage = manager.profileStorage(context)
             val userId = storage.profile()?.userId ?: return@launch
 
-            setLoadingStatus(manager, LOADING)
-            val profileResult = manager.fetchUserInfo(userId).toProfileResult(userId)
-
-            if (profileResult is ProfileResult.Failed) {
-                setLoadingStatus(manager, FAILED)
-            } else {
-                setLoadingStatus(manager, PENDING)
-                storage.setProfile(profileResult)
-            }
+            flow { emit(manager.getUserInfo(userId)) }
+                .toFetchStateFlow()
+                .collect {
+                    setLoadingStatus(manager, it.toLoadingStatus())
+                    if (it is FetchResult) {
+                        val profileResult = it.toProfileResult(userId)
+                        if (profileResult !is ProfileResult.Failed) {
+                            storage.setProfile(profileResult)
+                        }
+                    }
+                }
         }
     }
 

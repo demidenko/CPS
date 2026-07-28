@@ -27,6 +27,13 @@ fun <T> Result<T>.toFetchResult(): FetchResult<T> =
         onFailure = { FetchResult.Failure(it) }
     )
 
+fun FetchState<*>.toLoadingStatus(): LoadingStatus =
+    when (this) {
+        FetchState.Loading -> LOADING
+        is FetchResult.Failure -> FAILED
+        is FetchResult.Success -> PENDING
+    }
+
 // TODO: better name and signature
 data class FetchValue<out T>(
     val value: T,
@@ -45,11 +52,7 @@ operator fun <T> FetchValue<T>.plus(state: FetchState<T>): FetchValue<T> =
     }
 
 val FetchValue<*>.loadingStatus: LoadingStatus
-    get() = when (state) {
-        FetchState.Loading -> LOADING
-        is FetchResult.Success -> PENDING
-        is FetchResult.Failure -> FAILED
-    }
+    get() = state.toLoadingStatus()
 
 fun <T> Flow<T>.toFetchResultFlow(): Flow<FetchResult<T>> =
     map<T, FetchResult<T>> { FetchResult.Success(it) }
