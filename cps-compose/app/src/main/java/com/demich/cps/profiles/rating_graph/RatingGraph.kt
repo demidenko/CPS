@@ -173,13 +173,17 @@ private fun List<RatingChange>.closestOrNull(
     tap: Offset,
     tapRadius: Float
 ): RatingChange? {
-    val pos = minOfWithIndex {
+    val index = minOfWithIndex {
         val o = it.toGraphPoint().toCanvasPoint()
         (o - tap).getDistance()
     }.takeIf { it.value <= tapRadius }?.index ?: return null
-    val res = get(pos)
-    if (pos == 0 || res.oldRating != null) return res
-    return res.copy(oldRating = get(pos-1).rating)
+    return getProperly(index)
+}
+
+private fun List<RatingChange>.getProperly(index: Int): RatingChange {
+    val res = get(index)
+    if (index == 0 || res.oldRating != null) return res
+    return res.copy(oldRating = get(index-1).rating)
 }
 
 private fun ViewPortState.setViewPort(bounds: RatingGraphBounds) {
