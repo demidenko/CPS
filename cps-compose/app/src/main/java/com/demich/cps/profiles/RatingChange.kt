@@ -12,10 +12,8 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
-@Serializable
 data class RatingChange(
     val rating: Int,
     val date: Instant,
