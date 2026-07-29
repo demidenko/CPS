@@ -40,9 +40,9 @@ class AtCoderProfileManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(str: String): AtCoderUserInfo? =
+    override suspend fun getUserInfo(userId: String): AtCoderUserInfo? =
         try {
-            AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = str))
+            AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = userId))
         } catch (it: Throwable) {
             if (it.isPageNotFound) null
             else throw it

@@ -36,9 +36,9 @@ class DmojProfileManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(str: String): DmojUserInfo? =
+    override suspend fun getUserInfo(userId: String): DmojUserInfo? =
         try {
-            val res = DmojClient.getUser(handle = str)
+            val res = DmojClient.getUser(handle = userId)
             DmojUserInfo(handle = res.username, rating = res.rating)
         } catch (it: Throwable) {
             if (it.isPageNotFound) null

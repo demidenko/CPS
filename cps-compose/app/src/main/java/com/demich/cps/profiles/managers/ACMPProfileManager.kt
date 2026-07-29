@@ -26,11 +26,11 @@ class ACMPProfileManager :
 
     override fun isValidForUserId(char: Char): Boolean = char in '0'..'9'
 
-    override suspend fun getUserInfo(str: String): ACMPUserInfo? =
+    override suspend fun getUserInfo(userId: String): ACMPUserInfo? =
         try {
             ACMPParser().extractUserInfo(
-                source = ACMPClient.getUserPage(id = str.toInt()),
-                id = str
+                source = ACMPClient.getUserPage(id = userId.toInt()),
+                id = userId
             )
         } catch (it: Throwable) {
             if (it.isRedirect) null

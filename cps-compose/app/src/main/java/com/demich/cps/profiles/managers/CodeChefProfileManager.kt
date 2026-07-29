@@ -62,11 +62,11 @@ class CodeChefProfileManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(str: String): CodeChefUserInfo? =
+    override suspend fun getUserInfo(userId: String): CodeChefUserInfo? =
         try {
             CodeChefParser().extractUserInfo(
-                source = CodeChefClient.getUserPage(handle = str),
-                handle = str
+                source = CodeChefClient.getUserPage(handle = userId),
+                handle = userId
             )
         } catch (it: Throwable) {
             if (it.isRedirect) null

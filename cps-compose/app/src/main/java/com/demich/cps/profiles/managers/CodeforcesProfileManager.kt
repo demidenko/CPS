@@ -76,11 +76,11 @@ class CodeforcesProfileManager :
         else -> false
     }
 
-    override suspend fun getUserInfo(str: String): CodeforcesUserInfo? =
+    override suspend fun getUserInfo(userId: String): CodeforcesUserInfo? =
         try {
-            CodeforcesClient().getUser(handle = str, checkHistoricHandles = true).toUserInfo()
+            CodeforcesClient().getUser(handle = userId, checkHistoricHandles = true).toUserInfo()
         } catch (it: CodeforcesApiHandleNotFoundException) {
-            check(it.handle == str)
+            check(it.handle == userId)
             null
         }
 

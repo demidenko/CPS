@@ -20,11 +20,11 @@ class CListProfileManager :
     override val userIdTitle = "login"
     override val urlHomePage = ClistUrls.main
 
-    override suspend fun getUserInfo(str: String): ClistUserInfo? =
+    override suspend fun getUserInfo(userId: String): ClistUserInfo? =
         try {
             ClistParser().extractUserInfo(
-                source = ClistClient().getUserPage(login = str),
-                login = str
+                source = ClistClient().getUserPage(login = userId),
+                login = userId
             )
         } catch (it: Throwable) {
             if (it.isPageNotFound) null

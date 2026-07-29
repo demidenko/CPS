@@ -53,8 +53,8 @@ fun <U: RatedUserInfo> RatedProfileManager<U>.makeHandleSpan(profileResult: Prof
         AnnotatedString(text = profileResult.handle)
     }
 
-suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(str: String): ProfileResult<U> =
-    flow { emit(getUserInfo(str)) }.toFetchResultFlow().single().toProfileResult(str)
+suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(userId: String): ProfileResult<U> =
+    flow { emit(getUserInfo(userId)) }.toFetchResultFlow().single().toProfileResult(userId)
 
 fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
     when (this) {

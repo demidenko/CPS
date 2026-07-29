@@ -30,7 +30,7 @@ abstract class ProfileManager<U: UserInfo> {
 
     open fun isValidForUserId(char: Char): Boolean = true
 
-    abstract suspend fun getUserInfo(str: String): U?
+    abstract suspend fun getUserInfo(userId: String): U?
 
     abstract fun makeUserInfoSpan(userInfo: U, cpsColors: CPSColors): AnnotatedString
 
