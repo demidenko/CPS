@@ -107,7 +107,7 @@ private fun ColumnScope.DialogContent(
         ListTitle(text = "available:")
         LoadingContentBox(
             fetchState = { fetchState().map { it - selected().toSet() } },
-            failedText = { it.niceMessage ?: "Failed to load resources" },
+            failedText = { it.niceMessage ?: "Failed to get resources" },
             onRetry = onFetchRetry,
             modifier = Modifier
                 .padding(bottom = 5.dp)

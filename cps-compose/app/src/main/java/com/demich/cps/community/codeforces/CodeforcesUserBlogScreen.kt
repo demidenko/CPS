@@ -105,7 +105,7 @@ private fun CodeforcesUserBlogContent(
 ) {
     LoadingContentBox(
         fetchState = blogEntries,
-        failedText = { it.niceMessage ?: "Blog load error" },
+        failedText = { it.niceMessage ?: "Failed to get blog" },
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
     ) { blogEntries ->

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.ui.LoadingContentBox
@@ -66,7 +67,7 @@ fun RatingGraph(
     LoadingContentBox(
         fetchState = ratingChanges,
         onRetry = onRetry,
-        failedText = { "Failed to get rating history" },
+        failedText = { it.niceMessage ?: "Failed to get rating history" },
         modifier = modifier
             .heightIn(min = graphHeight)
             .fillMaxWidth()
