@@ -41,7 +41,7 @@ internal fun RatingGraphCanvas(
     viewPortState: ViewPortState,
     currentTime: Instant,
     filterType: RatingFilterType,
-    selectedRatingChange: RatingChange?,
+    selectedIndex: Int?,
     modifier: Modifier = Modifier
 ) {
     val cpsColors = cpsColors
@@ -66,7 +66,7 @@ internal fun RatingGraphCanvas(
 
     RatingGraphCanvas(
         ratingPoints = ratingPoints,
-        selectedPoint = selectedRatingChange?.toGraphPoint(),
+        selectedIndex = selectedIndex,
         markVerticals = markVerticals,
         getColor = colorsMap::getValue,
         viewPortState = viewPortState,
@@ -79,7 +79,7 @@ internal fun RatingGraphCanvas(
 @Composable
 private fun RatingGraphCanvas(
     ratingPoints: List<GraphPoint>,
-    selectedPoint: GraphPoint?,
+    selectedIndex: Int?,
     markVerticals: List<Instant>,
     getColor: (HandleColor) -> Color,
     viewPortState: ViewPortState,
@@ -107,6 +107,8 @@ private fun RatingGraphCanvas(
 
     val shadowLayer = rememberGraphicsLayer()
     val ratingPath = remember { Path() }
+
+    val selectedPoint: GraphPoint? = selectedIndex?.let { ratingPoints.getOrNull(selectedIndex) }
 
     Canvas(
         modifier = modifier

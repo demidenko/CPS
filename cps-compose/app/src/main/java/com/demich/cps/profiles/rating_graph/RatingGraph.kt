@@ -32,12 +32,10 @@ import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchState
-import com.demich.cps.utils.asSaver
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -112,7 +110,7 @@ private fun RatingGraphWithHeader(
     }
 
     //TODO: reset to null on ratings changes
-    var selectedRatingChange: RatingChange? by rememberSaveable(stateSaver = Json.asSaver()) {
+    var selectedIndex: Int? by rememberSaveable {
         mutableStateOf(null)
     }
 
@@ -121,8 +119,7 @@ private fun RatingGraphWithHeader(
     Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
             manager = manager,
-            header = selectedRatingChange
-                ?.let { RatingChangeHeader(it, rectangles) }
+            header = selectedIndex?.let { RatingChangeHeader(ratingChanges.getProperly(it), rectangles) }
                 ?: FilterHeader(filterType, ratingChanges, currentTime),
             onHeaderChange = { header ->
                 if (header is FilterHeader) {
@@ -144,7 +141,7 @@ private fun RatingGraphWithHeader(
             viewPortState = viewPortState,
             currentTime = currentTime,
             filterType = filterType,
-            selectedRatingChange = selectedRatingChange,
+            selectedIndex = selectedIndex,
             modifier = Modifier
                 .height(graphHeight)
                 .clip(shape)
@@ -157,7 +154,7 @@ private fun RatingGraphWithHeader(
                 .pointerInput(viewPortState, ratingChanges) {
                     detectTapGestures { tapPoint ->
                         viewPortState.projectorToCanvas {
-                            selectedRatingChange = ratingChanges.closestOrNull(
+                            selectedIndex = ratingChanges.indexOfClosestOrNull(
                                 tap = tapPoint,
                                 tapRadius = 24.dp.toPx()
                             )
@@ -169,16 +166,14 @@ private fun RatingGraphWithHeader(
 }
 
 context(projector: RectProjector)
-private fun List<RatingChange>.closestOrNull(
+private fun List<RatingChange>.indexOfClosestOrNull(
     tap: Offset,
     tapRadius: Float
-): RatingChange? {
-    val index = minOfWithIndex {
+): Int? =
+    minOfWithIndex {
         val o = it.toGraphPoint().toCanvasPoint()
         (o - tap).getDistance()
-    }.takeIf { it.value <= tapRadius }?.index ?: return null
-    return getProperly(index)
-}
+    }.takeIf { it.value <= tapRadius }?.index
 
 private fun List<RatingChange>.getProperly(index: Int): RatingChange {
     val res = get(index)
