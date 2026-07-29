@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.single
 
 sealed interface FetchState<out T> {
     data object Loading: FetchState<Nothing>
@@ -52,3 +53,6 @@ fun <T> Flow<T>.toFetchFlow(): Flow<FetchState<T>> =
 
 fun <T> fetchFlowOf(block: suspend () -> T): Flow<FetchState<T>> =
     flow { emit(block()) }.toFetchFlow()
+
+suspend fun <T> fetchResultOf(block: suspend () -> T): FetchResult<T> =
+    flow { emit(block()) }.toFetchResultFlow().single()

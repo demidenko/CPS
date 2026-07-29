@@ -12,9 +12,7 @@ import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.toFetchResultFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
+import com.demich.cps.utils.fetchResultOf
 
 fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
     ratingsUpperBounds
@@ -54,7 +52,7 @@ fun <U: RatedUserInfo> RatedProfileManager<U>.makeHandleSpan(profileResult: Prof
     }
 
 suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(userId: String): ProfileResult<U> =
-    flow { emit(getUserInfo(userId)) }.toFetchResultFlow().single().toProfileResult(userId)
+    fetchResultOf { getUserInfo(userId) }.toProfileResult(userId)
 
 fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
     when (this) {
