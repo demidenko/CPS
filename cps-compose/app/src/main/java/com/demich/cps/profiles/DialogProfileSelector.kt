@@ -77,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
@@ -243,7 +244,8 @@ private fun <U: UserInfo> profileFetchState(
                 emit(FetchValue(null))
                 if (userId.isBlank()) return@transformLatest
                 delay(requestDebounceDelay)
-                fetchFlowOf { withContext(Dispatchers.Default) { manager.getUserInfo(userId) } }
+                fetchFlowOf { manager.getUserInfo(userId) }
+                    .flowOn(Dispatchers.Default)
                     .collect {
                         when (it) {
                             is FetchState.Loading -> emit(FetchValue(null, it))
