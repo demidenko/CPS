@@ -54,6 +54,7 @@ internal enum class RatingFilterType {
 }
 
 //TODO: info comes from different sources (rating: vm, time: remember, selected: rememberSaveable)
+// move selected to vm
 
 @Composable
 fun RatingGraph(
@@ -96,22 +97,24 @@ private fun RatingGraphWithHeader(
 ) {
     require(ratingChanges.isNotEmpty())
 
-    //TODO: saveables not reset after ratings changes
     val viewPortState = rememberViewPortState(inflateHorizontal = 10.dp)
+    val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 
+    // TODO: carefully change to provide current time
     val currentTime = remember { getSystemTime() }
-    var filterType by rememberSaveable {
+
+    //TODO: reset on ratings changes
+    var filterType: RatingFilterType by rememberSaveable {
         viewPortState.setViewPort(
             createBounds(ratingChanges = ratingChanges, filterType = ALL, now = currentTime)
         )
-        mutableStateOf(RatingFilterType.ALL)
+        mutableStateOf(ALL)
     }
 
+    //TODO: reset to null on ratings changes
     var selectedRatingChange: RatingChange? by rememberSaveable(stateSaver = Json.asSaver()) {
         mutableStateOf(null)
     }
-
-    val rectangles = remember(manager) { RatingGraphRectangles(manager) }
 
     val animationScope = rememberCoroutineScope()
 
