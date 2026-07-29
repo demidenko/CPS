@@ -187,8 +187,8 @@ internal suspend fun ViewPortState.detectTransformGestures(
 }
 
 private fun Size.maxScale(minWidth: Float, minHeight: Float): Float {
-    require(minWidth > 0)
-    require(minHeight > 0)
+    require(minWidth > 0) { "minWidth must be positive" }
+    require(minHeight > 0) { "minHeight must be positive" }
     // |width| / scale >= minWidth
     // |width| / minWidth >= scale
     // |height| / scale >= minHeight

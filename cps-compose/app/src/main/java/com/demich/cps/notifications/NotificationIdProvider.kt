@@ -4,7 +4,7 @@ private class Allocator {
     private var firstUnused = Int.MIN_VALUE
     operator fun invoke(size: Int) =
         firstUnused.also {
-            require(size > 0)
+            require(size > 0) { "size must be positive" }
             //it + size <= Int.MAX_VALUE
             require(it <= Int.MAX_VALUE - size)
             firstUnused += size

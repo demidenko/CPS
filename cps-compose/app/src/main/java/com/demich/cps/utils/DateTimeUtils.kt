@@ -19,7 +19,7 @@ fun Instant.truncateBySeconds(seconds: Long): Instant {
 }
 
 fun Clock.flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
-    require(seconds > 0)
+    require(seconds > 0) { "seconds must be positive" }
     return flow {
         val period = seconds.seconds
         while (true) {
