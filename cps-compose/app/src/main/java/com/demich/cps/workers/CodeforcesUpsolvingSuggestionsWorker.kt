@@ -96,7 +96,7 @@ private suspend inline fun getContestUpsolvingSuggestions(
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
-    val (userSubmissions, acceptedStats) = awaitPair(
+    val (contestSubmissions, acceptedStats) = awaitPair(
         blockFirst = {
             api.getContestSubmissions(contestId = contestId, handle = handle)
         },
@@ -107,7 +107,7 @@ private suspend inline fun getContestUpsolvingSuggestions(
 
     makeContestUpsolvingSuggestions(
         rank = rank,
-        userSubmissions = userSubmissions,
+        contestSubmissions = contestSubmissions,
         acceptedStats = acceptedStats,
         contestSuggested = suggestedProblems.filter { it.contestId == contestId },
         toRemoveAsSolved = toRemoveAsSolved,
@@ -117,18 +117,20 @@ private suspend inline fun getContestUpsolvingSuggestions(
 
 private inline fun makeContestUpsolvingSuggestions(
     rank: Int,
-    userSubmissions: List<CodeforcesSubmission>,
+    contestSubmissions: List<CodeforcesSubmission>,
     acceptedStats: List<Pair<CodeforcesProblem, Int>>,
     contestSuggested: Collection<CodeforcesProblem>,
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
-    val solvedIndices = userSubmissions
+    val solvedIndices = contestSubmissions
         .filter { it.verdict == OK }
         .mapToSet { it.problem.index }
 
-//    check(acceptedStats.mapToSet { it.first.index }.containsAll(solvedIndices))
-    check(solvedIndices.all { index -> acceptedStats.any { it.first.index == index } })
+//    require(acceptedStats.mapToSet { it.first.index }.containsAll(solvedIndices))
+    require(solvedIndices.all { index -> acceptedStats.any { it.first.index == index } }) {
+        "acceptedStats doesn't contains all solvedIndices"
+    }
 
     contestSuggested.filter { it.index in solvedIndices }.let { solved ->
         if (solved.isNotEmpty()) toRemoveAsSolved(solved)
