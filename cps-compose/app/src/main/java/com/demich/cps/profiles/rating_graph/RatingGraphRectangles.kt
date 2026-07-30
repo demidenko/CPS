@@ -29,7 +29,7 @@ internal class RatingGraphRectangles(
         }
         addBounds(x = Instant.DISTANT_FUTURE, bounds = manager.ratingsUpperBounds)
     }.apply {
-        check(isSortedWith(compareBy<Pair<GraphPoint, HandleColor>> { it.first.x }.thenBy { it.first.y }))
+        check(isSortedWith(compareBy({ it.first.x }, { it.first.y })))
     }
 
     fun getHandleColor(point: GraphPoint): HandleColor =
@@ -42,7 +42,7 @@ internal class RatingGraphRectangles(
         var prevX: Instant = Instant.DISTANT_PAST
         upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
-            upperBounds.forEach(l, r) { (point, handleColor) ->
+            upperBounds.subList(l, r).forEach { (point, handleColor) ->
                 add(Triple(GraphPoint(prevX, prevY), point, handleColor))
                 prevY = point.y
             }
@@ -52,13 +52,5 @@ internal class RatingGraphRectangles(
 
     inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
         rectangles.forEach { block(it.first, it.second, it.third) }
-    }
-}
-
-private inline fun <T> List<T>.forEach(from: Int, to: Int = size, block: (T) -> Unit) {
-    var i = from
-    while (i < to) {
-        block(get(i))
-        ++i
     }
 }
