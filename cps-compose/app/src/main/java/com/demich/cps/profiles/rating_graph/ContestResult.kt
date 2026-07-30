@@ -64,7 +64,7 @@ private fun ContestResult(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = ratingChange.title,
+                text = ratingChange.contestTitle,
                 fontSize = titleFontSize,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -131,7 +131,7 @@ private fun ContestResultTest(
     val rating = 2150
     ContestResult(
         ratingChange = RatingChange(
-            title = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
+            contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
             date = Instant.fromEpochSeconds(1e9.toLong()),
             rating = rating,
             rank = 345,

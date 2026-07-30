@@ -11,10 +11,10 @@ import kotlin.time.Instant
 
 data class RatingChange(
     val rating: Int,
+    val contestTitle: String,
     val date: Instant,
-    val title: String = "",
-    val oldRating: Int? = null,
     val rank: Int,
+    val oldRating: Int? = null,
     val url: String? = null
 )
 
@@ -26,7 +26,7 @@ internal fun CodeforcesRatingChange.toRatingChange() =
         rating = newRating,
         oldRating = oldRating,
         date = ratingUpdateTime,
-        title = contestName,
+        contestTitle = contestName,
         rank = rank,
         url = CodeforcesUrls.contestsWith(handle)
     )
@@ -37,7 +37,7 @@ internal fun AtCoderRatingChange.toRatingChange(handle: String) =
         oldRating = OldRating,
         rank = Place,
         date = EndTime,
-        title = ContestName,
+        contestTitle = ContestName,
         url = url(handle)
     )
 
@@ -45,7 +45,7 @@ internal fun CodeChefRatingChange.toRatingChange() =
     RatingChange(
         rating = rating.toInt(),
         rank = rank.toInt(),
-        title = name,
+        contestTitle = name,
         date = date()
     )
 
@@ -53,6 +53,6 @@ internal fun DmojRatingChange.toRatingChange() =
     RatingChange(
         rating = rating,
         date = Instant.fromEpochMilliseconds(timestamp.toLong()),
-        title = label,
+        contestTitle = label,
         rank = ranking
     )
