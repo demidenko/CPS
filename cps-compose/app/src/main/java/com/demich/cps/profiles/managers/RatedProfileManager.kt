@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.HandleColorBound
 import com.demich.cps.profiles.RatingChange
@@ -21,7 +20,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
     abstract val ratingsUpperBounds: List<HandleColorBound>
 
-    abstract fun originalColor(handleColor: HandleColor): Color
+    abstract fun originalColor(handleColor: HandleColor): Color?
 
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
@@ -58,20 +57,8 @@ interface RatingRevolutionsProvider {
     val ratingUpperBoundRevolutions: List<Pair<Instant, List<HandleColorBound>>>
 }
 
-private class IllegalHandleColor(
-    platform: Platform,
-    color: HandleColor
-): IllegalArgumentException("platform ${platform.name} does not support handle color ${color.name}")
-
-fun RatedProfileManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
-    throw IllegalHandleColor(platform = platform, color = handleColor)
+fun RatedProfileManager<*>.originalColorOrThrow(handleColor: HandleColor): Color =
+    originalColor(handleColor = handleColor) ?: throw IllegalArgumentException("platform $platform does not support handle color $handleColor")
 
 fun RatedProfileManager<*>.availableHandleColors(): List<HandleColor> =
-    HandleColor.entries.filter {
-        try {
-            val _ = originalColor(it)
-            true
-        } catch (_: IllegalHandleColor) {
-            false
-        }
-    }
+    HandleColor.entries.filter { originalColor(it) != null }

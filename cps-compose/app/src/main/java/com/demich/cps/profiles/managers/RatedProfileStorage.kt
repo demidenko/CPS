@@ -69,7 +69,7 @@ abstract class RatedProfileStorage<U: RatedUserInfo>(
             contentTitle = "$handle new rating: ${ratingChange.rating}"
             contentText = "${difference.toSignedString()} (rank: ${ratingChange.rank})"
             subText = "${manager.platform} rating changes"
-            color = manager.originalColor(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
+            color = manager.originalColorOrThrow(manager.getHandleColor(ratingChange.rating)) //TODO not original but cpsColors
             ratingChange.url?.let { url = it }
             time = ratingChange.date
         }

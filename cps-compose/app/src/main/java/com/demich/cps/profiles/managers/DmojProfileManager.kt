@@ -66,7 +66,7 @@ class DmojProfileManager :
 
     override val rankedHandleColors = HandleColor.rankedDmoj
 
-    override fun originalColor(handleColor: HandleColor) =
+    override fun originalColor(handleColor: HandleColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF999999)
             GREEN -> Color(0xff00a900)
@@ -74,7 +74,7 @@ class DmojProfileManager :
             VIOLET -> Color(0xFF800080)
             ORANGE -> Color(0xFFFFB100)
             RED -> Color(0xFFEE0000)
-            else -> illegalHandleColorError(handleColor)
+            else -> null
         }
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString {

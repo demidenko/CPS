@@ -70,7 +70,7 @@ class AtCoderProfileManager :
 
     override val rankedHandleColors = HandleColor.rankedAtCoder
 
-    override fun originalColor(handleColor: HandleColor): Color =
+    override fun originalColor(handleColor: HandleColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF808080)
             BROWN -> Color(0xFF804000)
@@ -80,7 +80,7 @@ class AtCoderProfileManager :
             YELLOW -> Color(0xFFC0C000)
             ORANGE -> Color(0xFFFF8000)
             RED -> Color(0xFFFF0000)
-            else -> illegalHandleColorError(handleColor)
+            else -> null
         }
 
     @Composable

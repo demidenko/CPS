@@ -98,7 +98,7 @@ class CodeforcesProfileManager :
 
     override val rankedHandleColors = HandleColor.rankedCodeforces
 
-    override fun originalColor(handleColor: HandleColor): Color =
+    override fun originalColor(handleColor: HandleColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF808080)
             GREEN -> Color(0xFF008000)
@@ -108,7 +108,7 @@ class CodeforcesProfileManager :
             YELLOW -> Color(0xFFBBBB00)
             ORANGE -> Color(0xFFFF8C00)
             RED -> Color(0xFFFF0000)
-            else -> illegalHandleColorError(handleColor)
+            else -> null
         }
 
     fun makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors): AnnotatedString =

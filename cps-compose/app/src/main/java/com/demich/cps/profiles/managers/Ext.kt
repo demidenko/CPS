@@ -21,7 +21,7 @@ fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
 
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(handleColor: HandleColor): Color =
-    if (useOriginalHandleColors) manager.originalColor(handleColor)
+    if (useOriginalHandleColors) manager.originalColorOrThrow(handleColor)
     else handleColor(handleColor)
 
 context(manager: RatedProfileManager<*>)

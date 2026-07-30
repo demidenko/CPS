@@ -95,7 +95,7 @@ class CodeChefProfileManager :
         )
     }
 
-    override fun originalColor(handleColor: HandleColor): Color =
+    override fun originalColor(handleColor: HandleColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF666666)
             GREEN -> Color(0xFF1E7D22)
@@ -104,7 +104,7 @@ class CodeChefProfileManager :
             YELLOW -> Color(255, 191, 0)
             ORANGE -> Color(255, 127, 0)
             RED -> Color(208,1,27)
-            else -> illegalHandleColorError(handleColor)
+            else -> null
         }
 
     override val rankedHandleColors = HandleColor.rankedCodeChef
