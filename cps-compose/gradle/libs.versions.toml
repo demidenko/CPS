@@ -22,7 +22,7 @@ room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
 
 datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/datastore
 
-jsoup = "1.22.2" # https://github.com/jhy/jsoup/releases
+jsoup = "1.23.1" # https://github.com/jhy/jsoup/releases
 jspecify = "1.0.0"
 
 resaca = "5.1.3" # https://github.com/sebaslogen/resaca/releases
