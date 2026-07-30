@@ -133,14 +133,14 @@ private class BlogLoadingViewModel: ViewModel() {
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
 
-    // TODO: context leak
-    fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) =
-        blogEntriesLoader.executeFlow(key = Pair(handle, key)) {
+    fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) = blogEntriesLoader.run {
+        val repository = context.followRepository
+        executeFlow(key = Pair(handle, key)) {
             val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
             emitAll(
                 combine(
                     flow = flow {
-                        emit(context.followRepository.getAndReloadBlogEntries(handle).getOrThrow())
+                        emit(repository.getAndReloadBlogEntries(handle).getOrThrow())
                     },
                     flow2 = flow {
                         emit(null)
@@ -153,4 +153,5 @@ private class BlogLoadingViewModel: ViewModel() {
                 }
             )
         }
+    }
 }
