@@ -2,8 +2,8 @@ package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogReadNotAllowedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.getProfile
@@ -96,25 +96,17 @@ private suspend fun CodeforcesApi.getBlogEntries(
     handle: String
 ): GetBlogEntriesResult {
     runCatching {
-        getUserBlogEntriesChecked(handle = handle)
+        getUserBlogEntriesRecovered(handle = handle)
     }.onFailure {
         if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
             val result = getUserCatching(handle = handle, checkHistoricHandles = true)
             val profile = result.toProfileResult(handle)
             return GetBlogEntriesResult(
                 newProfile = profile,
-                blogEntries = result.mapCatching { getUserBlogEntriesChecked(handle = profile.handle) }
+                blogEntries = result.mapCatching { getUserBlogEntriesRecovered(handle = profile.handle) }
             )
         }
     }.also {
         return GetBlogEntriesResult(newProfile = null, blogEntries = it)
-    }
-}
-
-private suspend fun CodeforcesApi.getUserBlogEntriesChecked(handle: String): List<CodeforcesBlogEntry> {
-    return try {
-        getUserBlogEntries(handle = handle)
-    } catch (e: CodeforcesApiBlogReadNotAllowedException) {
-        emptyList()
     }
 }
