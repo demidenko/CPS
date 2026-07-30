@@ -24,10 +24,5 @@ data class AtCoderRatingChange(
     @Serializable(with = InstantAsSecondsSerializer::class)
     val EndTime: Instant,
     val ContestName: String,
-    private val StandingsUrl: String //relative
-) {
-    fun contestId(): String {
-        val s = StandingsUrl.removePrefix("/contests/")
-        return s.substring(0, s.indexOf('/'))
-    }
-}
+    val StandingsUrl: String //relative
+)

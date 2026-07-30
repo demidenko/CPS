@@ -1,11 +1,11 @@
 package com.demich.cps.profiles
 
 import com.demich.cps.platforms.api.atcoder.AtCoderRatingChange
-import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.api.codechef.CodeChefRatingChange
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.dmoj.DmojRatingChange
+import com.demich.cps.platforms.utils.atcoder.url
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -43,7 +43,7 @@ internal fun AtCoderRatingChange.toRatingChange(handle: String) =
         rank = Place,
         date = EndTime,
         title = ContestName,
-        url = AtCoderUrls.userContestResult(handle, contestId())
+        url = url(handle)
     )
 
 internal fun CodeChefRatingChange.toRatingChange() =
