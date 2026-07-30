@@ -1,8 +1,8 @@
 package com.demich.cps.utils
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
@@ -23,7 +23,7 @@ inline fun <T, R> FetchState<T>.map(transform: (T) -> R): FetchState<R> {
     }
 }
 
-fun <T> Result<T>.toFetchResult(): FetchResult<T> =
+fun <T> Result<T>.asFetchResult(): FetchResult<T> =
     fold(
         onSuccess = { FetchResult.Success(it) },
         onFailure = { FetchResult.Failure(it) }
@@ -36,23 +36,21 @@ fun FetchState<*>.toLoadingStatus(): LoadingStatus =
         is FetchResult.Success -> PENDING
     }
 
+private fun <T> Flow<T>.toResultFlow(): Flow<Result<T>> =
+    map { Result.success(it) }
+        .catch { emit(Result.failure(it)) }
+
 fun <T> Flow<T>.toFetchResultFlow(): Flow<FetchResult<T>> =
-    map<T, FetchResult<T>> { FetchResult.Success(it) }
-        .catch {
-            emit(FetchResult.Failure(it))
-        }
+    toResultFlow().map { it.asFetchResult() }
 
 fun <T> Flow<T>.toFetchFlow(): Flow<FetchState<T>> =
-    map<T, FetchState<T>> { FetchResult.Success(it) }
-        .onStart {
+    toFetchResultFlow()
+        .onStart<FetchState<T>> {
             emit(FetchState.Loading)
-        }
-        .catch {
-            emit(FetchResult.Failure(it))
         }
 
 fun <T> fetchFlowOf(block: suspend () -> T): Flow<FetchState<T>> =
-    flow { emit(block()) }.toFetchFlow()
+    block.asFlow().toFetchFlow()
 
 suspend fun <T> fetchResultOf(block: suspend () -> T): FetchResult<T> =
-    flow { emit(block()) }.toFetchResultFlow().single()
+    block.asFlow().toFetchResultFlow().single()
