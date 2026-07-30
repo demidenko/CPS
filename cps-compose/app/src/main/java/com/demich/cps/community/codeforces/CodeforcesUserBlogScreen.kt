@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -33,6 +34,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -134,12 +136,15 @@ private class BlogLoadingViewModel: ViewModel() {
     // TODO: context leak
     fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) =
         blogEntriesLoader.executeFlow(key = Pair(handle, key)) {
+            val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
             emitAll(
                 combine(
-                    flow = flow { emit(context.followRepository.getAndReloadBlogEntries(handle).getOrThrow()) },
+                    flow = flow {
+                        emit(context.followRepository.getAndReloadBlogEntries(handle).getOrThrow())
+                    },
                     flow2 = flow {
                         emit(null)
-                        emit(CodeforcesClient().getRealColorTagOrNull(handle))
+                        emit(colorTagDeferred.await())
                     }
                 ) { blogEntries, colorTag ->
                     blogEntries.map {
