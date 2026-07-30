@@ -32,8 +32,7 @@ internal inline fun Element.classNames(block: (String) -> Unit) {
 }
 
 internal inline fun Element.classNameFirstOrNull(predicate: (String) -> Boolean): String? {
-    // return classNames().firstOrNull(predicate)
-    // classNames() is terribly inefficient so do manually
+    // return classList().firstOrNull(predicate)
     classNames { if (predicate(it)) return it }
     return null
 }
