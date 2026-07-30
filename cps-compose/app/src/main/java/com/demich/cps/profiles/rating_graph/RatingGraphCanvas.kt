@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.availableHandleColors
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.geom.toOffset
@@ -43,22 +42,17 @@ internal fun RatingGraphCanvas(
     selectedIndex: Int?,
     modifier: Modifier = Modifier
 ) {
-    val cpsColors = cpsColors
-    val colorsMap = remember(manager, cpsColors) {
-        manager.run {
-            availableHandleColors().associateWith { cpsColors.colorFor(handleColor = it) }
-        }
-    }
-
     val ratingPoints = remember(ratingChanges) {
         ratingChanges.map { it.toGraphPoint() }.sortedBy { it.x }
     }
+
+    val cpsColors = cpsColors
 
     RatingGraphCanvas(
         ratingPoints = ratingPoints,
         selectedIndex = selectedIndex,
         markVerticals = markVerticals,
-        getColor = colorsMap::getValue,
+        getColor = { context(manager) { cpsColors.colorFor(handleColor = it) } },
         viewPortState = viewPortState,
         rectangles = rectangles,
         lineColor = Color.Black,
@@ -91,8 +85,8 @@ private fun RatingGraphCanvas(
 
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
-    val pointsWithColors = remember(ratingPoints, rectangles, getColor) {
-        ratingPoints.map { it to getColor(rectangles.getHandleColor(it)) }
+    val pointsWithColors = remember(ratingPoints, rectangles) {
+        ratingPoints.map { it to rectangles.getHandleColor(it) }
     }
 
     val shadowLayer = rememberGraphicsLayer()
@@ -152,10 +146,10 @@ private fun RatingGraphCanvas(
                 )
 
                 //rating points
-                pointsWithColors.forEach { (point, color) ->
+                pointsWithColors.forEach { (point, handleColor) ->
                     drawPoint(
                         center = point.toCanvasPoint(),
-                        color = color,
+                        color = getColor(handleColor),
                         borderColor = lineColor,
                         radius = circleRadius,
                         borderWidth = circleBorderWidth,
