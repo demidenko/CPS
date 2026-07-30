@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.HandleColorBound
 import com.demich.cps.profiles.RatingChange
@@ -52,14 +53,25 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
 }
 
-
-fun RatedProfileManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
-    throw IllegalArgumentException("Manager ${platform.name} does not support color ${handleColor.name}")
-
-fun RatedProfileManager<*>.availableHandleColors(): List<HandleColor> =
-    HandleColor.entries.filter { runCatching { originalColor(it) }.isSuccess }
-
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
     val ratingUpperBoundRevolutions: List<Pair<Instant, List<HandleColorBound>>>
 }
+
+private class IllegalHandleColor(
+    platform: Platform,
+    color: HandleColor
+): IllegalArgumentException("platform ${platform.name} does not support handle color ${color.name}")
+
+fun RatedProfileManager<*>.illegalHandleColorError(handleColor: HandleColor): Nothing =
+    throw IllegalHandleColor(platform = platform, color = handleColor)
+
+fun RatedProfileManager<*>.availableHandleColors(): List<HandleColor> =
+    HandleColor.entries.filter {
+        try {
+            val _ = originalColor(it)
+            true
+        } catch (_: IllegalHandleColor) {
+            false
+        }
+    }
