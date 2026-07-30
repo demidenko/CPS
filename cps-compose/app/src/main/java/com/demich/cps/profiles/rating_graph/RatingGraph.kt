@@ -114,6 +114,15 @@ private fun RatingGraphWithHeader(
         mutableStateOf(null)
     }
 
+    val markVerticals: List<Instant> = remember(filterType, ratingChanges, currentTime) {
+        if (filterType == ALL || ratingChanges.size < 2) emptyList()
+        else {
+            createBounds(ratingChanges, filterType, currentTime).run {
+                listOf(startTime, endTime)
+            }
+        }
+    }
+
     val animationScope = rememberCoroutineScope()
 
     Column(modifier = Modifier.background(cpsColors.background)) {
@@ -139,8 +148,7 @@ private fun RatingGraphWithHeader(
             manager = manager,
             rectangles = rectangles,
             viewPortState = viewPortState,
-            currentTime = currentTime,
-            filterType = filterType,
+            markVerticals = markVerticals,
             selectedIndex = selectedIndex,
             modifier = Modifier
                 .height(graphHeight)

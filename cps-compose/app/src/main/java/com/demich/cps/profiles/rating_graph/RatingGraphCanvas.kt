@@ -39,8 +39,7 @@ internal fun RatingGraphCanvas(
     manager: RatedProfileManager<*>,
     rectangles: RatingGraphRectangles,
     viewPortState: ViewPortState,
-    currentTime: Instant,
-    filterType: RatingFilterType,
+    markVerticals: List<Instant>,
     selectedIndex: Int?,
     modifier: Modifier = Modifier
 ) {
@@ -48,15 +47,6 @@ internal fun RatingGraphCanvas(
     val colorsMap = remember(manager, cpsColors) {
         manager.run {
             availableHandleColors().associateWith { cpsColors.colorFor(handleColor = it) }
-        }
-    }
-
-    val markVerticals: List<Instant> = remember(filterType, ratingChanges, currentTime) {
-        if (filterType == ALL || ratingChanges.size < 2) emptyList()
-        else {
-            createBounds(ratingChanges, filterType, currentTime).run {
-                listOf(startTime, endTime)
-            }
         }
     }
 
