@@ -6,12 +6,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.dmoj.DmojRatingChange
 import com.demich.cps.platforms.utils.atcoder.url
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.char
-import kotlinx.datetime.toInstant
+import com.demich.cps.platforms.utils.date
 import kotlin.time.Instant
 
 data class RatingChange(
@@ -51,11 +46,7 @@ internal fun CodeChefRatingChange.toRatingChange() =
         rating = rating.toInt(),
         rank = rank.toInt(),
         title = name,
-        date = LocalDateTime.Format {
-            date(LocalDate.Formats.ISO)
-            char(' ')
-            time(LocalTime.Formats.ISO)
-        }.parse(end_date).toInstant(TimeZone.of("IST"))
+        date = date()
     )
 
 internal fun DmojRatingChange.toRatingChange() =

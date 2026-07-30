@@ -1,6 +1,14 @@
 package com.demich.cps.platforms.utils
 
+import com.demich.cps.platforms.api.codechef.CodeChefRatingChange
 import com.demich.cps.profiles.userinfo.CodeChefUserInfo
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 class CodeChefParser {
     fun extractUserInfo(source: String, handle: String): CodeChefUserInfo =
@@ -21,3 +29,10 @@ class CodeChefParser {
             )
         }
 }
+
+fun CodeChefRatingChange.date(): Instant =
+    LocalDateTime.Format {
+        date(LocalDate.Formats.ISO)
+        char(' ')
+        time(LocalTime.Formats.ISO)
+    }.parse(end_date).toInstant(TimeZone.of("IST"))
