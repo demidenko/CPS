@@ -40,7 +40,11 @@ internal fun ContestResult(
     modifier: Modifier = Modifier
 ) {
     ContestResult(
-        ratingChange = ratingChange,
+        rating = ratingChange.rating,
+        change = ratingChange.run { if (oldRating == null) null else ratingDiff() },
+        contestTitle = ratingChange.contestTitle,
+        date = ratingChange.date,
+        rank = ratingChange.rank,
         ratingColor = manager.colorFor(handleColor = rectangles.getHandleColor(ratingChange.toGraphPoint())),
         modifier = modifier
     )
@@ -48,7 +52,11 @@ internal fun ContestResult(
 
 @Composable
 private fun ContestResult(
-    ratingChange: RatingChange,
+    rating: Int,
+    change: Int?,
+    contestTitle: String,
+    date: Instant,
+    rank: Int,
     ratingColor: Color,
     modifier: Modifier = Modifier,
     titleFontSize: TextUnit = 18.sp,
@@ -64,7 +72,7 @@ private fun ContestResult(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = ratingChange.contestTitle,
+                text = contestTitle,
                 fontSize = titleFontSize,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -72,9 +80,7 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = with(ratingChange) {
-                    date.formatRatingChangeDate() + "  rank: $rank"
-                },
+                text = date.formatRatingChangeDate() + "  rank: $rank",
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
             )
@@ -84,14 +90,14 @@ private fun ContestResult(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = ratingChange.rating.toString(),
+                text = rating.toString(),
                 fontSize = ratingFontSize,
                 fontWeight = FontWeight.Bold,
                 color = ratingColor,
             )
-            if (ratingChange.oldRating != null) {
+            if (change != null) {
                 RatingChange(
-                    change = ratingChange.ratingDiff(),
+                    change = change,
                     fontSize = subTitleFontSize
                 )
             }
@@ -130,13 +136,11 @@ private fun ContestResultTest(
 ) {
     val rating = 2150
     ContestResult(
-        ratingChange = RatingChange(
-            contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
-            date = Instant.fromEpochSeconds(1e9.toLong()),
-            rating = rating,
-            rank = 345,
-            oldRating = if (change != null) rating - change else null
-        ),
+        rating = rating,
+        change = change,
+        contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
+        date = Instant.fromEpochSeconds(1e9.toLong()),
+        rank = 345,
         ratingColor = cpsColors.handleColor(handleColor = handleColor),
         modifier = Modifier
             .background(cpsColors.backgroundAdditional)
