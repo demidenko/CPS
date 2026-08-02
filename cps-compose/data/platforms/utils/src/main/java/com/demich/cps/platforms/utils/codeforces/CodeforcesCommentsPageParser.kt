@@ -13,7 +13,8 @@ import kotlin.time.Instant
 
 class CodeforcesCommentsPageParser:
     CodeforcesCommunityPageParser(),
-    CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl()
+    CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl(),
+    CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl()
 {
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")

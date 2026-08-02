@@ -42,10 +42,16 @@ internal class CodeforcesDivInfoSelectorImpl: CodeforcesDivInfoSelector {
     override fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
 }
 
-abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
-    private val evaluatorHumanTime = Evaluator.Class("format-humantime")
-    protected fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
+internal interface CodeforcesHumanTimeSelector: CodeforcesPageParser {
+    fun Element.expectHumanTime(): Element
+}
 
+internal class CodeforcesHumanTimeSelectorImpl: CodeforcesHumanTimeSelector {
+    private val evaluatorHumanTime = Evaluator.Class("format-humantime")
+    override fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
+}
+
+abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
     private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", blogEntryHrefPrefix)
     protected fun Element.expectBlogEntryHref(): Element = expectFirst(evaluatorHrefBlogEntry)
 }
