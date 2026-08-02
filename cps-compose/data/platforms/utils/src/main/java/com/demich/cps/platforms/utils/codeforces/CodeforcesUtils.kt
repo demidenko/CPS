@@ -10,14 +10,12 @@ private val evaluatorRatedUser = Evaluator.Class("rated-user")
 private fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
 
 
-suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String): CodeforcesColorTag? {
-    val page = runCatching { getUserPage(handle) }.getOrElse { return null }
-    return page.parseDocument()
+suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String): CodeforcesColorTag? =
+    getUserPage(handle).parseDocument()
         .selectFirst("div.userbox")
         ?.selectRatedUser()
         ?.extractRatedUser()
         ?.colorTag
-}
 
 suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Sequence<CodeforcesHandle> =
     getHandleSuggestionsPage(str)

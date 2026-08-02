@@ -31,6 +31,7 @@ import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
+import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
@@ -144,7 +145,8 @@ private class BlogLoadingViewModel: ViewModel() {
                     },
                     flow2 = flow {
                         emit(null)
-                        emit(colorTagDeferred.await())
+                        val result = fetchResultOf { colorTagDeferred.await() }
+                        if (result is FetchResult.Success) emit(result.value)
                     }
                 ) { blogEntries, colorTag ->
                     blogEntries.map {
