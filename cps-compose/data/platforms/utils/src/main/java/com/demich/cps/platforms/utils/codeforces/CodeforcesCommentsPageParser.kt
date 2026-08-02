@@ -61,9 +61,11 @@ class CodeforcesCommentsPageParser:
         )
     }
 
+    private fun Document.selectComments() =
+        expectContent().selectSequence(Evaluator.Class("comment-table"))
 
     internal fun extractComments(document: Document): Sequence<Result<CodeforcesWebComment>> =
-        document.expectContent().selectSequence(".comment-table")
+        document.selectComments()
             .map { runCatching { it.extractComment() } }
 
     fun parseComments(page: String): List<CodeforcesWebComment> =

@@ -58,8 +58,11 @@ class CodeforcesBlogEntriesPageParser:
         )
     }
 
+    private fun Document.selectTopics() =
+        expectContent().selectSequence(EvaluatorTagWithClass(tag = "div", className = "topic"))
+
     internal fun extractBlogEntries(document: Document): Sequence<Result<CodeforcesWebBlogEntry>> =
-        document.expectContent().selectSequence("div.topic")
+        document.selectTopics()
             .map { runCatching { it.extractBlogEntry() } }
 
     fun parseBlogEntries(page: String): List<CodeforcesWebBlogEntry> =

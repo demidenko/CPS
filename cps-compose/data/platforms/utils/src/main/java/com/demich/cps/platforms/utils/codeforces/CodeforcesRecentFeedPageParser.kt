@@ -1,5 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
+import com.demich.cps.platforms.utils.EvaluatorTagWithClass
+import com.demich.cps.platforms.utils.expectFirst
 import com.demich.cps.platforms.utils.href
 import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.selectSequence
@@ -28,9 +30,13 @@ class CodeforcesRecentFeedPageParser:
         )
     }
 
-    internal fun extractRecentFeedBlogEntries(document: Document): Sequence<Result<CodeforcesRecentFeedBlogEntry>> =
-        document.expectSidebar().expectFirst("div.recent-actions")
+    private fun Document.selectRecentFeedBlogEntries() =
+        expectSidebar()
+            .expectFirst(EvaluatorTagWithClass(tag = "div", className = "recent-actions"))
             .selectSequence("li")
+
+    internal fun extractRecentFeedBlogEntries(document: Document): Sequence<Result<CodeforcesRecentFeedBlogEntry>> =
+        document.selectRecentFeedBlogEntries()
             .map { runCatching { it.extractRecentBlogEntry() } }
 
     fun parseRecentFeedBlogEntries(page: String): List<CodeforcesRecentFeedBlogEntry> =

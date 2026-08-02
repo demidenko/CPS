@@ -1,6 +1,7 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.utils.EvaluatorTagWithClass
+import com.demich.cps.platforms.utils.EvaluatorTagWithId
 import com.demich.cps.platforms.utils.expectFirst
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -12,10 +13,10 @@ internal interface CodeforcesPageParser {
 
 
 context(parser: CodeforcesPageParser)
-internal fun Document.expectContent(): Element = expectFirst("div.content-with-sidebar")
+internal fun Document.expectContent(): Element = expectFirst(EvaluatorTagWithClass(tag = "div", className = "content-with-sidebar"))
 
 context(parser: CodeforcesPageParser)
-internal fun Document.selectSidebar(): Element? = selectFirst("div#sidebar")
+internal fun Document.selectSidebar(): Element? = selectFirst(EvaluatorTagWithId(tag = "div", id = "sidebar"))
 
 context(parser: CodeforcesPageParser)
 internal fun Document.expectSidebar(): Element = requireNotNull(selectSidebar())
