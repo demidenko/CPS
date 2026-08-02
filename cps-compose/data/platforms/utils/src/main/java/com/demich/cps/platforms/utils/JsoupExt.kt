@@ -50,5 +50,15 @@ internal class EvaluatorTagWithClass(val tag: String, val className: String): Ev
     override fun cost(): Int = 8
 }
 
+internal class EvaluatorTagWithId(val tag: String, val id: String): Evaluator() {
+    override fun matches(root: Element, element: Element): Boolean {
+        return element.nameIs(tag) && element.id() == id
+    }
+
+    override fun toString(): String = "$tag#$id"
+
+    override fun cost(): Int = 8
+}
+
 internal fun EvaluatorNthTag(tag: String, index: Int): Evaluator =
     Selector.evaluatorOf("$tag:eq($index)")
