@@ -12,9 +12,10 @@ import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
 class CodeforcesCommentsPageParser:
-    CodeforcesCommunityPageParser(),
+    CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl(),
     CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl(),
-    CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl()
+    CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl(),
+    CodeforcesHrefBlogEntrySelector by CodeforcesHrefBlogEntrySelectorImpl()
 {
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")

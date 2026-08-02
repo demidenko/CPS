@@ -13,7 +13,7 @@ import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
 class CodeforcesBlogEntriesPageParser:
-    CodeforcesCommunityPageParser(),
+    CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl(),
     CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl(),
     CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl()
 {

@@ -7,7 +7,10 @@ import com.demich.cps.platforms.utils.values
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
-class CodeforcesRecentFeedPageParser: CodeforcesCommunityPageParser() {
+class CodeforcesRecentFeedPageParser:
+    CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl(),
+    CodeforcesHrefBlogEntrySelector by CodeforcesHrefBlogEntrySelectorImpl()
+{
     private fun Element.extractRecentBlogEntry(): CodeforcesRecentFeedBlogEntry {
         val author = expectRatedUser().extractRatedUser()
         val blogEntryId: Int

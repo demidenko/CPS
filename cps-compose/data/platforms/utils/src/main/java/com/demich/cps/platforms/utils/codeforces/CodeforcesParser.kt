@@ -51,9 +51,13 @@ internal class CodeforcesHumanTimeSelectorImpl: CodeforcesHumanTimeSelector {
     override fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 }
 
-abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
+internal interface CodeforcesHrefBlogEntrySelector: CodeforcesPageParser {
+    fun Element.expectBlogEntryHref(): Element
+}
+
+internal class CodeforcesHrefBlogEntrySelectorImpl: CodeforcesHrefBlogEntrySelector {
     private val evaluatorHrefBlogEntry = Evaluator.AttributeWithValueStarting("href", blogEntryHrefPrefix)
-    protected fun Element.expectBlogEntryHref(): Element = expectFirst(evaluatorHrefBlogEntry)
+    override fun Element.expectBlogEntryHref(): Element = expectFirst(evaluatorHrefBlogEntry)
 }
 
 const val blogEntryHrefPrefix = "/blog/entry/"
