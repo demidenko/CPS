@@ -34,7 +34,7 @@ operator fun Duration.rem(other: Duration): Duration {
     }
 
     if (this.isNegative()) {
-        return -rem(other)
+        return (-this).rem(other)
     }
 
     check(this.isPositive())
