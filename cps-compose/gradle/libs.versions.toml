@@ -16,9 +16,11 @@ compose-bom = "2026.06.01" # https://developer.android.com/develop/ui/compose/bo
 
 activity-compose = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/activity
 navigation-compose = "2.9.8" # https://developer.android.com/jetpack/androidx/releases/navigation
+# navigation3 = TODO # https://developer.android.com/jetpack/androidx/releases/navigation3
 lifecycle = "2.11.0"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
 room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
+# room3 = TODO # https://developer.android.com/jetpack/androidx/releases/room3
 
 datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/datastore
 
@@ -54,6 +56,7 @@ androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
+# TODO androidx-compose-material3 = { module = "androidx.compose.material:material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
