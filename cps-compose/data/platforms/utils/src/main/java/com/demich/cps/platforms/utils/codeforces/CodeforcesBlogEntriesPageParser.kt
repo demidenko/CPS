@@ -12,7 +12,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
-class CodeforcesBlogEntriesPageParser: CodeforcesCommunityPageParser() {
+class CodeforcesBlogEntriesPageParser:
+    CodeforcesCommunityPageParser(),
+    CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl()
+{
     private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
     private val evaluatorMeta = Evaluator.Class("meta")
     private val evaluatorLeftMeta = Evaluator.Class("left-meta")

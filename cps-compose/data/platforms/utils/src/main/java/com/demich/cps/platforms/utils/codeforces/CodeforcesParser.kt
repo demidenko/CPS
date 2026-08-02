@@ -33,10 +33,16 @@ internal class CodeforcesRatedUserSelectorImpl: CodeforcesRatedUserSelector {
     override fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
 }
 
-abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
-    private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
-    protected fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
+internal interface CodeforcesDivInfoSelector: CodeforcesPageParser {
+    fun Element.expectDivInfo(): Element
+}
 
+internal class CodeforcesDivInfoSelectorImpl: CodeforcesDivInfoSelector {
+    private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
+    override fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
+}
+
+abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
     private val evaluatorHumanTime = Evaluator.Class("format-humantime")
     protected fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
 

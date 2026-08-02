@@ -11,7 +11,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
-class CodeforcesCommentsPageParser: CodeforcesCommunityPageParser() {
+class CodeforcesCommentsPageParser:
+    CodeforcesCommunityPageParser(),
+    CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl()
+{
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
     private val evaluatorDivTypography = EvaluatorTagWithClass(tag = "div", className = "ttypography")
