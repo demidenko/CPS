@@ -21,13 +21,21 @@ context(parser: CodeforcesPageParser)
 internal fun Document.expectSidebar(): Element = requireNotNull(selectSidebar())
 
 
-abstract class CodeforcesCommunityPageParser: CodeforcesPageParser {
+internal interface CodeforcesRatedUserSelector: CodeforcesPageParser {
+    fun Element.selectRatedUser(): Element?
+}
+
+context(selector: CodeforcesRatedUserSelector)
+internal fun Element.expectRatedUser(): Element = with(selector) { requireNotNull(selectRatedUser()) }
+
+internal class CodeforcesRatedUserSelectorImpl: CodeforcesRatedUserSelector {
+    private val evaluatorRatedUser = Evaluator.Class("rated-user")
+    override fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
+}
+
+abstract class CodeforcesCommunityPageParser: CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl() {
     private val evaluatorDivInfo = EvaluatorTagWithClass(tag = "div", className = "info")
     protected fun Element.expectDivInfo(): Element = expectFirst(evaluatorDivInfo)
-
-    private val evaluatorRatedUser = Evaluator.Class("rated-user")
-    protected fun Element.selectRatedUser(): Element? = selectFirst(evaluatorRatedUser)
-    protected fun Element.expectRatedUser(): Element = expectFirst(evaluatorRatedUser)
 
     private val evaluatorHumanTime = Evaluator.Class("format-humantime")
     protected fun Element.expectHumanTime(): Element = expectFirst(evaluatorHumanTime)
