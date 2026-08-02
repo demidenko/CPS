@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
@@ -65,5 +66,6 @@ fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() -> Duratio
             val delayNext = block()
             if (delayNext == Duration.INFINITE) break
             if (delayNext > Duration.ZERO) delay(delayNext)
+            ensureActive()
         }
     }
