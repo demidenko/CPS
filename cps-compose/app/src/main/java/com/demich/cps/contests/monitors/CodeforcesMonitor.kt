@@ -18,7 +18,9 @@ import com.demich.cps.platforms.api.codeforces.models.isResult
 import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getContestRatingChangesStatus
-import com.demich.cps.platforms.utils.codeforces.getSysTestPercentageOrNull
+import com.demich.cps.platforms.utils.codeforces.getSysTestPercentage
+import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit
@@ -240,8 +242,10 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
     .transformLatest { phase ->
         if (phase == SYSTEM_TEST) {
             while (true) {
-                pageContentProvider.getSysTestPercentageOrNull(contestId = contestId)
-                    ?.let { emit(it) }
+                val result = fetchResultOf {
+                    pageContentProvider.getSysTestPercentage(contestId = contestId)
+                }
+                if (result is FetchResult.Success && result.value != null) emit(result.value)
                 delay(duration = delay)
             }
         }

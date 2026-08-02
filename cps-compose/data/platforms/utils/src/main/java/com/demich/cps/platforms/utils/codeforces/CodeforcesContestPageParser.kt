@@ -20,7 +20,7 @@ internal class CodeforcesContestPageParser: CodeforcesPageParser {
     }
 }
 
-suspend fun CodeforcesPageContentProvider.getSysTestPercentageOrNull(contestId: Int): Int? =
-    runCatching { getContestPage(contestId = contestId) }
-        .map { CodeforcesContestPageParser().parseContestSystemTestingPercentageOrNull(it) }
-        .getOrNull()
+suspend fun CodeforcesPageContentProvider.getSysTestPercentage(contestId: Int): Int? =
+    CodeforcesContestPageParser().parseContestSystemTestingPercentageOrNull(
+        source = getContestPage(contestId = contestId)
+    )
