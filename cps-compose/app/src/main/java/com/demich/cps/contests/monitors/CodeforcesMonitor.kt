@@ -204,14 +204,12 @@ private class RatingChangeWaiter(
     }
 
     private suspend fun isRatingChangeDone(): Boolean {
-        val status = api.runCatching {
-            getContestRatingChangesStatus(contestId = contestId)
-        }.getOrElse {
+        val result = fetchResultOf { api.getContestRatingChangesStatus(contestId = contestId) }
+        if (result !is FetchResult.Success) {
             //TODO: save this failure?
             return false
         }
-
-        return when (status) {
+        return when (val status = result.value) {
             CodeforcesRatingChangesStatus.Empty -> false
             CodeforcesRatingChangesStatus.Unavailable -> true
             is CodeforcesRatingChangesStatus.Done -> {
