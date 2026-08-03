@@ -15,7 +15,8 @@ import kotlin.time.Instant
 class CodeforcesBlogEntriesPageParser:
     CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl(),
     CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl(),
-    CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl()
+    CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl(),
+    CodeforcesPageDateTimeParser by CodeforcesPageDateTimeParserImpl()
 {
     private val evaluatorDivTitle = EvaluatorTagWithClass(tag = "div", className = "title")
     private val evaluatorMeta = Evaluator.Class("meta")

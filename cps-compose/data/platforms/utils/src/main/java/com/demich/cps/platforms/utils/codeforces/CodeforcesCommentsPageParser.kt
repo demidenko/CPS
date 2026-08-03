@@ -15,7 +15,8 @@ class CodeforcesCommentsPageParser:
     CodeforcesRatedUserSelector by CodeforcesRatedUserSelectorImpl(),
     CodeforcesDivInfoSelector by CodeforcesDivInfoSelectorImpl(),
     CodeforcesHumanTimeSelector by CodeforcesHumanTimeSelectorImpl(),
-    CodeforcesHrefBlogEntrySelector by CodeforcesHrefBlogEntrySelectorImpl()
+    CodeforcesHrefBlogEntrySelector by CodeforcesHrefBlogEntrySelectorImpl(),
+    CodeforcesPageDateTimeParser by CodeforcesPageDateTimeParserImpl()
 {
     private val evaluatorAvatar = Evaluator.Class("avatar")
     private val evaluatorAttrCommentId = Evaluator.Attribute("commentid")
