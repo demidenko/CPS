@@ -43,25 +43,35 @@ class AtCoderParser {
             )
         }.toList()
     }
+}
 
-    fun extractNews(source: String): List<AtcoderNewsPost?> =
-        source.parseDocument()
-            .selectSequence("div.panel.panel-default, div.panel.panel-info")
-            .mapNotNull { it.extractNewsFromPanel() }
-            .toList()
-            .sortedByDescending { it.time }
+class AtCoderNewsParser {
+
+    private val evaluatorPanelHeading = EvaluatorTagWithClass(tag = "div", className = "panel-heading")
+    private val evaluatorPanelTitle = EvaluatorTagWithClass(tag = "h3", className = "panel-title")
+    private val evaluatorTooltip = EvaluatorTagWithClass(tag = "span", className = "tooltip-unix")
 
     private fun Element.extractNewsFromPanel(): AtcoderNewsPost? {
-        val header = selectFirst("div.panel-heading") ?: return null
-        val titleElement = header.expectFirst("h3.panel-title")
-        val timeElement = header.selectFirst("span.tooltip-unix") ?: return null
-        val id = titleElement.expectFirst("a").href.removePrefix("/posts/")
+        val header = selectFirst(evaluatorPanelHeading) ?: return null
+        val titleElement = header.expectFirst(evaluatorPanelTitle)
+        val timeElement = header.selectFirst(evaluatorTooltip) ?: return null
+        val id = titleElement.expectFirst(Evaluator.Tag("a")).href.removePrefix("/posts/")
         return AtcoderNewsPost(
             title = titleElement.text(),
             time = Instant.fromEpochSeconds(timeElement.attr("title").toLong()),
             id = id
         )
     }
+
+    private fun Document.selectPanels() =
+        selectSequence("div.panel.panel-default, div.panel.panel-info")
+
+    fun parseNews(source: String): List<AtcoderNewsPost> =
+        source.parseDocument()
+            .selectPanels()
+            .mapNotNull { it.extractNewsFromPanel() }
+            .toList()
+            .sortedByDescending { it.time }
 }
 
 data class AtcoderNewsPost(

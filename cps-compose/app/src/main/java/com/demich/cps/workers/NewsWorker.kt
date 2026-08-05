@@ -11,7 +11,7 @@ import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerRssParser
-import com.demich.cps.platforms.utils.atcoder.AtCoderParser
+import com.demich.cps.platforms.utils.atcoder.AtCoderNewsParser
 import com.demich.cps.utils.asHtmlToSpanned
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
@@ -55,7 +55,7 @@ class NewsWorker(
     private suspend fun atcoderNews() {
         hintsDataStore.scanNewsFeed(
             newsFeed = atcoder_news,
-            posts = AtCoderParser().extractNews(source = AtCoderClient.getMainPage())
+            posts = AtCoderNewsParser().parseNews(source = AtCoderClient.getMainPage())
         ) { post ->
             notificationChannels.atcoder.news(post.id).notify(context) {
                 subText = "atcoder news"
