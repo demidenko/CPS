@@ -245,8 +245,9 @@ private val codeforcesHttpClient: HttpClient =
             handleResponseException { exception ->
                 if (exception !is ResponseException) return@handleResponseException
                 val response = exception.response
-                runCatching { response.body<CodeforcesAPIErrorResponse>() }
-                    .onSuccess { throw it.toApiException() }
+                val body = response.bodyAsText()
+                val error = defaultJson.decodeCodeforcesAPIErrorResponseOrNull(body)
+                if (error != null) throw error.toApiException()
             }
         }
 

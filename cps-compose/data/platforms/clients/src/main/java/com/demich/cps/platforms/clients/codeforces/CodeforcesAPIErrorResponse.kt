@@ -10,6 +10,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUnspecifiedException
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 
 @Serializable
 internal class CodeforcesAPIErrorResponse(val comment: String) {
@@ -60,6 +62,15 @@ internal class CodeforcesAPIErrorResponse(val comment: String) {
         return false
     }
 }
+
+internal fun Json.decodeCodeforcesAPIErrorResponseOrNull(string: String): CodeforcesAPIErrorResponse? =
+    try {
+        decodeFromString<CodeforcesAPIErrorResponse>(string = string)
+    } catch (_: SerializationException) {
+        null
+    } catch (_: IllegalArgumentException) {
+        null
+    }
 
 internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException {
     // "participantTypes: Unknown participant type: 'AAAAAA'"
