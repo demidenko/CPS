@@ -11,6 +11,7 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.parse
 import kotlinx.datetime.toInstant
 import org.jsoup.nodes.Element
+import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
 class ProjectEulerParser {
@@ -56,25 +57,25 @@ class ProjectEulerParser {
 class ProjectEulerRssParser(
     rssPage: String
 ) {
-    private val items: Sequence<RssItem> =
-        rssPage.parseDocument().selectSequence("item").map { RssItem(it) }
+    private val rssItems: Sequence<Element> =
+        rssPage.parseDocument().selectSequence("item")
 
-    private class RssItem(private val item: Element) {
-        fun description() = item.expectFirst("description")
+    private val evaluatorDescription = Evaluator.Tag("description")
+    private fun Element.description() = expectFirst(evaluatorDescription)
 
-        fun title() = item.expectFirst("title")
+    private val evaluatorTitle = Evaluator.Tag("title")
+    private fun Element.title() = expectFirst(evaluatorTitle)
 
-        inline fun <T> guidOrNull(prefix: String, block: (String) -> T): T? {
-            val idFull = item.expectFirst("guid").text()
-            val id = idFull.removePrefix(prefix)
-            if (id == idFull) return null
-            return block(id)
-        }
+    private val evaluatorGUID = Evaluator.Tag("guid")
+    private inline fun <T> Element.guidOrNull(prefix: String, block: (String) -> T): T? {
+        val idFull = expectFirst(evaluatorGUID).text()
+        val id = idFull.removePrefix(prefix)
+        if (id == idFull) return null
+        return block(id)
     }
 
-
     fun parseNews(): Sequence<ProjectEulerNewsPost> =
-        items.mapNotNull { item ->
+        rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
                 ProjectEulerNewsPost(
                     title = item.title().text(),
@@ -98,7 +99,7 @@ class ProjectEulerRssParser(
             offset(UtcOffset.Formats.FOUR_DIGITS)
         }
 
-        return items.mapNotNull { item ->
+        return rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
                 val description = item.description().text()
                 val date = Instant.parse(
