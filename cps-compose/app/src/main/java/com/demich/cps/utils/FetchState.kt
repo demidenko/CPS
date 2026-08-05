@@ -29,6 +29,12 @@ fun <T> Result<T>.asFetchResult(): FetchResult<T> =
         onFailure = { FetchResult.Failure(it) }
     )
 
+inline fun <T> FetchResult<T>.valueOr(onFailure: () -> T): T =
+    when (this) {
+        is FetchResult.Success -> value
+        is FetchResult.Failure -> onFailure()
+    }
+
 fun FetchState<*>.toLoadingStatus(): LoadingStatus =
     when (this) {
         FetchState.Loading -> LOADING
