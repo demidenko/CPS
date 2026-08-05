@@ -357,31 +357,48 @@ private fun SuggestionsList(
 ) {
     val isError = suggestionsResult is Failure
     val suggestions = suggestionsResult.valueOr { emptyList() }
-    if (suggestions.isNotEmpty() || isLoading || isError) {
-        Column(modifier = modifier) {
-            ProfileHeader(
-                text = if (isError) "suggestions fetch failed" else "suggestions:",
-                color = if (isError) cpsColors.error else cpsColors.contentAdditional
-            ) {
-                if (isLoading) {
-                    LoadingIndicator(strokeWidth = 2.dp)
-                } else {
-                    Icon(
-                        imageVector = CPSIcons.Search,
-                        contentDescription = null
-                    )
-                }
+    if (isLoading || isError || suggestions.isNotEmpty()) {
+        SuggestionsList(
+            suggestions = suggestions,
+            isError = isError,
+            isLoading = isLoading,
+            modifier = modifier,
+            onClick = onClick
+        )
+    }
+}
+
+@Composable
+private fun SuggestionsList(
+    suggestions: List<UserSuggestion>,
+    isError: Boolean,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: (UserSuggestion) -> Unit
+) {
+    Column(modifier = modifier) {
+        ProfileHeader(
+            text = if (isError) "suggestions fetch failed" else "suggestions:",
+            color = if (isError) cpsColors.error else cpsColors.contentAdditional
+        ) {
+            if (isLoading) {
+                LoadingIndicator(strokeWidth = 2.dp)
+            } else {
+                Icon(
+                    imageVector = CPSIcons.Search,
+                    contentDescription = null
+                )
             }
-            LazyColumnWithScrollBar {
-                items(suggestions, key = { it.userId }) {
-                    SuggestionItem(
-                        suggestion = it,
-                        modifier = Modifier
-                            .clickable { onClick(it) }
-                            .padding(3.dp)
-                    )
-                    Divider()
-                }
+        }
+        LazyColumnWithScrollBar {
+            items(suggestions, key = { it.userId }) {
+                SuggestionItem(
+                    suggestion = it,
+                    modifier = Modifier
+                        .clickable { onClick(it) }
+                        .padding(3.dp)
+                )
+                Divider()
             }
         }
     }
