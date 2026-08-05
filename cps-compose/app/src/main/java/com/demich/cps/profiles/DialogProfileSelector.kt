@@ -71,8 +71,10 @@ import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
 import com.demich.cps.utils.fetchFlowOf
+import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.rememberFocusOnCreationRequester
 import com.demich.cps.utils.showToast
+import com.demich.cps.utils.valueOr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -193,7 +195,7 @@ private fun <U: UserInfo> DialogContent(
 
     if (manager is ProfileSuggestionsProvider) {
         val userIdExt by rememberUpdatedState(newValue = Pair(textFieldValue.value.text, textFieldValue.source))
-        var suggestionsResult: Result<List<UserSuggestion>> by remember { mutableStateOf(Result.success(emptyList())) }
+        var suggestionsResult: FetchResult<List<UserSuggestion>> by remember { mutableStateOf(FetchResult.Success(emptyList())) }
         val loadingSuggestionsInProgressState = remember { mutableStateOf(false) }
 
         SuggestionsList(
@@ -213,18 +215,18 @@ private fun <U: UserInfo> DialogContent(
             val userId = userIdExt.first
             // if (userId.isBlank()) ???
             if (userId.length < suggestionsMinLength) {
-                suggestionsResult = Result.success(emptyList())
+                suggestionsResult = FetchResult.Success(emptyList())
                 loadingSuggestionsInProgressState.value = false
                 return@LaunchedEffect
             }
             delay(requestDebounceDelay)
             loadingSuggestionsInProgressState.value = true
-            val data = withContext(Dispatchers.Default) {
-                manager.runCatching { getSuggestions(userId) }
+            val result = withContext(Dispatchers.Default) {
+                fetchResultOf { manager.getSuggestions(userId) }
             }
             loadingSuggestionsInProgressState.value = false
             ensureActive()
-            suggestionsResult = data
+            suggestionsResult = result
         }
     }
 }
@@ -348,13 +350,13 @@ private fun TextFieldMainIcon(
 
 @Composable
 private fun SuggestionsList(
-    suggestionsResult: Result<List<UserSuggestion>>,
+    suggestionsResult: FetchResult<List<UserSuggestion>>,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     onClick: (UserSuggestion) -> Unit
 ) {
-    val isError = suggestionsResult.isFailure
-    val suggestions = suggestionsResult.getOrDefault(emptyList())
+    val isError = suggestionsResult is Failure
+    val suggestions = suggestionsResult.valueOr { emptyList() }
     if (suggestions.isNotEmpty() || isLoading || isError) {
         Column(modifier = modifier) {
             ProfileHeader(
