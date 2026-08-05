@@ -114,10 +114,7 @@ class ProjectEulerRssParser(
         return rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
                 val description = item.description().text()
-                val date = Instant.parse(
-                    input = description.run { substring(startIndex = indexOf(',') + 2) },
-                    format = format
-                )
+                val date = description.extractDate()
                 id.toInt() to date
             }
         }
