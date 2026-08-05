@@ -66,6 +66,9 @@ class ProjectEulerRssParser(
     private val evaluatorTitle = Evaluator.Tag("title")
     private fun Element.title() = expectFirst(evaluatorTitle)
 
+    private val evaluatorPubDate = Evaluator.Tag("pubDate".lowercase())
+    private fun Element.pubDateOrNull() = selectFirst(evaluatorPubDate)
+
     private val evaluatorGUID = Evaluator.Tag("guid")
     private inline fun <T> Element.guidOrNull(prefix: String, block: (String) -> T): T? {
         val idFull = expectFirst(evaluatorGUID).text()
@@ -74,31 +77,40 @@ class ProjectEulerRssParser(
         return block(id)
     }
 
+    private val format = DateTimeComponents.Format {
+        //04 Apr 2025 23:00:00 +0100
+        day(padding = Padding.NONE)
+        char(' ')
+        monthName(names = MonthNames.ENGLISH_ABBREVIATED)
+        char(' ')
+        year()
+        char(' ')
+        time(LocalTime.Formats.ISO)
+        char(' ')
+        offset(UtcOffset.Formats.FOUR_DIGITS)
+    }
+
+    // <description>Release date: Sun, 28 Jun 2026 04:00:00 +0000</description>
+    // <pubDate>Mon, 25 May 2026 00:00:00 +0000</pubDate>
+    private fun String.extractDate(): Instant =
+        Instant.parse(
+            input = substring(startIndex = indexOf(',') + 2),
+            format = format
+        )
+
     fun parseNews(): Sequence<ProjectEulerNewsPost> =
         rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
                 ProjectEulerNewsPost(
                     title = item.title().text(),
                     descriptionHtml = item.description().html(),
-                    id = id
+                    id = id,
+                    date = item.pubDateOrNull()?.text()?.extractDate()
                 )
             }
         }
 
     fun parseProblems(): Sequence<Pair<Int, Instant>> {
-        val format = DateTimeComponents.Format {
-            //04 Apr 2025 23:00:00 +0100
-            day(padding = Padding.NONE)
-            char(' ')
-            monthName(names = MonthNames.ENGLISH_ABBREVIATED)
-            char(' ')
-            year()
-            char(' ')
-            time(LocalTime.Formats.ISO)
-            char(' ')
-            offset(UtcOffset.Formats.FOUR_DIGITS)
-        }
-
         return rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
                 val description = item.description().text()
@@ -121,5 +133,6 @@ class ProjectEulerRecentProblem(
 class ProjectEulerNewsPost(
     val title: String,
     val descriptionHtml: String,
-    override val id: String
+    override val id: String,
+    val date: Instant?
 ): NewsPostEntry
