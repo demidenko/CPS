@@ -46,8 +46,8 @@ var <T> DataStoreItem<T>.value: T
     get() = scope.get(item = this)
     set(value) = scope.set(item = this, value = value)
 
-inline fun <D: ItemizedDataStore, R> D.flowOf(
-    crossinline transform: context(DataStoreSnapshot) D.() -> R
+fun <D: ItemizedDataStore, R> D.flowOf(
+    transform: context(DataStoreSnapshot) D.() -> R
 ): Flow<R> =
     snapshotFlow().map { snapshot ->
         context(snapshot) {
