@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,9 +40,9 @@ import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -190,7 +189,6 @@ private fun AddProfileButton(
     var showMenu by remember { mutableStateOf(false) }
     var selectedPlatform: Platform? by remember { mutableStateOf(null) }
 
-    val scope = rememberCoroutineScope()
     val progressBarsViewModel = progressBarsViewModel()
     val clistImportIsRunning by collectAsState { progressBarsViewModel.flowOfClistImportIsRunning() }
 
@@ -230,7 +228,6 @@ private fun AddProfileButton(
             ChangeSavedProfileDialog(
                 manager = profileManagerOf(platform),
                 initial = null,
-                scope = scope,
                 onDismissRequest = { selectedPlatform = null }
             )
         }
@@ -241,10 +238,10 @@ private fun AddProfileButton(
 internal fun <U: UserInfo> ChangeSavedProfileDialog(
     manager: ProfileManager<U>,
     initial: ProfileResult<U>?,
-    scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
     val context = context
+    val scope = backgroundCoroutineScope
     DialogProfileSelector(
         manager = manager,
         initial = initial,

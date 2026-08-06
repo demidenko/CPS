@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,7 +51,6 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     manager: ProfileManager<U>
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
     var showChangeDialog by remember { mutableStateOf(false) }
 
     val profileResult by collectItemAsState { manager.profileStorage(context).profile }
@@ -68,7 +66,6 @@ private fun <U: UserInfo> ProfileSettingsScreen(
             ChangeSavedProfileDialog(
                 manager = manager,
                 initial = it,
-                scope = scope,
                 onDismissRequest = { showChangeDialog = false }
             )
         }
