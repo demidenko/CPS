@@ -5,16 +5,14 @@ interface NewsPostEntry {
 }
 
 inline fun <T: NewsPostEntry> scanNewsPostEntries(
-    posts: List<T?>,
+    posts: List<T>,
     getLastId: () -> String?,
     setLastId: (String) -> Unit,
     onNewPost: (T) -> Unit
 ) {
     val lastId = getLastId()
 
-    val newEntries = posts
-        .filterNotNull()
-        .takeWhile { it.id != lastId }
+    val newEntries = posts.takeWhile { it.id != lastId }
 
     if (newEntries.isEmpty()) return
 

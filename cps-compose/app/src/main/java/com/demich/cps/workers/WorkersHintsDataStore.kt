@@ -29,7 +29,7 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
 
 suspend inline fun <T: NewsPostEntry> WorkersHintsDataStore.scanNewsFeed(
     newsFeed: NewsFeed,
-    posts: List<T?>,
+    posts: List<T>,
     onNewPost: (T) -> Unit
 ) {
     scanNewsPostEntries(

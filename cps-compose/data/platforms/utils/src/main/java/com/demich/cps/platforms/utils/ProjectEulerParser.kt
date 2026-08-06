@@ -15,7 +15,7 @@ import org.jsoup.select.Evaluator
 import kotlin.time.Instant
 
 class ProjectEulerParser {
-    fun parseRecentProblems(source: String): List<ProjectEulerRecentProblem?> {
+    fun parseRecentProblems(source: String): List<ProjectEulerRecentProblem> {
         val format = LocalDateTime.Format {
             //5th April 2025, 02:00 pm
             day(padding = Padding.NONE)
@@ -39,7 +39,7 @@ class ProjectEulerParser {
         val peUtcOffset = UtcOffset(hours = +1)
 
         return source.parseDocument().expectFirst("#problems_table").select("td.id_column")
-            .map { idCell ->
+            .mapNotNull { idCell ->
                 idCell.nextElementSibling()?.let { nameCell ->
                     // title="Published on Saturday, 5th April 2025, 02:00 pm"
                     val title = nameCell.expectFirst("a").attr("title")
