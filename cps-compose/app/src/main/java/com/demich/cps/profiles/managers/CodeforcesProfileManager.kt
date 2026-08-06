@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -45,6 +44,7 @@ import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.cps.utils.jsonCPS
@@ -331,7 +331,7 @@ private fun CodeforcesApiAccessSettingsItem(
     profileStorage: CodeforcesProfileStorage
 ) {
     val uriHandler = LocalUriHandler.current
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     ApiAccessSettingsItem(
         item = profileStorage.apiAccess,

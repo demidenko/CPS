@@ -17,7 +17,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +28,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.setValueIn
@@ -62,7 +62,7 @@ private fun CloseRow(
 @Composable
 private fun LayoutSelectRow() {
     val context = context
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
     val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
 
     Row(

@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
@@ -39,6 +38,7 @@ import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
@@ -204,7 +204,7 @@ private fun nameOf(tag: CodeforcesColorTag): String =
 context(scope: SettingsContainerScope)
 private fun RuEnabledSettingsItem() {
     val context = context
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     val locale by collectItemAsState { context.settingsCommunity.codeforcesLocale }
 
