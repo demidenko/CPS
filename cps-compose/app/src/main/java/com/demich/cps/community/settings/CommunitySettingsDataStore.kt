@@ -21,16 +21,15 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
         private val Context.community_settings_dataStore by dataStoreWrapper("community_settings")
     }
 
-    val codeforcesDefaultTab = itemEnum(name = "cf_default_tab", defaultValue = CodeforcesTab.TOP)
-    val codeforcesLocale = jsonCPS.item(name = "cf_locale") {
-        if (isRuSystemLanguage()) CodeforcesLocale.RU
-        else CodeforcesLocale.EN
+    val codeforcesDefaultTab = itemEnum<CodeforcesTab>(name = "cf_default_tab", defaultValue = TOP)
+    val codeforcesLocale = jsonCPS.item<CodeforcesLocale>(name = "cf_locale") {
+        if (isRuSystemLanguage()) RU else EN
     }
 
     val codeforcesFollowEnabled = itemBoolean(name = "cf_follow_enabled", defaultValue = false)
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
-    val codeforcesLostMinRatingTag = itemEnum(name = "cf_lost_min_rating", defaultValue = CodeforcesColorTag.ORANGE)
+    val codeforcesLostMinRatingTag = itemEnum<CodeforcesColorTag>(name = "cf_lost_min_rating", defaultValue = ORANGE)
 
     val codeforcesTabs = codeforcesLostEnabled.transform { lostEnabled ->
         buildList<CodeforcesTab> {
