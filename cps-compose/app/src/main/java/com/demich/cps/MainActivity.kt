@@ -28,6 +28,7 @@ import com.demich.cps.profiles.NavContentProfilesSettingsScreen
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.utils.ProvideBackgroundCoroutineScope
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,9 +46,9 @@ class MainActivity: ComponentActivity() {
         }
 
         setContent {
-            CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
-                CPSTheme {
-                    CPSContent()
+            ProvideBackgroundCoroutineScope {
+                CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
+                    CPSTheme(content = ::CPSContent)
                 }
             }
         }
