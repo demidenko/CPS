@@ -42,11 +42,10 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 @Composable
 private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
-    val darkLightMode by collectItemAsState { context.settingsUI.darkLightMode }
-    val isDarkMode = darkLightMode.isDarkMode()
+    val specs by collectItemAsState { context.settingsUI.uiColorSpecs }
+    val isDarkMode = specs.darkLightMode.isDarkMode()
     setSystemBarsStyle(context, isDarkMode)
-    val useOriginalColors by collectItemAsState { context.settingsUI.useOriginalColors }
-    val colors = if (isDarkMode) darkCPSColors(useOriginalColors) else lightCPSColors(useOriginalColors)
+    val colors = if (isDarkMode) darkCPSColors(specs.useOriginalColors) else lightCPSColors(specs.useOriginalColors)
     CompositionLocalProvider(LocalCPSColors provides colors, content = content)
 }
 

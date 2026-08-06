@@ -28,8 +28,7 @@ internal fun UIPanel(
     val context = context
     val settingsUI = remember { context.settingsUI }
 
-    val useOriginalColors by collectItemAsState { settingsUI.useOriginalColors }
-    val darkLightMode by collectItemAsState { settingsUI.darkLightMode }
+    val specs by collectItemAsState { settingsUI.uiColorSpecs }
 
     Row(modifier = modifier.background(cpsColors.background)) {
         CPSIconButton(icon = CPSIcons.Close, onClick = onClosePanel)
@@ -38,12 +37,12 @@ internal fun UIPanel(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CPSIconButton(icon = CPSIcons.Colors, onState = useOriginalColors) {
-                settingsUI.useOriginalColors.setValueIn(scope, !useOriginalColors)
+            CPSIconButton(icon = CPSIcons.Colors, onState = specs.useOriginalColors) {
+                settingsUI.useOriginalColors.setValueIn(scope, !specs.useOriginalColors)
             }
             StatusBarButtons()
             DarkLightModeButton(
-                mode = darkLightMode,
+                mode = specs.darkLightMode,
                 isSystemInDarkMode = isSystemInDarkTheme()
             ) { mode ->
                 settingsUI.darkLightMode.setValueIn(scope, mode)

@@ -40,13 +40,25 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
 
     val navigationLayoutType = itemEnum<NavigationLayoutType>(name = "navigation_bar_layout", defaultValue = start)
 
-    val bottomBarSpecs = combine {
+    val uiColorSpecs get() = combine {
+        CPSUIColorSpecs(
+            darkLightMode = darkLightMode.value,
+            useOriginalColors = useOriginalColors.value
+        )
+    }
+
+    val bottomBarSpecs get() = combine {
         CPSBottomBarSpecs(
             devModeEnabled = devModeEnabled.value,
             layoutType = navigationLayoutType.value
         )
     }
 }
+
+data class CPSUIColorSpecs(
+    val darkLightMode: DarkLightMode,
+    val useOriginalColors: Boolean
+)
 
 data class CPSBottomBarSpecs(
     val devModeEnabled: Boolean,
