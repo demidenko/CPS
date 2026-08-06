@@ -23,7 +23,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.snapshotFlow
@@ -68,6 +67,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
 import com.demich.cps.utils.add
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
@@ -215,7 +215,7 @@ private fun ContestsPage(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     val filtered: List<Contest> by remember(contests, filterState) {
         derivedStateOf {
@@ -454,7 +454,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         exit = exitInColumn()
     ) { contestData ->
         val contestId by rememberUpdatedState(contestData.contestId)
-        val scope = rememberCoroutineScope()
+        val scope = backgroundCoroutineScope
 
         val requestFailed by collectAsStateWithLifecycle {
             monitor.lastRequest.asFlow().map { it == false }

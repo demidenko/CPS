@@ -23,7 +23,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,6 +62,7 @@ import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -95,7 +95,7 @@ import kotlin.time.Instant
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     var showMonitorDialog by remember { mutableStateOf(false) }
     var showRestartDialogFor: CPSPeriodicWork? by remember { mutableStateOf(null) }
