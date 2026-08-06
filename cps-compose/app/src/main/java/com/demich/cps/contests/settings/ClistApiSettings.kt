@@ -2,7 +2,6 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -13,6 +12,7 @@ import com.demich.cps.ui.settings.ApiAccessSettingsItem
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.append
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ internal fun ClistApiAccessSettingsItem(
     settings: ContestsSettingsDataStore
 ) {
     val uriHandler = LocalUriHandler.current
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     ApiAccessSettingsItem(
         item = settings.clistApiAccess,

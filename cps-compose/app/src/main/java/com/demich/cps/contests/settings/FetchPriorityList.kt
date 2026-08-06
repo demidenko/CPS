@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.edit
@@ -39,7 +39,7 @@ fun FetchPriorityListDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = context
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     val settings = remember { context.settingsContests }
     val priorityList by collectAsState {
@@ -59,7 +59,7 @@ fun FetchPriorityListDialog(
             onListChange = { newList ->
                 scope.launch {
                     settings.fetchPriorityLists.edit {
-                        this[platform.toContestPlatform()] = newList
+                        set(key = platform.toContestPlatform(), value = newList)
                     }
                 }
             }

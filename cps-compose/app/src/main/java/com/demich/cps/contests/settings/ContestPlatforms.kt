@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +29,7 @@ import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
@@ -42,7 +42,7 @@ internal fun ContestPlatformsSettingsItem(
     enabledPlatformsItem: DataStoreItem<Set<Platform>>,
     clistAdditionalResourcesItem: DataStoreItem<List<ClistResource>>
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     val enabledPlatforms by collectItemAsState { enabledPlatformsItem }
     val clistResources by collectItemAsState { clistAdditionalResourcesItem }

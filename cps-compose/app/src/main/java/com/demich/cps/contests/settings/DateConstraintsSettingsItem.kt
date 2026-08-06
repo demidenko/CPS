@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,6 +28,7 @@ import com.demich.cps.ui.settings.Expandable
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.datastore_itemized.setValueIn
 import kotlin.time.Duration
@@ -40,7 +40,7 @@ context(scope: SettingsContainerScope)
 internal fun DateConstraintsSettingsItem(
     settings: ContestsSettingsDataStore
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
 

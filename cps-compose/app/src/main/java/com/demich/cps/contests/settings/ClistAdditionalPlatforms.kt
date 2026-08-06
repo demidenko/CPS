@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +33,7 @@ import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchState
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -61,7 +61,7 @@ internal fun ClistAdditionalResourcesDialog(
         .flowOfFetchResources(settings = settings, key = uuidState.value)
         .collectAsState()
 
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     CPSDialog(
         modifier = Modifier.fillMaxWidth(),

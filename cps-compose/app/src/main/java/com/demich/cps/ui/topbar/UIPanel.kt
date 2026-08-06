@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.setValueIn
@@ -24,7 +24,7 @@ internal fun UIPanel(
     modifier: Modifier = Modifier,
     onClosePanel: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
     val context = context
     val settingsUI = remember { context.settingsUI }
 
