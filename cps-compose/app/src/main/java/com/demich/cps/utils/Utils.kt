@@ -46,3 +46,9 @@ inline fun <K, V> MutableMap<K, List<V>>.edit(key: K, block: MutableList<V>.() -
     val list = get(key)?.toMutableList() ?: mutableListOf()
     set(key, list.apply(block))
 }
+
+fun <T> Set<T>.containsSomethingExcept(item: T): Boolean {
+    // return (this - item).isNotEmpty()
+    if (contains(item)) return size > 1
+    return isNotEmpty()
+}

@@ -64,9 +64,3 @@ data class CommunityCodeforcesScreenSettings(
     val followEnabled: Boolean,
     val renderAllTabs: Boolean
 )
-
-fun Set<CommunitySettingsDataStore.NewsFeed>.containsSomethingExcept(item: CommunitySettingsDataStore.NewsFeed): Boolean {
-    // return (this - item).isNotEmpty()
-    if (contains(item)) return size > 1
-    return isNotEmpty()
-}

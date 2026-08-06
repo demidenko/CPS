@@ -13,6 +13,7 @@ import com.demich.cps.platforms.clients.ProjectEulerClient
 import com.demich.cps.platforms.utils.ProjectEulerRssParser
 import com.demich.cps.platforms.utils.atcoder.AtCoderNewsParser
 import com.demich.cps.utils.asHtmlToSpanned
+import com.demich.cps.utils.containsSomethingExcept
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import kotlin.time.Duration.Companion.hours

@@ -40,6 +40,7 @@ import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesCommunityFollowWorker
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
