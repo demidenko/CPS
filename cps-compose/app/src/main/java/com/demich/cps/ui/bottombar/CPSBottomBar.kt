@@ -120,16 +120,16 @@ private fun BottomBarBodyMain(
     modifier: Modifier = Modifier
 ) {
     val context = context
+    // TODO: move out
+    // TODO: start collect with null
+    val specs by collectItemAsState { context.settingsUI.bottomBarSpecs }
 
-    val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
-    val layoutType by collectItemAsState { context.settingsUI.navigationLayoutType }
-
-    val rootScreens = remember(devModeEnabled) {
+    val rootScreens = remember(specs.devModeEnabled) {
         buildList {
             add(Screen.Profiles)
             add(Screen.Community)
             add(Screen.Contests)
-            if (devModeEnabled) add(Screen.Development)
+            if (specs.devModeEnabled) add(Screen.Development)
         }
     }
 
@@ -138,7 +138,7 @@ private fun BottomBarBodyMain(
         rootScreens = rootScreens,
         selectedRootScreen = { if (settingsEnabled) null else selectedRootScreen() },
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
-        layoutType = layoutType,
+        layoutType = specs.layoutType,
         onSelect = onNavigateToScreen,
         onLongPress = onEnableSettings
     )

@@ -7,7 +7,9 @@ import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.theme.DarkLightMode
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.value
 
 
 val Context.settingsUI: UISettingsDataStore
@@ -37,4 +39,16 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     }
 
     val navigationLayoutType = itemEnum<NavigationLayoutType>(name = "navigation_bar_layout", defaultValue = start)
+
+    val bottomBarSpecs = combine {
+        CPSBottomBarSpecs(
+            devModeEnabled = devModeEnabled.value,
+            layoutType = navigationLayoutType.value
+        )
+    }
 }
+
+data class CPSBottomBarSpecs(
+    val devModeEnabled: Boolean,
+    val layoutType: NavigationLayoutType
+)
