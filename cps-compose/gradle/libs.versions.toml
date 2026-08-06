@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "9.3.1"
 kotlin = "2.4.10"
-ksp = "2.3.10" # https://github.com/google/ksp/releases
+ksp = "2.3.11" # https://github.com/google/ksp/releases
 
 serialization = "1.11.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.8.0" # https://github.com/Kotlin/kotlinx-datetime/releases
