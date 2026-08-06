@@ -36,6 +36,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CPSWorkersDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -118,7 +119,7 @@ private fun InfoText(
 }
 
 @Composable
-fun ContentLoadingButton(
+private fun ContentLoadingButton(
     text: String,
     block: suspend () -> Unit
 ) {
@@ -128,7 +129,7 @@ fun ContentLoadingButton(
         enabled = enabled,
         onClick = {
             enabled = false
-            scope.launch {
+            scope.launch(Dispatchers.Default) {
                 block()
                 enabled = true
             }
