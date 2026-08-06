@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import com.demich.cps.R
-import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
+import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -221,21 +221,21 @@ private fun RuEnabledSettingsItem() {
 }
 
 
-private val NewsFeed.title: String
+private val CommunityNewsFeed.title: String
     get() = when (this) {
         atcoder_news -> "AtCoder news"
         project_euler_news -> "Project Euler news"
         project_euler_problems -> "Project Euler recent problems"
     }
 
-private val NewsFeed.shortName: String
+private val CommunityNewsFeed.shortName: String
     get() = when (this) {
         atcoder_news -> "atcoder"
         project_euler_news -> "pe_news"
         project_euler_problems -> "pe_problems"
     }
 
-private val NewsFeed.link: String
+private val CommunityNewsFeed.link: String
     get() = when (this) {
         atcoder_news -> "atcoder.jp"
         project_euler_news -> "projecteuler.net/news"
@@ -252,7 +252,7 @@ private fun NewsFeedsSettingsItem() {
     MultiSelectEnum(
         title = "Subscriptions",
         item = enabledItem,
-        options = NewsFeed.entries,
+        options = CommunityNewsFeed.entries,
         optionName = { it.shortName },
         optionContent = {
             Column {

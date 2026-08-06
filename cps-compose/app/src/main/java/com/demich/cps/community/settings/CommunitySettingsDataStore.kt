@@ -1,6 +1,7 @@
 package com.demich.cps.community.settings
 
 import android.content.Context
+import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
@@ -40,13 +41,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
         }
     }
 
-    enum class NewsFeed {
-        atcoder_news,
-        project_euler_news,
-        project_euler_problems
-    }
-
-    val enabledNewsFeeds = itemEnumSet<NewsFeed>(name = "news_feeds")
+    val enabledNewsFeeds = itemEnumSet<CommunityNewsFeed>(name = "news_feeds")
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
 

@@ -1,7 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import com.demich.cps.community.settings.CommunitySettingsDataStore.NewsFeed
+import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHint
 import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.scanNewsPostEntries
@@ -22,13 +22,13 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
 
     val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 
-    val newsFeedsLastIds = jsonCPS.itemMap<NewsFeed,String>(name = "news_feeds_last_id")
+    val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
 
     val projectEulerProblemPublishTime = jsonCPS.itemNullable<Instant>(name = "pe_problem_publish_time")
 }
 
 suspend inline fun <T: NewsPostEntry> WorkersHintsDataStore.scanNewsFeed(
-    newsFeed: NewsFeed,
+    newsFeed: CommunityNewsFeed,
     posts: List<T>,
     onNewPost: (T) -> Unit
 ) {
