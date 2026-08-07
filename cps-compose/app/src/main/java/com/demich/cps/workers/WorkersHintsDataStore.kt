@@ -2,7 +2,6 @@ package com.demich.cps.workers
 
 import android.content.Context
 import com.demich.cps.community.CommunityNewsFeed
-import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHint
 import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.scanNewsPostEntries
 import com.demich.cps.utils.jsonCPS
@@ -19,8 +18,6 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
 
     //TODO: clean up unused ids sometimes
     val followLastUserOnlineTime = jsonCPS.itemMap<Long, Instant?>(name = "follow_last_online")
-
-    val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 
     val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
 }

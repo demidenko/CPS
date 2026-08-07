@@ -43,7 +43,9 @@ class CodeforcesCommunityLostRecentWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_lost", context = context) {
+        const val workName = "cf_lost"
+
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
 
             override suspend fun requestBuilder() =
@@ -54,7 +56,7 @@ class CodeforcesCommunityLostRecentWorker(
             override fun flowOfInfo() =
                 combine(
                     flow = CodeforcesLostDataStore(context).flowOfEntries(),
-                    flow2 = WorkersHintsDataStore(context).codeforcesLostHintNotNew.asFlow()
+                    flow2 = context.workerStorage.hintNotNew.asFlow()
                 ) { entries, hint ->
                     mapOf(
                         "hint" to hint?.run { "($blogEntryId, $creationTime)" },
@@ -75,12 +77,22 @@ class CodeforcesCommunityLostRecentWorker(
         lostStorage.updateEntries(
             api = client,
             pageContentProvider = client,
-            hintStorage = hintsDataStore.codeforcesLostHintNotNew.asHintStorage(),
+            hintStorage = context.workerStorage.hintNotNew.asHintStorage(),
             isFresh = { currentTime - it < 24.hours },
             isStale = { currentTime - it > 7.days },
             trustColorTags = isCFMagicSafeMonth()
         )
     }
+}
+
+private val Context.workerStorage get() = CodeforcesCommunityLostRecentWorkerStorage(this)
+
+private class CodeforcesCommunityLostRecentWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
+    companion object {
+        private val Context.dataStore by workerDataStoreDelegate(workName = CodeforcesCommunityLostRecentWorker.workName)
+    }
+
+    val hintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "hint_not_new")
 }
 
 @Serializable
