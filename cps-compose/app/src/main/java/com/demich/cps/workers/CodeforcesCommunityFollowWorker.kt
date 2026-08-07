@@ -59,7 +59,7 @@ class CodeforcesCommunityFollowWorker(
             .sortedByDescending { it.userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST }
             .forEachWithProgress { blog ->
                 repository.getAndReloadBlogEntries(handle = blog.handle).getOrThrow()
-                lastOnlineItem.edit { put(blog.id, blog.userLastOnlineTimeOrNull()) }
+                lastOnlineItem.edit { set(key = blog.id, value = blog.userLastOnlineTimeOrNull()) }
             }
     }
 }
