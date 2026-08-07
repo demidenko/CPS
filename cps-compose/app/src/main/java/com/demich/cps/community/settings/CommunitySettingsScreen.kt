@@ -40,12 +40,12 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesCommunityFollowWorker
 import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
+import com.demich.cps.workers.checkEnabled
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.setValueIn
@@ -264,13 +264,9 @@ private fun NewsFeedsSettingsItem() {
                 )
             }
         },
-        onNewSelected = {
-            if (it.containsSomethingExcept(project_euler_problems)) {
-                NewsWorker.getWork(context).startImmediate()
-            }
-            if (project_euler_problems in it) {
-                ProjectEulerRecentProblemsWorker.getWork(context).startImmediate()
-            }
+        onSaved = {
+            NewsWorker.getWork(context).checkEnabled(immediate = true)
+            ProjectEulerRecentProblemsWorker.getWork(context).checkEnabled(immediate = true)
         }
     )
 }
