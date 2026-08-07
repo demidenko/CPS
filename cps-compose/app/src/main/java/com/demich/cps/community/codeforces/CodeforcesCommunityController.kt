@@ -23,7 +23,7 @@ import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
-import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
+import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
@@ -131,7 +131,7 @@ fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<
     if (tab == LOST) {
         val context = context
         return remember {
-            CodeforcesCommunityLostRecentWorker.getWork(context)
+            CodeforcesLostRecentWorker.getWork(context)
                 .flowOfWorkInfo()
                 .map { if (it.isRunning) LoadingStatus.LOADING else PENDING }
         }.collectAsStateWithLifecycle(initialValue = PENDING)

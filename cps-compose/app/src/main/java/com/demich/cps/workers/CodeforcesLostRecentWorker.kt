@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 
-class CodeforcesCommunityLostRecentWorker(
+class CodeforcesLostRecentWorker(
     context: Context,
     parameters: WorkerParameters
 ): CPSWorker(
@@ -48,7 +48,7 @@ class CodeforcesCommunityLostRecentWorker(
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
 
             override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<CodeforcesCommunityLostRecentWorker>(
+                CPSPeriodicWorkRequestBuilder<CodeforcesLostRecentWorker>(
                     repeatInterval = 30.minutes
                 )
 
@@ -84,11 +84,11 @@ class CodeforcesCommunityLostRecentWorker(
     }
 }
 
-private val Context.workerStorage get() = CodeforcesCommunityLostRecentWorkerStorage(this)
+private val Context.workerStorage get() = CodeforcesLostRecentWorkerStorage(this)
 
-private class CodeforcesCommunityLostRecentWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
+private class CodeforcesLostRecentWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {
-        private val Context.dataStore by workerDataStoreDelegate(CodeforcesCommunityLostRecentWorker)
+        private val Context.dataStore by workerDataStoreDelegate(CodeforcesLostRecentWorker)
     }
 
     val hintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "hint_not_new")

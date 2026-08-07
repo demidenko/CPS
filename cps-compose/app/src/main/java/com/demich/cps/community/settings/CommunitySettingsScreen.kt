@@ -42,8 +42,8 @@ import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
-import com.demich.cps.workers.CodeforcesCommunityLostRecentWorker
 import com.demich.cps.workers.CodeforcesFollowWorker
+import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
@@ -145,7 +145,7 @@ private fun LostSettingsItem() {
             item = item,
             title = "Lost recent blog entries",
             description = stringResource(id = R.string.community_settings_cf_lost_description),
-            workProvider = CodeforcesCommunityLostRecentWorker
+            workProvider = CodeforcesLostRecentWorker
         )
         AnimatedVisibility(
             visible = enabled,
