@@ -11,11 +11,15 @@ import com.demich.cps.platforms.utils.ProjectEulerParser
 import com.demich.cps.platforms.utils.ProjectEulerRssParser
 import com.demich.cps.ui.platformLogoResId
 import com.demich.cps.utils.getSystemTime
+import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
+
+private const val workName = "pe_recent"
 
 class ProjectEulerRecentProblemsWorker(
     context: Context,
@@ -25,7 +29,7 @@ class ProjectEulerRecentProblemsWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "pe_recent", context = context) {
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() =
                 context.settingsCommunity.enabledNewsFeeds().contains(project_euler_problems)
 
@@ -35,7 +39,7 @@ class ProjectEulerRecentProblemsWorker(
                 )
 
             override fun flowOfInfo() =
-                WorkersHintsDataStore(context).flowOf {
+                context.workerStorage.flowOf {
                     mapOf("next problem" to projectEulerProblemPublishTime.value)
                 }
         }
@@ -50,7 +54,7 @@ class ProjectEulerRecentProblemsWorker(
                 .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also {
-                    WorkersHintsDataStore(context).projectEulerProblemPublishTime.setValue(it)
+                    context.workerStorage.projectEulerProblemPublishTime.setValue(it)
                 }
         }
     }
@@ -86,10 +90,20 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun getPublishTimeHint(): Instant? {
-        hintsDataStore.projectEulerProblemPublishTime().let {
+        context.workerStorage.projectEulerProblemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
         val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
         return extractAndSaveHint(parser = rssParser, context = context)
     }
+}
+
+private val Context.workerStorage get() = ProjectEulerRecentProblemsWorkerStorage(this)
+
+private class ProjectEulerRecentProblemsWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
+    companion object {
+        private val Context.dataStore by workerDataStoreDelegate(workName = workName)
+    }
+
+    val projectEulerProblemPublishTime = jsonCPS.itemNullable<Instant>(name = "pe_problem_publish_time")
 }

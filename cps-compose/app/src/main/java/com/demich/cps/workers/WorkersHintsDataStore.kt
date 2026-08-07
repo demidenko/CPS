@@ -23,9 +23,9 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
     val codeforcesLostHintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "cf_lost_hint")
 
     val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
-
-    val projectEulerProblemPublishTime = jsonCPS.itemNullable<Instant>(name = "pe_problem_publish_time")
 }
+
+fun workerDataStoreDelegate(workName: String) = dataStoreWrapper(name = "WORKER_${workName}_storage")
 
 suspend inline fun <T: NewsPostEntry> List<T>.scanNewsFeed(
     newsFeed: CommunityNewsFeed,
