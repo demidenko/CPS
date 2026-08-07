@@ -18,7 +18,7 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
     val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
 }
 
-// TODO: pass work provider instead of provider?
+// TODO: pass work instead of provider?
 fun workerDataStoreDelegate(provider: CPSPeriodicWorkProvider) =
     dataStoreWrapper(name = "WORKER_${provider.workName}_storage")
 
