@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
 
-class CodeforcesCommunityFollowWorker(
+class CodeforcesFollowWorker(
     context: Context,
     parameters: WorkerParameters
 ): CPSWorker(
@@ -28,7 +28,7 @@ class CodeforcesCommunityFollowWorker(
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
             override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<CodeforcesCommunityFollowWorker>(
+                CPSPeriodicWorkRequestBuilder<CodeforcesFollowWorker>(
                     repeatInterval = 4.hours,
                     batteryNotLow = true
                 )
@@ -44,7 +44,7 @@ class CodeforcesCommunityFollowWorker(
 
         val blogs = repository.blogs()
 
-        val lastOnlineItem = CodeforcesCommunityFollowWorkerStorage(context).usersLastOnlineTime
+        val lastOnlineItem = CodeforcesFollowWorkerStorage(context).usersLastOnlineTime
         val blogsToUpdate = lastOnlineItem().let { last ->
             blogs.filterNot {
                 // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
@@ -67,9 +67,9 @@ class CodeforcesCommunityFollowWorker(
 private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
     userProfile.userInfoOrNull()?.lastOnlineTime
 
-private class CodeforcesCommunityFollowWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
+private class CodeforcesFollowWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {
-        private val Context.dataStore by workerDataStoreDelegate(CodeforcesCommunityFollowWorker)
+        private val Context.dataStore by workerDataStoreDelegate(CodeforcesFollowWorker)
     }
 
     //TODO: clean up unused ids sometimes

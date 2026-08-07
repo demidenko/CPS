@@ -177,7 +177,7 @@ fun Context.getCPSWorks(): List<CPSPeriodicWork> =
         ContestsWorker,
         CodeforcesMonitorLauncherWorker,
         CodeforcesCommunityLostRecentWorker,
-        CodeforcesCommunityFollowWorker,
+        CodeforcesFollowWorker,
         CodeforcesUpsolvingSuggestionsWorker,
         ProjectEulerRecentProblemsWorker,
         UtilityWorker
