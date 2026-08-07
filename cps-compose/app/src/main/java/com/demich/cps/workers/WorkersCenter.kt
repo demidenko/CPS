@@ -130,6 +130,13 @@ abstract class CPSPeriodicWork(
     }
 }
 
+suspend fun CPSPeriodicWork.checkEnabled(immediate: Boolean) {
+    if (isEnabled()) {
+        if (immediate) startImmediate()
+        else enqueueIfEnabled()
+    } else stop()
+}
+
 suspend fun CPSWork.workInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()
 
 suspend fun CPSWork.state(): WorkInfo.State = workInfo().stateOrCancelled
