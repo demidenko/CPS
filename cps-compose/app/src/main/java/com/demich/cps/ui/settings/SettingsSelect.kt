@@ -7,7 +7,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -16,6 +15,7 @@ import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.dialogs.CPSDialogMultiSelectEnum
 import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.DataStoreItem
@@ -31,7 +31,7 @@ fun <T> Select(
     options: Iterable<T>,
     optionTitle: @Composable (T) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
     val selectedOption by collectItemAsState { item }
 
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
@@ -70,7 +70,7 @@ fun <T> SelectSubtitled(
     onOptionSaved: suspend (T) -> Unit,
     optionTitle: @Composable (T) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
     val selectedOption by collectItemAsState { item }
 
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
@@ -127,7 +127,7 @@ fun <T: Enum<T>> MultiSelectEnum(
     onNewSelected: suspend (Set<T>) -> Unit,
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
 
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
 

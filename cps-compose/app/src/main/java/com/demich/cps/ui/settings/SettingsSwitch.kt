@@ -3,10 +3,10 @@ package com.demich.cps.ui.settings
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSSwitch
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CPSPeriodicWorkProvider
@@ -43,7 +43,7 @@ private inline fun SwitchByItem(
     description: String = "",
     crossinline onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    val scope = backgroundCoroutineScope
     val checked by collectItemAsState { item }
     Switch(
         checked = checked,
