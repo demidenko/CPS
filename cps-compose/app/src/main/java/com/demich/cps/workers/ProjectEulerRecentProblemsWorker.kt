@@ -40,7 +40,7 @@ class ProjectEulerRecentProblemsWorker(
 
             override fun flowOfInfo() =
                 context.workerStorage.flowOf {
-                    mapOf("next problem" to projectEulerProblemPublishTime.value)
+                    mapOf("next problem" to problemPublishTime.value)
                 }
         }
 
@@ -54,7 +54,7 @@ class ProjectEulerRecentProblemsWorker(
                 .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also {
-                    context.workerStorage.projectEulerProblemPublishTime.setValue(it)
+                    context.workerStorage.problemPublishTime.setValue(it)
                 }
         }
     }
@@ -90,7 +90,7 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun getPublishTimeHint(): Instant? {
-        context.workerStorage.projectEulerProblemPublishTime().let {
+        context.workerStorage.problemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
         val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
@@ -105,5 +105,5 @@ private class ProjectEulerRecentProblemsWorkerStorage(context: Context): Itemize
         private val Context.dataStore by workerDataStoreDelegate(workName = workName)
     }
 
-    val projectEulerProblemPublishTime = jsonCPS.itemNullable<Instant>(name = "pe_problem_publish_time")
+    val problemPublishTime = jsonCPS.itemNullable<Instant>(name = "problem_publish_time")
 }
