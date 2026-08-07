@@ -32,7 +32,9 @@ class CodeforcesUpsolvingSuggestionsWorker(
 ) {
 
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_upsolving", context = context) {
+        override val workName get() = "cf_upsolving"
+
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() =
                 CodeforcesProfileManager().settingsStorage(context).upsolvingSuggestionsEnabled()
 

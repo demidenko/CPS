@@ -16,7 +16,9 @@ class UtilityWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "utility", context = context) {
+        override val workName get() = "utility"
+
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() = true
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<UtilityWorker>(

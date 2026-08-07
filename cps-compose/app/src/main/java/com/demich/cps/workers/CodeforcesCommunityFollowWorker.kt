@@ -21,7 +21,9 @@ class CodeforcesCommunityFollowWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "cf_follow", context = context) {
+        override val workName get() = "cf_follow"
+
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesFollowEnabled()
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<CodeforcesCommunityFollowWorker>(

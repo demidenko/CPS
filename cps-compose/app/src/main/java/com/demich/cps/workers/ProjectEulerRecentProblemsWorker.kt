@@ -19,8 +19,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
-private const val workName = "pe_recent"
-
 class ProjectEulerRecentProblemsWorker(
     context: Context,
     parameters: WorkerParameters
@@ -29,6 +27,8 @@ class ProjectEulerRecentProblemsWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
+        override val workName get() = "pe_recent"
+
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() =
                 context.settingsCommunity.enabledNewsFeeds().contains(project_euler_problems)
@@ -102,7 +102,7 @@ private val Context.workerStorage get() = ProjectEulerRecentProblemsWorkerStorag
 
 private class ProjectEulerRecentProblemsWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {
-        private val Context.dataStore by workerDataStoreDelegate(workName = workName)
+        private val Context.dataStore by workerDataStoreDelegate(ProjectEulerRecentProblemsWorker)
     }
 
     val problemPublishTime = jsonCPS.itemNullable<Instant>(name = "problem_publish_time")

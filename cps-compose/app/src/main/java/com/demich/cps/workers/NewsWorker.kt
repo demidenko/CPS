@@ -25,7 +25,9 @@ class NewsWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        override fun getWork(context: Context) = object : CPSPeriodicWork(name = "news", context = context) {
+        override val workName get() = "news"
+
+        override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled(): Boolean {
                 return context.settingsCommunity.enabledNewsFeeds().containsSomethingExcept(project_euler_problems)
             }

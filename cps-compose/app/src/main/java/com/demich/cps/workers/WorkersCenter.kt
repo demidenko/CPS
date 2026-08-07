@@ -165,6 +165,8 @@ internal inline fun <reified W: CPSWorker> CPSPeriodicWorkRequestBuilder(
     }
 
 interface CPSPeriodicWorkProvider {
+    val workName: String
+
     fun getWork(context: Context): CPSPeriodicWork
 }
 

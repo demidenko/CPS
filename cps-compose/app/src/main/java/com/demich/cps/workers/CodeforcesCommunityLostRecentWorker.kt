@@ -42,7 +42,7 @@ class CodeforcesCommunityLostRecentWorker(
     parameters = parameters
 ) {
     companion object : CPSPeriodicWorkProvider {
-        const val workName = "cf_lost"
+        override val workName get() = "cf_lost"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
             override suspend fun isEnabled() = context.settingsCommunity.codeforcesLostEnabled()
@@ -88,7 +88,7 @@ private val Context.workerStorage get() = CodeforcesCommunityLostRecentWorkerSto
 
 private class CodeforcesCommunityLostRecentWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {
-        private val Context.dataStore by workerDataStoreDelegate(workName = CodeforcesCommunityLostRecentWorker.workName)
+        private val Context.dataStore by workerDataStoreDelegate(CodeforcesCommunityLostRecentWorker)
     }
 
     val hintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "hint_not_new")
