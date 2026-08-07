@@ -3,16 +3,23 @@ package com.demich.cps.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.R
+import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.ProjectEulerClient
+import com.demich.cps.platforms.utils.NewsPostEntry
 import com.demich.cps.platforms.utils.ProjectEulerRssParser
 import com.demich.cps.platforms.utils.atcoder.AtCoderNewsParser
+import com.demich.cps.platforms.utils.scanNewsPostEntries
 import com.demich.cps.utils.asHtmlToSpanned
 import com.demich.cps.utils.containsSomethingExcept
+import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
+import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import kotlin.time.Duration.Companion.hours
@@ -39,7 +46,7 @@ class NewsWorker(
                 )
 
             override fun flowOfInfo() =
-                WorkersHintsDataStore(context).flowOf {
+                NewsFeedStorage(context).flowOf {
                     newsFeedsLastIds.value.mapKeys { it.key.name }
                 }
         }
@@ -57,7 +64,7 @@ class NewsWorker(
     private suspend fun atcoderNews() {
         AtCoderNewsParser().parseNews(source = AtCoderClient.getMainPage()).scanNewsFeed(
             newsFeed = atcoder_news,
-            hintsDataStore = hintsDataStore
+            storage = NewsFeedStorage(context)
         ) { post ->
             notificationChannels.atcoder.news(post.id).notify(context) {
                 subText = "atcoder news"
@@ -76,7 +83,7 @@ class NewsWorker(
 
         rssParser.parseNews().scanNewsFeed(
             newsFeed = project_euler_news,
-            hintsDataStore = hintsDataStore
+            storage = NewsFeedStorage(context)
         ) { post ->
             notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
                 subText = "Project Euler news"
@@ -95,4 +102,29 @@ class NewsWorker(
             ProjectEulerRecentProblemsWorker.extractAndSaveHint(parser = rssParser, context = context)
         }
     }
+}
+
+class NewsFeedStorage(context: Context): ItemizedDataStore(context.dataStore) {
+    companion object {
+        private val Context.dataStore by dataStoreWrapper(name = "news_feed")
+    }
+
+    val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
+}
+
+suspend inline fun <T: NewsPostEntry> List<T>.scanNewsFeed(
+    newsFeed: CommunityNewsFeed,
+    storage: NewsFeedStorage,
+    onNewPost: (T) -> Unit
+) {
+    val item = storage.newsFeedsLastIds
+    scanNewsPostEntries(
+        getLastId = {
+            item()[newsFeed]
+        },
+        setLastId = {
+            item.edit { set(key = newsFeed, value = it) }
+        },
+        onNewPost = onNewPost
+    )
 }

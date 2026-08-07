@@ -68,7 +68,7 @@ class ProjectEulerRecentProblemsWorker(
     private suspend fun scanProblems() {
         ProjectEulerParser().parseRecentProblems(ProjectEulerClient.getRecentPage()).scanNewsFeed(
             newsFeed = project_euler_problems,
-            hintsDataStore = hintsDataStore
+            storage = NewsFeedStorage(context)
         ) { post ->
             val problemId = post.id.toInt()
             notificationChannels.project_euler.problems(problemId).notify(context) {

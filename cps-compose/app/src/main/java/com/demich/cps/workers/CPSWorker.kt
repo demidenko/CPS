@@ -143,10 +143,6 @@ abstract class CPSWorker(
     ) {
         val duration: Duration? get() = end?.minus(start)
     }
-
-    protected val hintsDataStore: WorkersHintsDataStore
-        get() = WorkersHintsDataStore(context)
-
 }
 
 private const val KEY_PROGRESS = "cpsworker_progress"
