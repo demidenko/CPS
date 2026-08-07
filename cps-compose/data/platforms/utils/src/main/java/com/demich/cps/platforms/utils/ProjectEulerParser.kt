@@ -57,8 +57,7 @@ class ProjectEulerParser {
 class ProjectEulerRssParser(
     rssPage: String
 ) {
-    private val document = rssPage.parseDocument()
-    private fun rssItems(): Sequence<Element> = document.selectSequence(Evaluator.Tag("item"))
+    private val rssItems = rssPage.parseDocument().select(Evaluator.Tag("item"))
 
     private val evaluatorDescription = Evaluator.Tag("description")
     private fun Element.description() = expectFirst(evaluatorDescription)
@@ -98,8 +97,8 @@ class ProjectEulerRssParser(
             format = format
         )
 
-    fun parseNews(): Sequence<ProjectEulerNewsPost> =
-        rssItems().mapNotNull { item ->
+    fun parseNews(): List<ProjectEulerNewsPost> =
+        rssItems.mapNotNull { item ->
             item.guidOrNull(prefix = "news_id_") { id ->
                 ProjectEulerNewsPost(
                     title = item.title().text(),
@@ -111,7 +110,7 @@ class ProjectEulerRssParser(
         }
 
     fun parseProblems(): Sequence<Pair<Int, Instant>> =
-        rssItems().mapNotNull { item ->
+        rssItems.asSequence().mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
                 val description = item.description().text()
                 val date = description.extractDate()
