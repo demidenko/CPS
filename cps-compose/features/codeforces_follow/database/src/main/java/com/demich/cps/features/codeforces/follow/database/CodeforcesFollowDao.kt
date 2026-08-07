@@ -19,6 +19,10 @@ internal const val cfFollowTableName = "FollowList"
 @Dao
 internal abstract class CodeforcesFollowDao {
 
+    @Query("SELECT * FROM $cfFollowTableName WHERE id == :id")
+    @RewriteQueriesToDropUnusedColumns
+    abstract suspend fun getShortEntity(id: Long): CodeforcesUserBlogEntityShort?
+
     @Query("SELECT * FROM $cfFollowTableName")
     @RewriteQueriesToDropUnusedColumns
     abstract suspend fun getShortBlogs(): List<CodeforcesUserBlogEntityShort>

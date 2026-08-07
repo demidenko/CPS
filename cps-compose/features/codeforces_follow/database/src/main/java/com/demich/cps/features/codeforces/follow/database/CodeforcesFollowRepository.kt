@@ -24,6 +24,9 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(handle: String) = dao.remove(handle)
 
+    suspend fun blog(id: Long): CodeforcesUserBlog? =
+        dao.getShortEntity(id)?.toCodeforcesUserBlog()
+
     fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>> =
         dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
