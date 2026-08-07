@@ -70,11 +70,11 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
-        val rssPage = ProjectEulerClient.getRSSPage()
+        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
 
         hintsDataStore.scanNewsFeed(
             newsFeed = project_euler_news,
-            posts = ProjectEulerRssParser(rssPage).parseNews().toList()
+            posts = rssParser.parseNews().toList()
         ) { post ->
             notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
                 subText = "Project Euler news"
@@ -90,7 +90,7 @@ class NewsWorker(
         }
 
         if (ProjectEulerRecentProblemsWorker.getWork(context).isEnabled()) {
-            ProjectEulerRecentProblemsWorker.extractAndSaveHint(rssPage = rssPage, context = context)
+            ProjectEulerRecentProblemsWorker.extractAndSaveHint(parser = rssParser, context = context)
         }
     }
 }

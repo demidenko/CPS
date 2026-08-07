@@ -42,12 +42,12 @@ class ProjectEulerRecentProblemsWorker(
 
         @IgnorableReturnValue
         suspend fun extractAndSaveHint(
-            rssPage: String,
+            parser: ProjectEulerRssParser,
             context: Context
         ): Instant? {
             val item = WorkersHintsDataStore(context).projectEulerProblemPublishTime
             val currentTime = getSystemTime()
-            return ProjectEulerRssParser(rssPage).parseProblems()
+            return parser.parseProblems()
                 .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also { item.setValue(it) }
@@ -88,6 +88,7 @@ class ProjectEulerRecentProblemsWorker(
         hintsDataStore.projectEulerProblemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
-        return extractAndSaveHint(rssPage = ProjectEulerClient.getRSSPage(), context = context)
+        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
+        return extractAndSaveHint(parser = rssParser, context = context)
     }
 }
