@@ -8,16 +8,12 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
-import kotlin.time.Instant
 
 
 class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {
         private val Context.dataStore by dataStoreWrapper(name = "workers_hints")
     }
-
-    //TODO: clean up unused ids sometimes
-    val followLastUserOnlineTime = jsonCPS.itemMap<Long, Instant?>(name = "follow_last_online")
 
     val newsFeedsLastIds = jsonCPS.itemMap<CommunityNewsFeed, String>(name = "news_feeds_last_id")
 }

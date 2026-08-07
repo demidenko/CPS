@@ -8,6 +8,8 @@ import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
 import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
+import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
@@ -42,7 +44,7 @@ class CodeforcesCommunityFollowWorker(
 
         val blogs = repository.blogs()
 
-        val lastOnlineItem = hintsDataStore.followLastUserOnlineTime
+        val lastOnlineItem = CodeforcesCommunityFollowWorkerStorage(context).usersLastOnlineTime
         val blogsToUpdate = lastOnlineItem().let { last ->
             blogs.filterNot {
                 // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
@@ -64,3 +66,12 @@ class CodeforcesCommunityFollowWorker(
 
 private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
     userProfile.userInfoOrNull()?.lastOnlineTime
+
+private class CodeforcesCommunityFollowWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {
+    companion object {
+        private val Context.dataStore by workerDataStoreDelegate(CodeforcesCommunityFollowWorker)
+    }
+
+    //TODO: clean up unused ids sometimes
+    val usersLastOnlineTime = jsonCPS.itemMap<Long, Instant?>(name = "users_last_online")
+}
