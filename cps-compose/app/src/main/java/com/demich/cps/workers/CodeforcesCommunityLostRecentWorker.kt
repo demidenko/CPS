@@ -16,7 +16,6 @@ import com.demich.cps.platforms.codeforces.lost.updateEntries
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.toSystemLocalDate
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -77,7 +76,7 @@ class CodeforcesCommunityLostRecentWorker(
         lostStorage.updateEntries(
             api = client,
             pageContentProvider = client,
-            hintStorage = context.workerStorage.hintNotNew.asHintStorage(),
+            hintStorage = context.workerStorage.asHintStorage(),
             isFresh = { currentTime - it < 24.hours },
             isStale = { currentTime - it > 7.days },
             trustColorTags = isCFMagicSafeMonth()
@@ -93,6 +92,14 @@ private class CodeforcesCommunityLostRecentWorkerStorage(context: Context): Item
     }
 
     val hintNotNew = jsonCPS.itemNullable<CodeforcesLostHint>(name = "hint_not_new")
+
+    fun asHintStorage(): CodeforcesLostHintStorage =
+        object : CodeforcesLostHintStorage {
+            override suspend fun getValue(): CodeforcesLostHint? = hintNotNew()
+            override suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint?) {
+                hintNotNew.update(transform)
+            }
+        }
 }
 
 @Serializable
@@ -166,17 +173,6 @@ private fun Collection<CodeforcesLostEntry>.counters(): String {
     val lost = count { it is CodeforcesLostBlogEntry }
     return "$suspects / $fresh / $lost"
 }
-
-private fun DataStoreItem<CodeforcesLostHint?>.asHintStorage(): CodeforcesLostHintStorage =
-    object : CodeforcesLostHintStorage {
-        override suspend fun getValue(): CodeforcesLostHint? {
-            return this@asHintStorage.invoke()
-        }
-
-        override suspend fun update(transform: (CodeforcesLostHint?) -> CodeforcesLostHint?) {
-            this@asHintStorage.update(transform)
-        }
-    }
 
 private fun isCFMagicSafeMonth(): Boolean =
     Clock.System.now().toSystemLocalDate().month in Month.MARCH .. Month.OCTOBER
