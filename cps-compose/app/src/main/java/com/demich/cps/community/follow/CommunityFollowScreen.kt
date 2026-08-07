@@ -36,7 +36,7 @@ import com.demich.cps.utils.launchData
 
 @Composable
 private fun CommunityFollowScreen(
-    onShowBlogScreen: (String) -> Unit
+    onShowBlogScreen: (Long) -> Unit
 ) {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
@@ -65,7 +65,7 @@ private fun CommunityFollowScreen(
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFollowListScreen(
-    onShowBlogScreen: (String) -> Unit
+    onShowBlogScreen: (Long) -> Unit
 ) {
     screenTitle = ScreenStaticTitleState("community", "codeforces", "follow", "list")
 
@@ -80,7 +80,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 private fun CodeforcesFollowList(
     userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
-    onOpenBlog: (String) -> Unit,
+    onOpenBlog: (Long) -> Unit,
     onDeleteUser: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -112,7 +112,7 @@ private fun CodeforcesFollowList(
                     title = "Show blog",
                     icon = CPSIcons.BlogEntry,
                     enabled = enabled,
-                    onClick = { onOpenBlog(userBlog.handle) }
+                    onClick = { onOpenBlog(userBlog.id) }
                 )
                 CPSDropdownMenuItem(
                     title = "Delete",

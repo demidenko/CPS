@@ -98,8 +98,8 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.CommunityFollowList> {
             NavContentCommunityFollowListScreen(
-                onShowBlogScreen = { handle ->
-                    navigator.navigateTo(Screen.CommunityCodeforcesBlog(handle = handle))
+                onShowBlogScreen = { id ->
+                    navigator.navigateTo(Screen.CommunityCodeforcesBlog(blogId = id))
                 }
             )
         }

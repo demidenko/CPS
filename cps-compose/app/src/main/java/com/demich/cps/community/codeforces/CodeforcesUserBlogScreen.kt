@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
+import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -46,7 +47,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforce
 
     val filterState = rememberFilterState()
     CodeforcesUserBlogScreen(
-        handle = screen.handle,
+        blogId = screen.blogId,
         filterState = filterState
     )
 
@@ -57,13 +58,13 @@ fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforce
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    handle: String,
+    blogId: Long,
     filterState: FilterState
 ) {
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     val uuidState = rememberUUIDState()
-    val flow = viewModel.flowOfFetchBlogEntries(handle, context, key = uuidState.value)
+    val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
     val blogEntries by flow.collectAsState()
 
     CodeforcesUserBlogScreen(
@@ -134,9 +135,12 @@ private class BlogLoadingViewModel: ViewModel() {
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
 
-    fun flowOfFetchBlogEntries(handle: String, context: Context, key: Any) = blogEntriesLoader.run {
+    fun flowOfFetchBlogEntries(blogId: Long, context: Context, key: Any) = blogEntriesLoader.run {
         val repository = context.followRepository
-        executeFlow(key = Pair(handle, key)) {
+        executeFlow(key = Pair(blogId, key)) {
+            val blog = repository.blog(id = blogId)
+            requireNotNull(blog) { "blogId $blogId not in database" }
+            val handle = blog.handle
             val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
             emitAll(
                 combine(

@@ -54,7 +54,7 @@ sealed interface Screen {
     }
 
     @Serializable
-    data class CommunityCodeforcesBlog(val handle: String): Screen {
+    data class CommunityCodeforcesBlog(val blogId: Long): Screen {
         override val rootScreen: RootScreen
             get() = Community
     }
