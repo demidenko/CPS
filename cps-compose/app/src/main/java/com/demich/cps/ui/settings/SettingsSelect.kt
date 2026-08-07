@@ -67,7 +67,7 @@ fun <T> SelectSubtitled(
     title: String,
     item: DataStoreItem<T>,
     options: Iterable<T>,
-    onSaved: suspend () -> Unit,
+    onOptionSaved: suspend (T) -> Unit,
     optionTitle: @Composable (T) -> Unit
 ) {
     val scope = backgroundCoroutineScope
@@ -92,7 +92,7 @@ fun <T> SelectSubtitled(
             onSelectOption = {
                 scope.launch {
                     item.setValue(it)
-                    onSaved()
+                    onOptionSaved(it)
                 }
             }
         )
@@ -124,7 +124,7 @@ fun <T: Enum<T>> MultiSelectEnum(
     item: DataStoreItem<Set<T>>,
     options: Iterable<T>,
     optionName: (T) -> String = { it.name },
-    onSaved: suspend () -> Unit,
+    onNewSelected: suspend (Set<T>) -> Unit,
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }
 ) {
     val scope = backgroundCoroutineScope
@@ -153,7 +153,7 @@ fun <T: Enum<T>> MultiSelectEnum(
             onSaveSelected = {
                 scope.launch {
                     item.setValue(it)
-                    onSaved()
+                    onNewSelected(it - selected)
                 }
             }
         )

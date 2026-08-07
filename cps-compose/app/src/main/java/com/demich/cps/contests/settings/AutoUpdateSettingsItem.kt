@@ -7,7 +7,6 @@ import com.demich.cps.ui.settings.SelectSubtitled
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.utils.context
 import com.demich.cps.workers.ContestsWorker
-import com.demich.cps.workers.checkEnabled
 import com.demich.datastore_itemized.DataStoreItem
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -26,8 +25,11 @@ internal fun AutoUpdateSettingsItem(
         options = remember {
             listOf(null, 15.minutes, 30.minutes, 1.hours, 2.hours, 6.hours)
         },
-        onSaved = {
-            ContestsWorker.getWork(context).checkEnabled(immediate = false)
+        onOptionSaved = {
+            with(ContestsWorker.getWork(context)) {
+                if (it == null) stop()
+                else enqueueIfEnabled()
+            }
         },
         optionTitle = {
             Text(text = title(it))
