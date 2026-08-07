@@ -27,19 +27,19 @@ class WorkersHintsDataStore(context: Context): ItemizedDataStore(context.dataSto
     val projectEulerProblemPublishTime = jsonCPS.itemNullable<Instant>(name = "pe_problem_publish_time")
 }
 
-suspend inline fun <T: NewsPostEntry> WorkersHintsDataStore.scanNewsFeed(
+suspend inline fun <T: NewsPostEntry> List<T>.scanNewsFeed(
     newsFeed: CommunityNewsFeed,
-    posts: List<T>,
+    hintsDataStore: WorkersHintsDataStore,
     onNewPost: (T) -> Unit
 ) {
+    val item = hintsDataStore.newsFeedsLastIds
     scanNewsPostEntries(
-        posts = posts,
-        onNewPost = onNewPost,
         getLastId = {
-            newsFeedsLastIds()[newsFeed]
+            item()[newsFeed]
         },
         setLastId = {
-            newsFeedsLastIds.edit { this[newsFeed] = it }
-        }
+            item.edit { set(key = newsFeed, value = it) }
+        },
+        onNewPost = onNewPost
     )
 }

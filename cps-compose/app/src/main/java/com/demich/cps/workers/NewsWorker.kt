@@ -53,9 +53,9 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        hintsDataStore.scanNewsFeed(
+        AtCoderNewsParser().parseNews(source = AtCoderClient.getMainPage()).scanNewsFeed(
             newsFeed = atcoder_news,
-            posts = AtCoderNewsParser().parseNews(source = AtCoderClient.getMainPage())
+            hintsDataStore = hintsDataStore
         ) { post ->
             notificationChannels.atcoder.news(post.id).notify(context) {
                 subText = "atcoder news"
@@ -72,9 +72,9 @@ class NewsWorker(
     private suspend fun projectEulerNews() {
         val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
 
-        hintsDataStore.scanNewsFeed(
+        rssParser.parseNews().toList().scanNewsFeed(
             newsFeed = project_euler_news,
-            posts = rssParser.parseNews().toList()
+            hintsDataStore = hintsDataStore
         ) { post ->
             notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
                 subText = "Project Euler news"
