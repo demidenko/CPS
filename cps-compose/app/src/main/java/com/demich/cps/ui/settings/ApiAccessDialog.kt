@@ -24,6 +24,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
+import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.DataStoreValue
 import kotlin.reflect.KProperty1
@@ -60,7 +61,8 @@ internal fun <T> ApiAccessSettingsItem(
             decode = decode,
             onSave = onSave,
             onDismissRequest = { showDialog = false },
-            onHelp = onHelp
+            onHelp = onHelp,
+            checkRequest = checkRequest
         )
     }
 }
@@ -71,13 +73,14 @@ private class Field(
 )
 
 @Composable
-private fun <T> ApiDialog(
+private fun <T: Any> ApiDialog(
     dialogTitle: String,
     fields: List<Field>,
     decode: (List<String>) -> T,
     onSave: (T) -> Unit,
     onDismissRequest: () -> Unit,
-    onHelp: (() -> Unit)?
+    onHelp: (() -> Unit)?,
+    checkRequest: (suspend (T) -> Unit)? = null
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -120,7 +123,8 @@ private fun <T> ApiDialog(
             },
             onCheckRequest = {
                 TODO()
-            }
+            },
+            checkFetchState = { TODO() }
         )
     }
 }
@@ -130,7 +134,8 @@ private fun ApiAccessControls(
     modifier: Modifier = Modifier,
     onSaveResuest: () -> Unit,
     onCancelRequest: () -> Unit,
-    onCheckRequest: () -> Unit
+    onCheckRequest: () -> Unit,
+    checkFetchState: () -> FetchState<*>?
 ) {
     CPSDialogCancelAcceptButtons(
         modifier = modifier,
