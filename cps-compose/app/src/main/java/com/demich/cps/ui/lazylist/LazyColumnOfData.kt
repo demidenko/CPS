@@ -19,16 +19,16 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.utils.plusIf
 
 @Composable
-inline fun <T> LazyColumnOfData(
+fun <T> LazyColumnOfData(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = true,
     scrollUpButtonEnabled: Boolean = false,
-    noinline autoScrollPredicate: (LazyListItemInfo, LazyListItemInfo) -> Boolean = { prev, cur -> prev.index == 0 && prev.offset == 0 },
-    crossinline items: () -> List<T>,
-    noinline key: ((item: T) -> Any)? = null,
-    noinline contentType: (item: T) -> Any? = { null },
-    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+    autoScrollPredicate: (LazyListItemInfo, LazyListItemInfo) -> Boolean = { prev, cur -> prev.index == 0 && prev.offset == 0 },
+    items: () -> List<T>,
+    key: ((item: T) -> Any)? = null,
+    contentType: (item: T) -> Any? = { null },
+    itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier) {
         LazyColumnWithScrollBar(
