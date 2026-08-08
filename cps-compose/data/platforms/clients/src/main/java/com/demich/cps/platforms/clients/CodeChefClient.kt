@@ -19,6 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: class instead of object
 object CodeChefClient: CodeChefApi, CodeChefPageContentProvider {
     private val json get() = defaultJson
 
