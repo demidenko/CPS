@@ -54,7 +54,7 @@ internal abstract class CodeforcesFollowDao {
     protected abstract suspend fun update(userInfoFields: UserInfoFields)
 
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
-    abstract suspend fun remove(handle: String)
+    protected abstract suspend fun remove(handle: String)
 
     @Query("DELETE FROM $cfFollowTableName WHERE id == :blogId")
     abstract suspend fun remove(blogId: Long)
@@ -96,7 +96,7 @@ internal abstract class CodeforcesFollowDao {
     suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
         when (result) {
             is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
-            is ProfileResult.NotFound -> remove(handle)
+            is ProfileResult.NotFound -> remove(handle = handle)
             is ProfileResult.Failed -> { }
         }
     }

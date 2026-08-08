@@ -22,7 +22,7 @@ abstract class CodeforcesFollowRepository(
     private val dao: CodeforcesFollowDao =
         context.followDataBase.followListDao()
 
-    suspend fun remove(handle: String) = dao.remove(handle)
+    suspend fun remove(blogId: Long) = dao.remove(blogId = blogId)
 
     suspend fun blog(id: Long): CodeforcesUserBlog? =
         dao.getShortEntity(id)?.toCodeforcesUserBlog()

@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.features.codeforces.follow.database.CodeforcesUserBlog
-import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -50,9 +49,9 @@ private fun CommunityFollowScreen(
             userBlogs = { userBlogs },
             isRefreshing = { loadingStatusState.value == LOADING },
             onOpenBlog = onShowBlogScreen,
-            onDeleteUser = { handle ->
+            onDeleteUser = { blogId ->
                 viewModel.launchData {
-                    context.followRepository.remove(handle)
+                    context.followRepository.remove(blogId)
                 }
             },
             modifier = Modifier.fillMaxSize()
@@ -81,7 +80,7 @@ private fun CodeforcesFollowList(
     userBlogs: () -> List<CodeforcesUserBlog>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (Long) -> Unit,
-    onDeleteUser: (String) -> Unit,
+    onDeleteUser: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -134,7 +133,7 @@ private fun CodeforcesFollowList(
                 append(" from follow list?")
             },
             onDismissRequest = { showDeleteDialogForBlog = null },
-            onConfirmRequest = { onDeleteUser(userBlog.handle) }
+            onConfirmRequest = { onDeleteUser(userBlog.id) }
         )
     }
 }
