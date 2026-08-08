@@ -27,13 +27,13 @@ class TimusProfileManager :
 
     override suspend fun getUserInfo(userId: String): TimusUserInfo? =
         TimusParser().extractUserInfo(
-            source = TimusClient.getUserPage(userId.toInt()),
+            source = TimusClient().getUserPage(userId.toInt()),
             handle = userId
         )
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return TimusParser().extractUsersSuggestions(source = TimusClient.getSearchPage(str))
+        return TimusParser().extractUsersSuggestions(source = TimusClient().getSearchPage(str))
     }
 
     override fun makeUserInfoSpan(userInfo: TimusUserInfo, cpsColors: CPSColors): AnnotatedString =

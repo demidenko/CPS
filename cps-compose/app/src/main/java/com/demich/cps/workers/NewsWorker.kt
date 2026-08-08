@@ -79,7 +79,7 @@ class NewsWorker(
     }
 
     private suspend fun projectEulerNews() {
-        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
+        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient().getRSSPage())
 
         rssParser.parseNews().scanNewsFeed(
             newsFeed = project_euler_news,

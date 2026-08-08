@@ -12,7 +12,7 @@ import io.ktor.client.statement.bodyAsText
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-object ACMPClient:  ACMPPageContentProvider {
+class ACMPClient: ACMPPageContentProvider {
     private val windows1251 = Charset.forName("windows-1251")
 
     private val client = cpsHttpClient {

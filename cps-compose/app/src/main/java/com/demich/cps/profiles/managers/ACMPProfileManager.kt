@@ -29,7 +29,7 @@ class ACMPProfileManager :
     override suspend fun getUserInfo(userId: String): ACMPUserInfo? =
         try {
             ACMPParser().extractUserInfo(
-                source = ACMPClient.getUserPage(id = userId.toInt()),
+                source = ACMPClient().getUserPage(id = userId.toInt()),
                 id = userId
             )
         } catch (it: Throwable) {
@@ -39,7 +39,7 @@ class ACMPProfileManager :
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
         if (str.toIntOrNull() != null) return emptyList()
-        return ACMPParser().extractUsersSuggestions(source = ACMPClient.getUsersSearch(str))
+        return ACMPParser().extractUsersSuggestions(source = ACMPClient().getUsersSearch(str))
     }
 
     override fun makeUserInfoSpan(userInfo: ACMPUserInfo, cpsColors: CPSColors): AnnotatedString =

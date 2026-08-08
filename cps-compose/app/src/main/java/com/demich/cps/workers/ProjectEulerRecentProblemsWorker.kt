@@ -66,7 +66,7 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun scanProblems() {
-        ProjectEulerParser().parseRecentProblems(ProjectEulerClient.getRecentPage()).scanNewsFeed(
+        ProjectEulerParser().parseRecentProblems(ProjectEulerClient().getRecentPage()).scanNewsFeed(
             newsFeed = project_euler_problems,
             storage = NewsFeedStorage(context)
         ) { post ->
@@ -93,7 +93,7 @@ class ProjectEulerRecentProblemsWorker(
         context.workerStorage.problemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
-        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient.getRSSPage())
+        val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient().getRSSPage())
         return extractAndSaveHint(parser = rssParser, context = context)
     }
 }

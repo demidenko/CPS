@@ -3,7 +3,7 @@ package com.demich.cps.platforms.clients
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerPageContentProvider
 import com.demich.cps.platforms.api.projecteuler.ProjectEulerUrls
 
-object ProjectEulerClient: ProjectEulerPageContentProvider {
+class ProjectEulerClient: ProjectEulerPageContentProvider {
     private val client get() = defaultHttpClient
 
     private suspend fun getPage(page: String): String {
