@@ -12,6 +12,7 @@ import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.utils.getSystemTime
+import com.demich.cps.utils.truncateBySeconds
 import com.demich.datastore_itemized.DataStoreSnapshot
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
@@ -30,7 +31,7 @@ context(scope: DataStoreSnapshot)
 private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<ContestPlatform>) =
     contestsFetchFlows(
         setup = fetchPriorityLists.value.filterKeys { it in platforms },
-        dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime()),
+        dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime().truncateBySeconds(1)),
     ) { fetchSource ->
         when (fetchSource) {
             clist_api -> ClistContestsFetcher(
