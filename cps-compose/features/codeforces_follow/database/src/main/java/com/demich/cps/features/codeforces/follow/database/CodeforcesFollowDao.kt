@@ -42,7 +42,7 @@ internal abstract class CodeforcesFollowDao {
     abstract suspend fun hasUser(handle: String): Boolean
 
     @Query("SELECT handle FROM $cfFollowTableName")
-    abstract suspend fun getHandles(): List<String>
+    abstract suspend fun usersHandles(): List<String>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     protected abstract suspend fun insert(entity: CodeforcesUserBlogEntity): Long
