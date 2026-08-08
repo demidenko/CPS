@@ -39,7 +39,7 @@ internal fun <T> ApiAccessSettingsItem(
     decode: (List<String>) -> T & Any,
     onSave: (T & Any) -> Unit,
     onHelp: (() -> Unit)? = null,
-    checkRequest: (suspend (T) -> Unit)? = null
+    checkRequest: (suspend (T & Any) -> Unit)? = null
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
