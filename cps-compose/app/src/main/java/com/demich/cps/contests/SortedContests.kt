@@ -120,7 +120,7 @@ internal fun produceSortedContestsWithTime(
     val init = rememberScoped {
         val sorter = ContestsSmartSorter()
         val initContests = flowOfContests(context).firstBlocking()
-        val initTime = clock.now().truncateBySeconds(1)
+        val initTime = clock.now().truncateBySeconds()
         sorter.apply(initContests, initTime)
         val contestsState = mutableStateOf(sorter.contests)
         val currentTimeState = mutableStateOf(initTime)

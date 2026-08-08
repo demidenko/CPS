@@ -31,7 +31,7 @@ context(scope: DataStoreSnapshot)
 private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<ContestPlatform>) =
     contestsFetchFlows(
         setup = fetchPriorityLists.value.filterKeys { it in platforms },
-        dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime().truncateBySeconds(1)),
+        dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime().truncateBySeconds()),
     ) { fetchSource ->
         when (fetchSource) {
             clist_api -> ClistContestsFetcher(

@@ -13,6 +13,9 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.Instant
 
+fun Instant.truncateBySeconds(): Instant {
+    return Instant.fromEpochSeconds(epochSeconds = epochSeconds)
+}
 
 fun Instant.truncateBySeconds(seconds: Long): Instant {
     return Instant.fromEpochSeconds(epochSeconds = epochSeconds - epochSeconds % seconds)
