@@ -13,16 +13,7 @@ import java.net.URLEncoder
 import java.nio.charset.Charset
 
 class ACMPClient: ACMPPageContentProvider {
-    private val windows1251 = Charset.forName("windows-1251")
-
-    private val client = cpsHttpClient {
-        followRedirects = false
-
-        Charsets {
-            register(windows1251)
-            responseCharsetFallback = windows1251
-        }
-    }
+    private val client get() = acmpHttpClient
 
     //TODO: ktor can't get charset from client
     private suspend fun HttpResponse.bodyAsText() = bodyAsText(fallbackCharset = windows1251)
@@ -45,3 +36,13 @@ class ACMPClient: ACMPPageContentProvider {
     }
 }
 
+private val windows1251 get() = Charset.forName("windows-1251")
+
+private val acmpHttpClient = cpsHttpClient {
+    followRedirects = false
+
+    Charsets {
+        register(windows1251)
+        responseCharsetFallback = windows1251
+    }
+}

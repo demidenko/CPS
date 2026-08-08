@@ -19,15 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 class DmojClient: DmojApi, DmojPageContentProvider {
     private val json get() = defaultJson
 
-    private val client = cpsHttpClient(json = json) {
-        defaultRequest {
-            url(DmojUrls.main)
-        }
-
-        install(RateLimitPlugin) {
-            3 per 2.seconds // https://docs.dmoj.ca/#/site/api?id=rate-limiting "90 requests per minute"
-        }
-    }
+    private val client get() = dmojHttpClient
 
     private inline fun <reified T> JsonObject.getObject(key: String): T =
         json.decodeFromJsonElement(getValue(key))
@@ -73,3 +65,13 @@ class DmojClient: DmojApi, DmojPageContentProvider {
     }
 }
 
+
+private val dmojHttpClient = cpsHttpClient(json = defaultJson) {
+    defaultRequest {
+        url(DmojUrls.main)
+    }
+
+    install(RateLimitPlugin) {
+        3 per 2.seconds // https://docs.dmoj.ca/#/site/api?id=rate-limiting "90 requests per minute"
+    }
+}
