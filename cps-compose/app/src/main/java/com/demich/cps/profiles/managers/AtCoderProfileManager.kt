@@ -42,17 +42,17 @@ class AtCoderProfileManager :
 
     override suspend fun getUserInfo(userId: String): AtCoderUserInfo? =
         try {
-            AtCoderParser().extractUserInfo(AtCoderClient.getUserPage(handle = userId))
+            AtCoderParser().extractUserInfo(AtCoderClient().getUserPage(handle = userId))
         } catch (it: Throwable) {
             if (it.isPageNotFound) null
             else throw it
         }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =
-        AtCoderParser().extractUserSuggestions(source = AtCoderClient.getSuggestionsPage(str))
+        AtCoderParser().extractUserSuggestions(source = AtCoderClient().getSuggestionsPage(str))
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        AtCoderClient.getRatingChanges(handle = userId).map {
+        AtCoderClient().getRatingChanges(handle = userId).map {
             it.toRatingChange(handle = userId)
         }
 

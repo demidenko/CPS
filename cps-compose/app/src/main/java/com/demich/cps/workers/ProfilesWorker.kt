@@ -105,7 +105,7 @@ private suspend fun AtCoderProfileManager.checkRating(context: Context) {
     val storage = profileStorage(context)
     val userInfo = storage.profile()?.userInfoOrNull() ?: return
 
-    val lastRatingChange = AtCoderClient
+    val lastRatingChange = AtCoderClient()
         .getRatingChanges(handle = userInfo.handle)
         .lastOrNull() ?: return
 

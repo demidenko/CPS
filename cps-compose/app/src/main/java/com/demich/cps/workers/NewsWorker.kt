@@ -62,7 +62,7 @@ class NewsWorker(
     }
 
     private suspend fun atcoderNews() {
-        AtCoderNewsParser().parseNews(source = AtCoderClient.getMainPage()).scanNewsFeed(
+        AtCoderNewsParser().parseNews(source = AtCoderClient().getMainPage()).scanNewsFeed(
             newsFeed = atcoder_news,
             storage = NewsFeedStorage(context)
         ) { post ->
