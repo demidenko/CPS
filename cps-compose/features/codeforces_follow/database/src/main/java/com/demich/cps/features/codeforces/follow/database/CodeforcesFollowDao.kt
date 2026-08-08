@@ -56,12 +56,15 @@ internal abstract class CodeforcesFollowDao {
     @Query("DELETE FROM $cfFollowTableName WHERE handle LIKE :handle")
     abstract suspend fun remove(handle: String)
 
+    @Query("DELETE FROM $cfFollowTableName WHERE id == :blogId")
+    abstract suspend fun remove(blogId: Long)
+
     private suspend fun changeHandle(fromHandle: String, toHandle: String) {
         if (fromHandle == toHandle) return
         val fromUserBlog = getEntity(fromHandle) ?: return
         getEntity(toHandle)?.let { toUserBlog ->
             if (toUserBlog.id != fromUserBlog.id) {
-                remove(fromHandle)
+                remove(blogId = fromUserBlog.id)
                 return
             }
         }
