@@ -54,7 +54,7 @@ internal fun <T> ApiAccessSettingsItem(
         val init = rememberFirstValue { item }
 
         ApiDialog(
-            dialogTitle = dialogTitle,
+            title = dialogTitle,
             fields = fields.map { (title, prop) ->
                 Field(title = title, initValue = init?.let { prop.get(it) } ?: "")
             },
@@ -74,7 +74,7 @@ private class Field(
 
 @Composable
 private fun <T: Any> ApiDialog(
-    dialogTitle: String,
+    title: String,
     fields: List<Field>,
     decode: (List<String>) -> T,
     onSave: (T) -> Unit,
@@ -83,21 +83,11 @@ private fun <T: Any> ApiDialog(
     checkRequest: (suspend (T) -> Unit)? = null
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = dialogTitle,
-                style = CPSDefaults.MonospaceTextStyle,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 4.dp)
-            )
-            if (onHelp != null) {
-                CPSIconButton(
-                    icon = CPSIcons.Help,
-                    onClick = onHelp
-                )
-            }
-        }
+        ApiAccessEditorHeader(
+            modifier = Modifier.fillMaxWidth(),
+            title = title,
+            onHelp = onHelp
+        )
 
         val strings = rememberSaveable {
             fields.map { it.initValue }.toMutableStateList()
@@ -162,4 +152,27 @@ private fun ApiAccessFieldTextField(
         onValueChange = onChangeInput,
         isError = input.isBlank()
     )
+}
+
+@Composable
+private fun ApiAccessEditorHeader(
+    modifier: Modifier = Modifier,
+    title: String,
+    onHelp: (() -> Unit)?
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = title,
+            style = CPSDefaults.MonospaceTextStyle,
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 4.dp)
+        )
+        if (onHelp != null) {
+            CPSIconButton(
+                icon = CPSIcons.Help,
+                onClick = onHelp
+            )
+        }
+    }
 }
