@@ -38,7 +38,8 @@ internal fun <T> ApiAccessSettingsItem(
     fields: List<Pair<String, KProperty1<T & Any, String>>>,
     decode: (List<String>) -> T & Any,
     onSave: (T & Any) -> Unit,
-    onHelp: (() -> Unit)? = null
+    onHelp: (() -> Unit)? = null,
+    checkRequest: (suspend () -> Unit)? = null
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
@@ -110,15 +111,33 @@ private fun <T> ApiDialog(
             )
         }
 
-        CPSDialogCancelAcceptButtons(
-            acceptTitle = "Save",
-            onCancelClick = onDismissRequest,
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            onSave(decode(strings))
-            onDismissRequest()
-        }
+        ApiAccessControls(
+            modifier = Modifier.padding(top = 8.dp),
+            onCancelRequest = onDismissRequest,
+            onSaveResuest = {
+                onSave(decode(strings))
+                onDismissRequest()
+            },
+            onCheckRequest = {
+                TODO()
+            }
+        )
     }
+}
+
+@Composable
+private fun ApiAccessControls(
+    modifier: Modifier = Modifier,
+    onSaveResuest: () -> Unit,
+    onCancelRequest: () -> Unit,
+    onCheckRequest: () -> Unit
+) {
+    CPSDialogCancelAcceptButtons(
+        modifier = modifier,
+        acceptTitle = "Save",
+        onCancelClick = onCancelRequest,
+        onAcceptClick = onSaveResuest,
+    )
 }
 
 @Composable
