@@ -40,6 +40,6 @@ private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<Cont
             )
             codeforces_api -> CodeforcesContestsFetcher(api = CodeforcesClient())
             atcoder_parse -> AtCoderContestsFetcher(api = AtCoderClient())
-            dmoj_api -> DmojContestsFetcher(api = DmojClient)
+            dmoj_api -> DmojContestsFetcher(api = DmojClient())
         }
     }

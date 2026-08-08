@@ -38,7 +38,7 @@ class DmojProfileManager :
 
     override suspend fun getUserInfo(userId: String): DmojUserInfo? =
         try {
-            val res = DmojClient.getUser(handle = userId)
+            val res = DmojClient().getUser(handle = userId)
             DmojUserInfo(handle = res.username, rating = res.rating)
         } catch (it: Throwable) {
             if (it.isPageNotFound) null
@@ -46,13 +46,13 @@ class DmojProfileManager :
         }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
-        return DmojClient.getSuggestions(str).map {
+        return DmojClient().getSuggestions(str).map {
             UserSuggestion(title = it.text, userId = it.id)
         }
     }
 
     override suspend fun getRatingChanges(userId: String): List<RatingChange> =
-        DmojClient.getRatingChanges(handle = userId).map { it.toRatingChange() }
+        DmojClient().getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
         listOf(
