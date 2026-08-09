@@ -52,6 +52,8 @@ interface CodeforcesApi {
         from: Long,
         count: Long
     ): List<CodeforcesSubmission>
+
+    suspend fun getUserFriends(onlyOnline: Boolean): List<String>
 }
 
 suspend fun CodeforcesApi.getContestStandings(

@@ -159,6 +159,11 @@ class CodeforcesClient(
             parameter("count", count)
         }
 
+    override suspend fun getUserFriends(onlyOnline: Boolean): List<String> =
+        getApi(method = "user.friends") {
+            parameter("onlyOnline", onlyOnline)
+        }
+
     // raw pages methods
     private suspend inline fun getWebPage(
         path: String,
