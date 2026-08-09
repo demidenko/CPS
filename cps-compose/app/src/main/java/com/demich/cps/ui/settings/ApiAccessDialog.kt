@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,14 +20,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.utils.FetchState
+import com.demich.cps.utils.fetchFlowOf
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.datastore_itemized.DataStoreValue
+import com.sebaslogen.resaca.viewModelScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty1
 
 @Composable
@@ -104,6 +113,9 @@ private fun <T: Any> ApiDialog(
             )
         }
 
+        val viewModel = viewModelScoped { ApiAccessCheckViewModel() }
+        val fetchState = viewModel.flowOfFetchState.collectAsState()
+
         ApiAccessControls(
             modifier = Modifier.padding(top = 8.dp),
             onCancelRequest = onDismissRequest,
@@ -112,9 +124,10 @@ private fun <T: Any> ApiDialog(
                 onDismissRequest()
             },
             onCheckRequest = {
-                TODO()
+                val access = decode(strings)
+                viewModel.launchCheck { checkRequest(access) }
             },
-            checkFetchState = { TODO() }
+            checkFetchState = fetchState::value
         )
     }
 }
@@ -173,6 +186,23 @@ private fun ApiAccessEditorHeader(
                 icon = CPSIcons.Help,
                 onClick = onHelp
             )
+        }
+    }
+}
+
+private class ApiAccessCheckViewModel: ViewModel() {
+
+    val flowOfFetchState: StateFlow<FetchState<Unit>?>
+        field = MutableStateFlow(null)
+
+    fun launchCheck(
+        block: suspend () -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            fetchFlowOf(block)
+                .collect {
+                    flowOfFetchState.value = it
+                }
         }
     }
 }
