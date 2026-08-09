@@ -365,7 +365,7 @@ private fun CodeforcesApiAccessSettingsItem(
         onHelp = {
             uriHandler.openUri(CodeforcesUrls.apiUserSettings)
         },
-        checkRequest = {
+        checkBlock = {
             val _ = CodeforcesClient(apiAccess = it).getUserFriends(onlyOnline = false)
         }
     )

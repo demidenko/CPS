@@ -63,7 +63,7 @@ internal fun ClistApiAccessSettingsItem(
         onHelp = {
             uriHandler.openUri(ClistUrls.apiHelp)
         },
-        checkRequest = {
+        checkBlock = {
             val _ = ClistClient(apiAccess = it).getResource(resourceId = 1)
         }
     )

@@ -56,7 +56,7 @@ internal fun <T> ApiAccessSettingsItem(
     decode: (List<String>) -> T & Any,
     onSave: (T & Any) -> Unit,
     onHelp: (() -> Unit)? = null,
-    checkRequest: suspend (T & Any) -> Unit // TODO nullable
+    checkBlock: suspend (T & Any) -> Unit // TODO nullable lambda
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
@@ -78,7 +78,7 @@ internal fun <T> ApiAccessSettingsItem(
             onSave = onSave,
             onDismissRequest = { showDialog = false },
             onHelp = onHelp,
-            checkRequest = checkRequest
+            checkBlock = checkBlock
         )
     }
 }
@@ -96,7 +96,7 @@ private fun <T: Any> ApiDialog(
     onSave: (T) -> Unit,
     onDismissRequest: () -> Unit,
     onHelp: (() -> Unit)?,
-    checkRequest: suspend (T) -> Unit
+    checkBlock: suspend (T) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
         ApiAccessEditorHeader(
@@ -120,21 +120,12 @@ private fun <T: Any> ApiDialog(
             )
         }
 
-        val viewModel = viewModelScoped { ApiAccessCheckViewModel() }
-        val fetchState = viewModel.flowOfFetchState.collectAsState()
-
         ApiAccessControls(
             modifier = Modifier.padding(top = 8.dp),
-            onCancelRequest = onDismissRequest,
-            onSaveResuest = {
-                onSave(decode(strings))
-                onDismissRequest()
-            },
-            onCheckRequest = {
-                val access = decode(strings)
-                viewModel.launchCheck { checkRequest(access) }
-            },
-            checkFetchState = fetchState::value
+            currentValue = { decode(strings) },
+            checkBlock = checkBlock,
+            onSave = onSave,
+            onCancelRequest = onDismissRequest
         )
     }
 }
@@ -179,6 +170,32 @@ private fun ApiAccessEditorHeader(
             )
         }
     }
+}
+
+@Composable
+private fun <T: Any> ApiAccessControls(
+    modifier: Modifier = Modifier,
+    currentValue: () -> T,
+    checkBlock: suspend (T) -> Unit,
+    onSave: (T) -> Unit,
+    onCancelRequest: () -> Unit
+) {
+    val viewModel = viewModelScoped { ApiAccessCheckViewModel() }
+    val fetchState = viewModel.flowOfFetchState.collectAsState()
+
+    ApiAccessControls(
+        modifier = modifier,
+        onCancelRequest = onCancelRequest,
+        onSaveResuest = {
+            onSave(currentValue())
+            onCancelRequest()
+        },
+        onCheckRequest = {
+            val access = currentValue()
+            viewModel.launchCheck { checkBlock(access) }
+        },
+        checkFetchState = fetchState::value
+    )
 }
 
 @Composable
