@@ -1,9 +1,11 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
+import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.fetchFlowOf
 import com.demich.cps.utils.rememberFirstValue
@@ -133,22 +136,6 @@ private fun <T: Any> ApiDialog(
 }
 
 @Composable
-private fun ApiAccessControls(
-    modifier: Modifier = Modifier,
-    onSaveResuest: () -> Unit,
-    onCancelRequest: () -> Unit,
-    onCheckRequest: () -> Unit,
-    checkFetchState: () -> FetchState<*>?
-) {
-    CPSDialogCancelAcceptButtons(
-        modifier = modifier,
-        acceptTitle = "Save",
-        onCancelClick = onCancelRequest,
-        onAcceptClick = onSaveResuest,
-    )
-}
-
-@Composable
 private fun ApiAccessFieldTextField(
     input: String,
     onChangeInput: (String) -> Unit,
@@ -186,6 +173,50 @@ private fun ApiAccessEditorHeader(
                 icon = CPSIcons.Help,
                 onClick = onHelp
             )
+        }
+    }
+}
+
+//TODO check ui
+@Composable
+private fun ApiAccessControls(
+    modifier: Modifier = Modifier,
+    onSaveResuest: () -> Unit,
+    onCancelRequest: () -> Unit,
+    onCheckRequest: () -> Unit,
+    checkFetchState: () -> FetchState<*>?
+) {
+    Column(modifier = modifier) {
+        ApiAccessCheckButton(
+            onCheckRequest = onCheckRequest,
+            checkFetchState = checkFetchState
+        )
+        CPSDialogCancelAcceptButtons(
+            acceptTitle = "Save",
+            onCancelClick = onCancelRequest,
+            onAcceptClick = onSaveResuest,
+        )
+    }
+}
+
+@Composable
+private fun ApiAccessCheckButton(
+    modifier: Modifier = Modifier,
+    onCheckRequest: () -> Unit,
+    checkFetchState: () -> FetchState<*>?
+) {
+    val state = checkFetchState()
+    Button(
+        modifier = modifier,
+        enabled = state != FetchState.Loading,
+        onClick = onCheckRequest
+    ) {
+        Text("check")
+        when (state) {
+            is FetchResult.Failure -> Text("(failed)")
+            is FetchResult.Success -> Text("(ok)")
+            FetchState.Loading -> Text("(checking...)")
+            null -> { }
         }
     }
 }
