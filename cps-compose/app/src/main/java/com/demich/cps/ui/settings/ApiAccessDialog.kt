@@ -1,12 +1,13 @@
 package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,17 +20,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
 import com.demich.cps.utils.FetchResult
+import com.demich.cps.utils.FetchResult.Success
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.fetchFlowOf
 import com.demich.cps.utils.rememberFirstValue
@@ -177,7 +181,6 @@ private fun ApiAccessEditorHeader(
     }
 }
 
-//TODO check ui
 @Composable
 private fun ApiAccessControls(
     modifier: Modifier = Modifier,
@@ -188,18 +191,24 @@ private fun ApiAccessControls(
 ) {
     val fetchState = checkFetchState()
     Column(modifier = modifier) {
-        ApiAccessCheckButton(
-            onCheckRequest = onCheckRequest,
-            fetchState = fetchState
-        )
-        if (fetchState is FetchResult.Failure) {
-            Text("${fetchState.exception.message}")
+        Box(modifier = Modifier.fillMaxWidth()) {
+            ApiAccessCheckButton(
+                modifier = Modifier.align(Alignment.TopStart),
+                onCheckRequest = onCheckRequest,
+                fetchState = fetchState
+            )
+            CPSDialogCancelAcceptButtons(
+                acceptTitle = "Save",
+                onCancelClick = onCancelRequest,
+                onAcceptClick = onSaveResuest,
+            )
         }
-        CPSDialogCancelAcceptButtons(
-            acceptTitle = "Save",
-            onCancelClick = onCancelRequest,
-            onAcceptClick = onSaveResuest,
-        )
+        if (fetchState is FetchResult) {
+            ApiAccessCheckResultMessage(
+                result = fetchState,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
     }
 }
 
@@ -209,19 +218,38 @@ private fun ApiAccessCheckButton(
     onCheckRequest: () -> Unit,
     fetchState: FetchState<*>?
 ) {
-    Button(
+    TextButton(
         modifier = modifier,
-        enabled = fetchState != FetchState.Loading,
+        enabled = fetchState != Loading,
         onClick = onCheckRequest
     ) {
-        Text("check")
-        when (fetchState) {
-            is FetchResult.Failure -> Text("(failed)")
-            is FetchResult.Success -> Text("(ok)")
-            FetchState.Loading -> Text("(checking...)")
-            null -> { }
+        val text = when (fetchState) {
+            Loading -> "checking..."
+            else -> "check"
         }
+        Text(text = text)
     }
+}
+
+@Composable
+private fun ApiAccessCheckResultMessage(
+    modifier: Modifier = Modifier,
+    result: FetchResult<*>
+) {
+    val text = when (result) {
+        is Failure -> {
+            val message = result.exception.niceMessage
+            if (message == null) "check failed"
+            else "check failed: $message"
+        }
+        is Success -> "successful check"
+    }
+    Text(
+        text = text,
+        modifier = modifier,
+        fontSize = 15.sp,
+        fontWeight = FontWeight.SemiBold
+    )
 }
 
 private class ApiAccessCheckViewModel: ViewModel() {
