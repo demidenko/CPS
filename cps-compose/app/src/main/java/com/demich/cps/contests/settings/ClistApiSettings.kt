@@ -61,6 +61,7 @@ internal fun ClistApiAccessSettingsItem(
         },
         onHelp = {
             uriHandler.openUri(ClistUrls.apiHelp)
-        }
+        },
+        checkRequest = { } //TODO
     )
 }

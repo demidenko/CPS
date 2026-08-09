@@ -364,6 +364,7 @@ private fun CodeforcesApiAccessSettingsItem(
         },
         onHelp = {
             uriHandler.openUri(CodeforcesUrls.apiUserSettings)
-        }
+        },
+        checkRequest = { } //TODO
     )
 }
