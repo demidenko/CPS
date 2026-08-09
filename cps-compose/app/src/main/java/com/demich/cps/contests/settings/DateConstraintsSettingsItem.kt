@@ -147,13 +147,18 @@ private fun DurationPickerDialog(
                 Text(title)
             }
         )
+
         Row {
-            CPSRadioButtonTitled(title = { Text("hours") }, selected = !inDays) {
-                inDays = false
-            }
-            CPSRadioButtonTitled(title = { Text("days") }, selected = inDays) {
-                inDays = true
-            }
+            CPSRadioButtonTitled(
+                title = { Text("hours") },
+                selected = !inDays,
+                onClick = { inDays = false }
+            )
+            CPSRadioButtonTitled(
+                title = { Text("days") },
+                selected = inDays,
+                onClick = { inDays = true }
+            )
         }
 
         CPSDialogCancelAcceptButtons(
