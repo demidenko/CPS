@@ -40,7 +40,7 @@ internal fun <T> ApiAccessSettingsItem(
     decode: (List<String>) -> T & Any,
     onSave: (T & Any) -> Unit,
     onHelp: (() -> Unit)? = null,
-    checkRequest: (suspend (T & Any) -> Unit)? = null
+    checkRequest: suspend (T & Any) -> Unit // TODO nullable
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     SubtitledByValue(
@@ -80,7 +80,7 @@ private fun <T: Any> ApiDialog(
     onSave: (T) -> Unit,
     onDismissRequest: () -> Unit,
     onHelp: (() -> Unit)?,
-    checkRequest: (suspend (T) -> Unit)? = null
+    checkRequest: suspend (T) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
         ApiAccessEditorHeader(
