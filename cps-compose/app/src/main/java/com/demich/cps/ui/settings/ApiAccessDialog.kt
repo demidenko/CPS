@@ -186,11 +186,15 @@ private fun ApiAccessControls(
     onCheckRequest: () -> Unit,
     checkFetchState: () -> FetchState<*>?
 ) {
+    val fetchState = checkFetchState()
     Column(modifier = modifier) {
         ApiAccessCheckButton(
             onCheckRequest = onCheckRequest,
-            checkFetchState = checkFetchState
+            fetchState = fetchState
         )
+        if (fetchState is FetchResult.Failure) {
+            Text("${fetchState.exception.message}")
+        }
         CPSDialogCancelAcceptButtons(
             acceptTitle = "Save",
             onCancelClick = onCancelRequest,
@@ -203,16 +207,15 @@ private fun ApiAccessControls(
 private fun ApiAccessCheckButton(
     modifier: Modifier = Modifier,
     onCheckRequest: () -> Unit,
-    checkFetchState: () -> FetchState<*>?
+    fetchState: FetchState<*>?
 ) {
-    val state = checkFetchState()
     Button(
         modifier = modifier,
-        enabled = state != FetchState.Loading,
+        enabled = fetchState != FetchState.Loading,
         onClick = onCheckRequest
     ) {
         Text("check")
-        when (state) {
+        when (fetchState) {
             is FetchResult.Failure -> Text("(failed)")
             is FetchResult.Success -> Text("(ok)")
             FetchState.Loading -> Text("(checking...)")
