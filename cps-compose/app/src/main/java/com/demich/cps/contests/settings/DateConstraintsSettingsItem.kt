@@ -105,6 +105,10 @@ private fun DurationRow(
 }
 
 
+private enum class DurationMode {
+    HOURS, DAYS
+}
+
 @Composable
 private fun DurationPickerDialog(
     title: String,
@@ -112,21 +116,26 @@ private fun DurationPickerDialog(
     onDismissRequest: () -> Unit,
     onDurationSelect: (Duration) -> Unit,
 ) {
-    var inDays by remember {
+    var mode: DurationMode by remember {
         initDuration.toComponents { days, hours, _, _, _ ->
-            mutableStateOf(hours == 0)
+            mutableStateOf(if (hours == 0) DAYS else HOURS)
         }
     }
 
     var input by remember {
-        val number = if (inDays) initDuration.inWholeDays
-        else initDuration.inWholeHours
+        val number = when (mode) {
+            HOURS -> initDuration.inWholeHours
+            DAYS -> initDuration.inWholeDays
+        }
         mutableStateOf(number.toString())
     }
 
     val duration: Duration? by rememberUpdatedState(
         input.toIntOrNull()?.let { number ->
-            if (inDays) number.days else number.hours
+            when (mode) {
+                HOURS -> number.hours
+                DAYS -> number.days
+            }
         }
     )
 
@@ -151,13 +160,13 @@ private fun DurationPickerDialog(
         Row {
             CPSRadioButtonTitled(
                 title = { Text("hours") },
-                selected = !inDays,
-                onClick = { inDays = false }
+                selected = mode == HOURS,
+                onClick = { mode = HOURS }
             )
             CPSRadioButtonTitled(
                 title = { Text("days") },
-                selected = inDays,
-                onClick = { inDays = true }
+                selected = mode == DAYS,
+                onClick = { mode = DAYS }
             )
         }
 
