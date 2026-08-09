@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.demich.cps.platforms.api.clist.ClistApiAccess
 import com.demich.cps.platforms.api.clist.ClistUrls
+import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.ui.settings.ApiAccessSettingsItem
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
@@ -62,6 +63,8 @@ internal fun ClistApiAccessSettingsItem(
         onHelp = {
             uriHandler.openUri(ClistUrls.apiHelp)
         },
-        checkRequest = { } //TODO
+        checkRequest = {
+            val _ = ClistClient(apiAccess = it).getResource(resourceId = 1)
+        }
     )
 }
