@@ -15,7 +15,5 @@ fun Instant.toSystemDateTime(): LocalDateTime =
 
 fun Instant.toSystemLocalDate(): LocalDate = toSystemDateTime().date
 
-inline fun <R> contextSystemTimeZone(block: context(TimeZone)() -> R): R =
-    context(TimeZone.currentSystemDefault()) {
-        block()
-    }
+inline fun <R> contextSystemTimeZone(block: context(TimeZone) () -> R): R =
+    context(TimeZone.currentSystemDefault(), block = block)
