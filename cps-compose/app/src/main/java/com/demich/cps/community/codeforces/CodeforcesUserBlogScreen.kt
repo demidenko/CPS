@@ -142,22 +142,20 @@ private class BlogLoadingViewModel: ViewModel() {
             requireNotNull(blog) { "blogId $blogId not in database" }
             val handle = blog.handle
             val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
-            emitAll(
-                combine(
-                    flow = flow {
-                        emit(repository.getAndReloadBlogEntries(handle).getOrThrow())
-                    },
-                    flow2 = flow {
-                        emit(null)
-                        val result = fetchResultOf { colorTagDeferred.await() }
-                        if (result is FetchResult.Success) emit(result.value)
-                    }
-                ) { blogEntries, colorTag ->
-                    blogEntries.map {
-                        it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
-                    }
+            combine(
+                flow = flow {
+                    emit(repository.getAndReloadBlogEntries(handle).getOrThrow())
+                },
+                flow2 = flow {
+                    emit(null)
+                    val result = fetchResultOf { colorTagDeferred.await() }
+                    if (result is FetchResult.Success) emit(result.value)
                 }
-            )
+            ) { blogEntries, colorTag ->
+                blogEntries.map {
+                    it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
+                }
+            }.let { emitAll(it) }
         }
     }
 }
