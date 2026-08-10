@@ -40,6 +40,8 @@ interface CodeforcesApi {
 
     suspend fun getUserBlogEntries(handle: String): List<CodeforcesBlogEntry>
 
+    suspend fun getUserFriends(onlyOnline: Boolean): List<String>
+
     suspend fun getUsers(
         handles: Collection<String>,
         checkHistoricHandles: Boolean = true
@@ -52,8 +54,6 @@ interface CodeforcesApi {
         from: Long,
         count: Long
     ): List<CodeforcesSubmission>
-
-    suspend fun getUserFriends(onlyOnline: Boolean): List<String>
 }
 
 suspend fun CodeforcesApi.getContestStandings(

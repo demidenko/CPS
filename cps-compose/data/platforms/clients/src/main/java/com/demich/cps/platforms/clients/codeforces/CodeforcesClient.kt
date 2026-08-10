@@ -143,6 +143,11 @@ class CodeforcesClient(
         }
     }
 
+    override suspend fun getUserFriends(onlyOnline: Boolean): List<String> =
+        getApi(method = "user.friends") {
+            parameter("onlyOnline", onlyOnline)
+        }
+
     override suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> =
         getApi(method = "user.rating") {
             parameter("handle", handle)
@@ -157,11 +162,6 @@ class CodeforcesClient(
             parameter("handle", handle)
             parameter("from", from)
             parameter("count", count)
-        }
-
-    override suspend fun getUserFriends(onlyOnline: Boolean): List<String> =
-        getApi(method = "user.friends") {
-            parameter("onlyOnline", onlyOnline)
         }
 
     // raw pages methods
