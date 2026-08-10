@@ -132,6 +132,11 @@ class CodeforcesClient(
             parameter("handle", handle)
         }
 
+    override suspend fun getUserFriends(onlyOnline: Boolean): List<String> =
+        getApi(method = "user.friends") {
+            parameter("onlyOnline", onlyOnline)
+        }
+
     override suspend fun getUsers(
         handles: Collection<String>,
         checkHistoricHandles: Boolean
@@ -142,11 +147,6 @@ class CodeforcesClient(
             parameter("checkHistoricHandles", checkHistoricHandles)
         }
     }
-
-    override suspend fun getUserFriends(onlyOnline: Boolean): List<String> =
-        getApi(method = "user.friends") {
-            parameter("onlyOnline", onlyOnline)
-        }
 
     override suspend fun getUserRatingChanges(handle: String): List<CodeforcesRatingChange> =
         getApi(method = "user.rating") {
