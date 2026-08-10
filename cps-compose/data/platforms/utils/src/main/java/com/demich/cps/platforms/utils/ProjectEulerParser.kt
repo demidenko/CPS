@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils
 
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.MonthNames
@@ -76,26 +75,8 @@ class ProjectEulerRssParser(
         return block(id)
     }
 
-    private val format = DateTimeComponents.Format {
-        //04 Apr 2025 23:00:00 +0100
-        day(padding = Padding.NONE)
-        char(' ')
-        monthName(names = MonthNames.ENGLISH_ABBREVIATED)
-        char(' ')
-        year()
-        char(' ')
-        time(LocalTime.Formats.ISO)
-        char(' ')
-        offset(UtcOffset.Formats.FOUR_DIGITS)
-    }
-
-    // <description>Release date: Sun, 28 Jun 2026 04:00:00 +0000</description>
-    // <pubDate>Mon, 25 May 2026 00:00:00 +0000</pubDate>
-    private fun String.extractDate(): Instant =
-        Instant.parse(
-            input = substring(startIndex = indexOf(',') + 2),
-            format = format
-        )
+    private fun String.parseDate(): Instant =
+        Instant.parse(this, DateTimeComponents.Formats.RFC_1123)
 
     fun parseNews(): List<ProjectEulerNewsPost> =
         rssItems.mapNotNull { item ->
@@ -104,7 +85,8 @@ class ProjectEulerRssParser(
                     title = item.title().text(),
                     descriptionHtml = item.description().html(),
                     id = id,
-                    date = item.pubDateOrNull()?.text()?.extractDate()
+                    // <pubDate>Mon, 25 May 2026 00:00:00 +0000</pubDate>
+                    date = item.pubDateOrNull()?.text()?.parseDate()
                 )
             }
         }
@@ -112,8 +94,8 @@ class ProjectEulerRssParser(
     fun parseProblems(): Sequence<Pair<Int, Instant>> =
         rssItems.asSequence().mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
-                val description = item.description().text()
-                val date = description.extractDate()
+                // <description>Release date: Sun, 28 Jun 2026 04:00:00 +0000</description>
+                val date = item.description().text().removePrefix("Release date: ").parseDate()
                 id.toInt() to date
             }
         }
