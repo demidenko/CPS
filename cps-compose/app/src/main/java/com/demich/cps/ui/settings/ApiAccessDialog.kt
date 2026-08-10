@@ -98,7 +98,10 @@ private fun <T: Any> ApiDialog(
     onHelp: (() -> Unit)?,
     checkBlock: suspend (T) -> Unit
 ) {
-    CPSDialog(onDismissRequest = onDismissRequest) {
+    CPSDialog(
+        onDismissRequest = onDismissRequest,
+        dismissOnClickOutside = false
+    ) {
         ApiAccessEditorHeader(
             modifier = Modifier.fillMaxWidth(),
             title = title,

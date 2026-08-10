@@ -139,7 +139,10 @@ private fun DurationPickerDialog(
         }
     )
 
-    CPSDialog(onDismissRequest = onDismissRequest) {
+    CPSDialog(
+        onDismissRequest = onDismissRequest,
+        dismissOnClickOutside = false
+    ) {
         OutlinedTextField(
             value = input,
             onValueChange = { str ->

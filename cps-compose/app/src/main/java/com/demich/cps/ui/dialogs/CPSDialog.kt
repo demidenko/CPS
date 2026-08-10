@@ -37,12 +37,14 @@ import com.demich.cps.utils.IncludeFontPadding
 fun CPSDialog(
     modifier: Modifier = Modifier,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    dismissOnClickOutside: Boolean = true,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
+            dismissOnClickOutside = dismissOnClickOutside
 //            usePlatformDefaultWidth = false, //affects height!!!
         )
     ) {
