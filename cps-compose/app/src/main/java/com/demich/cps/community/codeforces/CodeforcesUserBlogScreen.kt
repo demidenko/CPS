@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
+import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -138,9 +139,7 @@ private class BlogLoadingViewModel: ViewModel() {
     fun flowOfFetchBlogEntries(blogId: Long, context: Context, key: Any) = blogEntriesLoader.run {
         val repository = context.followRepository
         executeFlow(key = Pair(blogId, key)) {
-            val blog = repository.blog(id = blogId)
-            requireNotNull(blog) { "blogId $blogId not in database" }
-            val handle = blog.handle
+            val handle = repository.blog(blogId = blogId).handle
             val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
             combine(
                 flow = flow {

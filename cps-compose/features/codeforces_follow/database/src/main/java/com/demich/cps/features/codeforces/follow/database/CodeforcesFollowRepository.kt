@@ -24,8 +24,8 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(blogId: Long) = dao.remove(blogId = blogId)
 
-    suspend fun blog(id: Long): CodeforcesUserBlog? =
-        dao.getShortEntity(id)?.toCodeforcesUserBlog()
+    suspend fun blogOrNull(blogId: Long): CodeforcesUserBlog? =
+        dao.getShortEntity(blogId)?.toCodeforcesUserBlog()
 
     fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>> =
         dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
@@ -80,6 +80,9 @@ abstract class CodeforcesFollowRepository(
 
     protected abstract fun notifyNewBlogEntry(blogEntry: CodeforcesBlogEntry)
 }
+
+suspend fun CodeforcesFollowRepository.blog(blogId: Long) =
+    requireNotNull(blogOrNull(blogId)) { "blogId $blogId not in repository" }
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
     blogs().forEach {
