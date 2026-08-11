@@ -35,8 +35,9 @@ private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
     type: NewEntryType,
     date: LocalDate
 ) {
+    if (type == UNSEEN) return
     val oldType = getType(id)
-    if (type > oldType) set(key = id, value = NewEntryInfo(type, date))
+    if (type >= oldType) set(key = id, value = NewEntryInfo(type, date))
 }
 
 private fun systemDate(): LocalDate = getSystemTime().toLocalDateTime(TimeZone.UTC).date
@@ -49,6 +50,7 @@ class NewEntriesDataStoreItem (
 
     suspend fun markAtLeast(ids: Collection<Int>, type: NewEntryType) {
         if (ids.isEmpty()) return
+        if (type == UNSEEN) return
         item.edit {
             val date = systemDate()
             for (id in ids) markAtLeast(id, type, date)
