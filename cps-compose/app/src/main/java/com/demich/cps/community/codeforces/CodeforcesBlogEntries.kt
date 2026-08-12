@@ -38,6 +38,7 @@ import com.demich.cps.utils.plusIf
 
 @Composable
 fun CodeforcesBlogEntries(
+    blogEntries: () -> List<CodeforcesWebBlogEntry>,
     blogEntriesState: CodeforcesBlogEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
@@ -53,7 +54,7 @@ fun CodeforcesBlogEntries(
         modifier = modifier,
         scrollBarEnabled = scrollBarEnabled,
         scrollUpButtonEnabled = scrollUpButtonEnabled,
-        items = blogEntriesState::blogEntries,
+        items = blogEntries,
         key = { it.id },
         contentType = { CodeforcesBlogEntryContentType }
     ) { blogEntry ->

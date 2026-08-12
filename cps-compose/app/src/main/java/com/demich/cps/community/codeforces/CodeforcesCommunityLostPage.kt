@@ -48,6 +48,7 @@ fun CodeforcesCommunityLostPage(
     }.collectAsStateWithLifecycle(initialValue = emptySet())
 
     CodeforcesBlogEntriesFollowAddable(
+        blogEntries = { blogEntriesState.blogEntries },
         controller = controller,
         blogEntriesState = blogEntriesState,
         lazyListState = listState,

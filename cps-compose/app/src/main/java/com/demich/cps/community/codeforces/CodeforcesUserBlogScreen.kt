@@ -116,6 +116,7 @@ private fun CodeforcesUserBlogContent(
     ) { blogEntries ->
         ProvideSystemTimeEachMinute {
             CodeforcesBlogEntries(
+                blogEntries = { blogEntries },
                 blogEntriesState = rememberCodeforcesBlogEntriesState {
                     blogEntries.filterBy(filterState)
                 },

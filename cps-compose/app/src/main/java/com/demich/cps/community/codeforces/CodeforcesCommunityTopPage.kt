@@ -48,7 +48,9 @@ private fun CodeforcesCommunityTopBlogEntries(
         newEntriesState = newEntriesState,
         showNewEntries = false
     )
+
     CodeforcesBlogEntriesFollowAddable(
+        blogEntries = { blogEntriesState.blogEntries },
         controller = controller,
         blogEntriesState = blogEntriesState,
         lazyListState = listState,

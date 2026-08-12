@@ -34,6 +34,7 @@ private fun CodeforcesCommunityMainList(
     )
 
     CodeforcesBlogEntriesFollowAddable(
+        blogEntries = { blogEntriesState.blogEntries },
         controller = controller,
         blogEntriesState = blogEntriesState,
         lazyListState = listState,

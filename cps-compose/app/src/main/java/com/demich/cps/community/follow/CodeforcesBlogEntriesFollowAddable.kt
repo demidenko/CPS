@@ -20,6 +20,7 @@ import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesBlogEntriesFollowAddable(
+    blogEntries: () -> List<CodeforcesWebBlogEntry>,
     controller: CodeforcesCommunityController,
     blogEntriesState: CodeforcesBlogEntriesState,
     modifier: Modifier = Modifier,
@@ -32,6 +33,7 @@ fun CodeforcesBlogEntriesFollowAddable(
     var showAddToFollowDialogFor: CodeforcesWebBlogEntry? by remember { mutableStateOf(null) }
 
     CodeforcesBlogEntries(
+        blogEntries = blogEntries,
         blogEntriesState = blogEntriesState,
         modifier = modifier,
         lazyListState = lazyListState,
