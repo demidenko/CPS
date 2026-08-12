@@ -34,7 +34,7 @@ fun CodeforcesCommunityLostPage(
     val context = context
     val listState = rememberLazyListState()
 
-    val blogEntriesState = rememberCodeforcesBlogEntriesState(
+    val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
         isTabVisible = { controller.isTabVisible(tab = LOST) },
         listState = listState,
         newEntriesState = newEntriesState,
@@ -52,7 +52,7 @@ fun CodeforcesCommunityLostPage(
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },
         controller = controller,
-        blogEntriesState = blogEntriesState,
+        newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize(),
         scrollBarEnabled = true,

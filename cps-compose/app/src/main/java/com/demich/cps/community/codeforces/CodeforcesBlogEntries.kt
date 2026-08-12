@@ -39,7 +39,7 @@ import com.demich.cps.utils.plusIf
 @Composable
 fun CodeforcesBlogEntries(
     blogEntries: () -> List<CodeforcesWebBlogEntry>,
-    blogEntriesState: CodeforcesBlogEntriesState,
+    newEntriesState: CodeforcesNewEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
@@ -61,12 +61,12 @@ fun CodeforcesBlogEntries(
         ItemWithDivider(modifier = Modifier.animateItem()) {
             BlogEntryInfo(
                 blogEntry = blogEntry,
-                markNew = blogEntriesState.isNew(blogEntry.id),
+                markNew = newEntriesState.isNew(blogEntry.id),
                 label = label?.let { { it(blogEntry) } },
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onClick = { blogEntriesState.openBlogEntry(blogEntry, uriHandler) },
+                        onClick = { newEntriesState.openBlogEntry(blogEntry, uriHandler) },
                         onLongClick = onLongClick?.let { { it(blogEntry) } }
                     )
                     .padding(

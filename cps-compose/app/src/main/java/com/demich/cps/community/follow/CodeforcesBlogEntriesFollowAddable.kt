@@ -10,8 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesBlogEntries
-import com.demich.cps.community.codeforces.CodeforcesBlogEntriesState
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
+import com.demich.cps.community.codeforces.CodeforcesNewEntriesState
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
@@ -22,7 +22,7 @@ import com.demich.cps.utils.context
 fun CodeforcesBlogEntriesFollowAddable(
     blogEntries: () -> List<CodeforcesWebBlogEntry>,
     controller: CodeforcesCommunityController,
-    blogEntriesState: CodeforcesBlogEntriesState,
+    newEntriesState: CodeforcesNewEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     scrollBarEnabled: Boolean = false,
@@ -34,7 +34,7 @@ fun CodeforcesBlogEntriesFollowAddable(
 
     CodeforcesBlogEntries(
         blogEntries = blogEntries,
-        blogEntriesState = blogEntriesState,
+        newEntriesState = newEntriesState,
         modifier = modifier,
         lazyListState = lazyListState,
         scrollBarEnabled = scrollBarEnabled,

@@ -53,7 +53,7 @@ fun rememberNewEntriesState(): NewEntriesState {
 }
 
 @Stable
-abstract class CodeforcesBlogEntriesState {
+abstract class CodeforcesNewEntriesState {
     protected open fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) = Unit
     fun openBlogEntry(blogEntry: CodeforcesWebBlogEntry, handler: UriHandler) {
         onOpenBlogEntry(blogEntry)
@@ -64,12 +64,12 @@ abstract class CodeforcesBlogEntriesState {
 }
 
 @Composable
-fun rememberCodeforcesBlogEntriesState(
+fun rememberCodeforcesNewEntriesState(
     isTabVisible: () -> Boolean,
     listState: LazyListState,
     newEntriesState: NewEntriesState,
     showNewEntries: Boolean
-): CodeforcesBlogEntriesState {
+): CodeforcesNewEntriesState {
     LaunchedEffect(newEntriesState, listState, isTabVisible) {
         snapshotFlow {
             if (!isTabVisible()) emptyList()
@@ -83,7 +83,7 @@ fun rememberCodeforcesBlogEntriesState(
     }
 
     return remember(newEntriesState, showNewEntries) {
-        object : CodeforcesBlogEntriesState() {
+        object : CodeforcesNewEntriesState() {
             override fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) {
                 newEntriesState.markOpened(id = blogEntry.id)
             }

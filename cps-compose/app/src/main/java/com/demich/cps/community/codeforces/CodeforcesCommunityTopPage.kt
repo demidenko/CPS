@@ -42,7 +42,7 @@ private fun CodeforcesCommunityTopBlogEntries(
     val context = context
     val listState = rememberLazyListState()
 
-    val blogEntriesState = rememberCodeforcesBlogEntriesState(
+    val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
         isTabVisible = { controller.isTabVisible(tab = TOP) },
         listState = listState,
         newEntriesState = newEntriesState,
@@ -54,7 +54,7 @@ private fun CodeforcesCommunityTopBlogEntries(
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },
         controller = controller,
-        blogEntriesState = blogEntriesState,
+        newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()
     )

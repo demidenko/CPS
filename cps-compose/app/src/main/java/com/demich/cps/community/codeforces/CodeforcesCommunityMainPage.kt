@@ -27,7 +27,7 @@ private fun CodeforcesCommunityMainList(
     val context = context
     val listState = rememberLazyListState()
 
-    val blogEntriesState = rememberCodeforcesBlogEntriesState(
+    val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
         isTabVisible = { controller.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
@@ -39,7 +39,7 @@ private fun CodeforcesCommunityMainList(
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },
         controller = controller,
-        blogEntriesState = blogEntriesState,
+        newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()
     )
