@@ -14,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSDefaults
+import com.demich.cps.utils.ifThen
 import com.demich.cps.utils.plusIf
 
 @Composable
@@ -30,7 +32,7 @@ fun <T> LazyColumnOfData(
     contentType: (item: T) -> Any? = { null },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
         LazyColumnWithScrollBar(
             state = state,
             scrollBarEnabled = scrollBarEnabled,
@@ -58,12 +60,12 @@ fun <T> LazyColumnOfData(
                     )
             )
         }
+    }
 
-        LaunchedEffect(state, autoScrollPredicate) {
-            state.autoScrollToTop(
-                predicate = autoScrollPredicate,
-                animationScope = this
-            )
-        }
+    LaunchedEffect(state, autoScrollPredicate) {
+        state.autoScrollToTop(
+            predicate = autoScrollPredicate,
+            animationScope = this
+        )
     }
 }
