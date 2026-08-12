@@ -12,11 +12,9 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.NewEntriesMap
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getType
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -56,8 +54,6 @@ fun rememberNewEntriesState(): NewEntriesState {
 
 @Stable
 abstract class CodeforcesBlogEntriesState {
-    abstract val blogEntries: List<CodeforcesWebBlogEntry>
-
     protected open fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) = Unit
     fun openBlogEntry(blogEntry: CodeforcesWebBlogEntry, handler: UriHandler) {
         onOpenBlogEntry(blogEntry)
@@ -69,18 +65,6 @@ abstract class CodeforcesBlogEntriesState {
 
 @Composable
 fun rememberCodeforcesBlogEntriesState(
-    blogEntries: () -> List<CodeforcesWebBlogEntry>
-): CodeforcesBlogEntriesState {
-    return remember(blogEntries) {
-        object : CodeforcesBlogEntriesState() {
-            override val blogEntries get() = blogEntries()
-        }
-    }
-}
-
-@Composable
-fun rememberCodeforcesBlogEntriesState(
-    blogEntriesFlow: Flow<List<CodeforcesWebBlogEntry>>,
     isTabVisible: () -> Boolean,
     listState: LazyListState,
     newEntriesState: NewEntriesState,
@@ -98,11 +82,8 @@ fun rememberCodeforcesBlogEntriesState(
             }
     }
 
-    val blogEntriesState = collectAsStateWithLifecycle { blogEntriesFlow }
-    return remember(blogEntriesState, newEntriesState, showNewEntries) {
+    return remember(newEntriesState, showNewEntries) {
         object : CodeforcesBlogEntriesState() {
-            override val blogEntries by blogEntriesState
-
             override fun onOpenBlogEntry(blogEntry: CodeforcesWebBlogEntry) {
                 newEntriesState.markOpened(id = blogEntry.id)
             }

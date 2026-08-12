@@ -42,7 +42,6 @@ private fun CodeforcesCommunityTopBlogEntries(
     val listState = rememberLazyListState()
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
-        blogEntriesFlow = controller.flowOfTopBlogEntries(context),
         isTabVisible = { controller.isTabVisible(tab = TOP) },
         listState = listState,
         newEntriesState = newEntriesState,

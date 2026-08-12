@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -117,9 +118,7 @@ private fun CodeforcesUserBlogContent(
         ProvideSystemTimeEachMinute {
             CodeforcesBlogEntries(
                 blogEntries = { blogEntries },
-                blogEntriesState = rememberCodeforcesBlogEntriesState {
-                    blogEntries.filterBy(filterState)
-                },
+                blogEntriesState = remember { object : CodeforcesBlogEntriesState() {} },
                 scrollBarEnabled = true,
                 scrollUpButtonEnabled = true,
                 modifier = Modifier.fillMaxSize()

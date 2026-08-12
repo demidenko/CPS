@@ -28,7 +28,6 @@ private fun CodeforcesCommunityMainList(
     val listState = rememberLazyListState()
 
     val blogEntriesState = rememberCodeforcesBlogEntriesState(
-        blogEntriesFlow = controller.flowOfMainBlogEntries(context),
         isTabVisible = { controller.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
