@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -36,6 +35,7 @@ import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.filterByTokensAsSubsequence
+import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.async
@@ -66,12 +66,13 @@ private fun CodeforcesUserBlogScreen(
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     val uuidState = rememberUUIDState()
+
     val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
-    val blogEntries by flow.collectAsState()
+    val blogEntriesState = flow.collectAsState()
 
     CodeforcesUserBlogScreen(
-        blogEntries = { blogEntries },
-        onRetry = { uuidState.reset() },
+        blogEntries = blogEntriesState::value,
+        onRetry = uuidState::reset,
         filterState = filterState
     )
 
@@ -90,9 +91,8 @@ private fun CodeforcesUserBlogScreen(
 ) {
     Column {
         CodeforcesUserBlogContent(
-            blogEntries = blogEntries,
+            blogEntries = { blogEntries().map { it.filterBy(filterState) } },
             onRetry = onRetry,
-            filterState = filterState,
             modifier = Modifier.weight(1f)
         )
         FilterTextField(
@@ -106,7 +106,6 @@ private fun CodeforcesUserBlogScreen(
 private fun CodeforcesUserBlogContent(
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
-    filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
@@ -117,7 +116,7 @@ private fun CodeforcesUserBlogContent(
     ) { blogEntries ->
         ProvideSystemTimeEachMinute {
             CodeforcesBlogEntries(
-                blogEntries = { blogEntries.filterBy(filterState) },
+                blogEntries = { blogEntries },
                 newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
                 scrollBarEnabled = true,
                 scrollUpButtonEnabled = true,
