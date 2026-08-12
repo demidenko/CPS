@@ -3,9 +3,9 @@ package com.demich.cps.community.codeforces
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
@@ -34,7 +34,7 @@ private fun CodeforcesCommunityMainList(
         showNewEntries = true
     )
 
-    val blogEntries by controller.flowOfMainBlogEntries(context).collectAsState()
+    val blogEntries by controller.flowOfMainBlogEntries(context).collectAsStateWithLifecycle()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },

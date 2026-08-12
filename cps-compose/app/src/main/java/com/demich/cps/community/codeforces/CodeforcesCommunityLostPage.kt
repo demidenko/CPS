@@ -18,7 +18,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostDataStore
 import com.demich.kotlin_stdlib_boost.mapToSet
@@ -47,7 +47,7 @@ fun CodeforcesCommunityLostPage(
         }
     }.collectAsStateWithLifecycle(initialValue = emptySet())
 
-    val blogEntries by collectAsState { controller.flowOfLostBlogEntries(context) }
+    val blogEntries by collectAsStateWithLifecycle { controller.flowOfLostBlogEntries(context) }
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },
