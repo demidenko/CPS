@@ -63,6 +63,7 @@ private fun CodeforcesUserBlogScreen(
     blogId: Long,
     filterState: FilterState
 ) {
+    val context = context
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     val uuidState = rememberUUIDState()
@@ -90,6 +91,7 @@ private fun CodeforcesUserBlogScreen(
     filterState: FilterState
 ) {
     Column {
+        // TODO: add user blog info
         CodeforcesUserBlogContent(
             blogEntries = { blogEntries().map { it.filterBy(filterState) } },
             onRetry = onRetry,
