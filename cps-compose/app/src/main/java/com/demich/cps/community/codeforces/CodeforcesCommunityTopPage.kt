@@ -49,8 +49,10 @@ private fun CodeforcesCommunityTopBlogEntries(
         showNewEntries = false
     )
 
+    val blogEntries by controller.flowOfTopBlogEntries(context).collectAsState()
+
     CodeforcesBlogEntriesFollowAddable(
-        blogEntries = { blogEntriesState.blogEntries },
+        blogEntries = { blogEntries },
         controller = controller,
         blogEntriesState = blogEntriesState,
         lazyListState = listState,
