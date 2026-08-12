@@ -117,7 +117,7 @@ private fun CodeforcesUserBlogContent(
     ) { blogEntries ->
         ProvideSystemTimeEachMinute {
             CodeforcesBlogEntries(
-                blogEntries = { blogEntries },
+                blogEntries = { blogEntries.filterBy(filterState) },
                 newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
                 scrollBarEnabled = true,
                 scrollUpButtonEnabled = true,
