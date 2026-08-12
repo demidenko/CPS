@@ -11,14 +11,15 @@ import androidx.compose.ui.platform.UriHandler
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.utils.NewEntriesMap
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getType
-import com.demich.cps.utils.launchData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -31,21 +32,21 @@ interface NewEntriesState {
 @Composable
 fun rememberNewEntriesState(): NewEntriesState {
     val context = context
-    val viewModel = codeforcesCommunityViewModel()
+    val scope = backgroundCoroutineScope
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
     val typesState = collectItemAsState { item }
-    return remember(viewModel, item, typesState) {
+    return remember {
         object : NewEntriesState {
             override val types by typesState
 
             override fun markSeen(ids: List<Int>) {
-                viewModel.launchData {
+                scope.launch {
                     item.markAtLeast(ids, SEEN)
                 }
             }
 
             override fun markOpened(id: Int) {
-                viewModel.launchData {
+                scope.launch {
                     item.markAtLeast(id, OPENED)
                 }
             }
@@ -93,6 +94,7 @@ fun rememberCodeforcesBlogEntriesState(
             .debounce(250.milliseconds) //prevent user do fast scroll / page switch
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
+                // TODO: run in vm scope
                 newEntriesState.markSeen(ids = visibleIds)
             }
     }
