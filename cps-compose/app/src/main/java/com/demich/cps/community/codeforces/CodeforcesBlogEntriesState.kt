@@ -94,7 +94,6 @@ fun rememberCodeforcesBlogEntriesState(
             .debounce(250.milliseconds) //prevent user do fast scroll / page switch
             .distinctUntilChanged() //prevent repeats after debounce
             .collect { visibleIds ->
-                // TODO: run in vm scope
                 newEntriesState.markSeen(ids = visibleIds)
             }
     }
