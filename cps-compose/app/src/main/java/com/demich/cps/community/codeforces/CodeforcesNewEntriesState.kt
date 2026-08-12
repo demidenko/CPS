@@ -72,13 +72,13 @@ fun rememberCodeforcesNewEntriesState(
 ): CodeforcesNewEntriesState {
     LaunchedEffect(newEntriesState, listState, isTabVisible) {
         snapshotFlow {
-            if (!isTabVisible()) emptyList()
+            if (!isTabVisible()) null
             else listState.visibleBlogEntriesIds(0.75f)
         }
             .debounce(250.milliseconds) //prevent user do fast scroll / page switch
             .distinctUntilChanged() //prevent repeats after debounce
-            .collect { visibleIds ->
-                newEntriesState.markSeen(ids = visibleIds)
+            .collect { ids ->
+                if (ids != null) newEntriesState.markSeen(ids = ids)
             }
     }
 
