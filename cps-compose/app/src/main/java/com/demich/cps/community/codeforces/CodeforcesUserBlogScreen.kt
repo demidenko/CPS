@@ -90,17 +90,19 @@ private fun CodeforcesUserBlogScreen(
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
-    Column {
-        // TODO: add user blog info
-        CodeforcesUserBlogContent(
-            blogEntries = { blogEntries().map { it.filterBy(filterState) } },
-            onRetry = onRetry,
-            modifier = Modifier.weight(1f)
-        )
-        FilterTextField(
-            filterState = filterState,
-            modifier = Modifier.fillMaxWidth()
-        )
+    ProvideSystemTimeEachMinute {
+        Column {
+            // TODO: add user blog info
+            CodeforcesUserBlogContent(
+                blogEntries = { blogEntries().map { it.filterBy(filterState) } },
+                onRetry = onRetry,
+                modifier = Modifier.weight(1f)
+            )
+            FilterTextField(
+                filterState = filterState,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 
@@ -116,15 +118,13 @@ private fun CodeforcesUserBlogContent(
         onRetry = onRetry,
         modifier = modifier.fillMaxSize()
     ) { blogEntries ->
-        ProvideSystemTimeEachMinute {
-            CodeforcesBlogEntries(
-                blogEntries = { blogEntries },
-                newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
-                scrollBarEnabled = true,
-                scrollUpButtonEnabled = true,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        CodeforcesBlogEntries(
+            blogEntries = { blogEntries },
+            newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
+            scrollBarEnabled = true,
+            scrollUpButtonEnabled = true,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 
