@@ -23,6 +23,10 @@ internal abstract class CodeforcesFollowDao {
     @RewriteQueriesToDropUnusedColumns
     abstract suspend fun getShortEntity(id: Long): CodeforcesUserBlogEntityShort?
 
+    @Query("SELECT * FROM $cfFollowTableName WHERE id == :id")
+    @RewriteQueriesToDropUnusedColumns
+    abstract fun flowOfShortEntity(id: Long): Flow<CodeforcesUserBlogEntityShort?>
+
     @Query("SELECT * FROM $cfFollowTableName")
     @RewriteQueriesToDropUnusedColumns
     abstract suspend fun getShortBlogs(): List<CodeforcesUserBlogEntityShort>

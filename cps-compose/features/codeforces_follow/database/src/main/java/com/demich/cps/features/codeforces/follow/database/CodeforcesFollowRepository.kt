@@ -24,13 +24,17 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun remove(blogId: Long) = dao.remove(blogId = blogId)
 
+    // TODO: without toCodeforcesUserBlog?
+
+    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlog?> =
+        dao.flowOfShortEntity(id = blogId).map { it?.toCodeforcesUserBlog() }
+
     suspend fun blogOrNull(blogId: Long): CodeforcesUserBlog? =
         dao.getShortEntity(blogId)?.toCodeforcesUserBlog()
 
     fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>> =
         dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    // TODO: without toCodeforcesUserBlog?
     suspend fun blogs(): List<CodeforcesUserBlog> =
         dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
 
