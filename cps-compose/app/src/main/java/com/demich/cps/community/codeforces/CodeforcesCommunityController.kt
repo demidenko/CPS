@@ -15,12 +15,10 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.collectAsState
-import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostRecentWorker
@@ -34,17 +32,25 @@ import kotlinx.serialization.json.Json
 
 @Composable
 fun rememberCodeforcesCommunityController(
-    defaultTab: CodeforcesTab
+    defaultTab: CodeforcesTab,
+    lostEnabled: Boolean
 ): CodeforcesCommunityController {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
 
-    val tabsState = collectItemAsState { context.settingsCommunity.codeforcesTabs }
+    val tabs = remember(lostEnabled) {
+        buildList<CodeforcesTab> {
+            add(MAIN)
+            add(TOP)
+            add(RECENT)
+            if (lostEnabled) add(LOST)
+        }
+    }
 
-    val controller = rememberSaveable(saver = controllerSaver(viewModel, tabsState)) {
+    val controller = rememberSaveable(saver = controllerSaver(viewModel, tabs)) {
         CodeforcesCommunityController(
+            tabs = tabs,
             dataManager = viewModel,
-            tabsState = tabsState,
             pagerData = CodeforcesCommunityPagerData(
                 selectedTab = defaultTab,
                 topPageType = BlogEntries,
@@ -70,11 +76,10 @@ data class CodeforcesCommunityPagerData(
 
 @Stable
 class CodeforcesCommunityController(
+    val tabs: List<CodeforcesTab>,
     dataManager: CodeforcesCommunityDataManger,
-    tabsState: State<List<CodeforcesTab>>,
     pagerData: CodeforcesCommunityPagerData
 ): CodeforcesCommunityDataManger by dataManager {
-    val tabs by tabsState
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
     val pagerState = object : PagerState(
@@ -144,7 +149,7 @@ fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<
 
 private fun controllerSaver(
     dataManager: CodeforcesCommunityDataManger,
-    tabsState: State<List<CodeforcesTab>>
+    tabs: List<CodeforcesTab>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
         Json.encodeToString(CodeforcesCommunityPagerData(
@@ -155,8 +160,8 @@ private fun controllerSaver(
     },
     restore = {
         CodeforcesCommunityController(
+            tabs = tabs,
             dataManager = dataManager,
-            tabsState = tabsState,
             pagerData = Json.decodeFromString(it)
         )
     }

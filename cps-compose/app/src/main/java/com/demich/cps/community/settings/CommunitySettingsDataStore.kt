@@ -10,7 +10,6 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
-import com.demich.datastore_itemized.transform
 import com.demich.datastore_itemized.value
 
 val Context.settingsCommunity: CommunitySettingsDataStore
@@ -31,15 +30,6 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
     val codeforcesLostMinRatingTag = itemEnum<CodeforcesColorTag>(name = "cf_lost_min_rating", defaultValue = ORANGE)
 
-    val codeforcesTabs = codeforcesLostEnabled.transform { lostEnabled ->
-        buildList<CodeforcesTab> {
-            add(MAIN)
-            add(TOP)
-            add(RECENT)
-            if (lostEnabled) add(LOST)
-        }
-    }
-
     val enabledNewsFeeds = itemEnumSet<CommunityNewsFeed>(name = "news_feeds")
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
@@ -48,6 +38,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
         CommunityCodeforcesScreenSettings(
             defaultTab = codeforcesDefaultTab.value,
             followEnabled = codeforcesFollowEnabled.value,
+            lostEnabled = codeforcesLostEnabled.value,
             renderAllTabs = renderAllTabs.value
         )
     }
@@ -56,5 +47,6 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 data class CommunityCodeforcesScreenSettings(
     val defaultTab: CodeforcesTab,
     val followEnabled: Boolean,
+    val lostEnabled: Boolean,
     val renderAllTabs: Boolean
 )
