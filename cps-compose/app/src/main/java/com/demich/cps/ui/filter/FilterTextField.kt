@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -29,17 +30,14 @@ fun FilterTextField(
     if (filterState.enabled) {
         val focusRequester = rememberFocusOnCreationRequester()
         OutlinedTextField(
+            state = filterState.textFieldState,
             modifier = modifier
                 .consumeWindowInsets(WindowInsets.navigationBars) //order matters!!
                 .consumeWindowInsets(PaddingValues(bottom = CPSDefaults.bottomBarHeight)) //TODO: actually wrong when no bottombar
                 .imePadding()
                 .focusRequester(focusRequester),
-            singleLine = true,
+            lineLimits = TextFieldLineLimits.SingleLine,
             textStyle = TextStyle(fontSize = CPSFontSize.itemTitle, fontWeight = FontWeight.Bold),
-            value = filterState.string,
-            onValueChange = {
-                filterState.string = it
-            },
             label = { Text("filter") },
             leadingIcon = {
                 Icon(

@@ -1,5 +1,6 @@
 package com.demich.cps.ui.filter
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -13,11 +14,11 @@ import com.demich.cps.utils.filterByTokensAsSubsequence
 
 @Composable
 fun rememberFilterState(): FilterState {
-    val stringState = rememberSaveable { mutableStateOf("") }
+    val textFieldState = rememberSaveable(saver = TextFieldState.Saver) { TextFieldState() }
     val enabledState = rememberSaveable { mutableStateOf(false) }
     return remember {
         FilterState(
-            stringState = stringState,
+            textFieldState = textFieldState,
             enabledState = enabledState
         )
     }
@@ -25,10 +26,11 @@ fun rememberFilterState(): FilterState {
 
 @Stable //TODO: not enough, compose ignores
 class FilterState(
-    stringState: MutableState<String>,
+    val textFieldState: TextFieldState,
     enabledState: MutableState<Boolean>
 ) {
-    var string by stringState
+    val string: String
+        get() = textFieldState.text.toString()
 
     var enabled by enabledState
 
