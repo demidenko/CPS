@@ -27,16 +27,10 @@ class FilterState(
     available: Boolean
 ) {
     var filter by mutableStateOf(filter)
-    private val enabledState = mutableStateOf(enabled)
+
+    var enabled by mutableStateOf(enabled)
+
     private val availableState = mutableStateOf(available)
-
-    var enabled: Boolean
-        get() = enabledState.value
-        set(value) {
-            enabledState.value = value
-            if (!value) filter = ""
-        }
-
     var available: Boolean
         get() = availableState.value
         set(value) {
