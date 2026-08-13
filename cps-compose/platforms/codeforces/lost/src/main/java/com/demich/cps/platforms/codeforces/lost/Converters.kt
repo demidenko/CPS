@@ -15,13 +15,13 @@ internal fun CodeforcesRecentFeedBlogEntry.toSuspect(
 
 internal fun CodeforcesBlogEntry.toFresh(authorColorTag: CodeforcesColorTag?): CodeforcesLostBlogEntryFresh =
     CodeforcesLostBlogEntryFresh(
-        blogEntry = this,
+        blogEntry = this.copy(rating = 0),
         authorColorTag = authorColorTag
     )
 
 internal fun CodeforcesLostBlogEntryFresh.toLost(): CodeforcesLostBlogEntry =
     CodeforcesLostBlogEntry(
-        blogEntry = blogEntry.copy(rating = 0),
+        blogEntry = blogEntry,
         authorColorTag = authorColorTag,
         timeStamp = Clock.System.now()
     )
