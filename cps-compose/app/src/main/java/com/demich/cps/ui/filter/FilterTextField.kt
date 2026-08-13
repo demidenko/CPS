@@ -36,9 +36,9 @@ fun FilterTextField(
                 .focusRequester(focusRequester),
             singleLine = true,
             textStyle = TextStyle(fontSize = CPSFontSize.itemTitle, fontWeight = FontWeight.Bold),
-            value = filterState.filter,
+            value = filterState.string,
             onValueChange = {
-                filterState.filter = it
+                filterState.string = it
             },
             label = { Text("filter") },
             leadingIcon = {

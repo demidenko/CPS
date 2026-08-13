@@ -11,20 +11,20 @@ import com.demich.cps.utils.filterByTokensAsSubsequence
 
 
 @Composable
-fun rememberFilterState() =
+fun rememberFilterState(): FilterState =
     rememberSaveable(saver = saver()) {
         FilterState(
-            filter = "",
+            string = "",
             enabled = false
         )
     }
 
 @Stable //TODO: not enough, compose ignores
 class FilterState(
-    filter: String,
+    string: String,
     enabled: Boolean
 ) {
-    var filter by mutableStateOf(filter)
+    var string by mutableStateOf(string)
 
     var enabled by mutableStateOf(enabled)
 
@@ -41,11 +41,11 @@ class FilterState(
 private fun saver() =
     listSaver<FilterState, String>(
         save = {
-            listOf(it.filter, it.enabled.toString())
+            listOf(it.string, it.enabled.toString())
         },
         restore = {
             FilterState(
-                filter = it[0],
+                string = it[0],
                 enabled = it[1].toBooleanStrict()
             )
         }
@@ -56,5 +56,5 @@ inline fun <T> List<T>.filterByTokensAsSubsequence(
     toCheck: T.() -> Sequence<String>
 ): List<T> {
     if (!filterState.enabled) return this
-    return filterByTokensAsSubsequence(filter = filterState.filter, toCheck = toCheck)
+    return filterByTokensAsSubsequence(filter = filterState.string, toCheck = toCheck)
 }
