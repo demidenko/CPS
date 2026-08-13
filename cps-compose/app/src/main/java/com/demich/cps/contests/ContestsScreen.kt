@@ -59,6 +59,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
+import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
@@ -74,7 +75,6 @@ import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
-import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.workers.CodeforcesMonitorWorker
@@ -199,7 +199,7 @@ private fun SortedContests.sublist(page: ContestsListViewState.ContestsPage): Li
     }
 
 private fun List<Contest>.filterBy(state: FilterState) =
-    filterByTokensAsSubsequence(state.filter) {
+    filterByTokensAsSubsequence(state) {
         sequence {
             yield(title)
             if (platform != unknown) yield(platform.name)

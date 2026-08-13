@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.demich.cps.utils.filterByTokensAsSubsequence
 
 
 @Composable
@@ -58,3 +59,11 @@ private fun saver() =
             )
         }
     )
+
+inline fun <T> List<T>.filterByTokensAsSubsequence(
+    filterState: FilterState,
+    toCheck: T.() -> Sequence<String>
+): List<T> {
+    if (!filterState.enabled) return this
+    return filterByTokensAsSubsequence(filter = filterState.filter, toCheck = toCheck)
+}

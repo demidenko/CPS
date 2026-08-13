@@ -27,6 +27,7 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
+import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
@@ -34,7 +35,6 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
 import com.demich.cps.utils.fetchResultOf
-import com.demich.cps.utils.filterByTokensAsSubsequence
 import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
@@ -129,7 +129,7 @@ private fun CodeforcesUserBlogContent(
 }
 
 private fun List<CodeforcesWebBlogEntry>.filterBy(state: FilterState) =
-    filterByTokensAsSubsequence(state.filter) {
+    filterByTokensAsSubsequence(state) {
         sequenceOf(title)
     }
 
