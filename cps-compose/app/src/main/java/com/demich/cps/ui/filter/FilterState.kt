@@ -1,32 +1,36 @@
 package com.demich.cps.ui.filter
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.utils.filterByTokensAsSubsequence
 
 
 @Composable
-fun rememberFilterState(): FilterState =
-    rememberSaveable(saver = saver()) {
+fun rememberFilterState(): FilterState {
+    val stringState = rememberSaveable { mutableStateOf("") }
+    val enabledState = rememberSaveable { mutableStateOf(false) }
+    return remember {
         FilterState(
-            string = "",
-            enabled = false
+            stringState = stringState,
+            enabledState = enabledState
         )
     }
+}
 
 @Stable //TODO: not enough, compose ignores
 class FilterState(
-    string: String,
-    enabled: Boolean
+    stringState: MutableState<String>,
+    enabledState: MutableState<Boolean>
 ) {
-    var string by mutableStateOf(string)
+    var string by stringState
 
-    var enabled by mutableStateOf(enabled)
+    var enabled by enabledState
 
     private val availableState = mutableStateOf(false)
     var available: Boolean
@@ -36,20 +40,6 @@ class FilterState(
             if (!value) enabled = false
         }
 }
-
-
-private fun saver() =
-    listSaver<FilterState, String>(
-        save = {
-            listOf(it.string, it.enabled.toString())
-        },
-        restore = {
-            FilterState(
-                string = it[0],
-                enabled = it[1].toBooleanStrict()
-            )
-        }
-    )
 
 inline fun <T> List<T>.filterByTokensAsSubsequence(
     filterState: FilterState,
