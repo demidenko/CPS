@@ -15,22 +15,20 @@ fun rememberFilterState() =
     rememberSaveable(saver = saver()) {
         FilterState(
             filter = "",
-            enabled = false,
-            available = false
+            enabled = false
         )
     }
 
 @Stable //TODO: not enough, compose ignores
 class FilterState(
     filter: String,
-    enabled: Boolean,
-    available: Boolean
+    enabled: Boolean
 ) {
     var filter by mutableStateOf(filter)
 
     var enabled by mutableStateOf(enabled)
 
-    private val availableState = mutableStateOf(available)
+    private val availableState = mutableStateOf(false)
     var available: Boolean
         get() = availableState.value
         set(value) {
@@ -43,13 +41,12 @@ class FilterState(
 private fun saver() =
     listSaver<FilterState, String>(
         save = {
-            listOf(it.filter, it.enabled.toString(), it.available.toString())
+            listOf(it.filter, it.enabled.toString())
         },
         restore = {
             FilterState(
                 filter = it[0],
-                enabled = it[1].toBooleanStrict(),
-                available = it[2].toBooleanStrict()
+                enabled = it[1].toBooleanStrict()
             )
         }
     )
