@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.features.codeforces.follow.database.handle
@@ -39,6 +38,7 @@ import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -141,14 +141,20 @@ private class BlogLoadingViewModel: ViewModel() {
         val repository = context.followRepository
         executeFlow(key = Pair(blogId, key)) {
             val handle = repository.blog(blogId = blogId).handle
-            val colorTagDeferred = viewModelScope.async { CodeforcesClient().getRealColorTagOrNull(handle) }
             combine(
                 flow = flow {
                     emit(repository.getAndReloadBlogEntries(handle).getOrThrow())
                 },
                 flow2 = flow {
+                    val colorTagDeferred = coroutineScope {
+                        async {
+                            fetchResultOf {
+                                CodeforcesClient().getRealColorTagOrNull(handle)
+                            }
+                        }
+                    }
                     emit(null)
-                    val result = fetchResultOf { colorTagDeferred.await() }
+                    val result = colorTagDeferred.await()
                     if (result is FetchResult.Success) emit(result.value)
                 }
             ) { blogEntries, colorTag ->
