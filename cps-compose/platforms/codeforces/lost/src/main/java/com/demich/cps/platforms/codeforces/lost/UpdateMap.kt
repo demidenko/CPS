@@ -13,6 +13,15 @@ internal fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replac
     }
 }
 
+internal inline fun <reified V: CodeforcesLostEntry> MutableMap<Int, CodeforcesLostEntry>.replaceValues(
+    crossinline transform: (V) -> CodeforcesLostEntry?
+) {
+    entries.replaceValues { id, it ->
+        if (it is V) transform(it)
+        else it
+    }
+}
+
 internal fun MutableMap<Int, CodeforcesLostEntry>.put(entry: CodeforcesLostEntry) {
     put(key = entry.blogEntryId, value = entry)
 }
