@@ -176,7 +176,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
     val recentIds = recent.map { it.id }
 
     editEntries {
-        replaceValues<CodeforcesLostBlogEntry> {
+        replaceValuesOf<CodeforcesLostBlogEntry> {
             when {
                 isStale(it.blogEntry) -> null
                 it.blogEntryId in recentIds -> {
@@ -191,7 +191,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
         }
 
         // fresh become lost
-        replaceValues<CodeforcesLostBlogEntryFresh> {
+        replaceValuesOf<CodeforcesLostBlogEntryFresh> {
             if (it.blogEntryId !in recentIds) {
                 it.toLost()
             } else {
@@ -225,7 +225,7 @@ private suspend fun CodeforcesLostStorage.editNullColorTags(
     colorTag: (CodeforcesLostEntry) -> CodeforcesColorTag?
 ) {
     editEntries {
-        replaceValues<CodeforcesLostEntry> {
+        replaceValues {
             if (it.authorColorTag == null) {
                 val colorTag = colorTag(it)
                 if (colorTag != null) {
