@@ -10,7 +10,26 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedPageParser
 import com.demich.cps.platforms.utils.codeforces.getUsersCatching
 import kotlin.time.Instant
 
+
 suspend fun CodeforcesLostStorage.updateEntries(
+    api: CodeforcesApi,
+    pageContentProvider: CodeforcesPageContentProvider,
+    hintStorage: CodeforcesLostHintStorage,
+    freshAfter: Instant,
+    staleUntil: Instant,
+    trustColorTags: Boolean
+) {
+    updateEntries(
+        api = api,
+        pageContentProvider = pageContentProvider,
+        hintStorage = hintStorage,
+        isFresh = { it > freshAfter },
+        isStale = { it < staleUntil },
+        trustColorTags = trustColorTags
+    )
+}
+
+private suspend fun CodeforcesLostStorage.updateEntries(
     api: CodeforcesApi,
     pageContentProvider: CodeforcesPageContentProvider,
     hintStorage: CodeforcesLostHintStorage,

@@ -77,8 +77,8 @@ class CodeforcesLostRecentWorker(
             api = client,
             pageContentProvider = client,
             hintStorage = context.workerStorage.asHintStorage(),
-            isFresh = { currentTime - it < 24.hours },
-            isStale = { currentTime - it > 7.days },
+            freshAfter = currentTime - 24.hours,
+            staleUntil = currentTime - 7.days,
             trustColorTags = isCFMagicSafeMonth()
         )
     }
