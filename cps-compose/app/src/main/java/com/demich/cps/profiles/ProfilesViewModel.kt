@@ -66,8 +66,8 @@ class ProfilesViewModel: ViewModel() {
 
     fun <U: UserInfo> delete(manager: ProfileManager<U>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
-            setLoadingStatus(manager, PENDING)
             manager.profileStorage(context).deleteProfile()
+            setLoadingStatus(manager, PENDING)
         }
     }
 
