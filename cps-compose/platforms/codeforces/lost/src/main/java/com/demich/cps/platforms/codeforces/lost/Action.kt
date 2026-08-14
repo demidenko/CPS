@@ -176,7 +176,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
     val recentIds = recent.map { it.id }
 
     editEntries {
-        entries.replaceValues { (id, it) ->
+        entries.replaceValues { id, it ->
             when {
                 it !is CodeforcesLostBlogEntry -> it
                 isStale(it.blogEntry) -> null
@@ -192,7 +192,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
         }
 
         // fresh become lost
-        entries.replaceValues { (id, it) ->
+        entries.replaceValues { id, it ->
             if (it is CodeforcesLostBlogEntryFresh && it.blogEntryId !in recentIds) {
                 it.toLost()
             } else {

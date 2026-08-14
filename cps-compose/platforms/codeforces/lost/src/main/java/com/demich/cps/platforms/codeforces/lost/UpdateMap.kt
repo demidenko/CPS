@@ -1,10 +1,10 @@
 package com.demich.cps.platforms.codeforces.lost
 
 internal fun <K, V: Any> MutableCollection<MutableMap.MutableEntry<K, V>>.replaceValues(
-    transform: (Map.Entry<K, V>) -> V?
+    transform: (K, V) -> V?
 ) {
     removeAll {
-        val newValue = transform(it)
+        val newValue = transform(it.key, it.value)
         if (newValue == null) true
         else {
             it.setValue(newValue)
