@@ -3,7 +3,6 @@ package com.demich.cps.contests
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.database.toContestPlatform
@@ -19,9 +18,9 @@ import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
+import com.demich.cps.utils.uniqueLaunch
 import com.demich.cps.workers.ContestsWorker
 import com.demich.kotlin_stdlib_boost.emptyEnumSet
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -30,7 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 @Composable
 fun contestsViewModel(): ContestsViewModel = sharedViewModel()
@@ -77,8 +76,9 @@ class ContestsViewModel: ViewModel() {
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
         .collectTo(repository = context.contestsRepository)
 
+    private val reloadEnabledPlatformsMutex = Mutex()
     fun reloadEnabledPlatforms(context: Context) {
-        viewModelScope.launch(Dispatchers.Default) {
+        uniqueLaunch(mutex = reloadEnabledPlatformsMutex) {
             ContestsWorker.getWork(context).enqueueInRepeatInterval()
 
             context.settingsContests.contestsFetchFlows()
@@ -86,10 +86,11 @@ class ContestsViewModel: ViewModel() {
         }
     }
 
+    private val applyChangedSettingsMutex = Mutex()
     fun applyChangedSettings(context: Context) {
-        viewModelScope.launch(Dispatchers.Default) {
+        uniqueLaunch(mutex = applyChangedSettingsMutex) {
             val infoDataStore = ContestsInfoDataStore(context)
-            val snapshot = infoDataStore.settingsSnapshot() ?: return@launch
+            val snapshot = infoDataStore.settingsSnapshot() ?: return@uniqueLaunch
             infoDataStore.settingsSnapshot.setValue(null)
 
             val settings = context.settingsContests
