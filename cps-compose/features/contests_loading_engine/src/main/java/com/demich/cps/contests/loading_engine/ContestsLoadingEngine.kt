@@ -43,8 +43,8 @@ suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectTo(
     }
 }
 
-context(scope: CoroutineScope)
 fun contestsFetchFlows(
+    cacheScope: CoroutineScope,
     setup: Map<ContestPlatform, List<ContestsFetchSource>>,
     dateConstraints: ContestDateConstraints,
     createFetcher: (ContestsFetchSource) -> ContestsFetcher
@@ -53,7 +53,7 @@ fun contestsFetchFlows(
         setup = setup,
         dateConstraints = dateConstraints,
         getFetcher = createFetcher,
-        cacheScope = scope
+        cacheScope = cacheScope
     )
 
     return setup.mapValues { (platform, priorities) ->

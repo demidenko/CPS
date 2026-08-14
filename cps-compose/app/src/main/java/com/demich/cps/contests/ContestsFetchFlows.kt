@@ -33,6 +33,7 @@ suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<ContestP
 context(_: DataStoreSnapshot, scope: CoroutineScope)
 private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<ContestPlatform>) =
     contestsFetchFlows(
+        cacheScope = scope,
         setup = fetchPriorityLists.value.filterKeys { it in platforms },
         dateConstraints = contestsDateConstraints.value.at(currentTime = getSystemTime().truncateBySeconds()),
     ) { fetchSource ->
