@@ -38,12 +38,11 @@ import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
@@ -156,15 +155,11 @@ private class BlogLoadingViewModel: ViewModel() {
 
     private fun flowOfColorTag(handle: String): Flow<CodeforcesColorTag?> =
         flow {
-            val colorTagDeferred = coroutineScope {
-                async {
-                    fetchResultOf {
-                        CodeforcesClient().getRealColorTagOrNull(handle)
-                    }
-                }
+            val result = fetchResultOf {
+                CodeforcesClient().getRealColorTagOrNull(handle)
             }
-            emit(null)
-            val result = colorTagDeferred.await()
             if (result is FetchResult.Success) emit(result.value)
+        }.onStart {
+            emit(null)
         }
 }
