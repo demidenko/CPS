@@ -32,14 +32,12 @@ import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
+import com.demich.cps.utils.asyncFetchResultOf
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
-import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -156,15 +154,11 @@ private class BlogLoadingViewModel: ViewModel() {
 
     private fun flowOfColorTag(handle: String): Flow<CodeforcesColorTag?> =
         flow {
-            val colorTagDeferred = coroutineScope {
-                async {
-                    fetchResultOf {
-                        CodeforcesClient().getRealColorTagOrNull(handle)
-                    }
-                }
+            val job = asyncFetchResultOf {
+                CodeforcesClient().getRealColorTagOrNull(handle)
             }
             emit(null)
-            val result = colorTagDeferred.await()
+            val result = job.await()
             if (result is FetchResult.Success) emit(result.value)
         }
 }

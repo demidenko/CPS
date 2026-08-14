@@ -1,5 +1,8 @@
 package com.demich.cps.utils
 
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
@@ -60,3 +63,10 @@ fun <T> fetchFlowOf(block: suspend () -> T): Flow<FetchState<T>> =
 
 suspend fun <T> fetchResultOf(block: suspend () -> T): FetchResult<T> =
     block.asFlow().toFetchResultFlow().single()
+
+suspend fun <T> asyncFetchResultOf(block: suspend () -> T): Deferred<FetchResult<T>> =
+    coroutineScope {
+        async {
+            fetchResultOf(block = block)
+        }
+    }
