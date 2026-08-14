@@ -1,7 +1,10 @@
 package com.demich.cps.utils
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -69,3 +72,14 @@ fun CoroutineScope.launchWhileActive(block: suspend CoroutineScope.() -> Duratio
             ensureActive()
         }
     }
+
+fun ViewModel.uniqueLaunch(mutex: Mutex, block: suspend CoroutineScope.() -> Unit) {
+    if (!mutex.tryLock()) return
+    viewModelScope.launch(context = Dispatchers.Default) {
+        try {
+            block()
+        } finally {
+            mutex.unlock()
+        }
+    }
+}
