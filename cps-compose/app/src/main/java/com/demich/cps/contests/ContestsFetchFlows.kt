@@ -27,7 +27,7 @@ suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<ContestP
         makeContestsFetchFlows(platforms)
     }
 
-context(scope: DataStoreSnapshot)
+context(_: DataStoreSnapshot)
 private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<ContestPlatform>) =
     contestsFetchFlows(
         setup = fetchPriorityLists.value.filterKeys { it in platforms },
