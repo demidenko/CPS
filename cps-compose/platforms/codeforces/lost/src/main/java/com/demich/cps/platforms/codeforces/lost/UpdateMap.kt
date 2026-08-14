@@ -28,6 +28,14 @@ internal inline fun <reified V: CodeforcesLostEntry> MutableMap<Int, CodeforcesL
     }
 }
 
+internal inline fun <reified V: CodeforcesLostEntry> MutableMap<Int, CodeforcesLostEntry>.removeValuesOf(
+    crossinline predicate: (V) -> Boolean
+) {
+    replaceValuesOf<V> {
+        if (predicate(it)) null else it
+    }
+}
+
 internal fun MutableMap<Int, CodeforcesLostEntry>.put(entry: CodeforcesLostEntry) {
     put(key = entry.blogEntryId, value = entry)
 }
