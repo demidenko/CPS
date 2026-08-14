@@ -18,6 +18,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
+import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
@@ -39,6 +40,7 @@ import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -142,21 +144,8 @@ private class BlogLoadingViewModel: ViewModel() {
         executeFlow(key = Pair(blogId, key)) {
             val handle = repository.blog(blogId = blogId).handle
             combine(
-                flow = flow {
-                    emit(repository.getAndReloadBlogEntries(handle).getOrThrow())
-                },
-                flow2 = flow {
-                    val colorTagDeferred = coroutineScope {
-                        async {
-                            fetchResultOf {
-                                CodeforcesClient().getRealColorTagOrNull(handle)
-                            }
-                        }
-                    }
-                    emit(null)
-                    val result = colorTagDeferred.await()
-                    if (result is FetchResult.Success) emit(result.value)
-                }
+                flow = flow { emit(repository.getAndReloadBlogEntries(handle).getOrThrow()) },
+                flow2 = flowOfColorTag(handle = handle)
             ) { blogEntries, colorTag ->
                 blogEntries.map {
                     it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
@@ -164,4 +153,18 @@ private class BlogLoadingViewModel: ViewModel() {
             }.let { emitAll(it) }
         }
     }
+
+    private fun flowOfColorTag(handle: String): Flow<CodeforcesColorTag?> =
+        flow {
+            val colorTagDeferred = coroutineScope {
+                async {
+                    fetchResultOf {
+                        CodeforcesClient().getRealColorTagOrNull(handle)
+                    }
+                }
+            }
+            emit(null)
+            val result = colorTagDeferred.await()
+            if (result is FetchResult.Success) emit(result.value)
+        }
 }
