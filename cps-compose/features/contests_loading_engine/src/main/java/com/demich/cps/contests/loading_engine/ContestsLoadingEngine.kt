@@ -109,9 +109,9 @@ private class ContestsFetchMemoizer(
                 }
             }
             is ContestsMultiplatformFetcher -> {
-                mutex.withLock {
-                    results.getOrPut(source) {
-                        coroutineScope { // TODO: useless async because of this 'coroutineScope'
+                coroutineScope { //TODO: not sure it is ok to do like that
+                    mutex.withLock {
+                        results.getOrPut(source) {
                             async { fetcher.fetchAllPlatforms() }
                         }
                     }
