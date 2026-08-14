@@ -91,8 +91,8 @@ private suspend fun CodeforcesLostStorage.updateSuspects(
     trustColorTags: Boolean
 ) {
     editEntries {
-        entries.removeAll { (id, it) ->
-            it is CodeforcesLostBlogEntrySuspect && isNotFresh(id, hint)
+        removeValuesOf<CodeforcesLostBlogEntrySuspect> {
+            isNotFresh(it.blogEntryId, hint)
         }
 
         recent.forEach { blogEntry ->
@@ -120,8 +120,8 @@ private suspend fun CodeforcesLostStorage.updateFresh(
     isFresh: (CodeforcesBlogEntry) -> Boolean
 ) {
     editEntries {
-        values.removeAll {
-            it is CodeforcesLostBlogEntryFresh && !isFresh(it.blogEntry)
+        removeValuesOf<CodeforcesLostBlogEntryFresh> {
+            !isFresh(it.blogEntry)
         }
     }
 
