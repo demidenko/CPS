@@ -225,19 +225,18 @@ private suspend fun CodeforcesLostStorage.editNullColorTags(
     colorTag: (CodeforcesLostEntry) -> CodeforcesColorTag?
 ) {
     editEntries {
-        entries.forEach { mapEntry ->
-            val it = mapEntry.value
+        replaceValues<CodeforcesLostEntry> {
             if (it.authorColorTag == null) {
                 val colorTag = colorTag(it)
                 if (colorTag != null) {
-                    val entry = when (it) {
+                    return@replaceValues when (it) {
                         is CodeforcesLostBlogEntry -> it.copy(authorColorTag = colorTag)
                         is CodeforcesLostBlogEntryFresh -> it.copy(authorColorTag = colorTag)
                         is CodeforcesLostBlogEntrySuspect -> it.copy(authorColorTag = colorTag)
                     }
-                    mapEntry.setValue(entry)
                 }
             }
+            it
         }
     }
 }
