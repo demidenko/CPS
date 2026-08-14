@@ -31,9 +31,7 @@ suspend fun CodeforcesLostStorage.updateEntries(
             hintStorage.update(blogEntry.id, blogEntry.creationTime)
         }
 
-    val recentResult = pageContentProvider.getRecentCatching()
-
-    recentResult.onFailure {
+    val recent = pageContentProvider.getRecentCatching().onFailure {
         val blogEntries = api.getRecentActionsBlogEntries()
             .mapNotNull {
                 if (isFresh(it.creationTime)) {
@@ -44,12 +42,12 @@ suspend fun CodeforcesLostStorage.updateEntries(
             }
 
         addFresh(blogEntries)
-    }
+    }.getOrThrow()
 
     delayedStorage.use {
         updateEntries(
             api = api,
-            recent = recentResult.getOrThrow(),
+            recent = recent,
             hint = hintStorage.getHint(),
             isFresh = { isFresh(it.creationTime) },
             isStale = { isStale(it.creationTime) },
