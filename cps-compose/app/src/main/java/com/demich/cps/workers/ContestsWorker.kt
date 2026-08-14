@@ -6,6 +6,7 @@ import com.demich.cps.contests.contestsFetchFlows
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.loading_engine.collectTo
 import com.demich.cps.contests.settings.settingsContests
+import kotlinx.coroutines.coroutineScope
 
 class ContestsWorker(
     context: Context,
@@ -32,8 +33,10 @@ class ContestsWorker(
 
     override suspend fun runWork() {
         // usual reload
-        context.settingsContests.contestsFetchFlows().collectTo(
-            repository = context.contestsRepository
-        )
+        coroutineScope {
+            context.settingsContests.contestsFetchFlows().collectTo(
+                repository = context.contestsRepository
+            )
+        }
     }
 }

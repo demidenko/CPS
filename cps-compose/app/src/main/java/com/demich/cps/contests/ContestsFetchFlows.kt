@@ -16,18 +16,21 @@ import com.demich.cps.utils.truncateBySeconds
 import com.demich.datastore_itemized.DataStoreSnapshot
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
+import kotlinx.coroutines.CoroutineScope
 
+context(scope: CoroutineScope)
 suspend fun ContestsSettingsDataStore.contestsFetchFlows() =
     fromSnapshot {
         makeContestsFetchFlows(platforms = enabledContestPlatforms.value)
     }
 
+context(scope: CoroutineScope)
 suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<ContestPlatform>) =
     fromSnapshot {
         makeContestsFetchFlows(platforms)
     }
 
-context(_: DataStoreSnapshot)
+context(_: DataStoreSnapshot, scope: CoroutineScope)
 private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<ContestPlatform>) =
     contestsFetchFlows(
         setup = fetchPriorityLists.value.filterKeys { it in platforms },

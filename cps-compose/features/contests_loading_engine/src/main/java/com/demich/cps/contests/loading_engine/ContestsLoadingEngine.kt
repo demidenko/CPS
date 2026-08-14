@@ -10,6 +10,7 @@ import com.demich.cps.contests.loading_engine.fetchers.ContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsMultiplatformFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsSinglePlatformFetcher
 import com.demich.cps.contests.loading_engine.fetchers.correctAtCoderTitle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -42,12 +43,18 @@ suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectTo(
     }
 }
 
+context(scope: CoroutineScope)
 fun contestsFetchFlows(
     setup: Map<ContestPlatform, List<ContestsFetchSource>>,
     dateConstraints: ContestDateConstraints,
     createFetcher: (ContestsFetchSource) -> ContestsFetcher
 ): Map<ContestPlatform, Flow<ContestsFetchResult>> {
-    val memoizer = ContestsFetchMemoizer(setup, dateConstraints, createFetcher)
+    val memoizer = ContestsFetchMemoizer(
+        setup = setup,
+        dateConstraints = dateConstraints,
+        getFetcher = createFetcher,
+        cacheScope = scope
+    )
 
     return setup.mapValues { (platform, priorities) ->
         priorities.toFetchFlow(
@@ -84,7 +91,8 @@ private fun Contest.correctTitle(): Contest {
 private class ContestsFetchMemoizer(
     private val setup: Map<ContestPlatform, List<ContestsFetchSource>>,
     private val dateConstraints: ContestDateConstraints,
-    private val getFetcher: (ContestsFetchSource) -> ContestsFetcher
+    private val getFetcher: (ContestsFetchSource) -> ContestsFetcher,
+    private val cacheScope: CoroutineScope
 ) {
     private typealias ContestsResult = Result<Map<ContestPlatform, List<Contest>>>
 
@@ -109,11 +117,9 @@ private class ContestsFetchMemoizer(
                 }
             }
             is ContestsMultiplatformFetcher -> {
-                coroutineScope { //TODO: not sure it is ok to do like that
-                    mutex.withLock {
-                        results.getOrPut(source) {
-                            async { fetcher.fetchAllPlatforms() }
-                        }
+                mutex.withLock {
+                    results.getOrPut(source) {
+                        cacheScope.async { fetcher.fetchAllPlatforms() }
                     }
                 }.await().map {
                     it.getOrElse(platform) { emptyList() }
