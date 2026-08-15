@@ -3,7 +3,6 @@ package com.demich.cps.contests.settings
 import android.content.Context
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.contests.fetching.ContestDateConstraints
 import com.demich.cps.contests.fetching.ContestsFetchSource
@@ -15,7 +14,6 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.value
-import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -32,12 +30,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
 
     val enabledPlatforms = itemEnumSet<Platform>(name = "enabled_platforms")
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
-
-    val enabledContestPlatforms = combine {
-        enabledPlatforms.value.map { it.toContestPlatform() }.toEnumSet().apply {
-            if (clistAdditionalResources.value.isNotEmpty()) add(unknown)
-        }
-    }
 
     val anyPlatformEnabled = combine {
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()

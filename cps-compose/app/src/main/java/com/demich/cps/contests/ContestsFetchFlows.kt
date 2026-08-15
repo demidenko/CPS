@@ -1,6 +1,7 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.ContestPlatform
+import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.loading_engine.contestsFetchFlows
 import com.demich.cps.contests.loading_engine.fetchers.AtCoderContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ClistContestsFetcher
@@ -16,18 +17,19 @@ import com.demich.cps.utils.truncateBySeconds
 import com.demich.datastore_itemized.DataStoreSnapshot
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
+import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.CoroutineScope
 
 context(scope: CoroutineScope)
 suspend fun ContestsSettingsDataStore.contestsFetchFlows() =
     fromSnapshot {
-        makeContestsFetchFlows(platforms = enabledContestPlatforms.value)
+        makeContestsFetchFlows(platforms = enabledContestPlatforms())
     }
 
 context(scope: CoroutineScope)
 suspend fun ContestsSettingsDataStore.contestsFetchFlows(platforms: Set<ContestPlatform>) =
     fromSnapshot {
-        makeContestsFetchFlows(platforms)
+        makeContestsFetchFlows(platforms = platforms)
     }
 
 context(_: DataStoreSnapshot, scope: CoroutineScope)
@@ -46,4 +48,10 @@ private fun ContestsSettingsDataStore.makeContestsFetchFlows(platforms: Set<Cont
             atcoder_parse -> AtCoderContestsFetcher(api = AtCoderClient())
             dmoj_api -> DmojContestsFetcher(api = DmojClient())
         }
+    }
+
+context(_: DataStoreSnapshot)
+private fun ContestsSettingsDataStore.enabledContestPlatforms() =
+    enabledPlatforms.value.map { it.toContestPlatform() }.toEnumSet().apply {
+        if (clistAdditionalResources.value.isNotEmpty()) add(unknown)
     }
