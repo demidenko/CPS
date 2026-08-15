@@ -4,9 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.demich.cps.contests.ContestsInfoDataStore
+import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.LaunchedEffectOneTime
@@ -49,3 +52,6 @@ fun CPSNavigator.ScreenScope<Screen.ContestsSettings>.NavContentContestsSettings
 
     ContestsSettingsScreen()
 }
+
+val contestPlatforms: List<Platform> =
+    Contest.platformsExceptUnknown.map { it.toGeneralPlatform() }
