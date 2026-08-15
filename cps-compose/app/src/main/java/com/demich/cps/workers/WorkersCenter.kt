@@ -75,16 +75,15 @@ abstract class CPSPeriodicWork(
 
     suspend fun isEnabled(): Boolean = requestBuilder() != null
 
-    private inline fun enqueueWork(
+    private fun enqueueWork(
         requestBuilder: PeriodicWorkRequest.Builder?,
-        policy: ExistingPeriodicWorkPolicy,
-        block: PeriodicWorkRequest.Builder.() -> Unit = {}
+        policy: ExistingPeriodicWorkPolicy
     ) {
         if (requestBuilder == null) return ;
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = name,
             existingPeriodicWorkPolicy = policy,
-            request = requestBuilder.apply(block).build()
+            request = requestBuilder.build()
         )
     }
 
@@ -103,10 +102,13 @@ abstract class CPSPeriodicWork(
     }
 
     private suspend fun enqueueAt(time: Instant) {
-        enqueueWork(requestBuilder = requestBuilder(), policy = UPDATE) {
-            //note: ignores default even if default closer
-            setNextScheduleTimeOverride(time)
-        }
+        enqueueWork(
+            requestBuilder = requestBuilder()?.apply {
+                //note: ignores default even if default closer
+                setNextScheduleTimeOverride(time)
+            },
+            policy = UPDATE
+        )
     }
 
     private fun systemTime(): Instant = Clock.System.now()
