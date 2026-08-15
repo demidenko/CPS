@@ -1,6 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.community.settings.settingsCommunity
@@ -30,13 +31,13 @@ class ProjectEulerRecentProblemsWorker(
         override val workName get() = "pe_recent"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun isEnabled() =
-                context.settingsCommunity.enabledNewsFeeds().contains(project_euler_problems)
+            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
+                if (!context.settingsCommunity.enabledNewsFeeds().contains(project_euler_problems)) return null
 
-            override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
+                return CPSPeriodicWorkRequestBuilder<ProjectEulerRecentProblemsWorker>(
                     repeatInterval = 6.hours
                 )
+            }
 
             override fun flowOfInfo() =
                 context.workerStorage.flowOf {

@@ -70,15 +70,17 @@ abstract class CPSPeriodicWork(
     name: String,
     context: Context
 ): CPSWork(name, context) {
-    abstract suspend fun isEnabled(): Boolean
-
+    // null iff work is disabled
     protected abstract suspend fun requestBuilder(): PeriodicWorkRequest.Builder?
 
-    private suspend inline fun enqueueWork(
+    suspend fun isEnabled(): Boolean = requestBuilder() != null
+
+    private inline fun enqueueWork(
+        requestBuilder: PeriodicWorkRequest.Builder?,
         policy: ExistingPeriodicWorkPolicy,
         block: PeriodicWorkRequest.Builder.() -> Unit = {}
     ) {
-        val requestBuilder = requestBuilder() ?: return
+        if (requestBuilder == null) return ;
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = name,
             existingPeriodicWorkPolicy = policy,
@@ -87,16 +89,21 @@ abstract class CPSPeriodicWork(
     }
 
     suspend fun startImmediate() {
-        enqueueWork(policy = CANCEL_AND_REENQUEUE)
+        enqueueWork(
+            requestBuilder = requestBuilder(),
+            policy = CANCEL_AND_REENQUEUE
+        )
     }
 
     suspend fun enqueueIfEnabled() {
-        if (isEnabled()) enqueueWork(policy = UPDATE) //TODO: KEEP sometimes?
+        enqueueWork(
+            requestBuilder = requestBuilder(),
+            policy = UPDATE //TODO: KEEP sometimes?
+        )
     }
 
     private suspend fun enqueueAt(time: Instant) {
-        if (!isEnabled()) return
-        enqueueWork(policy = UPDATE) {
+        enqueueWork(requestBuilder = requestBuilder(), policy = UPDATE) {
             //note: ignores default even if default closer
             setNextScheduleTimeOverride(time)
         }
@@ -128,13 +135,6 @@ abstract class CPSPeriodicWork(
         }
         enqueueAt(time = time)
     }
-}
-
-suspend fun CPSPeriodicWork.checkEnabled(immediate: Boolean) {
-    if (isEnabled()) {
-        if (immediate) startImmediate()
-        else enqueueIfEnabled()
-    } else stop()
 }
 
 suspend fun CPSWork.workInfo(): WorkInfo? = flowOfWorkInfo().firstOrNull()

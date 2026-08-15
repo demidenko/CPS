@@ -1,6 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.contestsFetchFlows
 import com.demich.cps.contests.database.contestsRepository
@@ -19,17 +20,14 @@ class ContestsWorker(
         override val workName get() = "contests"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            private val settings get() = context.settingsContests
+            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
+                val interval = context.settingsContests.autoUpdateInterval() ?: return null
 
-            override suspend fun isEnabled() = settings.autoUpdateInterval() != null
-
-            override suspend fun requestBuilder() =
-                settings.autoUpdateInterval()?.let { repeatInterval ->
-                    CPSPeriodicWorkRequestBuilder<ContestsWorker>(
-                        repeatInterval = repeatInterval,
-                        batteryNotLow = true
-                    )
-                }
+                return CPSPeriodicWorkRequestBuilder<ContestsWorker>(
+                    repeatInterval = interval,
+                    batteryNotLow = true
+                )
+            }
         }
     }
 

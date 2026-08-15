@@ -1,6 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
@@ -30,13 +31,13 @@ class CodeforcesMonitorLauncherWorker(
         override val workName get() = "cf_monitor_launcher"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun isEnabled() =
-                CodeforcesProfileManager().settingsStorage(context).monitorEnabled()
+            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
+                if (!CodeforcesProfileManager().settingsStorage(context).monitorEnabled()) return null
 
-            override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
+                return CPSPeriodicWorkRequestBuilder<CodeforcesMonitorLauncherWorker>(
                     repeatInterval = 1.hours
                 )
+            }
 
             override fun flowOfInfo() =
                 CodeforcesProfileManager().profileStorage(context).flowOf {

@@ -30,7 +30,6 @@ class ProfilesWorker(
         override val workName get() = "profiles"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun isEnabled() = true //TODO something proper
             override suspend fun requestBuilder() =
                 CPSPeriodicWorkRequestBuilder<ProfilesWorker>(
                     repeatInterval = 15.minutes

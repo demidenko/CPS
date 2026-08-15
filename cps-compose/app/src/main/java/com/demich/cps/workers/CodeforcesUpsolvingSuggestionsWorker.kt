@@ -1,6 +1,7 @@
 package com.demich.cps.workers
 
 import android.content.Context
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.notifications.notificationChannels
@@ -35,14 +36,14 @@ class CodeforcesUpsolvingSuggestionsWorker(
         override val workName get() = "cf_upsolving"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun isEnabled() =
-                CodeforcesProfileManager().settingsStorage(context).upsolvingSuggestionsEnabled()
+            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
+                if (!CodeforcesProfileManager().settingsStorage(context).upsolvingSuggestionsEnabled()) return null
 
-            override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
+                return CPSPeriodicWorkRequestBuilder<CodeforcesUpsolvingSuggestionsWorker>(
                     repeatInterval = 12.hours,
                     batteryNotLow = true
                 )
+            }
         }
     }
 
