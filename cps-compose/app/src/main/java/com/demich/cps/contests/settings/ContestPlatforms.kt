@@ -93,14 +93,18 @@ private fun ContestPlatformsSettingsItemExpandedContent(
     clistResources: List<ClistResource>,
     onCheckedChange: (Platform, Boolean) -> Unit
 ) {
+    val availableSources = remember {
+        contestPlatforms.associateWith { platform ->
+            val platform = platform.toContestPlatform()
+            ContestsFetchSource.entries.filter { platform in it.platforms }.toEnumSet()
+        }
+    }
+
     Column {
         contestPlatforms.forEach { platform ->
             PlatformCheckRow(
                 platform = platform,
-                availableSources = remember(platform) {
-                    val platform = platform.toContestPlatform()
-                    ContestsFetchSource.entries.filter { platform in it.platforms }.toEnumSet()
-                },
+                availableSources = availableSources.getValue(platform),
                 isChecked = platform in enabledPlatforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
