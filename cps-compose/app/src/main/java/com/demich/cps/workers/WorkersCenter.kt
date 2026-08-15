@@ -28,13 +28,13 @@ import kotlin.time.toJavaDuration
 private val Context.workManager: WorkManager
     get() = WorkManager.getInstance(this)
 
+private val CPSWork.workManager: WorkManager
+    get() = context.workManager
+
 abstract class CPSWork(
     val name: String,
     val context: Context
 ) {
-    protected val workManager: WorkManager
-        get() = context.workManager
-
     fun stop() {
         workManager.cancelUniqueWork(name)
     }
