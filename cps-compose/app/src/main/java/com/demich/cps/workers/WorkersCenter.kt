@@ -72,13 +72,13 @@ abstract class CPSPeriodicWork(
 ): CPSWork(name, context) {
     abstract suspend fun isEnabled(): Boolean
 
-    abstract suspend fun requestBuilder(): PeriodicWorkRequest.Builder
+    protected abstract suspend fun requestBuilder(): PeriodicWorkRequest.Builder?
 
     private suspend inline fun enqueueWork(
         policy: ExistingPeriodicWorkPolicy,
         block: PeriodicWorkRequest.Builder.() -> Unit = {}
     ) {
-        val requestBuilder = runCatching { requestBuilder() }.getOrElse { return }
+        val requestBuilder = requestBuilder() ?: return
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = name,
             existingPeriodicWorkPolicy = policy,

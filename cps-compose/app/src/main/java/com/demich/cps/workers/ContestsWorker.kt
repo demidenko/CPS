@@ -24,10 +24,12 @@ class ContestsWorker(
             override suspend fun isEnabled() = settings.autoUpdateInterval() != null
 
             override suspend fun requestBuilder() =
-                CPSPeriodicWorkRequestBuilder<ContestsWorker>(
-                    repeatInterval = requireNotNull(settings.autoUpdateInterval()),
-                    batteryNotLow = true
-                )
+                settings.autoUpdateInterval()?.let { repeatInterval ->
+                    CPSPeriodicWorkRequestBuilder<ContestsWorker>(
+                        repeatInterval = repeatInterval,
+                        batteryNotLow = true
+                    )
+                }
         }
     }
 
