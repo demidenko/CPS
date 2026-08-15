@@ -52,18 +52,23 @@ abstract class CPSOneTimeWork(
 ): CPSWork(name, context) {
     abstract val requestBuilder: OneTimeWorkRequest.Builder
 
-    private inline fun enqueueWork(
-        policy: ExistingWorkPolicy,
-        block: OneTimeWorkRequest.Builder.() -> Unit = {}
+    private fun enqueueWork(
+        requestBuilder: OneTimeWorkRequest.Builder,
+        policy: ExistingWorkPolicy
     ) {
         workManager.enqueueUniqueWork(
             uniqueWorkName = name,
             existingWorkPolicy = policy,
-            request = requestBuilder.apply(block).build()
+            request = requestBuilder.build()
         )
     }
 
-    fun startImmediate() = enqueueWork(policy = REPLACE)
+    fun startImmediate() {
+        enqueueWork(
+            requestBuilder = requestBuilder,
+            policy = REPLACE
+        )
+    }
 }
 
 abstract class CPSPeriodicWork(
