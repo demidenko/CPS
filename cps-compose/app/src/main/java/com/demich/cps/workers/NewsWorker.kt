@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.community.CommunityNewsFeed
@@ -36,14 +35,13 @@ class NewsWorker(
         override val workName get() = "news"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
-                if (!context.settingsCommunity.enabledNewsFeeds().containsSomethingExcept(project_euler_problems)) return null
-
-                return CPSPeriodicWorkRequestBuilder<NewsWorker>(
-                    repeatInterval = 6.hours,
-                    batteryNotLow = true
-                )
-            }
+            override suspend fun requestBuilder() =
+                if (context.settingsCommunity.enabledNewsFeeds().containsSomethingExcept(project_euler_problems)) {
+                    CPSPeriodicWorkRequestBuilder<NewsWorker>(
+                        repeatInterval = 6.hours,
+                        batteryNotLow = true
+                    )
+                } else null
 
             override fun flowOfInfo() =
                 NewsFeedStorage(context).flowOf {

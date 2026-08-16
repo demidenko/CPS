@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
@@ -46,13 +45,12 @@ class CodeforcesLostRecentWorker(
         override val workName get() = "cf_lost"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
-                if (!context.settingsCommunity.codeforcesLostEnabled()) return null
-
-                return CPSPeriodicWorkRequestBuilder<CodeforcesLostRecentWorker>(
-                    repeatInterval = 30.minutes
-                )
-            }
+            override suspend fun requestBuilder() =
+                if (context.settingsCommunity.codeforcesLostEnabled()) {
+                    CPSPeriodicWorkRequestBuilder<CodeforcesLostRecentWorker>(
+                        repeatInterval = 30.minutes
+                    )
+                } else null
 
             override fun flowOfInfo() =
                 combine(

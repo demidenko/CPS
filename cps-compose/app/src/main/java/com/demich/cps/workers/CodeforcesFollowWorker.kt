@@ -1,7 +1,6 @@
 package com.demich.cps.workers
 
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
@@ -27,14 +26,13 @@ class CodeforcesFollowWorker(
         override val workName get() = "cf_follow"
 
         override fun getWork(context: Context) = object : CPSPeriodicWork(name = workName, context = context) {
-            override suspend fun requestBuilder(): PeriodicWorkRequest.Builder? {
-                if (!context.settingsCommunity.codeforcesFollowEnabled()) return null
-
-                return CPSPeriodicWorkRequestBuilder<CodeforcesFollowWorker>(
-                    repeatInterval = 4.hours,
-                    batteryNotLow = true
-                )
-            }
+            override suspend fun requestBuilder() =
+                if (context.settingsCommunity.codeforcesFollowEnabled()) {
+                    CPSPeriodicWorkRequestBuilder<CodeforcesFollowWorker>(
+                        repeatInterval = 4.hours,
+                        batteryNotLow = true
+                    )
+                } else null
         }
     }
 
