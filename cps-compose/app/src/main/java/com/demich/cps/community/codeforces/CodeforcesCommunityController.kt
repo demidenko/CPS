@@ -3,7 +3,7 @@ package com.demich.cps.community.codeforces
 import android.content.Context
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -59,9 +59,8 @@ fun rememberCodeforcesCommunityController(
         )
     }
 
-    DisposableEffect(controller) {
+    SideEffect(controller) {
         controller.touchFlows(context)
-        onDispose { }
     }
 
     return controller

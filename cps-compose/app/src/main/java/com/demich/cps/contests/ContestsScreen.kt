@@ -17,8 +17,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -343,9 +343,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onReloadClick = onReload
     )
 
-    DisposableEffect(contestsViewModel) {
+    SideEffect(contestsViewModel) {
         contestsViewModel.applyChangedSettings(context)
-        onDispose { }
     }
 }
 
