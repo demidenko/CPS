@@ -29,3 +29,10 @@ fun <T> Result<T>?.toLoadingStatus(): LoadingStatus =
         if (isFailure) FAILED
         else PENDING
     }
+
+fun FetchState<*>.toLoadingStatus(): LoadingStatus =
+    when (this) {
+        FetchState.Loading -> LOADING
+        is FetchResult.Failure -> FAILED
+        is FetchResult.Success -> PENDING
+    }

@@ -35,13 +35,6 @@ inline fun <T> FetchResult<T>.valueOr(onFailure: () -> T): T =
         is FetchResult.Failure -> onFailure()
     }
 
-fun FetchState<*>.toLoadingStatus(): LoadingStatus =
-    when (this) {
-        FetchState.Loading -> LOADING
-        is FetchResult.Failure -> FAILED
-        is FetchResult.Success -> PENDING
-    }
-
 private fun <T> Flow<T>.toResultFlow(): Flow<Result<T>> =
     map { Result.success(it) }
         .catch { emit(Result.failure(it)) }
