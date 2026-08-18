@@ -10,6 +10,10 @@ import com.demich.cps.contests.loading_engine.fetchers.ContestsFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsMultiplatformFetcher
 import com.demich.cps.contests.loading_engine.fetchers.ContestsSinglePlatformFetcher
 import com.demich.cps.contests.loading_engine.fetchers.correctAtCoderTitle
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.asResult
+import com.demich.cps.fetchstate.fetchResultOf
+import com.demich.cps.fetchstate.map
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -69,10 +73,11 @@ private fun List<ContestsFetchSource>.toFetchFlow(
     memoizer: ContestsFetchMemoizer
 ): Flow<ContestsFetchResult> = flow {
     forEach { fetchSource ->
+        val fetchResult = memoizer.getContests(platform, fetchSource)
         val result = ContestsFetchResult(
             platform = platform,
             fetchSource = fetchSource,
-            result = memoizer.getContests(platform, fetchSource).map { it.map { it.correctTitle() } }
+            result = fetchResult.map { it.map { it.correctTitle() } }.asResult()
         )
 
         emit(result)
@@ -94,7 +99,7 @@ private class ContestsFetchMemoizer(
     private val getFetcher: (ContestsFetchSource) -> ContestsFetcher,
     private val cacheScope: CoroutineScope
 ) {
-    private typealias ContestsResult = Result<Map<ContestPlatform, List<Contest>>>
+    private typealias ContestsResult = FetchResult<Map<ContestPlatform, List<Contest>>>
 
     private val mutex = Mutex()
     private val results = mutableMapOf<ContestsFetchSource, Deferred<ContestsResult>>()
@@ -103,7 +108,7 @@ private class ContestsFetchMemoizer(
     suspend fun getContests(
         platform: ContestPlatform,
         source: ContestsFetchSource
-    ): Result<List<Contest>> {
+    ): FetchResult<List<Contest>> {
         val fetcher = mutex.withLock {
             fetchers.getOrPut(source) {
                 getFetcher(source)
@@ -112,8 +117,8 @@ private class ContestsFetchMemoizer(
 
         return when (fetcher) {
             is ContestsSinglePlatformFetcher -> {
-                fetcher.runCatching {
-                    fetchContests(dateConstraints = dateConstraints)
+                fetchResultOf {
+                    fetcher.fetchContests(dateConstraints = dateConstraints)
                 }
             }
             is ContestsMultiplatformFetcher -> {
@@ -132,7 +137,7 @@ private class ContestsFetchMemoizer(
         val platforms = setup.mapNotNull { (platform, sources) ->
             if (fetchSource in sources) platform else null
         }
-        return runCatching {
+        return fetchResultOf {
             fetchContests(
                 platforms = platforms,
                 dateConstraints = dateConstraints

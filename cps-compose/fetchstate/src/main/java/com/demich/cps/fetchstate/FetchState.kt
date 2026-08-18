@@ -23,11 +23,24 @@ inline fun <T, R> FetchState<T>.map(transform: (T) -> R): FetchState<R> {
     }
 }
 
+inline fun <T, R> FetchResult<T>.map(transform: (T) -> R): FetchResult<R> {
+    return when (this) {
+        is FetchResult.Success -> FetchResult.Success(transform(value))
+        is FetchResult.Failure -> this //!!!!! `else` not compile !!!!
+    }
+}
+
 fun <T> Result<T>.asFetchResult(): FetchResult<T> =
     fold(
         onSuccess = { FetchResult.Success(it) },
         onFailure = { FetchResult.Failure(it) }
     )
+
+fun <T> FetchResult<T>.asResult(): Result<T> =
+    when (this) {
+        is FetchResult.Success -> Result.success(value)
+        is FetchResult.Failure -> Result.failure(exception)
+    }
 
 inline fun <T> FetchResult<T>.valueOr(onFailure: () -> T): T =
     when (this) {

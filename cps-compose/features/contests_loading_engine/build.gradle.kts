@@ -23,6 +23,7 @@ android {
 
 dependencies {
     implementation(project(":platforms"))
+    implementation(project(":fetchstate"))
     implementation(project(":data:contests:database"))
     implementation(project(":data:contests:fetching"))
     implementation(project(":data:platforms:api"))
