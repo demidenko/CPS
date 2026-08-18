@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 rootProject.name = "CPS"
 include(":app")
 include(":platforms")
+include(":fetchstate")
 include(":datastore_itemized")
 include(":data:platforms:api")
 include(":data:platforms:utils")
