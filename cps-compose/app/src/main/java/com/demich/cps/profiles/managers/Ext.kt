@@ -57,7 +57,7 @@ suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(userId: String): Profil
 fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
     when (this) {
         is FetchResult.Failure -> ProfileResult.Failed(userId)
-        is FetchResult.Success -> {
+        is FetchResult.Success -> value.let { value ->
             if (value != null) ProfileResult(value)
             else ProfileResult.NotFound(userId = userId)
         }

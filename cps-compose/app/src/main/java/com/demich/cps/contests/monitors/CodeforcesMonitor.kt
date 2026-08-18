@@ -243,7 +243,7 @@ private fun Flow<CodeforcesContestPhase>.toSystemTestPercentageFlow(
                 val result = fetchResultOf {
                     pageContentProvider.getSysTestPercentage(contestId = contestId)
                 }
-                if (result is FetchResult.Success && result.value != null) emit(result.value)
+                if (result is FetchResult.Success) result.value?.let { emit(it) }
                 delay(duration = delay)
             }
         }
