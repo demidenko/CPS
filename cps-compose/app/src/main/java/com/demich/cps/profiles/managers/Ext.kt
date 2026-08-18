@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
@@ -11,8 +13,6 @@ import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.fetchResultOf
 
 fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
     ratingsUpperBounds

@@ -8,6 +8,8 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.addNewUser
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
+import com.demich.cps.fetchstate.FetchState
+import com.demich.cps.fetchstate.toFetchResultFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
@@ -16,14 +18,12 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
-import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.loadingStatus
 import com.demich.cps.utils.plus
 import com.demich.cps.utils.sharedViewModel
-import com.demich.cps.utils.toFetchResultFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

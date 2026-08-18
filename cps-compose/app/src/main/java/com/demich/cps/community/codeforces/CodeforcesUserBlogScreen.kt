@@ -13,6 +13,10 @@ import androidx.lifecycle.ViewModel
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.features.codeforces.follow.database.handle
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.FetchState
+import com.demich.cps.fetchstate.fetchResultOf
+import com.demich.cps.fetchstate.map
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -29,13 +33,9 @@ import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
-import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.context
-import com.demich.cps.utils.fetchResultOf
-import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.flow.Flow

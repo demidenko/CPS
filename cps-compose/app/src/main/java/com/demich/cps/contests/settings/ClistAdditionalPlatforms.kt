@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import com.demich.cps.fetchstate.FetchState
+import com.demich.cps.fetchstate.map
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
@@ -32,12 +34,10 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.map
 import com.demich.cps.utils.rememberUUIDState
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit

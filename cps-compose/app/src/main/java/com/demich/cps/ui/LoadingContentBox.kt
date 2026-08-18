@@ -12,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.ProvideContentColor
 
 @Composable

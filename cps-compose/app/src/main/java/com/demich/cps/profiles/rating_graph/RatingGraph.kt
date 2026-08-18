@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
@@ -31,7 +32,6 @@ import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.FetchState
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.minOfWithIndex
 import com.demich.kotlin_stdlib_boost.partitionIndex

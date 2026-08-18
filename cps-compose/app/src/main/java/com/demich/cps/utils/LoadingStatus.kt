@@ -2,6 +2,8 @@ package com.demich.cps.utils
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.FetchState
 import kotlinx.coroutines.flow.Flow
 
 enum class LoadingStatus {

@@ -1,5 +1,7 @@
 package com.demich.cps.contests.monitors
 
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
@@ -19,8 +21,6 @@ import com.demich.cps.platforms.api.codeforces.models.isSystemTestOrFinished
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getContestRatingChangesStatus
 import com.demich.cps.platforms.utils.codeforces.getSysTestPercentage
-import com.demich.cps.utils.FetchResult
-import com.demich.cps.utils.fetchResultOf
 import com.demich.cps.utils.launchWhileActive
 import com.demich.datastore_itemized.DataStoreEditScope
 import com.demich.datastore_itemized.edit

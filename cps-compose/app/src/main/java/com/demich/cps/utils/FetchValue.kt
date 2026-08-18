@@ -1,5 +1,8 @@
 package com.demich.cps.utils
 
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.FetchState
+
 // TODO: better name and signature
 data class FetchValue<out T>(
     val value: T,

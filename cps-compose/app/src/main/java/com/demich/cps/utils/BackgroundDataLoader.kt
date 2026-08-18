@@ -2,6 +2,8 @@ package com.demich.cps.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.fetchstate.FetchState
+import com.demich.cps.fetchstate.toFetchFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

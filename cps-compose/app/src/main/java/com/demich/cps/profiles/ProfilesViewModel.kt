@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.fetchFlowOf
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.profileManagerOf
@@ -12,11 +14,9 @@ import com.demich.cps.profiles.userinfo.ClistUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
-import com.demich.cps.utils.FetchResult
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
-import com.demich.cps.utils.fetchFlowOf
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus

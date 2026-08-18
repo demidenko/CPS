@@ -1,4 +1,4 @@
-package com.demich.cps.utils
+package com.demich.cps.fetchstate
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
