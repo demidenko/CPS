@@ -17,9 +17,9 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
         ?.uppercase(Locale.ENGLISH)
         ?: return null
 
-    return kotlin.runCatching {
+    return try {
         CodeforcesColorTag.valueOf(str)
-    }.getOrElse {
+    } catch (_: IllegalArgumentException) {
         // user-4000 case
         str.toIntOrNull()?.let {
             CodeforcesColorTag.fromRating(it)
