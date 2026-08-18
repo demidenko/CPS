@@ -124,7 +124,11 @@ private class ContestsFetchMemoizer(
             is ContestsMultiplatformFetcher -> {
                 mutex.withLock {
                     results.getOrPut(source) {
-                        cacheScope.async { fetcher.fetchAllPlatforms() }
+                        cacheScope.async {
+                            fetchResultOf {
+                                fetcher.fetchAllPlatforms()
+                            }
+                        }
                     }
                 }.await().map {
                     it.getOrElse(platform) { emptyList() }
@@ -133,15 +137,13 @@ private class ContestsFetchMemoizer(
         }
     }
 
-    private suspend fun ContestsMultiplatformFetcher.fetchAllPlatforms(): ContestsResult {
+    private suspend fun ContestsMultiplatformFetcher.fetchAllPlatforms(): Map<ContestPlatform, List<Contest>> {
         val platforms = setup.mapNotNull { (platform, sources) ->
             if (fetchSource in sources) platform else null
         }
-        return fetchResultOf {
-            fetchContests(
-                platforms = platforms,
-                dateConstraints = dateConstraints
-            ).groupBy { it.platform }
-        }
+        return fetchContests(
+            platforms = platforms,
+            dateConstraints = dateConstraints
+        ).groupBy { it.platform }
     }
 }
