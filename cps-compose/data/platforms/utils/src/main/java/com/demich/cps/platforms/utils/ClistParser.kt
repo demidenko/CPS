@@ -99,5 +99,6 @@ val Platform.clistResourceId: Int?
         dmoj -> 77
         atcoder -> 93
         leetcode -> 102
+        luogu -> 162
         clist -> null
     }

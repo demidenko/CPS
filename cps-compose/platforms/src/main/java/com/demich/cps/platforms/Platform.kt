@@ -10,5 +10,6 @@ enum class Platform {
     clist,
     acmp,
     timus,
-    leetcode
+    leetcode,
+    luogu
 }
