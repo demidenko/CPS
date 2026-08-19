@@ -31,14 +31,14 @@ fun platformLogoPainter(platform: Platform): Painter =
 
 fun platformLogoResId(platform: Platform): Int =
     when (platform) {
-        codeforces -> R.drawable.ic_logo_codeforces
-        atcoder -> R.drawable.ic_logo_atcoder
-        topcoder -> R.drawable.ic_logo_topcoder
-        codechef -> R.drawable.ic_logo_codechef
-        dmoj -> R.drawable.ic_logo_dmoj
-        project_euler -> R.drawable.ic_logo_projecteuler
-        clist -> R.drawable.ic_logo_clist
-        leetcode -> R.drawable.ic_logo_leetcode
-        luogu -> R.drawable.ic_logo_luogu
+        codeforces -> R.drawable.logo_codeforces
+        atcoder -> R.drawable.logo_atcoder
+        topcoder -> R.drawable.logo_topcoder
+        codechef -> R.drawable.logo_codechef
+        dmoj -> R.drawable.logo_dmoj
+        project_euler -> R.drawable.logo_projecteuler
+        clist -> R.drawable.logo_clist
+        leetcode -> R.drawable.logo_leetcode
+        luogu -> R.drawable.logo_luogu
         acmp, timus -> throw IllegalArgumentException()
     }
