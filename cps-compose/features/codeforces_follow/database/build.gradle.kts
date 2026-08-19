@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":data:platforms:api"))
     implementation(project(":data:platforms:utils"))
     implementation(project(":data:accounts:userinfo"))
+    implementation(project(":platforms:codeforces:follow:storage"))
 
     implementation(libs.kotlinx.serialization.json)
 
