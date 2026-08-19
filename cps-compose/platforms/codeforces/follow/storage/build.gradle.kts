@@ -8,4 +8,6 @@ android {
 
 dependencies {
     implementation(project(":data:accounts:userinfo"))
+
+    implementation(libs.kotlinx.coroutines.android)
 }
