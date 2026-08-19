@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.features.codeforces.follow.database.blog
-import com.demich.cps.features.codeforces.follow.database.handle
 import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.fetchResultOf
@@ -22,6 +21,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
+import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry

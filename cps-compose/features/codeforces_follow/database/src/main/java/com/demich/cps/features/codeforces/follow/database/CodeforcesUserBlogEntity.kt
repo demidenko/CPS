@@ -3,9 +3,9 @@ package com.demich.cps.features.codeforces.follow.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
-import com.demich.cps.profiles.userinfo.handle
 
 @Entity(tableName = cfFollowTableName)
 internal data class CodeforcesUserBlogEntity(
@@ -31,15 +31,6 @@ internal class CodeforcesUserBlogEntityShort(
     val userInfo: CodeforcesUserInfo?,
     val blogSize: Int?
 )
-
-data class CodeforcesUserBlog(
-    val id: Long,
-    val userProfile: ProfileResult<CodeforcesUserInfo>,
-    val blogSize: Int?
-)
-
-val CodeforcesUserBlog.handle: String
-    get() = userProfile.handle
 
 internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
     CodeforcesUserBlog(

@@ -6,6 +6,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundExcept
 import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
 import com.demich.cps.platforms.utils.codeforces.getUserCatching
