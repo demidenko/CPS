@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.clients
 
-import com.demich.cps.platforms.api.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body

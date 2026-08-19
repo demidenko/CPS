@@ -1,6 +1,5 @@
 package com.demich.cps.platforms.clients.codeforces
 
-import com.demich.cps.platforms.api.BuildConfig
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiAccess
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiCallLimitExceededException
@@ -16,6 +15,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRecentAction
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesSubmission
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
+import com.demich.cps.platforms.clients.BuildConfig
 import com.demich.cps.platforms.clients.RateLimitPlugin
 import com.demich.cps.platforms.clients.cpsHttpClient
 import com.demich.cps.platforms.clients.defaultJson
