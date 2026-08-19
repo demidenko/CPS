@@ -1,11 +1,6 @@
 package com.demich.cps.features.codeforces.follow.database
 
-import android.content.Context
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesFollowStorage
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-
+/*
 class CodeforcesFollowStorageImpl(context: Context): CodeforcesFollowStorage {
     private val dao: CodeforcesFollowDao =
         context.followDataBase.followListDao()
@@ -26,3 +21,4 @@ class CodeforcesFollowStorageImpl(context: Context): CodeforcesFollowStorage {
         dao.remove(blogId = blogId)
     }
 }
+ */
