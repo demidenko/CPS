@@ -132,22 +132,24 @@ private fun CodeforcesUserBlogEntity.updateBlogInfo(
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
 ): CodeforcesUserBlogEntity? {
-    blogInfo?.run {
+    if (blogInfo == null) {
+        return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = blogEntries.map { it.id }.toSet()))
+    }
+
+    blogInfo.run {
         // no changes
         if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return null
     }
 
     val newToSave = newEntriesToSave(blogEntries)
-    if (blogInfo != null) {
-        newToSave.forEach(onNewBlogEntry)
-    }
+    newToSave.forEach(onNewBlogEntry)
 
     val newIds = buildSet {
-        if (blogInfo != null) addAll(blogInfo.savedIds)
+        addAll(blogInfo.savedIds)
         newToSave.forEach { add(it.id) }
     }
 
-    return copy(blogInfo = BlogInfo(savedIds = newIds, blogSize = blogEntries.size))
+    return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = newIds))
 }
 
 private fun CodeforcesUserBlogEntity.newEntriesToSave(
