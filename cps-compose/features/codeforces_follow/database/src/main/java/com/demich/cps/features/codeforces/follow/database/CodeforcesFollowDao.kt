@@ -75,8 +75,7 @@ internal abstract class CodeforcesFollowDao {
         update(fromUserBlog.copy(handle = toHandle))
     }
 
-    @Transaction
-    protected open suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
+    private suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
         if (userInfo.handle != handle) changeHandle(handle, userInfo.handle)
         val handle = userInfo.handle
         val entity = getUserInfoFields(handle) ?: return
