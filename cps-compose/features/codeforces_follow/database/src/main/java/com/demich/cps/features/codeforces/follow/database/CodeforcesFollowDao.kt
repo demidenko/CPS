@@ -85,6 +85,17 @@ internal abstract class CodeforcesFollowDao {
         }
     }
 
+    @Transaction
+    open suspend fun updateUserProfiles(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
+        results.forEach { (handle, result) ->
+            when (result) {
+                is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
+                is ProfileResult.NotFound -> remove(handle = handle)
+                is ProfileResult.Failed -> { }
+            }
+        }
+    }
+
     @IgnorableReturnValue
     suspend fun updateBlogEntries(
         handle: String,
@@ -95,19 +106,6 @@ internal abstract class CodeforcesFollowDao {
         val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return blogEntity
         update(newBlogEntity)
         return newBlogEntity
-    }
-
-    suspend fun updateUserProfile(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
-        when (result) {
-            is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
-            is ProfileResult.NotFound -> remove(handle = handle)
-            is ProfileResult.Failed -> { }
-        }
-    }
-
-    @Transaction
-    open suspend fun updateUserProfiles(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
-        results.forEach { updateUserProfile(handle = it.key, result = it.value) }
     }
 
     @IgnorableReturnValue
@@ -125,6 +123,11 @@ internal abstract class CodeforcesFollowDao {
         return rowId != -1L
     }
 }
+
+internal suspend fun CodeforcesFollowDao.updateUserProfile(
+    handle: String,
+    result: ProfileResult<CodeforcesUserInfo>
+) = updateUserProfiles(results = mapOf(handle to result))
 
 private fun CodeforcesUserBlogEntity.updateBlogInfo(
     blogEntries: List<CodeforcesBlogEntry>,
