@@ -136,20 +136,27 @@ private fun CodeforcesUserBlogEntity.updateBlogInfo(
         return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = blogEntries.map { it.id }.toSet()))
     }
 
-    blogInfo.run {
-        // no changes
-        if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return null
-    }
+    val newBlogInfo = blogInfo.merge(blogEntries, onNewBlogEntry)
+    if (newBlogInfo === blogInfo) return null
+    return copy(blogInfo = newBlogInfo)
+}
 
-    val newToSave = blogEntries.filter { it.id !in blogInfo.savedIds }
+private fun BlogInfo.merge(
+    blogEntries: List<CodeforcesBlogEntry>,
+    onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+): BlogInfo {
+    // no changes
+    if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return this
+
+    val newToSave = blogEntries.filter { it.id !in savedIds }
     newToSave.forEach(onNewBlogEntry)
 
     val newIds = buildSet {
-        addAll(blogInfo.savedIds)
+        addAll(savedIds)
         newToSave.forEach { add(it.id) }
     }
 
-    return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = newIds))
+    return BlogInfo(blogSize = blogEntries.size, savedIds = newIds)
 }
 
 internal data class UserInfoFields(
