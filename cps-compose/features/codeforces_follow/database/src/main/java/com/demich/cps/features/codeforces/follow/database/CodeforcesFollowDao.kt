@@ -102,8 +102,8 @@ internal abstract class CodeforcesFollowDao {
         onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
     ): CodeforcesUserBlogEntity? {
         val blogEntity = getEntity(handle) ?: return null
-        val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry) ?: return blogEntity
-        update(newBlogEntity)
+        val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry)
+        if (newBlogEntity !== blogEntity) update(entity = newBlogEntity)
         return newBlogEntity
     }
 
@@ -131,13 +131,13 @@ internal suspend fun CodeforcesFollowDao.updateUserProfile(
 private fun CodeforcesUserBlogEntity.updateBlogInfo(
     blogEntries: List<CodeforcesBlogEntry>,
     onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
-): CodeforcesUserBlogEntity? {
+): CodeforcesUserBlogEntity {
     if (blogInfo == null) {
         return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = blogEntries.map { it.id }.toSet()))
     }
 
     val newBlogInfo = blogInfo.merge(blogEntries, onNewBlogEntry)
-    if (newBlogInfo === blogInfo) return null
+    if (newBlogInfo === blogInfo) return this
     return copy(blogInfo = newBlogInfo)
 }
 
