@@ -97,7 +97,7 @@ internal abstract class CodeforcesFollowDao {
         return newBlogEntity
     }
 
-    suspend fun applyProfileResult(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
+    suspend fun updateUserProfile(handle: String, result: ProfileResult<CodeforcesUserInfo>) {
         when (result) {
             is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
             is ProfileResult.NotFound -> remove(handle = handle)
@@ -106,8 +106,8 @@ internal abstract class CodeforcesFollowDao {
     }
 
     @Transaction
-    open suspend fun applyProfilesResults(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
-        results.forEach { applyProfileResult(handle = it.key, result = it.value) }
+    open suspend fun updateUserProfiles(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
+        results.forEach { updateUserProfile(handle = it.key, result = it.value) }
     }
 
     @IgnorableReturnValue

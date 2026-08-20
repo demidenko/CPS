@@ -48,7 +48,7 @@ abstract class CodeforcesFollowRepository(
         locale: CodeforcesLocale
     ): Result<List<CodeforcesBlogEntry>> {
         val (newProfile, result) = getApi(locale).getBlogEntries(handle = handle)
-        if (newProfile != null) dao.applyProfileResult(handle = handle, result = newProfile)
+        if (newProfile != null) dao.updateUserProfile(handle = handle, result = newProfile)
         result.onSuccess { blogEntries ->
             dao.updateBlogEntries(
                 handle = newProfile?.handle ?: handle,
@@ -68,7 +68,7 @@ abstract class CodeforcesFollowRepository(
         // TODO: parallel?
         // TODO: reload can change handle
         if (result is ProfileResult.Failed) {
-            dao.applyProfileResult(
+            dao.updateUserProfile(
                 handle = handle,
                 result = getApi(EN).getProfile(handle = handle, checkHistoricHandles = true)
             )
@@ -78,7 +78,7 @@ abstract class CodeforcesFollowRepository(
     @IgnorableReturnValue
     suspend fun updateProfiles() =
         getApi(EN).getProfiles(handles = dao.usersHandles(), checkHistoricHandles = true)
-            .also { dao.applyProfilesResults(it) }
+            .also { dao.updateUserProfiles(it) }
 
     protected abstract suspend fun getLocale(): CodeforcesLocale
 
