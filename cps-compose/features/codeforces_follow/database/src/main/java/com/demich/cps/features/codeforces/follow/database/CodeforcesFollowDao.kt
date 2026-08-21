@@ -110,6 +110,7 @@ internal abstract class CodeforcesFollowDao {
     @IgnorableReturnValue
     suspend fun createUserWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>): Boolean {
         if (profileResult is ProfileResult.NotFound) return false
+        if (hasUser(profileResult.handle)) return false //TODO need proper way
 
         val rowId = insert(
             CodeforcesUserBlogEntity(
