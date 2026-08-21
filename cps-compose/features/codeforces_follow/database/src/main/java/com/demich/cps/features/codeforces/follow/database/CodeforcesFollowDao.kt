@@ -99,10 +99,10 @@ internal abstract class CodeforcesFollowDao {
     suspend fun updateBlogEntries(
         handle: String,
         blogEntries: List<CodeforcesBlogEntry>,
-        onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+        onNewBlogEntries: (List<CodeforcesBlogEntry>) -> Unit
     ): CodeforcesUserBlogEntity? {
         val blogEntity = getEntity(handle) ?: return null
-        val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntry)
+        val newBlogEntity = blogEntity.updateBlogInfo(blogEntries, onNewBlogEntries)
         if (newBlogEntity !== blogEntity) update(entity = newBlogEntity)
         return newBlogEntity
     }
@@ -130,26 +130,26 @@ internal suspend fun CodeforcesFollowDao.updateUserProfile(
 
 private fun CodeforcesUserBlogEntity.updateBlogInfo(
     blogEntries: List<CodeforcesBlogEntry>,
-    onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+    onNewBlogEntries: (List<CodeforcesBlogEntry>) -> Unit
 ): CodeforcesUserBlogEntity {
     if (blogInfo == null) {
         return copy(blogInfo = BlogInfo(blogSize = blogEntries.size, savedIds = blogEntries.map { it.id }.toSet()))
     }
 
-    val newBlogInfo = blogInfo.merge(blogEntries, onNewBlogEntry)
+    val newBlogInfo = blogInfo.merge(blogEntries, onNewBlogEntries)
     if (newBlogInfo === blogInfo) return this
     return copy(blogInfo = newBlogInfo)
 }
 
 private fun BlogInfo.merge(
     blogEntries: List<CodeforcesBlogEntry>,
-    onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+    onNewBlogEntries: (List<CodeforcesBlogEntry>) -> Unit
 ): BlogInfo {
     // no changes
     if (blogSize == blogEntries.size && blogEntries.all { it.id in savedIds }) return this
 
     val newToSave = blogEntries.filter { it.id !in savedIds }
-    newToSave.forEach(onNewBlogEntry)
+    onNewBlogEntries(newToSave)
 
     val newIds = buildSet {
         addAll(savedIds)

@@ -53,7 +53,7 @@ abstract class CodeforcesFollowRepository(
             dao.updateBlogEntries(
                 handle = newProfile?.handle ?: handle,
                 blogEntries = blogEntries,
-                onNewBlogEntry = ::notifyNewBlogEntry
+                onNewBlogEntries = { it.forEach(::notifyNewBlogEntry) }
             )
         }
         return result
