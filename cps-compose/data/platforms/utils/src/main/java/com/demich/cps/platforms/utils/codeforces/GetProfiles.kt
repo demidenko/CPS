@@ -1,5 +1,8 @@
 package com.demich.cps.platforms.utils.codeforces
 
+import com.demich.cps.fetchstate.FetchResult
+import com.demich.cps.fetchstate.asResult
+import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.getUser
@@ -14,25 +17,30 @@ suspend fun CodeforcesApi.getUsersCatching(
     buildMap {
         val handles = handles.toMutableSet()
         while (handles.isNotEmpty()) {
-            runCatching {
+            val result = fetchResultOf {
                 getUsers(handles = handles, checkHistoricHandles = checkHistoricHandles)
                     .also { check(it.size == handles.size) }
-            }.onFailure {
-                if (it is CodeforcesApiHandleNotFoundException) {
-                    val badHandle = it.handle
-                    put(key = badHandle, value = Result.failure(it))
-                    handles.remove(badHandle)
-                    continue
+            }
+            when (result) {
+                is FetchResult.Failure -> {
+                    val it = result.exception
+                    if (it is CodeforcesApiHandleNotFoundException) {
+                        val badHandle = it.handle
+                        put(key = badHandle, value = Result.failure(it))
+                        handles.remove(badHandle)
+                        continue
+                    }
+                    for (handle in handles) put(key = handle, value = Result.failure(it))
+                    break
                 }
-                for (handle in handles) put(key = handle, value = Result.failure(it))
-                break
-            }.onSuccess { users ->
-                val iter = users.iterator()
-                for (handle in handles) {
-                    val user = iter.next()
-                    put(key = handle, value = Result.success(user))
+                is FetchResult.Success -> {
+                    val iter = result.value.iterator()
+                    for (handle in handles) {
+                        val user = iter.next()
+                        put(key = handle, value = Result.success(user))
+                    }
+                    break
                 }
-                break
             }
         }
     }
@@ -45,7 +53,8 @@ suspend fun CodeforcesApi.getProfiles(
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
 suspend fun CodeforcesApi.getUserCatching(handle: String, checkHistoricHandles: Boolean): Result<CodeforcesUser> =
-    runCatching { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
+    fetchResultOf { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
+        .asResult()
 
 suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
     getUserCatching(handle = handle, checkHistoricHandles = checkHistoricHandles).toProfileResult(handle)
