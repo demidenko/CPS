@@ -65,14 +65,14 @@ internal abstract class CodeforcesFollowDao {
 
     private suspend fun changeHandle(fromHandle: String, toHandle: String) {
         if (fromHandle == toHandle) return
-        val fromUserBlog = getEntity(fromHandle) ?: return
-        getEntity(toHandle)?.let { toUserBlog ->
-            if (toUserBlog.id != fromUserBlog.id) {
-                remove(blogId = fromUserBlog.id)
+        val fromEntity = getUserInfoFields(handle = fromHandle) ?: return
+        userBlogId(handle = toHandle)?.let { id ->
+            if (id != fromEntity.id) {
+                remove(blogId = fromEntity.id)
                 return
             }
         }
-        update(fromUserBlog.copy(handle = toHandle))
+        update(userInfoFields = fromEntity.copy(handle = toHandle))
     }
 
     private suspend fun setUserInfo(handle: String, userInfo: CodeforcesUserInfo) {
