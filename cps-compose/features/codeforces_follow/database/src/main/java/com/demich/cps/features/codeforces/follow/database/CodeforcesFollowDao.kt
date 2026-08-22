@@ -42,8 +42,8 @@ internal abstract class CodeforcesFollowDao {
     @RewriteQueriesToDropUnusedColumns
     protected abstract suspend fun getUserInfoFields(handle: String): UserInfoFields?
 
-    @Query("SELECT 1 FROM $cfFollowTableName WHERE handle LIKE :handle")
-    abstract suspend fun hasUser(handle: String): Boolean
+    @Query("SELECT id FROM $cfFollowTableName WHERE handle LIKE :handle")
+    protected abstract suspend fun userBlogId(handle: String): Long?
 
     @Query("SELECT handle FROM $cfFollowTableName")
     abstract suspend fun usersHandles(): List<String>
@@ -106,6 +106,9 @@ internal abstract class CodeforcesFollowDao {
         if (newBlogEntity !== blogEntity) update(entity = newBlogEntity)
         return newBlogEntity
     }
+
+    suspend fun hasUser(handle: String): Boolean =
+        userBlogId(handle = handle) != null
 
     @IgnorableReturnValue
     suspend fun createUserWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>): Boolean {
