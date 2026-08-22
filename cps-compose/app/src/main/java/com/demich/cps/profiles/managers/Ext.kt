@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.fetchResultOf
+import com.demich.cps.platforms.utils.toProfileResult
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
@@ -53,12 +53,3 @@ fun <U: RatedUserInfo> RatedProfileManager<U>.makeHandleSpan(profileResult: Prof
 
 suspend fun <U: UserInfo> ProfileManager<U>.fetchProfile(userId: String): ProfileResult<U> =
     fetchResultOf { getUserInfo(userId) }.toProfileResult(userId)
-
-fun <U: UserInfo> FetchResult<U?>.toProfileResult(userId: String): ProfileResult<U> =
-    when (this) {
-        is FetchResult.Failure -> ProfileResult.Failed(userId)
-        is FetchResult.Success -> value.let { value ->
-            if (value != null) ProfileResult(value)
-            else ProfileResult.NotFound(userId = userId)
-        }
-    }

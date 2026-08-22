@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":data:platforms:api"))
     implementation(project(":data:accounts:userinfo"))
     implementation(project(":data:contests:database"))
+    implementation(project(":fetchstate"))
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)

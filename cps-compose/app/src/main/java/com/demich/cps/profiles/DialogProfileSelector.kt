@@ -57,9 +57,9 @@ import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.fetchFlowOf
 import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.fetchstate.valueOr
+import com.demich.cps.platforms.utils.toProfileResult
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSuggestionsProvider
-import com.demich.cps.profiles.managers.toProfileResult
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.UserSuggestion
