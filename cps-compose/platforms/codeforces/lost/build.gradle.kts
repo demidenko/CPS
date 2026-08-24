@@ -5,11 +5,6 @@ plugins {
 
 android {
     namespace = "com.demich.cps.platforms.codeforces.lost"
-
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {
