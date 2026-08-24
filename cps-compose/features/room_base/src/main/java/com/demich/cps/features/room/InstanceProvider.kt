@@ -28,7 +28,7 @@ inline fun <reified D: RoomDatabase> instanceDelegate(
                         .addMigrations(migrations = migrations().toTypedArray())
                     instance = builder.build()
                 }
-                requireNotNull(instance)
+                checkNotNull(instance)
             }
         }
     }

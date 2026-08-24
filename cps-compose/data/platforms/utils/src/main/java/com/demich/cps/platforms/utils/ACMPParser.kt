@@ -8,7 +8,7 @@ class ACMPParser {
         with(source.parseDocument()) {
             val userName = title()
             val box = body().select("h4").first { it.text() == "Общая статистика" }.parent()
-            requireNotNull(box)
+            checkNotNull(box)
             val bs = box.select("b.btext").map { it.text() }
             val solvedTasks = bs.first { it.startsWith("Решенные задачи") }.let {
                 it.substring(it.indexOf('(')+1, it.indexOf(')')).toInt()

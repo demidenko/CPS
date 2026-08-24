@@ -178,7 +178,7 @@ private fun DurationPickerDialog(
             acceptEnabled = duration != null,
             onCancelClick = onDismissRequest
         ) {
-            onDurationSelect(requireNotNull(duration))
+            onDurationSelect(checkNotNull(duration))
             onDismissRequest()
         }
     }

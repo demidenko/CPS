@@ -88,7 +88,7 @@ abstract class CodeforcesFollowRepository(
 }
 
 suspend fun CodeforcesFollowRepository.blog(blogId: Long) =
-    requireNotNull(blogOrNull(blogId)) { "blogId $blogId not in repository" }
+    checkNotNull(blogOrNull(blogId)) { "blogId $blogId not in repository" }
 
 suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
     blogs().forEach {

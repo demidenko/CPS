@@ -69,7 +69,7 @@ class ClistClient(
                 addAll(it)
                 offset += it.size
             }
-            val totalCount = requireNotNull(result.meta.total_count)
+            val totalCount = checkNotNull(result.meta.total_count)
         } while (offset < totalCount)
     }
 
