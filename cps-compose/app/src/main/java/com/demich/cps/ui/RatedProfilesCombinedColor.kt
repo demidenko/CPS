@@ -25,8 +25,9 @@ import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transformLatest
 
 @Composable
 fun ratedProfilesColorState(
@@ -147,17 +148,16 @@ private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
         } else {
             null
         }
-    }.transformLatest { settings ->
+    }.flatMapLatest { settings ->
         if (settings == null) {
-            emit(RankGetter { null })
+            flowOf(RankGetter { null })
         } else {
-            flowOfValidRanks(context).collect { validRanks ->
-                val getter = EnabledRankGetter(
+            flowOfValidRanks(context).map { validRanks ->
+                EnabledRankGetter(
                     validRanks = validRanks,
                     disabledPlatforms = settings.disabledPlatforms,
                     rankSelector = settings.rankSelector
                 )
-                emit(getter)
             }
         }
     }
