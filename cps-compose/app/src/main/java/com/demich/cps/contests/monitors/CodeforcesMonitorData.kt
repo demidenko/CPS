@@ -31,11 +31,10 @@ data class CodeforcesMonitorData(
 
     data class ProblemInfo(
         val name: String,
-        val result: ProblemResult
+        val result: ProblemResult?
     )
 
     sealed interface ProblemResult {
-        data object Empty: ProblemResult
         data object Pending: ProblemResult
         data object FailedSystemTest: ProblemResult
         data class Points(val points: Double, val isFinal: Boolean): ProblemResult

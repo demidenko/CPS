@@ -219,7 +219,7 @@ private fun StandingsRow(
 @Composable
 private fun ProblemColumn(
     problemName: String,
-    problemResult: CodeforcesMonitorData.ProblemResult,
+    problemResult: CodeforcesMonitorData.ProblemResult?,
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
@@ -237,7 +237,7 @@ private fun ProblemColumn(
 
 @Composable
 private fun ProblemResultCell(
-    problemResult: CodeforcesMonitorData.ProblemResult,
+    problemResult: CodeforcesMonitorData.ProblemResult?,
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
@@ -256,16 +256,16 @@ private fun ProblemResultCell(
                 modifier = modifier
             )
         }
-        is CodeforcesMonitorData.ProblemResult.Empty -> {
-            Text(
-                text = "",
-                modifier = modifier
-            )
-        }
         is CodeforcesMonitorData.ProblemResult.Points -> {
             ProblemResultCell(
                 text = if (contestType == ICPC) "+" else problemResult.pointsToNiceString(),
                 color = if (problemResult.isFinal) cpsColors.success else cpsColors.content,
+                modifier = modifier
+            )
+        }
+        null -> {
+            Text(
+                text = "",
                 modifier = modifier
             )
         }
@@ -355,7 +355,7 @@ private fun TestProblemColumns() {
             )
             ProblemColumn(
                 problemName = "E",
-                problemResult = CodeforcesMonitorData.ProblemResult.Empty,
+                problemResult = null,
                 contestType = CF,
                 modifier = Modifier.weight(1f)
             )

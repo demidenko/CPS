@@ -145,8 +145,7 @@ private fun CodeforcesMonitorDataStore.contestData(): CodeforcesMonitorData? {
                     )
                 submissionsInfo[index]?.any { it.isFailedSystemTest() } == true ->
                     CodeforcesMonitorData.ProblemResult.FailedSystemTest
-                else ->
-                    CodeforcesMonitorData.ProblemResult.Empty
+                else -> null
             }
         )
     }

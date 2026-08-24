@@ -104,10 +104,10 @@ class CodeforcesMonitorNotifier(
         }
     }
 
-    private val _problemResults = mutableMapOf<String, CodeforcesMonitorData.ProblemResult>()
+    private val _problemResults = mutableMapOf<String, CodeforcesMonitorData.ProblemResult?>()
     private fun setProblemResult(
         problemName: String,
-        problemResult: CodeforcesMonitorData.ProblemResult,
+        problemResult: CodeforcesMonitorData.ProblemResult?,
         contestType: CodeforcesContestType
     ): Boolean {
         if (_problemResults[problemName] == problemResult) return false
@@ -121,7 +121,7 @@ class CodeforcesMonitorNotifier(
     private val failColor = context.getColor(R.color.fail)
     private val successColor = context.getColor(R.color.success)
     private fun spanOfResult(
-        problemResult: CodeforcesMonitorData.ProblemResult,
+        problemResult: CodeforcesMonitorData.ProblemResult?,
         contestType: CodeforcesContestType
     ) = SpannableStringBuilder().apply {
             when (problemResult) {
@@ -143,7 +143,7 @@ class CodeforcesMonitorNotifier(
                         }
                     }
                 }
-                CodeforcesMonitorData.ProblemResult.Empty -> {}
+                null -> {}
             }
         }
 
