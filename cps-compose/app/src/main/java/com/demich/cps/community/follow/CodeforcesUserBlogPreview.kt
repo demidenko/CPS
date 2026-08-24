@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.profiles.managers.toHandleSpan
@@ -35,10 +36,22 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 @Composable
-fun CommunityFollowListItem(
+fun CodeforcesUserBlogPreview(
+    modifier: Modifier = Modifier,
+    userBlog: CodeforcesUserBlog
+) {
+    CodeforcesUserBlogPreview(
+        modifier = modifier,
+        profile = userBlog.userProfile,
+        blogEntriesCount = userBlog.blogSize
+    )
+}
+
+@Composable
+fun CodeforcesUserBlogPreview(
+    modifier: Modifier = Modifier,
     profile: ProfileResult<CodeforcesUserInfo>,
-    blogEntriesCount: Int?,
-    modifier: Modifier = Modifier
+    blogEntriesCount: Int?
 ) {
     Column(
         modifier = modifier,

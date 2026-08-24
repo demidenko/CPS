@@ -97,9 +97,8 @@ private fun CodeforcesFollowList(
         ContentWithCPSDropdownMenu(
             modifier = Modifier.animateItem(),
             content = {
-                CommunityFollowListItem(
-                    profile = userBlog.userProfile,
-                    blogEntriesCount = userBlog.blogSize,
+                CodeforcesUserBlogPreview(
+                    userBlog = userBlog,
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 5.dp)
                         .fillMaxWidth()
