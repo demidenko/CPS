@@ -19,9 +19,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -34,14 +33,11 @@ suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectTo(
     coroutineScope {
         forEach { (platform, flow) ->
             launch {
-                val last = flow.transformWhile {
-                    emit(it)
-                    it.result.isFailure
-                }.last()
-
-                last.result.onSuccess {
-                    repository.setContests(platform = platform, contests = it)
-                }
+                flow.firstOrNull { it.result.isSuccess }
+                    ?.result
+                    ?.onSuccess {
+                        repository.setContests(platform = platform, contests = it)
+                    }
             }
         }
     }
