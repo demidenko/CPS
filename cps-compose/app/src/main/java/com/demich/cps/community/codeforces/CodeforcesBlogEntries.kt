@@ -125,12 +125,12 @@ private fun BlogEntryInfo(
     ) {
         BlogEntryInfoHeader(
             title = title,
-            rating = rating,
             modifier = Modifier.fillMaxWidth()
         )
         BlogEntryInfoFooter(
             authorHandle = authorHandle,
             timeAgo = timeAgo,
+            rating = rating,
             commentsCount = commentsCount,
             markNew = markNew,
             label = label,
@@ -142,28 +142,21 @@ private fun BlogEntryInfo(
 @Composable
 private fun BlogEntryInfoHeader(
     title: String,
-    rating: Int,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        Text(
-            text = title,
-            fontSize = CPSFontSize.itemTitle,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        VotedRating(
-            rating = rating,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(start = 3.dp, top = 2.dp)
-        )
-    }
+    Text(
+        text = title,
+        fontSize = CPSFontSize.itemTitle,
+        fontWeight = FontWeight.Medium,
+        modifier = modifier
+    )
 }
 
 @Composable
 private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
     timeAgo: String,
+    rating: Int,
     commentsCount: Int,
     markNew: Boolean,
     label: (@Composable () -> Unit)?,
@@ -189,8 +182,15 @@ private fun BlogEntryInfoFooter(
                 NewEntryCircle(Modifier.alignBy { it.measuredHeight })
             }
         }
-        Row(modifier = Modifier.align(Alignment.TopEnd)) {
+        Row(
+            modifier = Modifier.align(Alignment.TopEnd),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
             if (label != null) label()
+            VotedRating(
+                rating = rating,
+                fontSize = 14.sp
+            )
             if (commentsCount > 0) {
                 CommentsRow(
                     text = AnnotatedString(commentsCount.toString()),
