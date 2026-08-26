@@ -19,7 +19,6 @@ interface CodeforcesCommunityDataManger {
     fun flowOfTopComments(context: Context): StateFlow<List<CodeforcesWebComment>>
     fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed>
 
-    fun addToFollowList(handle: String, context: Context)
     fun updateFollowUsersInfo(context: Context)
 }
 

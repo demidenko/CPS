@@ -53,7 +53,6 @@ private fun CodeforcesCommunityTopBlogEntries(
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = { blogEntries },
-        controller = controller,
         newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()

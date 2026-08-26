@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.follow.database.addNewUser
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.toFetchResultFlow
@@ -92,13 +91,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             block = { defaultProvider(context) }
         )
         tabs.forEach { reload(tab = it, provider = provider::await) }
-    }
-
-    override fun addToFollowList(handle: String, context: Context) {
-        viewModelScope.launch(Dispatchers.Default) {
-            context.settingsCommunity.codeforcesFollowEnabled.setValue(true)
-            context.followRepository.addNewUser(handle)
-        }
     }
 
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
