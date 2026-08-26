@@ -26,10 +26,8 @@ fun CommentsRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spaceSize)
     ) {
-        IconSp(
-            imageVector = CPSIcons.Comments,
+        CommentsIcon(
             size = iconSize,
-            color = cpsColors.contentAdditional,
             modifier = Modifier
                 .alignBy {
                     (it.measuredHeight * 0.77f).roundToInt()
@@ -43,4 +41,17 @@ fun CommentsRow(
             modifier = Modifier.alignByBaseline()
         )
     }
+}
+
+@Composable
+private fun CommentsIcon(
+    size: TextUnit,
+    modifier: Modifier = Modifier
+) {
+    IconSp(
+        imageVector = CPSIcons.Comments,
+        size = size,
+        color = cpsColors.contentAdditional,
+        modifier = modifier
+    )
 }
