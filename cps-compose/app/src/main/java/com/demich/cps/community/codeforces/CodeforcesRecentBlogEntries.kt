@@ -74,20 +74,15 @@ internal fun Modifier.recentBlogEntryPaddings() =
 @Immutable
 internal data class RecentBlogEntryData(
     val blogEntry: CodeforcesRecentFeedBlogEntry,
-    val comments: List<CodeforcesWebComment>, //only first comment per each commentator
+    val comments: List<CodeforcesWebComment>
 )
-
-private val RecentBlogEntryData.isLowRated: Boolean
-    get() = blogEntry.isLowRated
 
 private fun CodeforcesRecentFeed.group(): List<RecentBlogEntryData> {
     val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->
         RecentBlogEntryData(
             blogEntry = blogEntry,
-            comments = commentsGrouped[blogEntry.id]
-                ?.distinctBy { it.author }
-                ?: emptyList()
+            comments = commentsGrouped.getOrElse(blogEntry.id) { emptyList() }
         )
     }
 }
@@ -97,16 +92,19 @@ private fun RecentBlogEntry(
     recentBlogEntryData: RecentBlogEntryData,
     modifier: Modifier = Modifier
 ) {
+    val blogEntry = recentBlogEntryData.blogEntry
+    val unique = recentBlogEntryData.comments.distinctBy { it.author }
+
     RecentBlogEntry(
-        title = recentBlogEntryData.blogEntry.title,
-        authorHandle = recentBlogEntryData.blogEntry.author.toHandleSpan(),
+        title = blogEntry.title,
+        authorHandle = blogEntry.author.toHandleSpan(),
         commentators = buildAnnotatedString {
-            recentBlogEntryData.comments.forEachIndexed { index, comment ->
+            unique.forEachIndexed { index, comment ->
                 if (index > 0) append(", ")
                 append(comment.author.toHandleSpan())
             }
         },
-        isLowRated = recentBlogEntryData.isLowRated,
+        isLowRated = blogEntry.isLowRated,
         modifier = modifier
     )
 }
