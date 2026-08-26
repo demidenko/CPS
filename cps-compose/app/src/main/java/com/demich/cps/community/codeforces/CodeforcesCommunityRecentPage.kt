@@ -5,14 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
@@ -26,6 +27,11 @@ fun CodeforcesCommunityRecentPage(
 ) {
     val context = context
     val recent by controller.flowOfRecent(context).collectAsState()
+    val grouped by remember {
+        derivedStateOf {
+            recent.grouped()
+        }
+    }
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -53,7 +59,7 @@ fun CodeforcesCommunityRecentPage(
                 saveableStateHolder.SaveableStateProvider(key = false) {
                     val uriHandler = LocalUriHandler.current
                     RecentBlogEntriesPage(
-                        recent = { recent },
+                        recent = { grouped },
                         modifier = Modifier.fillMaxSize(),
                         onBrowseComment = { blogEntry, comment ->
                             uriHandler.openUri(CodeforcesUrls.comment(blogEntryId = blogEntry.id, commentId = comment.id))
@@ -72,7 +78,7 @@ fun CodeforcesCommunityRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    recent: () -> CodeforcesRecentFeed,
+    recent: () -> List<CodeforcesRecentCommentsOfBlogEntry>,
     modifier: Modifier = Modifier,
     onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesWebComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,

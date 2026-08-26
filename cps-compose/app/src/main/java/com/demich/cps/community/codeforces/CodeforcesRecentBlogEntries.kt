@@ -10,7 +10,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,21 +32,15 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 internal fun CodeforcesRecentBlogEntries(
-    recent: () -> CodeforcesRecentFeed,
+    recent: () -> List<CodeforcesRecentCommentsOfBlogEntry>,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesRecentCommentsOfBlogEntry) -> Unit
 ) {
-    val recentData by remember(recent) {
-        derivedStateOf {
-            recent().group()
-        }
-    }
-
     var showMenuForBlogEntryId: Int? by remember { mutableStateOf(null) }
     LazyColumnOfData(
         modifier = modifier,
-        items = { recentData },
+        items = recent,
         scrollBarEnabled = false
     ) {
         ContentWithCPSDropdownMenu(
@@ -83,7 +76,7 @@ internal fun CodeforcesRecentFeed.commentsOf(blogEntry: CodeforcesRecentFeedBlog
         comments = comments.filter { it.blogEntryId == blogEntry.id }
     )
 
-private fun CodeforcesRecentFeed.group(): List<CodeforcesRecentCommentsOfBlogEntry> {
+internal fun CodeforcesRecentFeed.grouped(): List<CodeforcesRecentCommentsOfBlogEntry> {
     val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->
         CodeforcesRecentCommentsOfBlogEntry(
