@@ -40,7 +40,7 @@ internal fun CodeforcesRecentBlogEntries(
 ) {
     val recentData by remember(recent) {
         derivedStateOf {
-            recent().makeRecentBlogEntries()
+            recent().group()
         }
     }
 
@@ -75,11 +75,12 @@ internal fun Modifier.recentBlogEntryPaddings() =
 internal data class RecentBlogEntryData(
     val blogEntry: CodeforcesRecentFeedBlogEntry,
     val comments: List<CodeforcesWebComment>, //only first comment per each commentator
-) {
-    val isLowRated: Boolean get() = blogEntry.isLowRated
-}
+)
 
-private fun CodeforcesRecentFeed.makeRecentBlogEntries(): List<RecentBlogEntryData> {
+private val RecentBlogEntryData.isLowRated: Boolean
+    get() = blogEntry.isLowRated
+
+private fun CodeforcesRecentFeed.group(): List<RecentBlogEntryData> {
     val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->
         RecentBlogEntryData(
