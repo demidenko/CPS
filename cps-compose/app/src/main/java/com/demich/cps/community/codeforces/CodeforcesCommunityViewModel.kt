@@ -124,10 +124,10 @@ private class CodeforcesDataLoader<T>(
     )
 
     private var inactive = true
-    fun flowOfData(context: Context): StateFlow<T> {
+    fun flowOfData(provider: suspend () -> CodeforcesPageContentProvider): StateFlow<T> {
         if (inactive) {
             inactive = false
-            launchLoadIfActive(provider = { defaultProvider(context) })
+            launchLoadIfActive(provider = provider)
         }
         return dataFlow
     }
@@ -150,6 +150,9 @@ private class CodeforcesDataLoader<T>(
         }
     }
 }
+
+private fun <T> CodeforcesDataLoader<T>.flowOfData(context: Context): StateFlow<T> =
+    flowOfData(provider = { defaultProvider(context)} )
 
 private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
