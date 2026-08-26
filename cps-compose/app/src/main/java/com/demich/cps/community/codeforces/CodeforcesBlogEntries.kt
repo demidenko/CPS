@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
@@ -125,6 +126,7 @@ private fun BlogEntryInfo(
     ) {
         BlogEntryInfoHeader(
             title = title,
+            markNew = markNew,
             modifier = Modifier.fillMaxWidth()
         )
         BlogEntryInfoFooter(
@@ -132,7 +134,6 @@ private fun BlogEntryInfo(
             timeAgo = timeAgo,
             rating = rating,
             commentsCount = commentsCount,
-            markNew = markNew,
             label = label,
             modifier = Modifier.fillMaxWidth()
         )
@@ -142,14 +143,24 @@ private fun BlogEntryInfo(
 @Composable
 private fun BlogEntryInfoHeader(
     title: String,
+    markNew: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = title,
-        fontSize = CPSFontSize.itemTitle,
-        fontWeight = FontWeight.Medium,
-        modifier = modifier
-    )
+    Box(modifier = modifier) {
+        Text(
+            text = title,
+            fontSize = CPSFontSize.itemTitle,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (markNew) {
+            NewEntryCircle(
+                modifier = Modifier.align { size, scope, _ ->
+                    IntOffset(x = -size.width / 2, y = -size.height / 2)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -158,7 +169,6 @@ private fun BlogEntryInfoFooter(
     timeAgo: String,
     rating: Int,
     commentsCount: Int,
-    markNew: Boolean,
     label: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier
 ) {
@@ -178,9 +188,6 @@ private fun BlogEntryInfoFooter(
                 fontSize = 11.sp,
                 modifier = Modifier.alignByBaseline()
             )
-            if (markNew) {
-                NewEntryCircle(Modifier.alignBy { it.measuredHeight })
-            }
         }
         Row(
             modifier = Modifier.align(Alignment.TopEnd),
