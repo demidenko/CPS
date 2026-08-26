@@ -93,7 +93,9 @@ private fun RecentBlogEntry(
     modifier: Modifier = Modifier
 ) {
     val blogEntry = recentComments.blogEntry
-    val unique = recentComments.comments.distinctBy { it.author }
+    val unique = remember(recentComments) {
+        recentComments.comments.distinctBy { it.author }
+    }
 
     RecentBlogEntry(
         title = blogEntry.title,
