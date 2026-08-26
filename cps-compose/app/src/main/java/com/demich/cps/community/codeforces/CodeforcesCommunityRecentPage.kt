@@ -34,17 +34,13 @@ fun CodeforcesCommunityRecentPage(
     CodeforcesReloadablePage(controller = controller, tab = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
-                val blogEntry = type.blogEntry
-                BackHandler(
-                    enabled = { controller.isTabVisible(tab = RECENT) },
-                    onBackPressed = { controller.recentPageType = RecentPageType.RecentFeed }
-                ) {
-                    RecentCommentsInBlogEntry(
-                        comments = { recent.comments },
-                        blogEntry = recent.blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                RecentCommentsInBlogEntry(
+                    blogEntry = type.blogEntry,
+                    recent = { recent },
+                    isTabVisible = { controller.isTabVisible(tab = RECENT) },
+                    onClose = { controller.recentPageType = RecentPageType.RecentFeed },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             RecentPageType.RecentComments -> {
@@ -104,28 +100,50 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    comments: () -> List<CodeforcesWebComment>,
     blogEntry: CodeforcesRecentFeedBlogEntry,
+    recent: () -> CodeforcesRecentFeed,
+    isTabVisible: () -> Boolean,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val id = blogEntry.id
-    val filteredComments by remember(key1 = id, key2 = comments) {
+    val pair by remember(blogEntry, recent) {
         derivedStateOf {
-            comments().filter { it.blogEntryId == id }
+            val id = blogEntry.id
+            val blogEntry = recent().blogEntries.firstOrNull { it.id == id } ?: blogEntry
+            val comments = recent().comments.filter { it.blogEntryId == id }
+            blogEntry to comments
         }
     }
 
+    BackHandler(
+        enabled = isTabVisible,
+        onBackPressed = onClose
+    ) {
+        RecentCommentsInBlogEntry(
+            comments = pair.second,
+            blogEntry = pair.first,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun RecentCommentsInBlogEntry(
+    comments: List<CodeforcesWebComment>,
+    blogEntry: CodeforcesRecentFeedBlogEntry,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier) {
         RecentBlogEntry(
             title = blogEntry.title,
             authorHandle = blogEntry.author.toHandleSpan(),
-            commentators = AnnotatedString(filteredComments.size.toString()),
+            commentators = AnnotatedString(comments.size.toString()),
             isLowRated = false,
             modifier = Modifier.recentBlogEntryPaddings()
         )
         Divider()
         CodeforcesComments(
-            comments = { filteredComments },
+            comments = { comments },
             showTitle = false,
             modifier = Modifier.fillMaxSize()
         )
