@@ -16,8 +16,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesCommentsPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
-import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
-import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
@@ -94,12 +92,6 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
             block = { defaultProvider(context) }
         )
         tabs.forEach { reload(tab = it, provider = provider::await) }
-    }
-
-    fun addToFollowList(result: ProfileResult<CodeforcesUserInfo>, context: Context) {
-        viewModelScope.launch(Dispatchers.Default) {
-            context.followRepository.addNewUser(result)
-        }
     }
 
     override fun addToFollowList(handle: String, context: Context) {

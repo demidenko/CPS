@@ -29,9 +29,11 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.launchData
+import kotlinx.coroutines.launch
 
 @Composable
 private fun CommunityFollowScreen(
@@ -139,7 +141,7 @@ private fun CodeforcesFollowList(
 
 fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     val context = context
-    val communityViewModel = codeforcesCommunityViewModel()
+    val scope = backgroundCoroutineScope
 
     var showChooseDialog by remember { mutableStateOf(false) }
 
@@ -152,7 +154,9 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
             manager = LocalCodeforcesProfileManager.current,
             initial = null,
             onDismissRequest = { showChooseDialog = false },
-            onResult = { communityViewModel.addToFollowList(result = it, context = context) }
+            onResult = {
+                scope.launch { context.followRepository.addNewUser(result = it) }
+            }
         )
     }
 }
