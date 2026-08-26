@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
@@ -141,3 +142,19 @@ private fun RecentCommentsInBlogEntry(
         )
     }
 }
+
+private fun CodeforcesRecentFeed.grouped(): List<CodeforcesRecentCommentsOfBlogEntry> {
+    val commentsGrouped = comments.groupBy { it.blogEntryId }
+    return blogEntries.map { blogEntry ->
+        CodeforcesRecentCommentsOfBlogEntry(
+            blogEntry = blogEntry,
+            comments = commentsGrouped.getOrElse(blogEntry.id) { emptyList() }
+        )
+    }
+}
+
+private fun CodeforcesRecentFeed.commentsOf(blogEntry: CodeforcesRecentFeedBlogEntry) =
+    CodeforcesRecentCommentsOfBlogEntry(
+        blogEntry = blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+        comments = comments.filter { it.blogEntryId == blogEntry.id }
+    )

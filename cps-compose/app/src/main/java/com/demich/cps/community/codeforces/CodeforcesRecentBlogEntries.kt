@@ -21,7 +21,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
@@ -69,22 +68,6 @@ internal data class CodeforcesRecentCommentsOfBlogEntry(
     val blogEntry: CodeforcesRecentFeedBlogEntry,
     val comments: List<CodeforcesWebComment>
 )
-
-internal fun CodeforcesRecentFeed.commentsOf(blogEntry: CodeforcesRecentFeedBlogEntry) =
-    CodeforcesRecentCommentsOfBlogEntry(
-        blogEntry = blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-        comments = comments.filter { it.blogEntryId == blogEntry.id }
-    )
-
-internal fun CodeforcesRecentFeed.grouped(): List<CodeforcesRecentCommentsOfBlogEntry> {
-    val commentsGrouped = comments.groupBy { it.blogEntryId }
-    return blogEntries.map { blogEntry ->
-        CodeforcesRecentCommentsOfBlogEntry(
-            blogEntry = blogEntry,
-            comments = commentsGrouped.getOrElse(blogEntry.id) { emptyList() }
-        )
-    }
-}
 
 @Composable
 private fun RecentBlogEntry(
