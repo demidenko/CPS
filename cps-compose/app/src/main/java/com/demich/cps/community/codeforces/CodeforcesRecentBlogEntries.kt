@@ -36,7 +36,7 @@ internal fun CodeforcesRecentBlogEntries(
     recent: () -> CodeforcesRecentFeed,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
-    menuBuilder: @Composable CPSDropdownMenuScope.(RecentBlogEntryData) -> Unit
+    menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesRecentCommentsOfBlogEntry) -> Unit
 ) {
     val recentData by remember(recent) {
         derivedStateOf {
@@ -62,7 +62,7 @@ internal fun CodeforcesRecentBlogEntries(
             menuAlignment = Alignment.CenterStart,
             onDismissRequest = { showMenuForBlogEntryId = null },
             menuBuilder = { menuBuilder(it) },
-            content = { RecentBlogEntry(recentBlogEntryData = it) }
+            content = { RecentBlogEntry(recentComments = it) }
         )
         Divider()
     }
@@ -72,15 +72,15 @@ internal fun Modifier.recentBlogEntryPaddings() =
     padding(start = 3.dp, end = 3.dp, bottom = 2.dp, top = 1.dp)
 
 @Immutable
-internal data class RecentBlogEntryData(
+internal data class CodeforcesRecentCommentsOfBlogEntry(
     val blogEntry: CodeforcesRecentFeedBlogEntry,
     val comments: List<CodeforcesWebComment>
 )
 
-private fun CodeforcesRecentFeed.group(): List<RecentBlogEntryData> {
+private fun CodeforcesRecentFeed.group(): List<CodeforcesRecentCommentsOfBlogEntry> {
     val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->
-        RecentBlogEntryData(
+        CodeforcesRecentCommentsOfBlogEntry(
             blogEntry = blogEntry,
             comments = commentsGrouped.getOrElse(blogEntry.id) { emptyList() }
         )
@@ -89,11 +89,11 @@ private fun CodeforcesRecentFeed.group(): List<RecentBlogEntryData> {
 
 @Composable
 private fun RecentBlogEntry(
-    recentBlogEntryData: RecentBlogEntryData,
+    recentComments: CodeforcesRecentCommentsOfBlogEntry,
     modifier: Modifier = Modifier
 ) {
-    val blogEntry = recentBlogEntryData.blogEntry
-    val unique = recentBlogEntryData.comments.distinctBy { it.author }
+    val blogEntry = recentComments.blogEntry
+    val unique = recentComments.comments.distinctBy { it.author }
 
     RecentBlogEntry(
         title = blogEntry.title,
