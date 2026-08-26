@@ -39,8 +39,12 @@ fun CodeforcesCommunityRecentPage(
     CodeforcesReloadablePage(controller = controller, tab = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
+                val blogEntry = type.blogEntry
                 RecentCommentsInBlogEntry(
-                    recentComments = { recent.commentsOf(blogEntry = type.blogEntry) },
+                    recentComments = {
+                        grouped.firstOrNull { it.blogEntry.id == blogEntry.id }
+                            ?: CodeforcesRecentCommentsOfBlogEntry(blogEntry = blogEntry, comments = emptyList())
+                    },
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
                     onClose = { controller.recentPageType = RecentPageType.RecentFeed },
                     modifier = Modifier.fillMaxSize()
@@ -152,9 +156,3 @@ private fun CodeforcesRecentFeed.grouped(): List<CodeforcesRecentCommentsOfBlogE
         )
     }
 }
-
-private fun CodeforcesRecentFeed.commentsOf(blogEntry: CodeforcesRecentFeedBlogEntry) =
-    CodeforcesRecentCommentsOfBlogEntry(
-        blogEntry = blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
-        comments = comments.filter { it.blogEntryId == blogEntry.id }
-    )
