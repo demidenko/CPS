@@ -77,6 +77,12 @@ internal data class CodeforcesRecentCommentsOfBlogEntry(
     val comments: List<CodeforcesWebComment>
 )
 
+internal fun CodeforcesRecentFeed.commentsOf(blogEntry: CodeforcesRecentFeedBlogEntry) =
+    CodeforcesRecentCommentsOfBlogEntry(
+        blogEntry = blogEntries.firstOrNull { it.id == blogEntry.id } ?: blogEntry,
+        comments = comments.filter { it.blogEntryId == blogEntry.id }
+    )
+
 private fun CodeforcesRecentFeed.group(): List<CodeforcesRecentCommentsOfBlogEntry> {
     val commentsGrouped = comments.groupBy { it.blogEntryId }
     return blogEntries.map { blogEntry ->

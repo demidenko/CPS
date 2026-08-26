@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -35,8 +33,7 @@ fun CodeforcesCommunityRecentPage(
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 RecentCommentsInBlogEntry(
-                    blogEntry = type.blogEntry,
-                    recent = { recent },
+                    recentComments = { recent.commentsOf(blogEntry = type.blogEntry) },
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
                     onClose = { controller.recentPageType = RecentPageType.RecentFeed },
                     modifier = Modifier.fillMaxSize()
@@ -100,28 +97,17 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    blogEntry: CodeforcesRecentFeedBlogEntry,
-    recent: () -> CodeforcesRecentFeed,
+    recentComments: () -> CodeforcesRecentCommentsOfBlogEntry,
     isTabVisible: () -> Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pair by remember(blogEntry, recent) {
-        derivedStateOf {
-            val id = blogEntry.id
-            val blogEntry = recent().blogEntries.firstOrNull { it.id == id } ?: blogEntry
-            val comments = recent().comments.filter { it.blogEntryId == id }
-            blogEntry to comments
-        }
-    }
-
     BackHandler(
         enabled = isTabVisible,
         onBackPressed = onClose
     ) {
         RecentCommentsInBlogEntry(
-            comments = pair.second,
-            blogEntry = pair.first,
+            recentComments = recentComments(),
             modifier = modifier
         )
     }
@@ -129,11 +115,11 @@ private fun RecentCommentsInBlogEntry(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    comments: List<CodeforcesWebComment>,
-    blogEntry: CodeforcesRecentFeedBlogEntry,
+    recentComments: CodeforcesRecentCommentsOfBlogEntry,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
+        val (blogEntry, comments) = recentComments
         RecentBlogEntry(
             title = blogEntry.title,
             authorHandle = blogEntry.author.toHandleSpan(),
