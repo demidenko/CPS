@@ -10,10 +10,13 @@ import kotlin.time.Instant
 fun getSystemTime(): Instant =
     Clock.System.now()
 
+fun getSystemTimeZone(): TimeZone =
+    TimeZone.currentSystemDefault()
+
 fun Instant.toSystemDateTime(): LocalDateTime =
-    toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+    toLocalDateTime(timeZone = getSystemTimeZone())
 
 fun Instant.toSystemLocalDate(): LocalDate = toSystemDateTime().date
 
 inline fun <R> contextSystemTimeZone(block: context(TimeZone) () -> R): R =
-    context(TimeZone.currentSystemDefault(), block = block)
+    context(getSystemTimeZone(), block = block)

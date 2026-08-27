@@ -2,6 +2,7 @@ package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.utils.RUSSIAN_ABBREVIATED
+import com.demich.cps.utils.getSystemTimeZone
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDate
@@ -53,7 +54,7 @@ private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 fun LocalDateTime.formatContestDate() = "${formatDate()} ${formatTime()}"
 
 // TODO: rework to context(timezone)
-fun Contest.dateBriefRange(): String = dateBriefRange(timeZone = TimeZone.currentSystemDefault())
+fun Contest.dateBriefRange(): String = dateBriefRange(timeZone = getSystemTimeZone())
 
 private fun Contest.dateBriefRange(timeZone: TimeZone): String {
     require(startTime <= endTime)
@@ -69,7 +70,7 @@ private fun Contest.dateBriefRange(timeZone: TimeZone): String {
 }
 
 // TODO: rework to context(timezone)
-fun Contest.dateRange(): String = dateRange(timeZone = TimeZone.currentSystemDefault())
+fun Contest.dateRange(): String = dateRange(timeZone = getSystemTimeZone())
 
 private fun Contest.dateRange(timeZone: TimeZone): String {
     require(startTime <= endTime)
