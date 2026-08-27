@@ -56,13 +56,13 @@ fun CPSDropdownMenu(
 }
 
 @Composable
-fun ContentWithCPSDropdownMenu(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
+inline fun ContentWithCPSDropdownMenu(
     modifier: Modifier = Modifier,
+    expanded: Boolean,
     menuAlignment: Alignment = Alignment.Center,
+    noinline onDismissRequest: () -> Unit,
     content: @Composable () -> Unit,
-    menuBuilder: CPSMenuBuilder
+    noinline menuBuilder: CPSMenuBuilder
 ) {
     Box(modifier = modifier) {
         content()
@@ -185,9 +185,9 @@ fun CPSDropdownMenuButton(
 ) {
     var showMenu by remember { mutableStateOf(false) }
     ContentWithCPSDropdownMenu(
+        modifier = modifier,
         expanded = showMenu,
         onDismissRequest = { showMenu = false },
-        modifier = modifier,
         content = {
             CPSIconButton(
                 icon = icon,
