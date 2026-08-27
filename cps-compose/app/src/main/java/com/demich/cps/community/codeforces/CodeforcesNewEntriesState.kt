@@ -65,14 +65,14 @@ abstract class CodeforcesNewEntriesState {
 
 @Composable
 fun rememberCodeforcesNewEntriesState(
-    isTabVisible: () -> Boolean,
+    isListVisible: () -> Boolean,
     listState: LazyListState,
     newEntriesState: NewEntriesState,
     showNewEntries: Boolean
 ): CodeforcesNewEntriesState {
-    LaunchedEffect(newEntriesState, listState, isTabVisible) {
+    LaunchedEffect(newEntriesState, listState, isListVisible) {
         snapshotFlow {
-            if (!isTabVisible()) null
+            if (!isListVisible()) null
             else listState.visibleBlogEntriesIds(0.75f)
         }
             .debounce(250.milliseconds) //prevent user do fast scroll / page switch

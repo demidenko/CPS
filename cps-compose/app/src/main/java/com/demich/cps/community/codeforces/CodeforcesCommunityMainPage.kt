@@ -28,7 +28,7 @@ private fun CodeforcesCommunityMainList(
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isTabVisible = { controller.isTabVisible(tab = MAIN) },
+        isListVisible = { controller.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true
