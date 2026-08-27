@@ -5,7 +5,6 @@ import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
@@ -73,4 +72,4 @@ fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesMa
             unseenCount = ids.count { types.getType(it) == null },
             seenCount = ids.count { types.getType(it) == SEEN }
         )
-    }.distinctUntilChanged()
+    }
