@@ -7,9 +7,11 @@ import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
@@ -50,28 +52,34 @@ private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
 
 fun LocalDateTime.formatContestDate() = "${formatDate()} ${formatTime()}"
 
-fun Contest.dateBriefRange(): String {
+// TODO: rework to context(timezone)
+fun Contest.dateBriefRange(): String = dateBriefRange(timeZone = TimeZone.currentSystemDefault())
+
+private fun Contest.dateBriefRange(timeZone: TimeZone): String {
     require(startTime <= endTime)
 
-    val startLocalDateTime = startTime.toSystemDateTime()
+    val startLocalDateTime = startTime.toLocalDateTime(timeZone)
     val start = startLocalDateTime.formatContestDate()
     if (startTime == endTime) return start
 
-    val endLocalDateTime = endTime.toSystemDateTime()
+    val endLocalDateTime = endTime.toLocalDateTime(timeZone)
     val end = if (eventDuration < 24.hours) endLocalDateTime.formatTime() else "..."
 
     return "$start-$end"
 }
 
-fun Contest.dateRange(): String {
+// TODO: rework to context(timezone)
+fun Contest.dateRange(): String = dateRange(timeZone = TimeZone.currentSystemDefault())
+
+private fun Contest.dateRange(timeZone: TimeZone): String {
     require(startTime <= endTime)
 
     //TODO: show year
-    val startLocalDateTime = startTime.toSystemDateTime()
+    val startLocalDateTime = startTime.toLocalDateTime(timeZone)
     val start = startLocalDateTime.formatContestDate()
     if (startTime == endTime) return start
 
-    val endLocalDateTime = endTime.toSystemDateTime()
+    val endLocalDateTime = endTime.toLocalDateTime(timeZone)
     val end = endLocalDateTime.run {
         if (date == startLocalDateTime.date) formatTime() else formatContestDate()
     }
