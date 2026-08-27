@@ -14,7 +14,6 @@ import kotlinx.serialization.Serializable
 
 
 enum class NewEntryType {
-    UNSEEN,
     SEEN,
     OPENED
 }
@@ -27,17 +26,16 @@ data class NewEntryInfo(
 
 typealias NewEntriesMap = Map<Int, NewEntryInfo>
 
-fun NewEntriesMap.getType(id: Int): NewEntryType =
-    this[id]?.type ?: UNSEEN
+fun NewEntriesMap.getType(id: Int): NewEntryType? =
+    get(id)?.type
 
 private fun MutableMap<Int, NewEntryInfo>.markAtLeast(
     id: Int,
     type: NewEntryType,
     date: LocalDate
 ) {
-    if (type == UNSEEN) return
     val oldType = getType(id)
-    if (type >= oldType) set(key = id, value = NewEntryInfo(type, date))
+    if (oldType == null || type >= oldType) set(key = id, value = NewEntryInfo(type, date))
 }
 
 private fun systemDate(): LocalDate = getSystemTime().toLocalDateTime(TimeZone.UTC).date
@@ -50,7 +48,6 @@ class NewEntriesDataStoreItem (
 
     suspend fun markAtLeast(ids: Collection<Int>, type: NewEntryType) {
         if (ids.isEmpty()) return
-        if (type == UNSEEN) return
         item.edit {
             val date = systemDate()
             for (id in ids) markAtLeast(id, type, date)
@@ -73,7 +70,7 @@ data class NewEntryTypeCounters(
 fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesMap>) =
     combine(flowOfIds, flowOfTypes) { ids, types ->
         NewEntryTypeCounters(
-            unseenCount = ids.count { types.getType(it) == UNSEEN },
+            unseenCount = ids.count { types.getType(it) == null },
             seenCount = ids.count { types.getType(it) == SEEN }
         )
     }.distinctUntilChanged()

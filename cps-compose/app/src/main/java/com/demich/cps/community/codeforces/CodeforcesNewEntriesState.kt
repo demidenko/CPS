@@ -91,7 +91,7 @@ fun rememberCodeforcesNewEntriesState(
             override fun isNew(id: Int): Boolean {
                 if (!showNewEntries) return false
                 val type = newEntriesState.types.getType(id)
-                return type == UNSEEN || type == SEEN
+                return type == null || type == SEEN
             }
         }
     }
