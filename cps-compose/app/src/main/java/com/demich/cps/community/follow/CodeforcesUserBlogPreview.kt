@@ -38,12 +38,12 @@ import kotlin.time.Instant
 @Composable
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
-    userBlog: () -> CodeforcesUserBlogInfo?
+    userBlogInfo: () -> CodeforcesUserBlogInfo?
 ) {
-    userBlog()?.let {
+    userBlogInfo()?.let {
         CodeforcesUserBlogPreview(
             modifier = modifier,
-            userBlog = it
+            userBlogInfo = it
         )
     }
 }
@@ -51,12 +51,12 @@ fun CodeforcesUserBlogPreview(
 @Composable
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
-    userBlog: CodeforcesUserBlogInfo
+    userBlogInfo: CodeforcesUserBlogInfo
 ) {
     CodeforcesUserBlogPreview(
         modifier = modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-        profile = userBlog.userProfile,
-        blogEntriesCount = userBlog.blogSize
+        profile = userBlogInfo.userProfile,
+        blogEntriesCount = userBlogInfo.blogSize
     )
 }
 

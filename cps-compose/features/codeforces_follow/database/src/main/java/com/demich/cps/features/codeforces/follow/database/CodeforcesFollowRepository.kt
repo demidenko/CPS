@@ -28,7 +28,7 @@ abstract class CodeforcesFollowRepository(
 
     // TODO: without toCodeforcesUserBlog?
 
-    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlogInfo?> =
+    fun flowOfUserBlogInfo(blogId: Long): Flow<CodeforcesUserBlogInfo?> =
         dao.flowOfShortEntity(id = blogId).map { it?.toCodeforcesUserBlog() }
 
     suspend fun blogOrNull(blogId: Long): CodeforcesUserBlogInfo? =

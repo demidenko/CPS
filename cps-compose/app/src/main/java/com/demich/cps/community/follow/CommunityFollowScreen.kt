@@ -98,7 +98,7 @@ private fun CodeforcesFollowList(
             modifier = Modifier.animateItem(),
             content = {
                 CodeforcesUserBlogPreview(
-                    userBlog = userBlog,
+                    userBlogInfo = userBlog,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
