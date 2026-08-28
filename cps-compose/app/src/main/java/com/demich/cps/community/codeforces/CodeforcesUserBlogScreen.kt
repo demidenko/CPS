@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
+import com.demich.cps.community.follow.CodeforcesUserBlogPreview
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.fetchstate.FetchResult
@@ -21,6 +23,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
 import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
@@ -35,6 +38,7 @@ import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
+import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
@@ -72,7 +76,10 @@ private fun CodeforcesUserBlogScreen(
     val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
     val blogEntriesState = flow.collectAsState()
 
+    val userBlogState = collectAsStateWithLifecycle { context.followRepository.flowOfUserBlog(blogId) }
+
     CodeforcesUserBlogScreen(
+        userBlog = userBlogState::value,
         blogEntries = blogEntriesState::value,
         onRetry = uuidState::reset,
         filterState = filterState
@@ -87,13 +94,18 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
+    userBlog: () -> CodeforcesUserBlog?,
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
     ProvideSystemTimeEachMinute {
         Column {
-            // TODO: add user blog info
+            CodeforcesUserBlogPreview(
+                modifier = Modifier.fillMaxWidth(),
+                userBlog = userBlog
+            )
+            Divider()
             CodeforcesUserBlogContent(
                 blogEntries = { blogEntries().map { it.filterBy(filterState) } },
                 onRetry = onRetry,

@@ -38,10 +38,23 @@ import kotlin.time.Instant
 @Composable
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
+    userBlog: () -> CodeforcesUserBlog?
+) {
+    userBlog()?.let {
+        CodeforcesUserBlogPreview(
+            modifier = modifier,
+            userBlog = it
+        )
+    }
+}
+
+@Composable
+fun CodeforcesUserBlogPreview(
+    modifier: Modifier = Modifier,
     userBlog: CodeforcesUserBlog
 ) {
     CodeforcesUserBlogPreview(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 5.dp),
         profile = userBlog.userProfile,
         blogEntriesCount = userBlog.blogSize
     )

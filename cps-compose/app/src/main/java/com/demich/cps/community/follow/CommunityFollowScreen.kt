@@ -2,7 +2,6 @@ package com.demich.cps.community.follow
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.unit.dp
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.navigation.CPSNavigator
@@ -101,9 +99,7 @@ private fun CodeforcesFollowList(
             content = {
                 CodeforcesUserBlogPreview(
                     userBlog = userBlog,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 5.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             menuBuilder = {
