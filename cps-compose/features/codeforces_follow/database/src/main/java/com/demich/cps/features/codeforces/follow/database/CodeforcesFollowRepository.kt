@@ -6,7 +6,7 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundExcept
 import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
@@ -28,16 +28,16 @@ abstract class CodeforcesFollowRepository(
 
     // TODO: without toCodeforcesUserBlog?
 
-    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlog?> =
+    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlogInfo?> =
         dao.flowOfShortEntity(id = blogId).map { it?.toCodeforcesUserBlog() }
 
-    suspend fun blogOrNull(blogId: Long): CodeforcesUserBlog? =
+    suspend fun blogOrNull(blogId: Long): CodeforcesUserBlogInfo? =
         dao.getShortEntity(blogId)?.toCodeforcesUserBlog()
 
-    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>> =
+    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlogInfo>> =
         dao.flowOfShortBlogs().map { it.map { it.toCodeforcesUserBlog() } }
 
-    suspend fun blogs(): List<CodeforcesUserBlog> =
+    suspend fun blogs(): List<CodeforcesUserBlogInfo> =
         dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
 
     suspend fun getAndReloadBlogEntries(handle: String) =

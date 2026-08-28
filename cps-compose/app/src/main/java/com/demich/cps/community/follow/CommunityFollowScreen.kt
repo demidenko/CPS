@@ -17,7 +17,7 @@ import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.profiles.DialogProfileSelector
 import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.ui.CPSIconButton
@@ -77,7 +77,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: () -> List<CodeforcesUserBlog>,
+    userBlogs: () -> List<CodeforcesUserBlogInfo>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (Long) -> Unit,
     onDeleteUser: (Long) -> Unit,
@@ -85,7 +85,7 @@ private fun CodeforcesFollowList(
 ) {
     val listState = rememberLazyListState()
 
-    var showDeleteDialogForBlog: CodeforcesUserBlog? by remember { mutableStateOf(null) }
+    var showDeleteDialogForBlog: CodeforcesUserBlogInfo? by remember { mutableStateOf(null) }
 
     LazyColumnOfData(
         state = listState,

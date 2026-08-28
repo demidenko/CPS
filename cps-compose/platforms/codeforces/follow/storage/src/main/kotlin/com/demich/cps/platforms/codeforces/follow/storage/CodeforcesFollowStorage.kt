@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.first
 private interface CodeforcesFollowStorage {
     //read
 
-    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlog>>
+    fun flowOfUserBlogs(): Flow<List<CodeforcesUserBlogInfo>>
 
-    suspend fun userBlogs(): List<CodeforcesUserBlog> =
+    suspend fun userBlogs(): List<CodeforcesUserBlogInfo> =
         flowOfUserBlogs().first()
 
-    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlog?>
+    fun flowOfUserBlog(blogId: Long): Flow<CodeforcesUserBlogInfo?>
 
-    suspend fun userBlogOrNull(blogId: Long): CodeforcesUserBlog? =
+    suspend fun userBlogOrNull(blogId: Long): CodeforcesUserBlogInfo? =
         flowOfUserBlog(blogId = blogId).first()
 
     suspend fun userHandles(): List<String> =

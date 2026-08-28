@@ -3,7 +3,7 @@ package com.demich.cps.features.codeforces.follow.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 
@@ -33,7 +33,7 @@ internal class CodeforcesUserBlogEntityShort(
 )
 
 internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
-    CodeforcesUserBlog(
+    CodeforcesUserBlogInfo(
         id = id,
         blogSize = blogInfo?.blogSize,
         userProfile = when (userInfo) {
@@ -43,7 +43,7 @@ internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
     )
 
 internal fun CodeforcesUserBlogEntityShort.toCodeforcesUserBlog() =
-    CodeforcesUserBlog(
+    CodeforcesUserBlogInfo(
         id = id,
         blogSize = blogSize,
         userProfile = when (userInfo) {

@@ -23,7 +23,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
@@ -94,7 +94,7 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    userBlog: () -> CodeforcesUserBlog?,
+    userBlog: () -> CodeforcesUserBlogInfo?,
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -65,7 +65,7 @@ class CodeforcesFollowWorker(
     }
 }
 
-private fun CodeforcesUserBlog.userLastOnlineTimeOrNull(): Instant? =
+private fun CodeforcesUserBlogInfo.userLastOnlineTimeOrNull(): Instant? =
     userProfile.userInfoOrNull()?.lastOnlineTime
 
 private class CodeforcesFollowWorkerStorage(context: Context): ItemizedDataStore(context.dataStore) {

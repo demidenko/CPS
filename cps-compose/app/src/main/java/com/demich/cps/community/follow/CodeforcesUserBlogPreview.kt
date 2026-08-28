@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlog
+import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.profiles.managers.toHandleSpan
@@ -38,7 +38,7 @@ import kotlin.time.Instant
 @Composable
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
-    userBlog: () -> CodeforcesUserBlog?
+    userBlog: () -> CodeforcesUserBlogInfo?
 ) {
     userBlog()?.let {
         CodeforcesUserBlogPreview(
@@ -51,7 +51,7 @@ fun CodeforcesUserBlogPreview(
 @Composable
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
-    userBlog: CodeforcesUserBlog
+    userBlog: CodeforcesUserBlogInfo
 ) {
     CodeforcesUserBlogPreview(
         modifier = modifier.padding(horizontal = 8.dp, vertical = 5.dp),
