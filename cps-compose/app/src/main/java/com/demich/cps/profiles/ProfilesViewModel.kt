@@ -43,7 +43,7 @@ class ProfilesViewModel: ViewModel() {
     private fun setLoadingStatus(manager: ProfileManager<*>, loadingStatus: LoadingStatus) =
         loadingStatuses.edit {
             if (loadingStatus == PENDING) remove(manager.platform)
-            else this[manager.platform] = loadingStatus
+            else set(key = manager.platform, value = loadingStatus)
         }
 
     fun <U: UserInfo> reload(manager: ProfileManager<U>, context: Context) {
@@ -64,7 +64,7 @@ class ProfilesViewModel: ViewModel() {
         }
     }
 
-    fun <U: UserInfo> delete(manager: ProfileManager<U>, context: Context) {
+    fun delete(manager: ProfileManager<*>, context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             manager.profileStorage(context).deleteProfile()
             setLoadingStatus(manager, PENDING)
