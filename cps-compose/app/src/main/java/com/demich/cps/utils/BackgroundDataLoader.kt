@@ -36,7 +36,7 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
         }
 
     private fun executeFlow(key: Any, flow: Flow<T>): StateFlow<FetchState<T>>  {
-        scope.launch {
+        scope.launch(Dispatchers.Default) {
             mutex.withLock {
                 if (currentKey != key) {
                     currentKey = key
