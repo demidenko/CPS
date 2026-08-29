@@ -56,7 +56,3 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
 }
 
 fun <T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)
-
-fun ViewModel.launchData(block: suspend CoroutineScope.() -> Unit) {
-    viewModelScope.launch(context = Dispatchers.Default, block = block)
-}

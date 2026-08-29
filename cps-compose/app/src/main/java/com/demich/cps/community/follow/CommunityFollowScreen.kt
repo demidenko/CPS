@@ -30,7 +30,6 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
-import com.demich.cps.utils.launchData
 import kotlinx.coroutines.launch
 
 @Composable
@@ -39,6 +38,7 @@ private fun CommunityFollowScreen(
 ) {
     val context = context
     val viewModel = codeforcesCommunityViewModel()
+    val scope = backgroundCoroutineScope
 
     val loadingStatusState = viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
 
@@ -50,7 +50,7 @@ private fun CommunityFollowScreen(
             isRefreshing = { loadingStatusState.value == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { blogId ->
-                viewModel.launchData {
+                scope.launch {
                     context.followRepository.remove(blogId)
                 }
             },
