@@ -42,6 +42,7 @@ import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty1
 
@@ -281,10 +282,7 @@ private class ApiAccessCheckViewModel: ViewModel() {
         block: suspend () -> Unit
     ) {
         viewModelScope.launch(Dispatchers.Default) {
-            fetchFlowOf(block)
-                .collect {
-                    flowOfFetchState.value = it
-                }
+            flowOfFetchState.emitAll(fetchFlowOf(block))
         }
     }
 }
