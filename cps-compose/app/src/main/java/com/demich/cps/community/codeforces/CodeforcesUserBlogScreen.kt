@@ -110,7 +110,7 @@ private fun CodeforcesUserBlogScreen(
                 userBlogInfo = userBlogInfo
             )
             Divider()
-            BlogEntries(
+            BlogEntriesBox(
                 blogEntries = { blogEntries().map { it.filterBy(filterState) } },
                 onRetry = onRetry,
                 modifier = Modifier.fillMaxWidth().weight(1f)
@@ -124,7 +124,7 @@ private fun CodeforcesUserBlogScreen(
 }
 
 @Composable
-private fun BlogEntries(
+private fun BlogEntriesBox(
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
