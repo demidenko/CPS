@@ -24,12 +24,14 @@ import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
-import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
+import com.demich.cps.profiles.userinfo.ProfileResult
+import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
@@ -155,10 +157,10 @@ private class BlogLoadingViewModel: ViewModel() {
     fun flowOfFetchBlogEntries(blogId: Long, context: Context, key: Any) = blogEntriesLoader.run {
         val repository = context.followRepository
         executeFlow(key = Pair(blogId, key)) {
-            val handle = repository.blog(blogId = blogId).handle
+            val user = repository.blog(blogId = blogId).userProfile
             combine(
-                flow = flow { emit(repository.getAndReloadBlogEntries(handle).getOrThrow()) },
-                flow2 = flowOfColorTag(handle = handle)
+                flow = flow { emit(repository.getAndReloadBlogEntries(handle = user.handle).getOrThrow()) },
+                flow2 = flowOfColorTag(profile = user)
             ) { blogEntries, colorTag ->
                 blogEntries.map {
                     it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
@@ -167,13 +169,16 @@ private class BlogLoadingViewModel: ViewModel() {
         }
     }
 
-    private fun flowOfColorTag(handle: String): Flow<CodeforcesColorTag?> =
+    private fun flowOfColorTag(profile: ProfileResult<CodeforcesUserInfo>): Flow<CodeforcesColorTag?> =
         flow {
             val result = fetchResultOf {
-                CodeforcesClient().getRealColorTagOrNull(handle)
+                CodeforcesClient().getRealColorTagOrNull(profile.handle)
             }
             if (result is FetchResult.Success) emit(result.value)
         }.onStart {
-            emit(null)
+            when (profile) {
+                is ProfileResult.Success -> emit(CodeforcesColorTag.fromRating(profile.userInfo.rating))
+                else -> emit(null)
+            }
         }
 }
