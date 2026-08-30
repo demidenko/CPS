@@ -108,10 +108,10 @@ private fun CodeforcesUserBlogScreen(
                 userBlogInfo = userBlogInfo
             )
             Divider()
-            CodeforcesUserBlogContent(
+            BlogEntries(
                 blogEntries = { blogEntries().map { it.filterBy(filterState) } },
                 onRetry = onRetry,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth().weight(1f)
             )
             FilterTextField(
                 filterState = filterState,
@@ -122,7 +122,7 @@ private fun CodeforcesUserBlogScreen(
 }
 
 @Composable
-private fun CodeforcesUserBlogContent(
+private fun BlogEntries(
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -131,7 +131,7 @@ private fun CodeforcesUserBlogContent(
         fetchState = blogEntries,
         failedText = { it.niceMessage ?: "Failed to get blog" },
         onRetry = onRetry,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
     ) { blogEntries ->
         CodeforcesBlogEntries(
             blogEntries = { blogEntries },
