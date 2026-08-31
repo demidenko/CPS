@@ -35,7 +35,7 @@ internal class CodeforcesUserBlogEntityShort(
 internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
     CodeforcesUserBlogInfo(
         id = id,
-        blogSize = blogInfo?.blogSize,
+        blogSize = blogInfo?.blogSize?.toUInt(),
         userProfile = when (userInfo) {
             null -> ProfileResult.Failed(userId = handle)
             else -> ProfileResult(userInfo = userInfo)
@@ -45,7 +45,7 @@ internal fun CodeforcesUserBlogEntity.toCodeforcesUserBlog() =
 internal fun CodeforcesUserBlogEntityShort.toCodeforcesUserBlog() =
     CodeforcesUserBlogInfo(
         id = id,
-        blogSize = blogSize,
+        blogSize = blogSize?.toUInt(),
         userProfile = when (userInfo) {
             null -> ProfileResult.Failed(userId = handle)
             else -> ProfileResult(userInfo = userInfo)

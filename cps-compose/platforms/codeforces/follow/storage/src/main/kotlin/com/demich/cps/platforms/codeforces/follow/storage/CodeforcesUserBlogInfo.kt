@@ -7,7 +7,7 @@ import com.demich.cps.profiles.userinfo.handle
 data class CodeforcesUserBlogInfo(
     val id: Long,
     val userProfile: ProfileResult<CodeforcesUserInfo>,
-    val blogSize: Int?
+    val blogSize: UInt?
 )
 
 val CodeforcesUserBlogInfo.handle: String
