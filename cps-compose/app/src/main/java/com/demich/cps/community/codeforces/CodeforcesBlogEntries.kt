@@ -114,7 +114,7 @@ private fun BlogEntryInfo(
     title: String,
     authorHandle: AnnotatedString,
     rating: Int,
-    commentsCount: Int,
+    commentsCount: UInt?,
     timeAgo: String,
     markNew: Boolean,
     modifier: Modifier = Modifier,
@@ -168,7 +168,7 @@ private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
     timeAgo: String,
     rating: Int,
-    commentsCount: Int,
+    commentsCount: UInt?,
     label: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier
 ) {
@@ -198,7 +198,7 @@ private fun BlogEntryInfoFooter(
                 rating = rating,
                 fontSize = 14.sp
             )
-            if (commentsCount > 0) {
+            if (commentsCount != null) {
                 CommentsRow(
                     text = AnnotatedString(commentsCount.toString()),
                     fontSize = 14.sp,
