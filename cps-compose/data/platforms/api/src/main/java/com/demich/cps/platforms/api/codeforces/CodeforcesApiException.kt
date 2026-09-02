@@ -7,7 +7,7 @@ class CodeforcesApiUnspecifiedException(comment: String): CodeforcesApiException
 
 class CodeforcesApiCallLimitExceededException(comment: String): CodeforcesApiException(comment)
 
-class CodeforcesApiHandleNotFoundException(comment: String, val handle: String): CodeforcesApiException(comment)
+class CodeforcesApiUserNotFoundException(comment: String, val handle: String): CodeforcesApiException(comment)
 
 class CodeforcesApiBlogEntryNotFoundException(comment: String, val blogEntryId: Int): CodeforcesApiException(comment)
 

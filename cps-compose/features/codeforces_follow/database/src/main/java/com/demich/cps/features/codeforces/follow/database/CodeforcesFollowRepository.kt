@@ -2,7 +2,7 @@ package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
 import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -112,7 +112,7 @@ private suspend inline fun CodeforcesApi.getBlogEntries(
     runCatching {
         getUserBlogEntriesRecovered(handle = handle)
     }.onFailure {
-        if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
+        if (it is CodeforcesApiUserNotFoundException && it.handle == handle) {
             val result = getUserCatching(handle = handle, checkHistoricHandles = true)
             val profile = result.toProfileResult(handle)
             onChangeProfile(profile)

@@ -4,7 +4,7 @@ import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.asResult
 import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
 import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
@@ -24,7 +24,7 @@ suspend fun CodeforcesApi.getUsersCatching(
             when (result) {
                 is FetchResult.Failure -> {
                     val it = result.exception
-                    if (it is CodeforcesApiHandleNotFoundException) {
+                    if (it is CodeforcesApiUserNotFoundException) {
                         val badHandle = it.handle
                         put(key = badHandle, value = Result.failure(it))
                         handles.remove(badHandle)
@@ -76,7 +76,7 @@ suspend fun CodeforcesApi.getUserOrNull(
 ): CodeforcesUser? {
     return try {
         getUser(handle = handle, checkHistoricHandles = checkHistoricHandles)
-    } catch (it: CodeforcesApiHandleNotFoundException) {
+    } catch (it: CodeforcesApiUserNotFoundException) {
         // TODO: check(it.handle == handle) ???
         null
     }
@@ -88,7 +88,7 @@ fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<Codefo
             ProfileResult(it.toUserInfo())
         },
         onFailure = {
-            if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) ProfileResult.NotFound(handle)
+            if (it is CodeforcesApiUserNotFoundException && it.handle == handle) ProfileResult.NotFound(handle)
             else ProfileResult.Failed(handle)
         }
     )

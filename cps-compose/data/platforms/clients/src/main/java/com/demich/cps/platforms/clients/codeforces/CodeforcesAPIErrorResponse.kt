@@ -7,8 +7,8 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundExcep
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestRatingChangesUnavailableException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUnspecifiedException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -78,7 +78,7 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
 
     comment.ifIsFieldMsg("handle") { msg ->
         msg.ifSurrounded("User with handle ", " not found") {
-            return CodeforcesApiHandleNotFoundException(comment, handle = it)
+            return CodeforcesApiUserNotFoundException(comment, handle = it)
         }
         when (msg) {
             "You are not allowed to read that blog" -> return CodeforcesApiBlogReadNotAllowedException(comment)
@@ -89,7 +89,7 @@ internal fun CodeforcesAPIErrorResponse.toApiException(): CodeforcesApiException
 
     comment.ifIsFieldMsg("handles") { msg ->
         msg.ifSurrounded("User with handle ", " not found") {
-            return CodeforcesApiHandleNotFoundException(comment, handle = it)
+            return CodeforcesApiUserNotFoundException(comment, handle = it)
         }
         when (msg) {
             // "Field should not be empty", "Поле должно быть не пусто" ->
