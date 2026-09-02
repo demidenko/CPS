@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.fetchstate.FetchResult
-import com.demich.cps.fetchstate.asResult
 import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
@@ -52,10 +51,6 @@ suspend fun CodeforcesApi.getProfiles(
     getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
-suspend fun CodeforcesApi.getUserCatching(handle: String, checkHistoricHandles: Boolean): Result<CodeforcesUser> =
-    fetchResultOf { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
-        .asResult()
-
 suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> {
     val result = fetchResultOf { getUserOrNull(handle = handle, checkHistoricHandles = checkHistoricHandles) }
     return when (result) {
@@ -67,7 +62,6 @@ suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boole
         }
     }
 }
-
 
 // returns null if user not found
 suspend fun CodeforcesApi.getUserOrNull(
@@ -82,7 +76,7 @@ suspend fun CodeforcesApi.getUserOrNull(
     }
 }
 
-fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
+private fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
     fold(
         onSuccess = {
             ProfileResult(it.toUserInfo())
