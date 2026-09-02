@@ -18,15 +18,14 @@ import com.demich.cps.notifications.NotificationChannelSingleId
 import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiAccess
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiHandleNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
-import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
+import com.demich.cps.platforms.utils.codeforces.getUserOrNull
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
@@ -77,12 +76,9 @@ class CodeforcesProfileManager :
     }
 
     override suspend fun getUserInfo(userId: String): CodeforcesUserInfo? =
-        try {
-            CodeforcesClient().getUser(handle = userId, checkHistoricHandles = true).toUserInfo()
-        } catch (it: CodeforcesApiHandleNotFoundException) {
-            check(it.handle == userId)
-            null
-        }
+        CodeforcesClient()
+            .getUserOrNull(handle = userId, checkHistoricHandles = true)
+            ?.toUserInfo()
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> =
         CodeforcesClient().getHandleSuggestions(str = str)
