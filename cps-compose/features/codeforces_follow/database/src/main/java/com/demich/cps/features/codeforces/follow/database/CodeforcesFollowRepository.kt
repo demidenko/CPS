@@ -67,18 +67,21 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
         if (!dao.createUserWithoutBlog(profileResult = result)) return
+        check(result !is ProfileResult.NotFound)
 
-        val handle = result.handle
-        getAndReloadBlogEntries(handle = handle)
-
-        // TODO: parallel?
-        // TODO: reload can change handle
-        if (result is ProfileResult.Failed) {
-            dao.updateUserProfile(
-                handle = handle,
-                result = getApi(EN).getProfile(handle = handle, checkHistoricHandles = true)
-            )
+        val result = when (result) {
+            is ProfileResult.Success -> result
+            is ProfileResult.Failed -> getApi(EN)
+                .getProfile(handle = result.handle, checkHistoricHandles = true)
+                .also {
+                    dao.updateUserProfile(
+                        handle = result.handle,
+                        result = it
+                    )
+                }
         }
+
+        getAndReloadBlogEntries(handle = result.handle)
     }
 
     @IgnorableReturnValue
