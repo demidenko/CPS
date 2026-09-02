@@ -13,6 +13,8 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import kotlinx.coroutines.flow.Flow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 internal const val cfFollowTableName = "FollowList"
 
@@ -110,8 +112,13 @@ internal abstract class CodeforcesFollowDao {
     suspend fun hasUser(handle: String): Boolean =
         userBlogId(handle = handle) != null
 
+    @OptIn(ExperimentalContracts::class)
     @IgnorableReturnValue
     suspend fun createUserWithoutBlog(profileResult: ProfileResult<CodeforcesUserInfo>): Boolean {
+        contract {
+            returns(true) implies (profileResult !is ProfileResult.NotFound)
+        }
+
         if (profileResult is ProfileResult.NotFound) return false
         if (hasUser(profileResult.handle)) return false //TODO need proper way
 

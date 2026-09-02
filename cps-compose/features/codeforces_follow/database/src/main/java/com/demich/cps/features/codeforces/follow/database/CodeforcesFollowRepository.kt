@@ -67,7 +67,6 @@ abstract class CodeforcesFollowRepository(
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
         if (!dao.createUserWithoutBlog(profileResult = result)) return
-        check(result !is ProfileResult.NotFound)
 
         val result = when (result) {
             is ProfileResult.Success -> result
