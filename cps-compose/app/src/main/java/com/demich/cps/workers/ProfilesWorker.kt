@@ -5,9 +5,9 @@ import androidx.work.WorkerParameters
 import com.demich.cps.R
 import com.demich.cps.notifications.getActiveNotification
 import com.demich.cps.notifications.notificationChannels
+import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.profiles.managers.AtCoderProfileManager
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.managers.applyRatingChange
@@ -79,8 +79,10 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
         ?.userInfoOrNull() ?: return
 
     val handle = userInfo.handle
-    val newContribution = CodeforcesClient().getProfile(handle = handle, checkHistoricHandles = false)
-        .userInfoOrNull()?.contribution ?: return
+
+    val newContribution = CodeforcesClient()
+        .getUser(handle = handle, checkHistoricHandles = false) // this.getUserInfo() uses checkHistoricHandles = true
+        .contribution
 
     if (newContribution == userInfo.contribution) return
 
