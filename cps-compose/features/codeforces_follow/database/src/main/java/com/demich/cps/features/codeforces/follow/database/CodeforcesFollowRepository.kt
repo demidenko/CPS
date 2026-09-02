@@ -3,6 +3,7 @@ package com.demich.cps.features.codeforces.follow.database
 import android.content.Context
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
+import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
@@ -10,8 +11,7 @@ import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.codeforces.follow.storage.handle
 import com.demich.cps.platforms.utils.codeforces.getProfile
 import com.demich.cps.platforms.utils.codeforces.getProfiles
-import com.demich.cps.platforms.utils.codeforces.getUserCatching
-import com.demich.cps.platforms.utils.codeforces.toProfileResult
+import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
@@ -40,29 +40,36 @@ abstract class CodeforcesFollowRepository(
     suspend fun blogs(): List<CodeforcesUserBlogInfo> =
         dao.getShortBlogs().map { it.toCodeforcesUserBlog() }
 
-    suspend fun getAndReloadBlogEntries(handle: String) =
-        getAndReloadBlogEntries(handle = handle, locale = getLocale())
+    // TODO
+    suspend fun getAndReloadBlogEntries(handle: String) = runCatching {
+        getAndUpdateBlogEntries(handle = handle, locale = getLocale())
+    }
 
-    private suspend fun getAndReloadBlogEntries(
+    private suspend fun getAndUpdateBlogEntries(
         handle: String,
         locale: CodeforcesLocale
-    ): Result<List<CodeforcesBlogEntry>> {
+    ): List<CodeforcesBlogEntry> {
         var handle = handle
-        val result = getApi(locale).getBlogEntries(
-            handle = handle,
-            onChangeProfile = {
-                dao.updateUserProfile(handle = handle, result = it)
-                handle = it.handle
-            }
-        )
-        result.onSuccess { blogEntries ->
-            dao.updateBlogEntries(
+        val blogEntries = try {
+            getApi(locale).getBlogEntriesRecoverHotFound(
                 handle = handle,
-                blogEntries = blogEntries,
-                onNewBlogEntries = { it.forEach(::notifyNewBlogEntry) }
+                onChangeUserInfo = {
+                    dao.updateUserProfile(handle = handle, result = ProfileResult(it))
+                    handle = it.handle
+                }
             )
+        } catch (it: CodeforcesApiUserNotFoundException) {
+            dao.updateUserProfile(handle = handle, result = ProfileResult.NotFound(handle))
+            throw it
         }
-        return result
+
+        dao.updateBlogEntries(
+            handle = handle,
+            blogEntries = blogEntries,
+            onNewBlogEntries = { it.forEach(::notifyNewBlogEntry) }
+        )
+
+        return blogEntries
     }
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
@@ -107,20 +114,15 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
 suspend fun CodeforcesFollowRepository.addNewUser(handle: String) =
     addNewUser(result = ProfileResult.Failed(handle))
 
-private suspend inline fun CodeforcesApi.getBlogEntries(
+private suspend inline fun CodeforcesApi.getBlogEntriesRecoverHotFound(
     handle: String,
-    onChangeProfile: (ProfileResult<CodeforcesUserInfo>) -> Unit
-): Result<List<CodeforcesBlogEntry>> {
-    runCatching {
-        getUserBlogEntriesRecovered(handle = handle)
-    }.onFailure {
-        if (it is CodeforcesApiUserNotFoundException && it.handle == handle) {
-            val result = getUserCatching(handle = handle, checkHistoricHandles = true)
-            val profile = result.toProfileResult(handle)
-            onChangeProfile(profile)
-            return result.mapCatching { getUserBlogEntriesRecovered(handle = profile.handle) }
-        }
-    }.also {
-        return it
+    onChangeUserInfo: (CodeforcesUserInfo) -> Unit
+): List<CodeforcesBlogEntry> {
+    try {
+        return getUserBlogEntriesRecovered(handle = handle)
+    } catch (it: CodeforcesApiUserNotFoundException) {
+        val user = getUser(handle = handle, checkHistoricHandles = true)
+        onChangeUserInfo(user.toUserInfo())
+        return getUserBlogEntriesRecovered(handle = user.handle) // TODO: not perfect (wrap to while?)
     }
 }
