@@ -56,8 +56,17 @@ suspend fun CodeforcesApi.getUserCatching(handle: String, checkHistoricHandles: 
     fetchResultOf { getUser(handle = handle, checkHistoricHandles = checkHistoricHandles) }
         .asResult()
 
-suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
-    getUserCatching(handle = handle, checkHistoricHandles = checkHistoricHandles).toProfileResult(handle)
+suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> {
+    val result = fetchResultOf { getUserOrNull(handle = handle, checkHistoricHandles = checkHistoricHandles) }
+    return when (result) {
+        is FetchResult.Failure -> ProfileResult.Failed(handle)
+        is FetchResult.Success -> {
+            val user = result.value
+            if (user == null) ProfileResult.NotFound(handle)
+            else ProfileResult(user.toUserInfo())
+        }
+    }
+}
 
 
 // returns null if user not found
