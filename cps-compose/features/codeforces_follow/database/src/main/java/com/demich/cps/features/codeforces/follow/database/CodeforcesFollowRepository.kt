@@ -47,11 +47,17 @@ abstract class CodeforcesFollowRepository(
         handle: String,
         locale: CodeforcesLocale
     ): Result<List<CodeforcesBlogEntry>> {
-        val (newProfile, result) = getApi(locale).getBlogEntries(handle = handle)
-        if (newProfile != null) dao.updateUserProfile(handle = handle, result = newProfile)
+        var handle = handle
+        val result = getApi(locale).getBlogEntries(
+            handle = handle,
+            onChangeProfile = {
+                dao.updateUserProfile(handle = handle, result = it)
+                handle = it.handle
+            }
+        )
         result.onSuccess { blogEntries ->
             dao.updateBlogEntries(
-                handle = newProfile?.handle ?: handle,
+                handle = handle,
                 blogEntries = blogEntries,
                 onNewBlogEntries = { it.forEach(::notifyNewBlogEntry) }
             )
@@ -99,26 +105,20 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
 suspend fun CodeforcesFollowRepository.addNewUser(handle: String) =
     addNewUser(result = ProfileResult.Failed(handle))
 
-private data class GetBlogEntriesResult(
-    val newProfile: ProfileResult<CodeforcesUserInfo>?,
-    val blogEntries: Result<List<CodeforcesBlogEntry>>
-)
-
-private suspend fun CodeforcesApi.getBlogEntries(
-    handle: String
-): GetBlogEntriesResult {
+private suspend inline fun CodeforcesApi.getBlogEntries(
+    handle: String,
+    onChangeProfile: (ProfileResult<CodeforcesUserInfo>) -> Unit
+): Result<List<CodeforcesBlogEntry>> {
     runCatching {
         getUserBlogEntriesRecovered(handle = handle)
     }.onFailure {
         if (it is CodeforcesApiHandleNotFoundException && it.handle == handle) {
             val result = getUserCatching(handle = handle, checkHistoricHandles = true)
             val profile = result.toProfileResult(handle)
-            return GetBlogEntriesResult(
-                newProfile = profile,
-                blogEntries = result.mapCatching { getUserBlogEntriesRecovered(handle = profile.handle) }
-            )
+            onChangeProfile(profile)
+            return result.mapCatching { getUserBlogEntriesRecovered(handle = profile.handle) }
         }
     }.also {
-        return GetBlogEntriesResult(newProfile = null, blogEntries = it)
+        return it
     }
 }
