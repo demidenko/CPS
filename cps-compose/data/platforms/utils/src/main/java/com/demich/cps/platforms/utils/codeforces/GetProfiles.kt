@@ -59,6 +59,20 @@ suspend fun CodeforcesApi.getUserCatching(handle: String, checkHistoricHandles: 
 suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
     getUserCatching(handle = handle, checkHistoricHandles = checkHistoricHandles).toProfileResult(handle)
 
+
+// returns null if user not found
+suspend fun CodeforcesApi.getUserOrNull(
+    handle: String,
+    checkHistoricHandles: Boolean
+): CodeforcesUser? {
+    return try {
+        getUser(handle = handle, checkHistoricHandles = checkHistoricHandles)
+    } catch (it: CodeforcesApiHandleNotFoundException) {
+        // TODO: check(it.handle == handle) ???
+        null
+    }
+}
+
 fun Result<CodeforcesUser>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
     fold(
         onSuccess = {
