@@ -7,7 +7,7 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedPageParser
-import com.demich.cps.platforms.utils.codeforces.getUsersCatching
+import com.demich.cps.platforms.utils.codeforces.getUsersCatchingFilterFound
 import kotlin.time.Instant
 
 
@@ -220,7 +220,7 @@ private suspend fun CodeforcesLostStorage.updateLost(
     val entries = getEntries().values
 
     if (entries.any { it is CodeforcesLostBlogEntry && it.authorColorTag == null }) {
-        val users = api.getUsersCatching(
+        val users = api.getUsersCatchingFilterFound(
             handles = entries.mapNotNull {
                 if (it.authorColorTag == null) it.authorHandle
                 else null
@@ -231,7 +231,6 @@ private suspend fun CodeforcesLostStorage.updateLost(
         editNullColorTags(
             colorTag = {
                 users[it.authorHandle]
-                    ?.getOrNull()
                     ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
             }
         )

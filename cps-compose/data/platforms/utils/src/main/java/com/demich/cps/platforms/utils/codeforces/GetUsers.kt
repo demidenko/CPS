@@ -44,6 +44,19 @@ suspend fun CodeforcesApi.getUsersCatching(
         }
     }
 
+suspend fun CodeforcesApi.getUsersCatchingFilterFound(
+    handles: Collection<String>,
+    checkHistoricHandles: Boolean
+): Map<String, CodeforcesUser> =
+    buildMap {
+        getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
+            .forEach { (handle, result) ->
+                result.onSuccess {
+                    if (it != null) put(key = handle, value = it)
+                }
+            }
+    }
+
 suspend fun CodeforcesApi.getProfiles(
     handles: Collection<String>,
     checkHistoricHandles: Boolean
