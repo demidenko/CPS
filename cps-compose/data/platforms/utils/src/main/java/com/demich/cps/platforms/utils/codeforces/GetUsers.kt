@@ -2,10 +2,12 @@ package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.fetchResultOf
+import com.demich.cps.fetchstate.map
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
 import com.demich.cps.platforms.api.codeforces.getUser
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
+import com.demich.cps.platforms.utils.toProfileResult
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 
@@ -64,17 +66,9 @@ suspend fun CodeforcesApi.getProfiles(
     getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
         .mapValues { it.value.toProfileResult(handle = it.key) }
 
-suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> {
-    val result = fetchResultOf { getUserOrNull(handle = handle, checkHistoricHandles = checkHistoricHandles) }
-    return when (result) {
-        is FetchResult.Failure -> ProfileResult.Failed(handle)
-        is FetchResult.Success -> {
-            val user = result.value
-            if (user == null) ProfileResult.NotFound(handle)
-            else ProfileResult(user.toUserInfo())
-        }
-    }
-}
+suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
+    fetchResultOf { getUserOrNull(handle = handle, checkHistoricHandles = checkHistoricHandles) }
+        .toProfileResult(handle)
 
 // returns null if user not found
 suspend fun CodeforcesApi.getUserOrNull(
@@ -90,10 +84,4 @@ suspend fun CodeforcesApi.getUserOrNull(
 }
 
 private fun FetchResult<CodeforcesUser?>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
-    when (this) {
-        is FetchResult.Failure -> ProfileResult.Failed(handle)
-        is FetchResult.Success -> value.let { value ->
-            if (value != null) ProfileResult(value.toUserInfo())
-            else ProfileResult.NotFound(userId = handle)
-        }
-    }
+    map { it?.toUserInfo() }.toProfileResult(userId = handle)
