@@ -12,7 +12,7 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 suspend fun CodeforcesApi.getUsersCatching(
     handles: Collection<String>,
     checkHistoricHandles: Boolean
-): Map<String, Result<CodeforcesUser?>> =
+): Map<String, FetchResult<CodeforcesUser?>> =
     buildMap {
         val handles = handles.toMutableSet()
         while (handles.isNotEmpty()) {
@@ -25,18 +25,18 @@ suspend fun CodeforcesApi.getUsersCatching(
                     val it = result.exception
                     if (it is CodeforcesApiUserNotFoundException) {
                         val notFoundHandle = it.handle
-                        put(key = notFoundHandle, value = Result.success(null))
+                        put(key = notFoundHandle, value = FetchResult.Success(null))
                         handles.remove(notFoundHandle)
                         continue
                     }
-                    for (handle in handles) put(key = handle, value = Result.failure(it))
+                    for (handle in handles) put(key = handle, value = result)
                     break
                 }
                 is FetchResult.Success -> {
                     val iter = result.value.iterator()
                     for (handle in handles) {
                         val user = iter.next()
-                        put(key = handle, value = Result.success(user))
+                        put(key = handle, value = FetchResult.Success(user))
                     }
                     break
                 }
@@ -51,8 +51,8 @@ suspend fun CodeforcesApi.getUsersCatchingFilterFound(
     buildMap {
         getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
             .forEach { (handle, result) ->
-                result.onSuccess {
-                    if (it != null) put(key = handle, value = it)
+                if (result is FetchResult.Success) {
+                    result.value?.let { put(key = handle, value = it) }
                 }
             }
     }
@@ -89,13 +89,11 @@ suspend fun CodeforcesApi.getUserOrNull(
     }
 }
 
-private fun Result<CodeforcesUser?>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
-    fold(
-        onSuccess = {
-            if (it != null) ProfileResult(it.toUserInfo())
-            else ProfileResult.NotFound(handle)
-        },
-        onFailure = {
-            ProfileResult.Failed(handle)
+private fun FetchResult<CodeforcesUser?>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
+    when (this) {
+        is FetchResult.Failure -> ProfileResult.Failed(handle)
+        is FetchResult.Success -> value.let { value ->
+            if (value != null) ProfileResult(value.toUserInfo())
+            else ProfileResult.NotFound(userId = handle)
         }
-    )
+    }
