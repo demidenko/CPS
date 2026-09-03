@@ -86,11 +86,3 @@ private fun Result<CodeforcesUser?>.toProfileResult(handle: String): ProfileResu
             ProfileResult.Failed(handle)
         }
     )
-
-fun CodeforcesUser.toUserInfo(): CodeforcesUserInfo =
-    CodeforcesUserInfo(
-        handle = handle,
-        rating = rating,
-        contribution = contribution,
-        lastOnlineTime = lastOnlineTime
-    )
