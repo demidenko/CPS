@@ -16,19 +16,17 @@ sealed interface FetchResult<out T>: FetchState<T> {
     class Failure(val exception: Throwable): FetchResult<Nothing>
 }
 
-inline fun <T, R> FetchState<T>.map(transform: (T) -> R): FetchState<R> {
-    return when (this) {
-        is FetchResult.Success -> FetchResult.Success(transform(value))
-        is FetchResult.Failure, is FetchState.Loading -> this //!!!!! `else` not compile !!!!
+inline fun <T, R> FetchState<T>.map(transform: (T) -> R): FetchState<R> =
+    when (this) {
+        is FetchResult -> map(transform)
+        is FetchState.Loading -> this
     }
-}
 
-inline fun <T, R> FetchResult<T>.map(transform: (T) -> R): FetchResult<R> {
-    return when (this) {
+inline fun <T, R> FetchResult<T>.map(transform: (T) -> R): FetchResult<R> =
+    when (this) {
         is FetchResult.Success -> FetchResult.Success(transform(value))
-        is FetchResult.Failure -> this //!!!!! `else` not compile !!!!
+        is FetchResult.Failure -> this
     }
-}
 
 fun <T> Result<T>.asFetchResult(): FetchResult<T> =
     fold(
