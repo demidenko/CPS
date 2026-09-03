@@ -48,12 +48,12 @@ inline fun <T> FetchResult<T>.valueOr(onFailure: () -> T): T =
         is FetchResult.Failure -> onFailure()
     }
 
-private fun <T> Flow<T>.toResultFlow(): Flow<Result<T>> =
+private fun <T> Flow<T>.toRunCatchingFlow(): Flow<Result<T>> =
     map { Result.success(it) }
         .catch { emit(Result.failure(it)) }
 
 fun <T> Flow<T>.toFetchResultFlow(): Flow<FetchResult<T>> =
-    toResultFlow().map { it.asFetchResult() }
+    toRunCatchingFlow().map { it.asFetchResult() }
 
 fun <T> Flow<T>.toFetchFlow(): Flow<FetchState<T>> =
     toFetchResultFlow()
