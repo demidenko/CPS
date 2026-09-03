@@ -42,16 +42,15 @@ abstract class CodeforcesFollowRepository(
 
     // TODO
     suspend fun getAndReloadBlogEntries(handle: String) = runCatching {
-        getAndUpdateBlogEntries(handle = handle, locale = getLocale())
+        getApi(locale = getLocale()).getAndUpdateBlogEntries(handle = handle)
     }
 
-    private suspend fun getAndUpdateBlogEntries(
-        handle: String,
-        locale: CodeforcesLocale
+    private suspend fun CodeforcesApi.getAndUpdateBlogEntries(
+        handle: String
     ): List<CodeforcesBlogEntry> {
         var handle = handle
         val blogEntries = try {
-            getApi(locale).getBlogEntriesRecoverHotFound(
+            getBlogEntriesRecoverHotFound(
                 handle = handle,
                 onChangeUserInfo = {
                     dao.updateUserProfile(handle = handle, result = ProfileResult(it))
