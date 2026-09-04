@@ -21,6 +21,7 @@ import com.demich.cps.fetchstate.map
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
@@ -160,7 +161,7 @@ private class BlogLoadingViewModel: ViewModel() {
             val user = repository.blog(blogId = blogId).userProfile
             combine(
                 flow = flow { emit(repository.getAndReloadBlogEntries(handle = user.handle).getOrThrow()) },
-                flow2 = flowOfColorTag(profile = user)
+                flow2 = CodeforcesClient().flowOfColorTag(profile = user)
             ) { blogEntries, colorTag ->
                 blogEntries.map {
                     it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
@@ -169,16 +170,17 @@ private class BlogLoadingViewModel: ViewModel() {
         }
     }
 
-    private fun flowOfColorTag(profile: ProfileResult<CodeforcesUserInfo>): Flow<CodeforcesColorTag?> =
-        flow {
-            val result = fetchResultOf {
-                CodeforcesClient().getRealColorTagOrNull(profile.handle)
-            }
-            if (result is FetchResult.Success) emit(result.value)
-        }.onStart {
-            when (profile) {
-                is ProfileResult.Success -> emit(CodeforcesColorTag.fromRating(profile.userInfo.rating))
-                else -> emit(null)
-            }
-        }
 }
+
+private fun CodeforcesPageContentProvider.flowOfColorTag(
+    profile: ProfileResult<CodeforcesUserInfo>
+): Flow<CodeforcesColorTag?> =
+    flow {
+        val result = fetchResultOf { getRealColorTagOrNull(profile.handle) }
+        if (result is FetchResult.Success) emit(result.value)
+    }.onStart { // note: not same as flow { emit(onStart); emitAll() }
+        when (profile) {
+            is ProfileResult.Success -> emit(CodeforcesColorTag.fromRating(profile.userInfo.rating))
+            else -> emit(null)
+        }
+    }
