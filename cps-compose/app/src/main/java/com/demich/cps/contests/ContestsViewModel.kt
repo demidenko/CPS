@@ -47,28 +47,35 @@ class ContestsViewModel: ViewModel() {
                 .distinct()
         }
 
-    private val loadingStatuses = MutableStateFlow(emptyMap<ContestPlatform, LoadingStatus>())
-    private val errors = MutableStateFlow(emptyMap<ContestPlatform, List<Pair<ContestsFetchSource?, Throwable>>>())
+    // TODO
+    private val loadingStatuses get() = fetchResults.map { it.mapValues { it.value.loadingStatus } }
+    private val errors get() = fetchResults.map { it.mapValues { it.value.errors } }
 
-    private fun setLoadingStatus(platform: ContestPlatform, loadingStatus: LoadingStatus) =
-        loadingStatuses.edit {
-            if (loadingStatus == LOADING) check(this[platform] != LOADING)
-            if (loadingStatus == PENDING) remove(platform)
-            else this[platform] = loadingStatus
+    private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
+
+    private inline fun editFetchResults(platform: ContestPlatform, block: (FetchTrack) -> FetchTrack) {
+        fetchResults.edit {
+            val current = getOrElse(platform) { FetchTrack(loadingStatus = PENDING, errors = emptyList()) }
+            set(platform, block(current))
         }
+    }
 
     private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
         var lastStatus: LoadingStatus = PENDING
         return onStart {
-            setLoadingStatus(platform, LOADING)
-            errors.edit { remove(platform) }
+            editFetchResults(platform) {
+                check(it.loadingStatus != LOADING)
+                FetchTrack(LOADING, emptyList())
+            }
         }.onEach { (platform, source, result) ->
             result.onFailure { error ->
-                errors.edit { edit(platform) { add(source to error) } }
+                editFetchResults(platform) {
+                    it.copy(errors = it.errors + Pair(source, error))
+                }
             }
             lastStatus = result.toLoadingStatus()
         }.onCompletion {
-            setLoadingStatus(platform, lastStatus)
+            editFetchResults(platform) { it.copy(loadingStatus = lastStatus) }
         }
     }
 
@@ -118,3 +125,8 @@ private fun ContestsFetchSettingsSnapshotDiff.contestPlatformsToReload(): Set<Co
         toReload.forEach { add(it.toContestPlatform()) }
         if (clistReload) add(unknown)
     }
+
+private data class FetchTrack(
+    val loadingStatus: LoadingStatus,
+    val errors: List<Pair<ContestsFetchSource?, Throwable>>
+)
