@@ -49,7 +49,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforcesBlog() {
@@ -176,11 +175,10 @@ private fun CodeforcesPageContentProvider.flowOfColorTag(
     profile: ProfileResult<CodeforcesUserInfo>
 ): Flow<CodeforcesColorTag?> =
     flow {
-        val result = fetchResultOf { getRealColorTagOrNull(profile.handle) }
-        if (result is FetchResult.Success) emit(result.value)
-    }.onStart { // note: not same as flow { emit(onStart); emitAll() }
         when (profile) {
             is ProfileResult.Success -> emit(CodeforcesColorTag.fromRating(profile.userInfo.rating))
             else -> emit(null)
         }
+        val result = fetchResultOf { getRealColorTagOrNull(profile.handle) }
+        if (result is FetchResult.Success) emit(result.value)
     }
