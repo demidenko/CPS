@@ -23,7 +23,6 @@ import com.demich.cps.workers.ContestsWorker
 import com.demich.kotlin_stdlib_boost.emptyEnumSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -37,19 +36,15 @@ fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 class ContestsViewModel: ViewModel() {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-        loadingStatuses.map { it.values.combine() }
+        fetchResults.map { it.map { it.value.loadingStatus }.combine() }
 
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
-        combine(loadingStatuses, errors) { loadingStatuses, errors ->
-            loadingStatuses
-                .filter { it.value == FAILED }
-                .flatMap { errors[it.key] ?: emptyList() }
+        fetchResults.map {
+            it.values
+                .filter { it.loadingStatus == FAILED }
+                .flatMap { it.errors }
                 .distinct()
         }
-
-    // TODO
-    private val loadingStatuses get() = fetchResults.map { it.mapValues { it.value.loadingStatus } }
-    private val errors get() = fetchResults.map { it.mapValues { it.value.errors } }
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
 
