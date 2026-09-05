@@ -46,29 +46,18 @@ class ContestsViewModel: ViewModel() {
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
 
-    private inline fun editFetchResults(platform: ContestPlatform, block: (FetchTrack) -> FetchTrack) {
-        fetchResults.edit {
-            val current = getOrElse(platform) { FetchTrack(loadingStatus = PENDING, errors = emptyList()) }
-            set(platform, block(current))
-        }
-    }
-
     private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
+        var track = FetchTrack(loadingStatus = LOADING, errors = emptyList())
         return onStart {
-            editFetchResults(platform) {
-                check(it.loadingStatus != LOADING)
-                FetchTrack(LOADING, emptyList())
-            }
-        }.onEach { (platform, source, result) ->
+            fetchResults.edit { set(platform, track) }
+        }.onEach { (_, source, result) ->
             result.onFailure { error ->
-                editFetchResults(platform) {
-                    it.copy(errors = it.errors + Pair(source, error))
-                }
+                track = track.run { copy(errors = errors + Pair(source, error)) }
+                fetchResults.edit { set(platform, track) }
             }
         }.onCompletion {
-            editFetchResults(platform) {
-                it.copy(loadingStatus = if (it.errors.isEmpty()) PENDING else FAILED)
-            }
+            track = track.run { copy(loadingStatus = if (errors.isEmpty()) PENDING else FAILED) }
+            fetchResults.edit { set(platform, track) }
         }
     }
 
