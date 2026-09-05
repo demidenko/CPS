@@ -180,5 +180,5 @@ private fun CodeforcesPageContentProvider.flowOfColorTag(
             else -> emit(null)
         }
         val result = fetchResultOf { getRealColorTagOrNull(profile.handle) }
-        if (result is FetchResult.Success) emit(result.value)
+        if (result is FetchResult.Success) result.value?.let { emit(it) }
     }
