@@ -17,7 +17,6 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
-import com.demich.cps.utils.toLoadingStatus
 import com.demich.cps.utils.uniqueLaunch
 import com.demich.cps.workers.ContestsWorker
 import com.demich.kotlin_stdlib_boost.emptyEnumSet
@@ -56,7 +55,6 @@ class ContestsViewModel: ViewModel() {
     }
 
     private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
-        var lastStatus: LoadingStatus = PENDING
         return onStart {
             editFetchResults(platform) {
                 check(it.loadingStatus != LOADING)
@@ -68,9 +66,10 @@ class ContestsViewModel: ViewModel() {
                     it.copy(errors = it.errors + Pair(source, error))
                 }
             }
-            lastStatus = result.toLoadingStatus()
         }.onCompletion {
-            editFetchResults(platform) { it.copy(loadingStatus = lastStatus) }
+            editFetchResults(platform) {
+                it.copy(loadingStatus = if (it.errors.isEmpty()) PENDING else FAILED)
+            }
         }
     }
 
