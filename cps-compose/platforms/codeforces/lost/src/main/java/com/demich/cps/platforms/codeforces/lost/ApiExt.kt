@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.codeforces.lost
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
-import com.demich.cps.platforms.api.codeforces.CodeforcesApiBlogEntryNotFoundException
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 
@@ -47,15 +46,6 @@ internal fun CodeforcesApi.withBeforeGetCall(
             beforeGet()
             origin.getRecentActions(maxCount = maxCount)
         }
-    }
-}
-
-// null only if blog entry not found!
-internal suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): CodeforcesBlogEntry? {
-    return try {
-        getBlogEntry(blogEntryId = blogEntryId)
-    } catch (e: CodeforcesApiBlogEntryNotFoundException) {
-        null
     }
 }
 

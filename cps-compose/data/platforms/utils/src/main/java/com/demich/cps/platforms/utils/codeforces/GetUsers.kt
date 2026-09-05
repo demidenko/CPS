@@ -5,7 +5,7 @@ import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.fetchstate.map
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
-import com.demich.cps.platforms.api.codeforces.getUser
+import com.demich.cps.platforms.api.codeforces.getUserOrNull
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesUser
 import com.demich.cps.platforms.utils.toProfileResult
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
@@ -69,19 +69,6 @@ suspend fun CodeforcesApi.getProfiles(
 suspend fun CodeforcesApi.getProfile(handle: String, checkHistoricHandles: Boolean): ProfileResult<CodeforcesUserInfo> =
     fetchResultOf { getUserOrNull(handle = handle, checkHistoricHandles = checkHistoricHandles) }
         .toProfileResult(handle)
-
-// returns null if user not found
-suspend fun CodeforcesApi.getUserOrNull(
-    handle: String,
-    checkHistoricHandles: Boolean
-): CodeforcesUser? {
-    return try {
-        getUser(handle = handle, checkHistoricHandles = checkHistoricHandles)
-    } catch (it: CodeforcesApiUserNotFoundException) {
-        // TODO: check(it.handle == handle) ???
-        null
-    }
-}
 
 private fun FetchResult<CodeforcesUser?>.toProfileResult(handle: String): ProfileResult<CodeforcesUserInfo> =
     map { it?.toUserInfo() }.toProfileResult(userId = handle)

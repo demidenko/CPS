@@ -77,10 +77,3 @@ suspend fun CodeforcesApi.getUser(
     ).single()
 
 suspend fun CodeforcesApi.getRecentActions() = getRecentActions(maxCount = 100)
-
-suspend fun CodeforcesApi.getUserBlogEntriesRecovered(handle: String): List<CodeforcesBlogEntry> =
-    try {
-        getUserBlogEntries(handle = handle)
-    } catch (_: CodeforcesApiBlogReadNotAllowedException) {
-        emptyList()
-    }

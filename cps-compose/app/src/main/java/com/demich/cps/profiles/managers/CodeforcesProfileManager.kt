@@ -19,13 +19,13 @@ import com.demich.cps.notifications.notificationChannels
 import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiAccess
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
+import com.demich.cps.platforms.api.codeforces.getUserOrNull
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
-import com.demich.cps.platforms.utils.codeforces.getUserOrNull
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange

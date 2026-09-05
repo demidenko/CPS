@@ -2,6 +2,7 @@ package com.demich.cps.platforms.codeforces.lost
 
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.api.codeforces.getBlogEntryOrNull
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
