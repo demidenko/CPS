@@ -15,7 +15,7 @@ import com.demich.cps.contests.settings.fetchSettingsSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combineLoadingStatus
-import com.demich.cps.utils.edit
+import com.demich.cps.utils.set
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.uniqueLaunch
 import com.demich.cps.workers.ContestsWorker
@@ -49,15 +49,15 @@ class ContestsViewModel: ViewModel() {
     private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
         var track = FetchTrack(loadingStatus = LOADING, errors = emptyList())
         return onStart {
-            fetchResults.edit { set(platform, track) }
+            fetchResults.set(platform, track)
         }.onEach { (_, source, result) ->
             result.onFailure { error ->
                 track = track.run { copy(errors = errors + Pair(source, error)) }
-                fetchResults.edit { set(platform, track) }
+                fetchResults.set(platform, track)
             }
         }.onCompletion {
             track = track.run { copy(loadingStatus = if (errors.isEmpty()) PENDING else FAILED) }
-            fetchResults.edit { set(platform, track) }
+            fetchResults.set(platform, track)
         }
     }
 

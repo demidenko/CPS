@@ -16,8 +16,8 @@ import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combine
-import com.demich.cps.utils.edit
 import com.demich.cps.utils.joinAllWithProgress
+import com.demich.cps.utils.set
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.toLoadingStatus
 import kotlinx.coroutines.Dispatchers
@@ -41,10 +41,10 @@ class ProfilesViewModel: ViewModel() {
         loadingStatuses.map { it.values.combine() }
 
     private fun setLoadingStatus(manager: ProfileManager<*>, loadingStatus: LoadingStatus) =
-        loadingStatuses.edit {
-            if (loadingStatus == PENDING) remove(manager.platform)
-            else set(key = manager.platform, value = loadingStatus)
-        }
+        loadingStatuses.set(
+            key = manager.platform,
+            value = loadingStatus.takeIf { it != PENDING }
+        )
 
     fun <U: UserInfo> reload(manager: ProfileManager<U>, context: Context) {
         if (loadingStatuses.value[manager.platform] == LOADING) return

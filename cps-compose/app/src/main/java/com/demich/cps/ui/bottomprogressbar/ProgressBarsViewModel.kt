@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.utils.edit
+import com.demich.cps.utils.set
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,10 +48,7 @@ class ProgressBarsViewModel: ViewModel() {
                 delay(1.seconds)
                 send(null)
             }.collect { value ->
-                flowOfProgresses.edit {
-                    if (value == null) remove(key = id)
-                    else put(key = id, value = value)
-                }
+                flowOfProgresses.set(key = id, value = value)
             }
         }
     }
