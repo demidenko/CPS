@@ -42,7 +42,6 @@ class ContestsViewModel: ViewModel() {
             it.values
                 .filter { it.loadingStatus == FAILED }
                 .flatMap { it.errors }
-                .distinct()
         }
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
