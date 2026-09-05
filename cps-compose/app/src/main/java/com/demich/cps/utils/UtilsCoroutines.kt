@@ -21,6 +21,12 @@ import kotlin.time.Duration
 inline fun <K, V> MutableStateFlow<Map<K, V>>.edit(block: MutableMap<K, V>.() -> Unit) =
     update { it.toMutableMap().apply(block) }
 
+fun <K, V: Any> MutableStateFlow<Map<K, V>>.set(key: K, value: V?) =
+    edit {
+        if (value != null) this.set(key = key, value = value)
+        else remove(key)
+    }
+
 suspend fun <A, B> awaitPair(
     blockFirst: suspend CoroutineScope.() -> A,
     blockSecond: suspend CoroutineScope.() -> B,
