@@ -23,7 +23,8 @@ suspend fun CodeforcesApi.getBlogEntryOrNull(blogEntryId: Int): CodeforcesBlogEn
         null
     }
 
-suspend fun CodeforcesApi.getUserBlogEntriesRecovered(handle: String): List<CodeforcesBlogEntry> =
+// returns emptyList if blog read not allowed
+suspend fun CodeforcesApi.getUserBlogEntriesOrEmpty(handle: String): List<CodeforcesBlogEntry> =
     try {
         getUserBlogEntries(handle = handle)
     } catch (_: CodeforcesApiBlogReadNotAllowedException) {

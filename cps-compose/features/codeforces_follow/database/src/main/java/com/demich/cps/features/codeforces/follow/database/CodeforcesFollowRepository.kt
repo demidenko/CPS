@@ -4,7 +4,7 @@ import android.content.Context
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiUserNotFoundException
 import com.demich.cps.platforms.api.codeforces.getUser
-import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesRecovered
+import com.demich.cps.platforms.api.codeforces.getUserBlogEntriesOrEmpty
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
@@ -118,10 +118,10 @@ private suspend inline fun CodeforcesApi.getBlogEntriesRecoverHotFound(
     onChangeUserInfo: (CodeforcesUserInfo) -> Unit
 ): List<CodeforcesBlogEntry> {
     try {
-        return getUserBlogEntriesRecovered(handle = handle)
+        return getUserBlogEntriesOrEmpty(handle = handle)
     } catch (it: CodeforcesApiUserNotFoundException) {
         val user = getUser(handle = handle, checkHistoricHandles = true)
         onChangeUserInfo(user.toUserInfo())
-        return getUserBlogEntriesRecovered(handle = user.handle) // TODO: not perfect (wrap to while?)
+        return getUserBlogEntriesOrEmpty(handle = user.handle) // TODO: not perfect (wrap to while?)
     }
 }
