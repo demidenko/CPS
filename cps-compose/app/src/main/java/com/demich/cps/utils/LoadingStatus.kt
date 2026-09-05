@@ -26,7 +26,7 @@ fun Iterable<LoadingStatus>.combine(): LoadingStatus =
     combineLoadingStatus { it }
 
 fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus> =
-    derivedStateOf { map { it.value }.combine() }
+    derivedStateOf { combineLoadingStatus { it.value } }
 
 fun Iterable<Flow<LoadingStatus>>.combine(): Flow<LoadingStatus> =
     kotlinx.coroutines.flow.combine(this) { it.asIterable().combine() }

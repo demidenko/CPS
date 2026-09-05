@@ -14,7 +14,7 @@ import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.fetchSettingsSnapshot
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.combine
+import com.demich.cps.utils.combineLoadingStatus
 import com.demich.cps.utils.edit
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.uniqueLaunch
@@ -35,7 +35,7 @@ fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 class ContestsViewModel: ViewModel() {
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-        fetchResults.map { it.map { it.value.loadingStatus }.combine() }
+        fetchResults.map { it.values.combineLoadingStatus { it.loadingStatus } }
 
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
         fetchResults.map {
