@@ -39,9 +39,9 @@ class ContestsViewModel: ViewModel() {
 
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
         fetchResults.map {
-            it.values
-                .filter { it.loadingStatus == FAILED }
-                .flatMap { it.errors }
+            it.values.flatMap {
+                if (it.loadingStatus == FAILED) it.errors else emptyList()
+            }
         }
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
