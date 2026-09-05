@@ -43,11 +43,11 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
-import com.demich.cps.utils.emitAll
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
 @Composable
@@ -165,7 +165,7 @@ private class BlogLoadingViewModel: ViewModel() {
                 blogEntries.map {
                     it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
                 }
-            }.emitAll()
+            }.let { emitAll(it) }
         }
     }
 
