@@ -4,20 +4,26 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.FetchState
+import com.demich.cps.utils.LoadingStatus.FAILED
+import com.demich.cps.utils.LoadingStatus.LOADING
 import kotlinx.coroutines.flow.Flow
 
 enum class LoadingStatus {
     PENDING, LOADING, FAILED;
 }
 
-fun Iterable<LoadingStatus>.combine(): LoadingStatus {
+inline fun <T> Iterable<T>.combineLoadingStatus(transform: (T) -> LoadingStatus): LoadingStatus {
     var result: LoadingStatus = PENDING
     forEach {
-        if (it == LOADING) return LOADING
-        if (it == FAILED) result = FAILED
+        val status = transform(it)
+        if (status == LOADING) return LOADING
+        if (status == FAILED) result = FAILED
     }
     return result
 }
+
+fun Iterable<LoadingStatus>.combine(): LoadingStatus =
+    combineLoadingStatus { it }
 
 fun Iterable<State<LoadingStatus>>.combine(): State<LoadingStatus> =
     derivedStateOf { map { it.value }.combine() }
