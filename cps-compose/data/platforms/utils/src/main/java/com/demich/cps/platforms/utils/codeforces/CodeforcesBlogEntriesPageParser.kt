@@ -42,11 +42,11 @@ class CodeforcesBlogEntriesPageParser:
         }
 
         val rating: Int
-        val commentsCount: UInt
+        val commentsCount: Int
         expectFirst(evaluatorMeta).let { bottom ->
             rating = bottom.expectFirst(evaluatorLeftMeta).expectFirst(evaluatorTopicRating).text().toInt()
             val commentsItem = bottom.expectFirst(evaluatorRightMeta).expectFirst(evaluator_li2)
-            commentsCount = commentsItem.expectFirst(evaluator_a1).text().toUInt()
+            commentsCount = commentsItem.expectFirst(evaluator_a1).text().toInt()
         }
 
         return CodeforcesWebBlogEntry(

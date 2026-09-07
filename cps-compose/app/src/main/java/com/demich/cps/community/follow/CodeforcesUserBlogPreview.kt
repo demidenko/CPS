@@ -64,7 +64,7 @@ fun CodeforcesUserBlogPreview(
 fun CodeforcesUserBlogPreview(
     modifier: Modifier = Modifier,
     profile: ProfileResult<CodeforcesUserInfo>,
-    blogEntriesCount: UInt?
+    blogEntriesCount: Int?
 ) {
     Column(
         modifier = modifier,
@@ -116,7 +116,7 @@ private fun UserHandle(
 
 @Composable
 private fun BlogEntryCount(
-    count: UInt,
+    count: Int,
     iconSize: TextUnit,
     fontSize: TextUnit,
     modifier: Modifier = Modifier

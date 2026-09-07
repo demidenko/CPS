@@ -10,7 +10,7 @@ data class CodeforcesWebBlogEntry(
     val author: CodeforcesHandle,
     val creationTime: Instant,
     val rating: Int,
-    val commentsCount: UInt?
+    val commentsCount: Int?
 )
 
 fun CodeforcesBlogEntry.extractTitle(): String =

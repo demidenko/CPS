@@ -114,7 +114,7 @@ private fun BlogEntryInfo(
     title: String,
     authorHandle: AnnotatedString,
     rating: Int,
-    commentsCount: UInt?,
+    commentsCount: Int?,
     timeAgo: String,
     markNew: Boolean,
     modifier: Modifier = Modifier,
@@ -168,7 +168,7 @@ private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
     timeAgo: String,
     rating: Int,
-    commentsCount: UInt?,
+    commentsCount: Int?,
     label: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier
 ) {
