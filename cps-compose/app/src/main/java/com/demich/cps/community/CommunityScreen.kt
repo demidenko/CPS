@@ -8,6 +8,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.community.settings.codeforcesScreenSettings
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen

@@ -33,8 +33,10 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val enabledNewsFeeds = itemEnumSet<CommunityNewsFeed>(name = "news_feeds")
 
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
+}
 
-    val codeforcesScreenSettings = combine {
+val CommunitySettingsDataStore.codeforcesScreenSettings
+    get() = combine {
         CommunityCodeforcesScreenSettings(
             defaultTab = codeforcesDefaultTab.value,
             followEnabled = codeforcesFollowEnabled.value,
@@ -42,7 +44,6 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
             renderAllTabs = renderAllTabs.value
         )
     }
-}
 
 data class CommunityCodeforcesScreenSettings(
     val defaultTab: CodeforcesTab,
