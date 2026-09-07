@@ -99,12 +99,15 @@ private fun tabColor(
     val l: Float = selectedIndex + selectedOffset
     val r: Float = l + 1
     val i = index.toFloat()
-    if (i <= r && l <= i + 1) return lerp(
-        start = unselectedTextColor,
-        stop = selectedTextColor,
-        fraction = min(r, i+1) - max(l, i)
-    )
-    return unselectedTextColor
+    return if (i <= r && l <= i + 1) {
+        lerp(
+            start = unselectedTextColor,
+            stop = selectedTextColor,
+            fraction = min(r, i+1) - max(l, i)
+        )
+    } else {
+        unselectedTextColor
+    }
 }
 
 //copy from accompanist
