@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.bottomBarSpecs
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
