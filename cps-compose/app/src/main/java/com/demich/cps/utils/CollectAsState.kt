@@ -64,3 +64,9 @@ fun <T: Any> Flow<T>.collectUntilFirst(): State<T?> =
     produceState(initialValue = null) {
         value = first()
     }
+
+@Composable
+fun <T: Any> DataStoreValue<T>.collectUntilFirst(): State<T?> =
+    produceState(initialValue = null) {
+        value = invoke()
+    }
