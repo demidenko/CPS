@@ -71,6 +71,10 @@ fun ProvideContentColor(color: Color, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalContentColor provides color, content = content)
 }
 
+inline fun <T> State<T>.onNotNull(block: (T & Any) -> Unit) {
+    value?.let(block)
+}
+
 inline fun <reified T> Json.asSaver() =
     Saver<T, String>(
         restore = ::decodeFromString,
