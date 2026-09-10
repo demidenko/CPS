@@ -198,7 +198,7 @@ fun CPSAskDialog(
 fun <T> CPSDialogSelect(
     title: String,
     options: Iterable<T>,
-    selectedOption: T,
+    initSelected: T,
     optionTitle: @Composable (T) -> Unit,
     onDismissRequest: () -> Unit,
     onSelectOption: (T) -> Unit
@@ -216,7 +216,7 @@ fun <T> CPSDialogSelect(
             options.forEach { option ->
                 CPSRadioButtonTitled(
                     title = { optionTitle(option) },
-                    selected = option == selectedOption,
+                    selected = option == initSelected,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     onSelectOption(option)

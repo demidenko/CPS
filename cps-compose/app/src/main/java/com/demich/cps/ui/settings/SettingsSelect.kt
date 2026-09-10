@@ -17,7 +17,7 @@ import com.demich.cps.ui.dialogs.CPSDialogSelect
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.rememberFirstValue
+import com.demich.cps.utils.collectUntilFirst
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ fun <T> Select(
         CPSDialogSelect(
             title = title,
             options = options,
-            selectedOption = selectedOption,
+            initSelected = selectedOption,
             optionTitle = optionTitle,
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
@@ -70,9 +70,6 @@ fun <T> SelectSubtitled(
     onOptionSaved: suspend (T) -> Unit,
     optionTitle: @Composable (T) -> Unit
 ) {
-    val scope = backgroundCoroutineScope
-    val selectedOption by collectItemAsState { item }
-
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
 
     SubtitledByValue(
@@ -83,10 +80,12 @@ fun <T> SelectSubtitled(
     )
 
     if (showChangeDialog) {
+        val scope = backgroundCoroutineScope
+        val selectedOption by collectItemAsState { item }
         CPSDialogSelect(
             title = title,
             options = options,
-            selectedOption = selectedOption,
+            initSelected = selectedOption,
             optionTitle = optionTitle,
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
@@ -127,8 +126,6 @@ fun <T: Enum<T>> MultiSelectEnum(
     onNewSelected: suspend (Set<T>) -> Unit,
     optionContent: @Composable (T) -> Unit = { Text(text = optionName(it)) }
 ) {
-    val scope = backgroundCoroutineScope
-
     var showChangeDialog by rememberSaveable { mutableStateOf(false) }
 
     SubtitledByValue(
@@ -143,19 +140,22 @@ fun <T: Enum<T>> MultiSelectEnum(
     }
 
     if (showChangeDialog) {
-        val selected = rememberFirstValue { item }
-        CPSDialogMultiSelectEnum(
-            title = title,
-            options = options,
-            initSelected = selected,
-            optionContent = optionContent,
-            onDismissRequest = { showChangeDialog = false },
-            onSaveSelected = {
-                scope.launch {
-                    item.setValue(it)
-                    onNewSelected(it - selected)
+        val selectedState = item.collectUntilFirst()
+        selectedState.value?.let { selected ->
+            val scope = backgroundCoroutineScope
+            CPSDialogMultiSelectEnum(
+                title = title,
+                options = options,
+                initSelected = selected,
+                optionContent = optionContent,
+                onDismissRequest = { showChangeDialog = false },
+                onSaveSelected = {
+                    scope.launch {
+                        item.setValue(it)
+                        onNewSelected(it - selected)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
