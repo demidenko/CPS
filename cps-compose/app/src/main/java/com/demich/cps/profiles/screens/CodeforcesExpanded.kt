@@ -162,9 +162,8 @@ private fun UpsolvingSuggestionsList(
                 .clickable {
                     uriHandler.openUri(CodeforcesUrls.problem(contestId = it.contestId, problemIndex = it.index))
                 }
-                .padding(horizontal = 2.dp)
-                .padding(vertical = 4.dp)
                 .fillMaxWidth()
+                .padding(horizontal = 2.dp, vertical = 4.dp)
         )
         Divider()
     }
