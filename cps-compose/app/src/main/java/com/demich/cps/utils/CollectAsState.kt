@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.annotation.RememberInComposition
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.datastore_itemized.DataStoreValue
@@ -57,3 +58,9 @@ inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>
 @Composable
 inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T =
     remember { block().getValueBlocking() }
+
+@Composable
+fun <T: Any> Flow<T>.collectUntilFirst(): State<T?> =
+    produceState(initialValue = null) {
+        value = first()
+    }
