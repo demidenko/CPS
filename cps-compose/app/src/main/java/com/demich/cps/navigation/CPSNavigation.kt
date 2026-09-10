@@ -35,6 +35,7 @@ import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
 import com.demich.cps.utils.jsonCPS
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.writeOnlyProperty
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -144,7 +145,7 @@ class CPSNavigator(
         val startScreenItem = remember { StartScreenDataStore(context).startRootScreen }
         val startScreenState = startScreenItem.collectUntilFirst()
 
-        startScreenState.value?.let { startScreen ->
+        startScreenState.onNotNull { startScreen ->
             androidx.navigation.compose.NavHost(
                 navController = navController,
                 startDestination = startScreen,

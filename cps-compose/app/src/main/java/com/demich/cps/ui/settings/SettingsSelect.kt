@@ -18,6 +18,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.collectUntilFirst
+import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.launch
@@ -141,7 +142,7 @@ fun <T: Enum<T>> MultiSelectEnum(
 
     if (showChangeDialog) {
         val selectedState = item.collectUntilFirst()
-        selectedState.value?.let { selected ->
+        selectedState.onNotNull { selected ->
             val scope = backgroundCoroutineScope
             CPSDialogMultiSelectEnum(
                 title = title,

@@ -25,6 +25,7 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,7 +73,7 @@ private fun <U: UserInfo> ProfileExpandedContent(
     val context = context
     val state = collectItemAsState { manager.profileStorage(context).profile }
 
-    state.value?.let { profile ->
+    state.onNotNull { profile ->
         manager.ExpandedContent(
             profileResult = profile,
             setBottomBarContent = setBottomBarContent,
