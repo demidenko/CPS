@@ -31,10 +31,10 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundColor
+import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getValue
 import com.demich.cps.utils.jsonCPS
-import com.demich.cps.utils.rememberFirstValue
 import com.demich.cps.utils.writeOnlyProperty
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -142,16 +142,18 @@ class CPSNavigator(
     ) {
         val context = context
         val startScreenItem = remember { StartScreenDataStore(context).startRootScreen }
-        val startScreen: Screen = rememberFirstValue { startScreenItem }
+        val startScreenState = startScreenItem.collectUntilFirst()
 
-        androidx.navigation.compose.NavHost(
-            navController = navController,
-            startDestination = startScreen,
-            modifier = modifier.fillMaxSize(),
-            enterTransition = { fadeIn(tween(500)) },
-            exitTransition = { fadeOut(tween(500)) },
-            builder = builder
-        )
+        startScreenState.value?.let { startScreen ->
+            androidx.navigation.compose.NavHost(
+                navController = navController,
+                startDestination = startScreen,
+                modifier = modifier.fillMaxSize(),
+                enterTransition = { fadeIn(tween(500)) },
+                exitTransition = { fadeOut(tween(500)) },
+                builder = builder
+            )
+        }
 
         LaunchedEffect(startScreenItem) {
             flowOfCurrentScreen()
