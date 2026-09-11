@@ -65,14 +65,15 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.context
 import com.demich.cps.utils.drawRoundRectWithBorderInside
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.formatDropSeconds
 import com.demich.cps.utils.formatExecTime
-import com.demich.cps.utils.getValueBlocking
 import com.demich.cps.utils.localCurrentTime
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.workers.CPSOneTimeWork
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CPSWork
@@ -512,23 +513,27 @@ private fun CPSColors.colorFor(result: CPSWorker.ResultType?): Color =
 @Composable
 private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int) -> Unit) {
     val context = context
-    var contestId: String by rememberSaveable {
-        val args = CodeforcesMonitorDataStore(context).args.getValueBlocking()
-        mutableStateOf(value = args?.contestId?.toString() ?: "")
-    }
 
-    CPSYesNoDialog(
-        onDismissRequest = onDismissRequest,
-        onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
-        title = {
-            TextField(
-                value = contestId,
-                onValueChange = { contestId = it },
-                label = { Text("contestId") },
-                isError = contestId.toIntOrNull() == null
-            )
-        }
-    )
+    val initIdState = remember {
+        CodeforcesMonitorDataStore(context).args.asFlow().map { it?.contestId?.toString() ?: "" }
+    }.collectUntilFirst()
+
+    initIdState.onNotNull { initContestId ->
+        var contestId: String by rememberSaveable { mutableStateOf(value = initContestId) }
+
+        CPSYesNoDialog(
+            onDismissRequest = onDismissRequest,
+            onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
+            title = {
+                TextField(
+                    value = contestId,
+                    onValueChange = { contestId = it },
+                    label = { Text("contestId") },
+                    isError = contestId.toIntOrNull() == null
+                )
+            }
+        )
+    }
 }
 
 private fun List<CPSWorker.ExecutionEvent>.sumOfDurations(): Duration =
