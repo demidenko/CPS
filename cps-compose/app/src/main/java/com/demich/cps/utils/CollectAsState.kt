@@ -61,7 +61,7 @@ inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T
 
 @Composable
 fun <T: Any> Flow<T>.collectUntilFirst(): State<T?> =
-    produceState(initialValue = null) {
+    produceState(initialValue = null, key1 = this) {
         value = first()
     }
 
