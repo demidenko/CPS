@@ -48,8 +48,8 @@ val UISettingsDataStore.uiColorSpecs get() = combine {
     )
 }
 
-val UISettingsDataStore.bottomBarSpecs get() = combine {
-    CPSBottomBarSpecs(
+val UISettingsDataStore.bottomNavBarSpecs get() = combine {
+    CPSBottomNavBarSpecs(
         devModeEnabled = devModeEnabled.value,
         layoutType = navigationLayoutType.value
     )
@@ -60,7 +60,7 @@ data class CPSUIColorSpecs(
     val useOriginalColors: Boolean
 )
 
-data class CPSBottomBarSpecs(
+data class CPSBottomNavBarSpecs(
     val devModeEnabled: Boolean,
     val layoutType: NavigationLayoutType
 )
