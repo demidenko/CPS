@@ -140,11 +140,8 @@ private fun ContestsContent(
     viewState: ContestsListViewState,
     filterState: FilterState
 ) {
-    val errorsMessage by loadingErrorsMessageState()
-
     Column {
         LoadingError(
-            errorsMessage = { errorsMessage },
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -278,10 +275,9 @@ internal fun Modifier.contestItemPaddings() =
 
 @Composable
 private fun ColumnScope.LoadingError(
-    errorsMessage: () -> String,
     modifier: Modifier = Modifier
 ) {
-    val message = errorsMessage()
+    val message by loadingErrorsMessageState()
     AnimatedVisibility(visible = message.isNotBlank()) {
         Text(
             text = message,
