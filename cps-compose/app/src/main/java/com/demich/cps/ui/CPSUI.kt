@@ -145,13 +145,13 @@ fun CPSIconButton(
 
 @Composable
 fun CPSReloadingButton(
-    loadingStatus: LoadingStatus,
+    loadingStatus: LoadingStatus?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     IconButton(
-        enabled = enabled && loadingStatus != LOADING,
+        enabled = enabled && loadingStatus != LOADING && loadingStatus != null,
         modifier = modifier,
         onClick = onClick
     ) {
