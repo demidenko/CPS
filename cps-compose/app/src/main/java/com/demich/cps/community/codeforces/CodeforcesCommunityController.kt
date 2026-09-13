@@ -18,7 +18,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostRecentWorker
@@ -127,8 +126,8 @@ class CodeforcesCommunityController(
 }
 
 @Composable
-fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus> =
-    collectAsState { flowOfLoadingStatus() }
+fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus?> =
+    remember(this) { flowOfLoadingStatus() }.collectAsState(initial = null)
 
 @Composable
 fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
