@@ -31,7 +31,7 @@ import com.demich.cps.ui.theme.cpsColors
 
 @Composable
 internal fun CodeforcesRecentBlogEntries(
-    recent: () -> List<CodeforcesRecentCommentsOfBlogEntry>,
+    recent: List<CodeforcesRecentCommentsOfBlogEntry>,
     modifier: Modifier = Modifier,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
     menuBuilder: @Composable CPSDropdownMenuScope.(CodeforcesRecentCommentsOfBlogEntry) -> Unit

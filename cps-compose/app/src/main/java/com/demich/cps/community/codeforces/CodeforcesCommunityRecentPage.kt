@@ -41,10 +41,8 @@ fun CodeforcesCommunityRecentPage(
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntry = type.blogEntry
                 RecentCommentsInBlogEntry(
-                    recentComments = {
-                        grouped.firstOrNull { it.blogEntry.id == blogEntry.id }
-                            ?: CodeforcesRecentCommentsOfBlogEntry(blogEntry = blogEntry, comments = emptyList())
-                    },
+                    recentComments = grouped.firstOrNull { it.blogEntry.id == blogEntry.id }
+                        ?: CodeforcesRecentCommentsOfBlogEntry(blogEntry = blogEntry, comments = emptyList()),
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
                     onClose = { controller.recentPageType = RecentPageType.RecentFeed },
                     modifier = Modifier.fillMaxSize()
@@ -54,7 +52,7 @@ fun CodeforcesCommunityRecentPage(
             RecentPageType.RecentComments -> {
                 saveableStateHolder.SaveableStateProvider(key = true) {
                     CodeforcesComments(
-                        comments = { recent.comments },
+                        comments = recent.comments,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -64,7 +62,7 @@ fun CodeforcesCommunityRecentPage(
                 saveableStateHolder.SaveableStateProvider(key = false) {
                     val uriHandler = LocalUriHandler.current
                     RecentBlogEntriesPage(
-                        recent = { grouped },
+                        recent = grouped,
                         modifier = Modifier.fillMaxSize(),
                         onBrowseComment = { blogEntry, comment ->
                             uriHandler.openUri(CodeforcesUrls.comment(blogEntryId = blogEntry.id, commentId = comment.id))
@@ -83,7 +81,7 @@ fun CodeforcesCommunityRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    recent: () -> List<CodeforcesRecentCommentsOfBlogEntry>,
+    recent: List<CodeforcesRecentCommentsOfBlogEntry>,
     modifier: Modifier = Modifier,
     onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesWebComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
@@ -108,7 +106,7 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    recentComments: () -> CodeforcesRecentCommentsOfBlogEntry,
+    recentComments: CodeforcesRecentCommentsOfBlogEntry,
     isTabVisible: () -> Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -118,7 +116,7 @@ private fun RecentCommentsInBlogEntry(
         onBackPressed = onClose
     ) {
         RecentCommentsInBlogEntry(
-            recentComments = recentComments(),
+            recentComments = recentComments,
             modifier = modifier
         )
     }
@@ -140,7 +138,7 @@ private fun RecentCommentsInBlogEntry(
         )
         Divider()
         CodeforcesComments(
-            comments = { comments },
+            comments = comments,
             showTitle = false,
             modifier = Modifier.fillMaxSize()
         )

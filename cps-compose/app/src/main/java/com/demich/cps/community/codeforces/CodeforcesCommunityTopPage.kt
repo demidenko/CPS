@@ -52,7 +52,7 @@ private fun CodeforcesCommunityTopBlogEntries(
     val blogEntries by controller.flowOfTopBlogEntries(context).collectAsStateWithLifecycle()
 
     CodeforcesBlogEntriesFollowAddable(
-        blogEntries = { blogEntries },
+        blogEntries = blogEntries,
         newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()
@@ -66,7 +66,7 @@ private fun CodeforcesCommunityTopComments(
     val context = context
     val comments by controller.flowOfTopComments(context).collectAsState()
     CodeforcesComments(
-        comments = { comments },
+        comments = comments,
         modifier = Modifier.fillMaxSize()
     )
 }

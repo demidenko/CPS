@@ -37,7 +37,7 @@ private fun CodeforcesCommunityMainList(
     val blogEntries by controller.flowOfMainBlogEntries(context).collectAsStateWithLifecycle()
 
     CodeforcesBlogEntriesFollowAddable(
-        blogEntries = { blogEntries },
+        blogEntries = blogEntries,
         newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize()

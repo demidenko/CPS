@@ -141,14 +141,14 @@ private fun UpsolvingSuggestionsList(
     val context = context
     val uriHandler = LocalUriHandler.current
 
-    val problemsState = collectAsStateWithLifecycle {
+    val problems by collectAsStateWithLifecycle {
         CodeforcesProfileManager().profileStorage(context)
             .upsolvingSuggestedProblems.asFlow()
             .map { it.valuesSortedByTime().asReversed() }
     }
 
     LazyColumnOfData(
-        items = problemsState::value,
+        items = problems,
         key = { it.problemId },
         modifier = modifier
     ) {

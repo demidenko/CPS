@@ -136,7 +136,7 @@ private fun BlogEntriesBox(
         modifier = modifier
     ) { blogEntries ->
         CodeforcesBlogEntries(
-            blogEntries = { blogEntries },
+            blogEntries = blogEntries,
             newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
             scrollBarEnabled = true,
             scrollUpButtonEnabled = true,

@@ -46,7 +46,7 @@ private fun CommunityFollowScreen(
 
     ProvideSystemTimeEachMinute {
         CodeforcesFollowList(
-            userBlogs = { userBlogs },
+            userBlogs = userBlogs,
             isRefreshing = { loadingStatusState.value == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { blogId ->
@@ -77,7 +77,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: () -> List<CodeforcesUserBlogInfo>,
+    userBlogs: List<CodeforcesUserBlogInfo>,
     isRefreshing: () -> Boolean,
     onOpenBlog: (Long) -> Unit,
     onDeleteUser: (Long) -> Unit,

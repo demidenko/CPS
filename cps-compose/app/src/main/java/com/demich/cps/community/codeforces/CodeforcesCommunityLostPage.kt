@@ -50,7 +50,7 @@ fun CodeforcesCommunityLostPage(
     val blogEntries by collectAsStateWithLifecycle { controller.flowOfLostBlogEntries(context) }
 
     CodeforcesBlogEntriesFollowAddable(
-        blogEntries = { blogEntries },
+        blogEntries = blogEntries,
         newEntriesState = codeforcesNewEntriesState,
         lazyListState = listState,
         modifier = Modifier.fillMaxSize(),

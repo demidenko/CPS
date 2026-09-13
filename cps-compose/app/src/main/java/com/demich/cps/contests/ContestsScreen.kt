@@ -183,7 +183,7 @@ private fun ContestsPager(
         val page = viewState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
-                contests = { contestsState.value.sublist(page) },
+                contests = contestsState.value.sublist(page),
                 viewState = viewState,
                 filterState = filterState,
                 modifier = modifier
@@ -209,7 +209,7 @@ private fun List<Contest>.filterBy(state: FilterState) =
 
 @Composable
 private fun ContestsPage(
-    contests: () -> List<Contest>,
+    contests: List<Contest>,
     viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
@@ -219,12 +219,12 @@ private fun ContestsPage(
 
     val filtered: List<Contest> by remember(contests, filterState) {
         derivedStateOf {
-            contests().filterBy(filterState)
+            contests.filterBy(filterState)
         }
     }
 
     ContestsColumn(
-        contests = { filtered },
+        contests = filtered,
         viewState = viewState,
         modifier = modifier,
         onDeleteRequest = { contest ->
@@ -238,7 +238,7 @@ private fun ContestsPage(
 
 @Composable
 private fun ContestsColumn(
-    contests: () -> List<Contest>,
+    contests: List<Contest>,
     viewState: ContestsListViewState,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier

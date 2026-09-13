@@ -27,7 +27,7 @@ fun <T> LazyColumnOfData(
     scrollBarEnabled: Boolean = true,
     scrollUpButtonEnabled: Boolean = false,
     autoScrollPredicate: (LazyListItemInfo, LazyListItemInfo) -> Boolean = { prev, cur -> prev.index == 0 && prev.offset == 0 },
-    items: () -> List<T>,
+    items: List<T>,
     key: ((item: T) -> Any)? = null,
     contentType: (item: T) -> Any? = { null },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
@@ -39,7 +39,7 @@ fun <T> LazyColumnOfData(
             modifier = Modifier.fillMaxSize()
         ) {
             itemsNotEmpty(
-                items = items(),
+                items = items,
                 onEmptyMessage = { Text(text = "List is empty") },
                 key = key,
                 itemContent = itemContent,

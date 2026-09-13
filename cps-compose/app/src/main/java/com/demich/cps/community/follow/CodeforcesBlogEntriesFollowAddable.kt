@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CodeforcesBlogEntriesFollowAddable(
-    blogEntries: () -> List<CodeforcesWebBlogEntry>,
+    blogEntries: List<CodeforcesWebBlogEntry>,
     newEntriesState: CodeforcesNewEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,

@@ -39,7 +39,7 @@ import com.demich.cps.utils.plusIf
 
 @Composable
 fun CodeforcesBlogEntries(
-    blogEntries: () -> List<CodeforcesWebBlogEntry>,
+    blogEntries: List<CodeforcesWebBlogEntry>,
     newEntriesState: CodeforcesNewEntriesState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
