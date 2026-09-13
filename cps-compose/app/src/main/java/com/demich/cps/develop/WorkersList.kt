@@ -408,9 +408,14 @@ private fun WorkerDialog(
                     )
                 }
 
-                val info by collectAsStateWithLifecycle { work.flowOfInfo() }
-                info.forEach { (key, value) ->
-                    Text(text = "$key: $value", fontSize = 12.sp)
+                val infoState = remember(work.name) {
+                    work.flowOfInfo()
+                }.collectAsStateWithLifecycle(initialValue = null)
+
+                infoState.onNotNull { info ->
+                    info.forEach { (key, value) ->
+                        Text(text = "$key: $value", fontSize = 12.sp)
+                    }
                 }
             }
         }
