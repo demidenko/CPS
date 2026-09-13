@@ -70,3 +70,9 @@ fun <T: Any> DataStoreValue<T>.collectUntilFirst(): State<T?> =
     produceState(initialValue = null) {
         value = invoke()
     }
+
+@Composable
+fun <T: Any> suspendAsState(block: suspend () -> T): State<T?> =
+    produceState(initialValue = null) { //key1 = block????
+        value = block()
+    }
