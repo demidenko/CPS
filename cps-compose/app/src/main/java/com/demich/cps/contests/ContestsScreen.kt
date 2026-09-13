@@ -360,7 +360,7 @@ private fun contestsBottomBarBuilder(
     viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
-    loadingStatus: () -> LoadingStatus,
+    loadingStatus: () -> LoadingStatus?,
     onReloadClick: () -> Unit
 ): AdditionalBottomBarBuilder = {
     if (anyPlatformEnabled) {
@@ -403,7 +403,7 @@ private fun ContestsPageSwitchButton(
 
 
 @Composable
-private fun ContestsViewModel.combinedLoadingStatusState(): State<LoadingStatus> {
+private fun ContestsViewModel.combinedLoadingStatusState(): State<LoadingStatus?> {
     val context = context
     return remember(this) {
         flowOfLoadingStatus()
@@ -411,7 +411,7 @@ private fun ContestsViewModel.combinedLoadingStatusState(): State<LoadingStatus>
                 if (workInfo.isRunning) LOADING
                 else loadingStatus
             }
-    }.collectAsStateWithLifecycle(initialValue = PENDING)
+    }.collectAsStateWithLifecycle(initialValue = null)
 }
 
 @Composable
