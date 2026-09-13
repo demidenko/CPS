@@ -127,7 +127,7 @@ class CodeforcesCommunityController(
 
 @Composable
 fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus?> =
-    remember(this) { flowOfLoadingStatus() }.collectAsState(initial = null)
+    remember { flowOfLoadingStatus() }.collectAsState(initial = null)
 
 @Composable
 fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
