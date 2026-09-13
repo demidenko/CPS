@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesDataStore
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -33,8 +34,8 @@ import com.demich.cps.ui.bottomprogressbar.ProgressBarInfo
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.workers.CPSWorkersDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -83,27 +84,33 @@ private fun NewEntriesCfInfo(
     modifier: Modifier = Modifier
 ) {
     val context = context
-    val count by collectAsState {
+
+    val state = remember {
         CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow().map { it.size }
+    }.collectAsStateWithLifecycle(initialValue = null)
+
+    state.onNotNull { count ->
+        InfoText(
+            modifier = modifier,
+            text = "cf new entries: $count"
+        )
     }
-    InfoText(
-        modifier = modifier,
-        text = "cf new entries: $count"
-    )
 }
 
 @Composable
 private fun WorkersEventsInfo(modifier: Modifier = Modifier) {
     val context = context
-    val count by collectAsState {
-        CPSWorkersDataStore(context).executions.asFlow().map {
-            it.values.sumOf { it.size }
-        }
+
+    val state = remember {
+        CPSWorkersDataStore(context).executions.asFlow().map { it.values.sumOf { it.size } }
+    }.collectAsStateWithLifecycle(initialValue = null)
+
+    state.onNotNull { count ->
+        InfoText(
+            modifier = modifier,
+            text = "work events: $count"
+        )
     }
-    InfoText(
-        modifier = modifier,
-        text = "work events: $count"
-    )
 }
 
 @Composable
