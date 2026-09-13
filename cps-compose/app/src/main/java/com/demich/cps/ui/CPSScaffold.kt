@@ -31,6 +31,8 @@ import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.backgroundColor
+import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.context
 import com.demich.cps.utils.ifThen
 
 @Stable
@@ -128,8 +130,14 @@ private fun BottomBarAndNavBar(
     onEnableBottomBarSettings: () -> Unit,
     additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
+    val context = context
+    // TODO: start collect with null
+    val specs by collectItemAsState { context.settingsUI.bottomNavBarSpecs }
+
     val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
+
     val enabled = bottomBarEnabled()
+
     Box(
         modifier = modifier
             .backgroundColor {
@@ -147,6 +155,7 @@ private fun BottomBarAndNavBar(
                 onEnableSettings = onEnableBottomBarSettings,
                 onDisableSettings = onDisableBottomBarSettings,
                 backgroundColor = { backgroundColor },
+                specs = specs,
                 modifier = Modifier
                     .fillMaxWidth()
             )

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,15 +27,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.Screen
+import com.demich.cps.ui.CPSBottomNavBarSpecs
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.bottomNavBarSpecs
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.switchAnimationSpec
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundColor
-import com.demich.cps.utils.collectItemAsState
-import com.demich.cps.utils.context
 import com.demich.cps.utils.ignoreInputEvents
 
 typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
@@ -50,6 +46,7 @@ fun CPSBottomBar(
     onEnableSettings: () -> Unit,
     onDisableSettings: () -> Unit,
     backgroundColor: () -> Color,
+    specs: CPSBottomNavBarSpecs,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -77,6 +74,7 @@ fun CPSBottomBar(
             additionalContent = additionalContent,
             settingsEnabled = settingsEnabled,
             onEnableSettings = onEnableSettings,
+            specs = specs,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(CPSDefaults.bottomBarHeight)
@@ -91,6 +89,7 @@ private fun BottomBarRow(
     additionalContent: () -> AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
+    specs: CPSBottomNavBarSpecs,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -107,7 +106,8 @@ private fun BottomBarRow(
             selectedRootScreen = selectedRootScreen,
             onNavigateToScreen = onNavigateToScreen,
             settingsEnabled = settingsEnabled,
-            onEnableSettings = onEnableSettings
+            onEnableSettings = onEnableSettings,
+            specs = specs
         )
     }
 }
@@ -118,13 +118,9 @@ private fun BottomBarBodyMain(
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
+    specs: CPSBottomNavBarSpecs,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    // TODO: move out
-    // TODO: start collect with null
-    val specs by collectItemAsState { context.settingsUI.bottomNavBarSpecs }
-
     val rootScreens = remember(specs.devModeEnabled) {
         buildList {
             add(Screen.Profiles)
