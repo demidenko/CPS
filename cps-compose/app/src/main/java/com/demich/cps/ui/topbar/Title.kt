@@ -82,14 +82,14 @@ private fun rememberTitleCharsState(
             .collect { cur ->
                 val (prev, prevIds) = value
                 val prefix = cur.commonPrefixLengthWith(prev)
-                val ids = Array(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
+                val ids = MutableList(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
                 subsetIndices(
                     a = prev.substring(startIndex = prefix),
                     b = cur.substring(startIndex = prefix)
                 ) { i, j ->
                     ids[prefix + j] = prevIds[prefix + i]
                 }
-                value = TitleChars(title = cur, ids = ids.asList())
+                value = TitleChars(title = cur, ids = ids)
             }
     }
 
