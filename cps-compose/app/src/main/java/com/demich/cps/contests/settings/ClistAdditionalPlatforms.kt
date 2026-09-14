@@ -56,7 +56,7 @@ internal fun ClistAdditionalResourcesDialog(
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     val uuidState = rememberUUIDState()
 
-    val fetchState = viewModel
+    val fetchState by viewModel
         .flowOfFetchResources(settings = settings, key = uuidState.value)
         .collectAsState()
 
@@ -67,7 +67,7 @@ internal fun ClistAdditionalResourcesDialog(
         onDismissRequest = onDismissRequest
     ) {
         DialogContent(
-            fetchState = fetchState::value,
+            fetchState = fetchState,
             onFetchRetry = uuidState::reset,
             selected = selected,
             onSelectResource = {
@@ -82,7 +82,7 @@ internal fun ClistAdditionalResourcesDialog(
 
 @Composable
 private fun ColumnScope.DialogContent(
-    fetchState: () -> FetchState<List<ClistResource>>,
+    fetchState: FetchState<List<ClistResource>>,
     onFetchRetry: () -> Unit,
     selected: List<ClistResource>,
     onSelectResource: (ClistResource) -> Unit,

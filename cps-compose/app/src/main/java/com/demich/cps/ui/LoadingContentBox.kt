@@ -20,20 +20,20 @@ import com.demich.cps.utils.ProvideContentColor
 @Composable
 fun <T> LoadingContentBox(
     modifier: Modifier = Modifier,
-    fetchState: () -> FetchState<T>,
+    fetchState: FetchState<T>,
     failedText: (Throwable) -> String,
     onRetry: (() -> Unit)? = null,
     content: @Composable (T) -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        when (val it = fetchState()) {
+        when (fetchState) {
             is FetchResult.Success -> {
-                content(it.value)
+                content(fetchState.value)
             }
             is FetchResult.Failure -> {
                 FailedContent {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = failedText(it.exception))
+                        Text(text = failedText(fetchState.exception))
                         if (onRetry != null) RetryButton(onClick = onRetry)
                     }
                 }

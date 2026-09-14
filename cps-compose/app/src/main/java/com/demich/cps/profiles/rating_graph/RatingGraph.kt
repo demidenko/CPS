@@ -64,7 +64,7 @@ fun RatingGraph(
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
     LoadingContentBox(
-        fetchState = ratingChanges,
+        fetchState = ratingChanges(),
         onRetry = onRetry,
         failedText = { it.niceMessage ?: "Failed to get rating history" },
         modifier = modifier

@@ -79,7 +79,7 @@ private fun CodeforcesUserBlogScreen(
     val uuidState = rememberUUIDState()
 
     val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
-    val blogEntriesState = flow.collectAsState()
+    val blogEntries by flow.collectAsState()
 
     val userBlogInfo by collectAsStateWithLifecycle {
         context.followRepository.flowOfUserBlogInfo(blogId = blogId)
@@ -87,7 +87,7 @@ private fun CodeforcesUserBlogScreen(
 
     CodeforcesUserBlogScreen(
         userBlogInfo = userBlogInfo,
-        blogEntries = blogEntriesState::value,
+        blogEntries = blogEntries,
         onRetry = uuidState::reset,
         filterState = filterState
     )
@@ -102,7 +102,7 @@ private fun CodeforcesUserBlogScreen(
 @Composable
 private fun CodeforcesUserBlogScreen(
     userBlogInfo: CodeforcesUserBlogInfo?,
-    blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
+    blogEntries: FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
@@ -115,7 +115,7 @@ private fun CodeforcesUserBlogScreen(
         }
         Divider()
         BlogEntriesBox(
-            blogEntries = { blogEntries().map { it.filterBy(filterState) } },
+            blogEntries = blogEntries.map { it.filterBy(filterState) },
             onRetry = onRetry,
             modifier = Modifier.fillMaxWidth().weight(1f)
         )
@@ -128,7 +128,7 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun BlogEntriesBox(
-    blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
+    blogEntries: FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
