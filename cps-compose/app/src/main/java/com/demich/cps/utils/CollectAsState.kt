@@ -20,9 +20,9 @@ fun <T> Flow<T>.firstBlocking(): T =
         else -> runBlocking { first() }
     }
 
-@RememberInComposition
-fun <T> DataStoreValue<T>.getValueBlocking(): T =
-    runBlocking { invoke() }
+@Composable
+inline fun <T> rememberRunBlocking(crossinline block: suspend () -> T): T =
+    remember { runBlocking { block() } }
 
 @Composable
 inline fun <T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
@@ -40,7 +40,7 @@ inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): St
 inline fun <T> collectItemAsState(
     crossinline block: () -> DataStoreValue<T>
 ): State<T> =
-    remember { block().run { asFlow() to getValueBlocking() } }.let { (flow, value) ->
+    rememberRunBlocking { block().run { asFlow() to invoke() } }.let { (flow, value) ->
         flow.collectAsState(initial = value)
     }
 
@@ -57,7 +57,7 @@ inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>
 
 @Composable
 inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T =
-    remember { block().getValueBlocking() }
+    rememberRunBlocking { block().invoke() }
 
 @Composable
 fun <T: Any> Flow<T>.collectUntilFirst(): State<T?> =
