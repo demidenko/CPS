@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -78,8 +77,9 @@ private fun CodeforcesUserBlogScreen(
 
     val uuidState = rememberUUIDState()
 
-    val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
-    val blogEntries by flow.collectAsState()
+    val blogEntries by viewModel
+        .flowOfFetchBlogEntries(blogId = blogId, context = context, key = uuidState.value)
+        .collectAsState()
 
     val userBlogInfo by collectAsStateWithLifecycle {
         context.followRepository.flowOfUserBlogInfo(blogId = blogId)
@@ -91,12 +91,6 @@ private fun CodeforcesUserBlogScreen(
         onRetry = uuidState::reset,
         filterState = filterState
     )
-
-    LaunchedEffect(flow, filterState) {
-        flow.collect {
-            filterState.available = it is FetchResult.Success && it.value.isNotEmpty()
-        }
-    }
 }
 
 @Composable
@@ -150,6 +144,8 @@ private fun BlogEntriesList(
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
+    filterState.available = blogEntries.isNotEmpty()
+
     val filtered by remember(blogEntries, filterState) {
         derivedStateOf { blogEntries.filterBy(filterState) }
     }
