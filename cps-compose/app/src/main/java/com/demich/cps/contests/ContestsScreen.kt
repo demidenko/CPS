@@ -297,23 +297,20 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         }
     }
 
-    val loadingStatus by contestsViewModel.combinedLoadingStatusState()
-    val isReloading = { loadingStatus == LOADING }
-
     menu = contestsMenuBuilder(
-        onOpenSettings = onOpenSettings,
-        isReloading = isReloading
+        onOpenSettings = onOpenSettings
     )
 
     val anyPlatformEnabled = rememberFirstValue { context.settingsContests.anyPlatformEnabled }
 
+    val loadingStatus by contestsViewModel.combinedLoadingStatusState()
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
         viewState = viewState,
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
-        isReloading = isReloading,
+        isReloading = { loadingStatus == LOADING },
         onReload = onReload
     )
 
@@ -331,13 +328,11 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
 }
 
 private fun contestsMenuBuilder(
-    onOpenSettings: () -> Unit,
-    isReloading: () -> Boolean
+    onOpenSettings: () -> Unit
 ): CPSMenuBuilder = {
     CPSDropdownMenuItem(
         title = "Settings",
         icon = CPSIcons.Settings,
-        enabled = !isReloading(),
         onClick = onOpenSettings
     )
 }
