@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.demich.cps.fetchstate.FetchState
-import com.demich.cps.fetchstate.map
 import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
@@ -57,7 +56,7 @@ internal fun ClistAdditionalResourcesDialog(
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     val uuidState = rememberUUIDState()
 
-    val fetchState by viewModel
+    val fetchState = viewModel
         .flowOfFetchResources(settings = settings, key = uuidState.value)
         .collectAsState()
 
@@ -68,9 +67,9 @@ internal fun ClistAdditionalResourcesDialog(
         onDismissRequest = onDismissRequest
     ) {
         DialogContent(
-            fetchState = { fetchState },
-            onFetchRetry = { uuidState.reset() },
-            selected = { selected },
+            fetchState = fetchState::value,
+            onFetchRetry = uuidState::reset,
+            selected = selected,
             onSelectResource = {
                 scope.launch { item.edit { add(index = 0, element = it) } }
             },
@@ -85,7 +84,7 @@ internal fun ClistAdditionalResourcesDialog(
 private fun ColumnScope.DialogContent(
     fetchState: () -> FetchState<List<ClistResource>>,
     onFetchRetry: () -> Unit,
-    selected: () -> List<ClistResource>,
+    selected: List<ClistResource>,
     onSelectResource: (ClistResource) -> Unit,
     onUnselectResource: (ClistResource) -> Unit
 ) {
@@ -97,7 +96,7 @@ private fun ColumnScope.DialogContent(
     ) {
         ListTitle(text = "selected:")
         ClistResourcesList(
-            resources = { filter(selected(), searchFilter) },
+            resources = filter(selected, searchFilter),
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .heightIn(max = 200.dp),
@@ -106,15 +105,16 @@ private fun ColumnScope.DialogContent(
 
         ListTitle(text = "available:")
         LoadingContentBox(
-            fetchState = { fetchState().map { it - selected().toSet() } },
+            fetchState = fetchState,
             failedText = { it.niceMessage ?: "Failed to get resources" },
             onRetry = onFetchRetry,
             modifier = Modifier
                 .padding(bottom = 5.dp)
                 .fillMaxWidth()
         ) { resources ->
+            val unselected = resources - selected.toSet()
             ClistResourcesList(
-                resources = { filter(resources, searchFilter) },
+                resources = filter(unselected, searchFilter),
                 onItemClick = onSelectResource
             )
         }
@@ -141,12 +141,12 @@ private fun filter(resources: List<ClistResource>, searchFilter: String) =
 
 @Composable
 private fun ClistResourcesList(
-    resources: () -> List<ClistResource>,
+    resources: List<ClistResource>,
     modifier: Modifier = Modifier,
     onItemClick: (ClistResource) -> Unit
 ) {
     LazyColumnWithScrollBar(modifier = modifier) {
-        items(items = resources(), key = { it.id }) { resource ->
+        items(items = resources, key = { it.id }) { resource ->
             ItemWithDivider(modifier = Modifier.animateItem()) {
                 Text(
                     text = resource.name,
