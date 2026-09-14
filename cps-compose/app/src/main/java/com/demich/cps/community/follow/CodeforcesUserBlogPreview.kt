@@ -35,18 +35,6 @@ import com.demich.cps.utils.localCurrentTime
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
-@Composable
-fun CodeforcesUserBlogPreview(
-    modifier: Modifier = Modifier,
-    userBlogInfo: () -> CodeforcesUserBlogInfo?
-) {
-    userBlogInfo()?.let {
-        CodeforcesUserBlogPreview(
-            modifier = modifier,
-            userBlogInfo = it
-        )
-    }
-}
 
 @Composable
 fun CodeforcesUserBlogPreview(

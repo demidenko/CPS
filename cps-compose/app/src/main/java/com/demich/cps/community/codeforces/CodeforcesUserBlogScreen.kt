@@ -8,6 +8,7 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -55,10 +56,12 @@ fun CPSNavigator.ScreenScope<Screen.CommunityCodeforcesBlog>.NavContentCodeforce
     screenTitle = ScreenStaticTitleState("community", "codeforces", "blog")
 
     val filterState = rememberFilterState()
-    CodeforcesUserBlogScreen(
-        blogId = screen.blogId,
-        filterState = filterState
-    )
+    ProvideSystemTimeEachMinute {
+        CodeforcesUserBlogScreen(
+            blogId = screen.blogId,
+            filterState = filterState
+        )
+    }
 
     bottomBar = {
         FilterIconButton(filterState = filterState)
@@ -78,12 +81,12 @@ private fun CodeforcesUserBlogScreen(
     val flow = viewModel.flowOfFetchBlogEntries(blogId, context, key = uuidState.value)
     val blogEntriesState = flow.collectAsState()
 
-    val userBlogInfoState = collectAsStateWithLifecycle {
+    val userBlogInfo by collectAsStateWithLifecycle {
         context.followRepository.flowOfUserBlogInfo(blogId = blogId)
     }
 
     CodeforcesUserBlogScreen(
-        userBlogInfo = userBlogInfoState::value,
+        userBlogInfo = userBlogInfo,
         blogEntries = blogEntriesState::value,
         onRetry = uuidState::reset,
         filterState = filterState
@@ -98,28 +101,28 @@ private fun CodeforcesUserBlogScreen(
 
 @Composable
 private fun CodeforcesUserBlogScreen(
-    userBlogInfo: () -> CodeforcesUserBlogInfo?,
+    userBlogInfo: CodeforcesUserBlogInfo?,
     blogEntries: () -> FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
     filterState: FilterState
 ) {
-    ProvideSystemTimeEachMinute {
-        Column {
+    Column {
+        userBlogInfo?.let {
             CodeforcesUserBlogPreview(
                 modifier = Modifier.fillMaxWidth(),
-                userBlogInfo = userBlogInfo
-            )
-            Divider()
-            BlogEntriesBox(
-                blogEntries = { blogEntries().map { it.filterBy(filterState) } },
-                onRetry = onRetry,
-                modifier = Modifier.fillMaxWidth().weight(1f)
-            )
-            FilterTextField(
-                filterState = filterState,
-                modifier = Modifier.fillMaxWidth()
+                userBlogInfo = it
             )
         }
+        Divider()
+        BlogEntriesBox(
+            blogEntries = { blogEntries().map { it.filterBy(filterState) } },
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxWidth().weight(1f)
+        )
+        FilterTextField(
+            filterState = filterState,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
