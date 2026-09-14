@@ -29,10 +29,6 @@ class ContestsSettingsDataStore(context: Context): ItemizedDataStore(context.con
     val enabledPlatforms = itemEnumSet<Platform>(name = "enabled_platforms")
     val clistAdditionalResources = jsonCPS.itemList<ClistResource>(name = "clist_additional_resources")
 
-    val anyPlatformEnabled = combine {
-        enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
-    }
-
     val clistApiLogin = itemString(name = "clist_api_login")
     val clistApiKey = itemString(name = "clist_api_key")
     val clistApiAccess = combine {

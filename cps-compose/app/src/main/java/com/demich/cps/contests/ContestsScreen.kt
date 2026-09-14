@@ -39,6 +39,7 @@ import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.contestId
 import com.demich.cps.contests.monitors.flowOfContestData
+import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -75,11 +76,13 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.getSystemTime
-import com.demich.cps.utils.rememberFirstValue
+import com.demich.cps.utils.rememberRunBlocking
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.state
+import com.demich.datastore_itemized.fromSnapshot
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -301,7 +304,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onOpenSettings = onOpenSettings
     )
 
-    val anyPlatformEnabled = rememberFirstValue { context.settingsContests.anyPlatformEnabled }
+    val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
 
     val loadingStatus by contestsViewModel.combinedLoadingStatusState()
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
@@ -485,3 +488,8 @@ private fun loadingErrorsMessageState(): State<String> {
         }
     }
 }
+
+private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
+    fromSnapshot {
+        enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
+    }
