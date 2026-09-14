@@ -128,29 +128,18 @@ private fun ContestsReloadableContent(
         onRefresh = onReload,
         modifier = modifier
     ) {
-        ContestsContent(
-            viewState = viewState,
-            filterState = filterState
-        )
-    }
-}
-
-@Composable
-private fun ContestsContent(
-    viewState: ContestsListViewState,
-    filterState: FilterState
-) {
-    Column {
-        LoadingError(
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        ContestsPager(
-            viewState = viewState,
-            filterState = filterState,
-            modifier = Modifier
-                .fillMaxSize()
-        )
+        Column {
+            LoadingError(
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            ContestsPager(
+                viewState = viewState,
+                filterState = filterState,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        }
     }
 }
 
