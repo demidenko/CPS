@@ -28,8 +28,8 @@ internal fun RatingGraphItem(
     RatingGraph(
         modifier = modifier,
         manager = manager,
-        ratingChanges = { ratingChanges },
-        onRetry = { uuidState.reset() }
+        ratingChanges = ratingChanges,
+        onRetry = uuidState::reset
     )
 }
 

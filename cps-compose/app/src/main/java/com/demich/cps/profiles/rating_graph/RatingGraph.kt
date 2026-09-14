@@ -56,7 +56,7 @@ internal enum class RatingFilterType {
 
 @Composable
 fun RatingGraph(
-    ratingChanges: () -> FetchState<List<RatingChange>>,
+    ratingChanges: FetchState<List<RatingChange>>,
     onRetry: () -> Unit,
     manager: RatedProfileManager<*>,
     modifier: Modifier = Modifier,
@@ -64,7 +64,7 @@ fun RatingGraph(
     shape: Shape = RoundedCornerShape(5.dp)
 ) {
     LoadingContentBox(
-        fetchState = ratingChanges(),
+        fetchState = ratingChanges,
         onRetry = onRetry,
         failedText = { it.niceMessage ?: "Failed to get rating history" },
         modifier = modifier
