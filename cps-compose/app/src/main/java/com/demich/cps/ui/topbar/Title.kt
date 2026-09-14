@@ -107,7 +107,7 @@ private data class TitleChars(
 }
 
 private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit) {
-    a.toSet().forEach { char ->
+    a.distinctFlat().forEach { char ->
         val va = a.indicesOf(char)
         val vb = b.indicesOf(char)
 //        val n = min(va.size, vb.size)
@@ -124,6 +124,13 @@ private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit
 
 private fun String.indicesOf(char: Char) =
     indices.filter { get(it) == char }
+
+private fun String.distinctFlat(): Iterable<Char> {
+//    return toSet()
+    val set = mutableListOf<Char>()
+    forEach { if (it !in set) set.add(it) }
+    return set
+}
 
 private inline fun zip(
     a: List<Int>,
