@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -154,22 +153,20 @@ private fun ContestsPager(
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime(clock = Clock.System)
 
-    LaunchedEffect(contestsState, filterState, viewState) {
-        // TODO: flow -> state -> flow -> state (fix)
-        snapshotFlow { contestsState.value }
-            .collect {
-                filterState.available = it.contests.isNotEmpty()
-                viewState.syncExpanded(it)
-            }
-    }
-
     val saveableStateHolder = rememberSaveableStateHolder()
 
     ProvideCurrentTime(currentTimeState) {
+        val sortedContests by contestsState
+        filterState.available = sortedContests.contests.isNotEmpty()
+
+        SideEffect(sortedContests, viewState) {
+            viewState.syncExpanded(sortedContests)
+        }
+
         val page = viewState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
-                contests = contestsState.value.sublist(page),
+                contests = sortedContests.sublist(page),
                 viewState = viewState,
                 filterState = filterState,
                 modifier = modifier
