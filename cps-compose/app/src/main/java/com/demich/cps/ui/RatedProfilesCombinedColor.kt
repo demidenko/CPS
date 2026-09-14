@@ -115,12 +115,11 @@ private fun interface RankGetter {
 
 private class EnabledRankGetter(
     private val validRanks: List<RatedRank>,
-    disabledPlatforms: Set<Platform>,
-    rankSelector: UISettingsDataStore.StatusBarRankSelector
+    specs: Specs
 ): RankGetter {
     private val rank: RatedRank? =
-        validRanks.filter { it.manager.platform !in disabledPlatforms }.run {
-            when (rankSelector) {
+        validRanks.filter { it.manager.platform !in specs.disabledPlatforms }.run {
+            when (specs.rankSelector) {
                 Min -> minByOrNull { it.rank }
                 Max -> maxByOrNull { it.rank }
             }
@@ -133,7 +132,7 @@ private class EnabledRankGetter(
         }
 }
 
-private data class Settings(
+private data class Specs(
     val disabledPlatforms: Set<Platform>,
     val rankSelector: UISettingsDataStore.StatusBarRankSelector
 )
@@ -141,22 +140,21 @@ private data class Settings(
 private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
     context.settingsUI.flowOf {
         if (coloredStatusBar.value) {
-            Settings(
+            Specs(
                 disabledPlatforms = statusBarDisabledPlatforms.value,
                 rankSelector = statusBarRankSelector.value
             )
         } else {
             null
         }
-    }.flatMapLatest { settings ->
-        if (settings == null) {
+    }.flatMapLatest { specs ->
+        if (specs == null) {
             flowOf(RankGetter { null })
         } else {
             flowOfValidRanks(context).map { validRanks ->
                 EnabledRankGetter(
                     validRanks = validRanks,
-                    disabledPlatforms = settings.disabledPlatforms,
-                    rankSelector = settings.rankSelector
+                    specs = specs
                 )
             }
         }
