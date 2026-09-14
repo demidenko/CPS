@@ -7,11 +7,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -75,13 +73,14 @@ private fun SubTitle(
 @Composable
 private fun rememberTitleCharsState(
     text: () -> String
-): State<List<Pair<Char, Uuid>>> {
-    val titleState = remember { mutableStateOf(TitleChars("", emptyList())) }
-
-    LaunchedEffect(text) {
+): State<List<Pair<Char, Uuid>>> =
+    produceState(
+        initialValue = TitleChars("", emptyList()),
+        key1 = text
+    ) {
         snapshotFlow { text() }
             .collect { cur ->
-                val (prev, prevIds) = titleState.value
+                val (prev, prevIds) = value
                 val prefix = cur.commonPrefixLengthWith(prev)
                 val ids = Array(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
                 subsetIndices(
@@ -90,12 +89,9 @@ private fun rememberTitleCharsState(
                 ) { i, j ->
                     ids[prefix + j] = prevIds[prefix + i]
                 }
-                titleState.value = TitleChars(title = cur, ids = ids.asList())
+                value = TitleChars(title = cur, ids = ids.asList())
             }
     }
-
-    return titleState
-}
 
 private data class TitleChars(
     val title: String,
