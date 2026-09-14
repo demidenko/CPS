@@ -8,6 +8,7 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,7 +19,6 @@ import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.fetchResultOf
-import com.demich.cps.fetchstate.map
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -112,24 +112,22 @@ private fun CodeforcesUserBlogScreen(
                 modifier = Modifier.fillMaxWidth(),
                 userBlogInfo = it
             )
+            Divider()
         }
-        Divider()
-        BlogEntriesBox(
-            blogEntries = blogEntries.map { it.filterBy(filterState) },
+        BlogEntriesLoadingBox(
+            blogEntries = blogEntries,
             onRetry = onRetry,
-            modifier = Modifier.fillMaxWidth().weight(1f)
-        )
-        FilterTextField(
             filterState = filterState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().weight(1f)
         )
     }
 }
 
 @Composable
-private fun BlogEntriesBox(
+private fun BlogEntriesLoadingBox(
     blogEntries: FetchState<List<CodeforcesWebBlogEntry>>,
     onRetry: () -> Unit,
+    filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
     LoadingContentBox(
@@ -138,12 +136,35 @@ private fun BlogEntriesBox(
         onRetry = onRetry,
         modifier = modifier
     ) { blogEntries ->
-        CodeforcesBlogEntries(
+        BlogEntriesList(
             blogEntries = blogEntries,
+            filterState = filterState,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun BlogEntriesList(
+    blogEntries: List<CodeforcesWebBlogEntry>,
+    filterState: FilterState,
+    modifier: Modifier = Modifier
+) {
+    val filtered by remember(blogEntries, filterState) {
+        derivedStateOf { blogEntries.filterBy(filterState) }
+    }
+
+    Column(modifier = modifier) {
+        CodeforcesBlogEntries(
+            blogEntries = filtered,
             newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
             scrollBarEnabled = true,
             scrollUpButtonEnabled = true,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth().weight(1f)
+        )
+        FilterTextField(
+            filterState = filterState,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
