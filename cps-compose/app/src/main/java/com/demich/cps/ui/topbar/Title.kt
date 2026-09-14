@@ -107,12 +107,9 @@ private data class TitleChars(
 }
 
 private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit) {
-    //TODO: speedup by not using maps
-    val ga = a.indices.groupBy { a[it] }
-//    val gb = b.indices.groupBy { b[it] }
-    ga.forEach { (char, va) ->
-//        val vb = gb.getOrElse(char) { return@forEach }
-        val vb = b.indices.filter { b[it] == char }
+    a.toSet().forEach { char ->
+        val va = a.indicesOf(char)
+        val vb = b.indicesOf(char)
 //        val n = min(va.size, vb.size)
 //        val sa = va.takeRandom(n)
 //        val sb = vb.takeRandom(n)
@@ -124,6 +121,9 @@ private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit
         }
     }
 }
+
+private fun String.indicesOf(char: Char) =
+    indices.filter { get(it) == char }
 
 private inline fun zip(
     a: List<Int>,
