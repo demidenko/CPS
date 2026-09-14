@@ -20,7 +20,6 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.kotlin_stdlib_boost.commonPrefixLengthWith
 import com.demich.kotlin_stdlib_boost.takeRandom
-import kotlin.math.max
 import kotlin.uuid.Uuid
 
 @Composable
@@ -105,33 +104,6 @@ private data class TitleChars(
     override val size: Int get() = title.length
 
     override fun get(index: Int) = Pair(title[index], ids[index])
-}
-
-
-// longest common subsequence
-private inline fun lcsIndices(a: String, b: String, block: (Int, Int) -> Unit) {
-    val d = Array(a.length + 1) { IntArray(b.length + 1) }
-    for (i in 0 .. a.length)
-    for (j in 0 .. b.length) {
-        d[i][j] = when {
-            i == 0 || j == 0 -> 0
-            a[i-1] == b[j-1] -> d[i-1][j-1] + 1
-            else -> max(d[i-1][j], d[i][j-1])
-        }
-    }
-    var i = a.length
-    var j = b.length
-    while (i > 0 && j > 0) {
-        when {
-            d[i][j] == d[i-1][j-1]+1 && a[i-1] == b[j-1] -> {
-                block(i-1, j-1)
-                --i
-                --j
-            }
-            d[i][j] == d[i-1][j] -> --i
-            d[i][j] == d[i][j-1] -> --j
-        }
-    }
 }
 
 private inline fun subsetIndices(a: String, b: String, block: (Int, Int) -> Unit) {
