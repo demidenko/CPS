@@ -23,7 +23,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,7 +83,6 @@ import com.demich.cps.workers.state
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -421,10 +419,10 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
 private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val context = context
     val uriHandler = LocalUriHandler.current
-    val monitor = remember { CodeforcesMonitorDataStore(context) }
+    val storage = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = collectAsStateWithLifecycle {
-        monitor.flowOfContestData()
+        storage.flowOfContestData()
     }
 
     AnimatedVisibleByNotNull(
@@ -432,25 +430,26 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         enter = enterInColumn(),
         exit = exitInColumn()
     ) { contestData ->
-        val contestId by rememberUpdatedState(contestData.contestId)
         val scope = backgroundCoroutineScope
 
-        val requestFailed by collectAsStateWithLifecycle {
-            monitor.lastRequest.asFlow().map { it == false }
-        }
+        // TODO: merge with contestData
+        val requestFailed by remember {
+            storage.lastRequest.asFlow()
+        }.collectAsStateWithLifecycle(initialValue = null)
 
         CodeforcesMonitorWidget(
             contestData = contestData,
-            requestFailed = requestFailed,
+            requestFailed = requestFailed ?: false,
             modifier = modifier,
             onOpenInBrowser = {
-                uriHandler.openUri(CodeforcesUrls.contest(contestId))
+                uriHandler.openUri(CodeforcesUrls.contest(contestData.contestId))
             },
             onStop = {
+                val contestId = contestData.contestId
                 scope.launch {
                     CodeforcesProfileManager().profileStorage(context)
                         .monitorCanceledContests.add(contestId, getSystemTime())
-                    monitor.reset()
+                    storage.reset()
                 }
             }
         )
@@ -459,7 +458,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         // TODO: check args instead of contestData?
         LaunchedEffect(Unit) {
             if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
-                val args = monitor.args() ?: return@LaunchedEffect
+                val args = storage.args() ?: return@LaunchedEffect
                 CodeforcesMonitorWorker.start(startArgs = args, context = context)
             }
         }
