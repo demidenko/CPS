@@ -82,14 +82,14 @@ class ContestsListViewState(
     fun collisionLevel(contest: Contest): SafetyLevel {
         if (noCollisionMinDuration == null) return SAFE
         val duration = expandedContests.values.minOfNotNull {
-            val l = it.startTime
-            val r = it.endTime
+            val start = it.startTime
+            val end = it.endTime
             when {
                 it.isParallelTo(contest) -> null
                 it.isVirtual -> null
                 it.isFinished() -> null
-                l >= contest.endTime -> l - contest.endTime
-                r <= contest.startTime -> contest.startTime - r
+                start >= contest.endTime -> start - contest.endTime
+                end <= contest.startTime -> contest.startTime - end
                 else -> return ALERT
             }
         } ?: Duration.INFINITE
