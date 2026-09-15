@@ -36,7 +36,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
-import com.demich.cps.utils.rememberFirstValue
+import com.demich.cps.utils.rememberRunBlocking
 import com.demich.datastore_itemized.DataStoreValue
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +68,7 @@ internal fun <T> ApiAccessSettingsItem(
     )
 
     if (showDialog) {
-        val init = rememberFirstValue { item }
+        val init = rememberRunBlocking { item() }
 
         ApiDialog(
             title = dialogTitle,

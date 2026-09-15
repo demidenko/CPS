@@ -45,19 +45,11 @@ inline fun <T> collectItemAsState(
     }
 
 @Composable
-inline fun <T> rememberFirst(crossinline block: () -> Flow<T>): T =
-    remember { block().firstBlocking() }
-
-@Composable
 inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>, T> =
     remember {
         val flow = block()
         flow to flow.firstBlocking()
     }
-
-@Composable
-inline fun <T> rememberFirstValue(crossinline block: () -> DataStoreValue<T>): T =
-    rememberRunBlocking { block().invoke() }
 
 @Composable
 fun <T: Any> Flow<T>.collectUntilFirst(): State<T?> =

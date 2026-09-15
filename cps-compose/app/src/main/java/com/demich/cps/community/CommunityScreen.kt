@@ -19,7 +19,7 @@ import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.context
-import com.demich.cps.utils.rememberFirstValue
+import com.demich.cps.utils.rememberRunBlocking
 
 @Composable
 private fun CommunityScreen(
@@ -72,7 +72,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val context = context
-    val screenSettings = rememberFirstValue { context.settingsCommunity.codeforcesScreenSettings }
+    val screenSettings = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSettings() }
 
     val controller = rememberCodeforcesCommunityController(
         defaultTab = screenSettings.defaultTab,
