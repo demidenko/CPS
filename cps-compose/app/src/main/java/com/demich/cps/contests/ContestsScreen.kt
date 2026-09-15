@@ -1,12 +1,10 @@
 package com.demich.cps.contests
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -261,17 +259,22 @@ internal fun Modifier.contestItemPaddings() =
     )
 
 @Composable
-private fun ColumnScope.LoadingError(
+private fun LoadingError(
     modifier: Modifier = Modifier
 ) {
-    val message by loadingErrorsMessageState()
-    AnimatedVisibility(visible = message.isNotBlank()) {
+    val messageState = loadingErrorsMessageState()
+    AnimatedVisibleByNotNull(
+        value = messageState::value,
+        enter = enterInColumn(),
+        exit = exitInColumn(),
+        modifier = modifier.fillMaxWidth()
+    ) { message ->
         Text(
             text = message,
             textAlign = TextAlign.Center,
             color = cpsColors.background,
             fontSize = 13.sp,
-            modifier = modifier
+            modifier = Modifier
                 .background(color = cpsColors.error)
                 .padding(all = 2.dp)
                 .heightIn(max = 200.dp)
@@ -466,7 +469,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun loadingErrorsMessageState(): State<String> {
+private fun loadingErrorsMessageState(): State<String?> {
     val context = context
     val viewModel = contestsViewModel()
 
@@ -476,7 +479,7 @@ private fun loadingErrorsMessageState(): State<String> {
             flow2 = context.settingsUI.devModeEnabled.asFlow(),
         ) { errors: List<Pair<ContestsFetchSource?, Throwable>>, exposeAll: Boolean ->
             when {
-                errors.isEmpty() -> ""
+                errors.isEmpty() -> null
                 else -> errors.groupBy(
                     keySelector = { (_, e) ->
                         e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
