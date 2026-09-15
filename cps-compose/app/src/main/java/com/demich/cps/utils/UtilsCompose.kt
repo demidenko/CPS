@@ -75,6 +75,14 @@ inline fun <T> State<T>.onNotNull(block: (T & Any) -> Unit) {
     value?.let(block)
 }
 
+private object StateOfNothing : State<Nothing?> {
+    override val value: Nothing?
+        get() = null
+}
+
+@Stable
+fun <T> stateOfNull(): State<T?> = StateOfNothing
+
 inline fun <reified T> Json.asSaver() =
     Saver<T, String>(
         restore = ::decodeFromString,

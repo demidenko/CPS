@@ -15,7 +15,6 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -34,6 +33,7 @@ import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
+import com.demich.cps.utils.stateOfNull
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTab {
@@ -144,7 +144,6 @@ private fun CodeforcesPagerHeader(
     }
 }
 
-
 @Composable
 private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesTab): State<NewEntryTypeCounters?> {
     val context = context
@@ -153,7 +152,7 @@ private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesT
     }
 
     return if (flow == null) {
-        remember { mutableStateOf(null) }
+        stateOfNull()
     } else {
         flow.collectAsStateWithLifecycle(initialValue = remember { flow.firstBlocking() })
     }
