@@ -90,7 +90,7 @@ class ContestsListViewState(
                 it.isFinished() -> null
                 l >= contest.endTime -> l - contest.endTime
                 r <= contest.startTime -> contest.startTime - r
-                else -> return DANGER
+                else -> return ALERT
             }
         } ?: Duration.INFINITE
         if (duration < noCollisionMinDuration) return WARNING
