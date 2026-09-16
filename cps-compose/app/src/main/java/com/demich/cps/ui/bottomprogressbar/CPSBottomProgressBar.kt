@@ -13,7 +13,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -25,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsState
+import com.demich.cps.utils.onNotNull
 import kotlinx.coroutines.flow.map
 
 
@@ -34,25 +36,28 @@ fun CPSBottomProgressBarsColumn(
     modifier: Modifier = Modifier
 ) {
     val progressBarsViewModel = progressBarsViewModel()
-    val progresses by collectAsState {
-        progressBarsViewModel.flowOfProgresses.map { it.entries.toList() }
-    }
 
-    //TODO: still shit animation of top item
-    LazyColumn(
-        modifier = modifier,
-        reverseLayout = true
-    ) {
-        items(
-            items = progresses,
-            key = { it.key }
+    val state = remember {
+        progressBarsViewModel.flowOfProgresses.map { it.entries.toList() }
+    }.collectAsState(initial = null)
+
+    state.onNotNull { progresses ->
+        //TODO: still shit animation of top item
+        LazyColumn(
+            modifier = modifier,
+            reverseLayout = true
         ) {
-            CPSBottomProgressBar(
-                progressBarInfo = it.value,
-                modifier = Modifier
-                    .padding(all = 3.dp)
-                    .animateItem()
-            )
+            items(
+                items = progresses,
+                key = { it.key }
+            ) {
+                CPSBottomProgressBar(
+                    progressBarInfo = it.value,
+                    modifier = Modifier
+                        .padding(all = 3.dp)
+                        .animateItem()
+                )
+            }
         }
     }
 }
