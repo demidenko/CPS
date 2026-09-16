@@ -156,9 +156,9 @@ private fun ContestsPager(
 
     ProvideCurrentTime(currentTimeState) {
         val sortedContests by contestsState
-        filterState.available = sortedContests.contests.isNotEmpty()
 
         SideEffect(sortedContests, viewState) {
+            filterState.available = sortedContests.contests.isNotEmpty()
             viewState.syncExpanded(sortedContests)
         }
 
