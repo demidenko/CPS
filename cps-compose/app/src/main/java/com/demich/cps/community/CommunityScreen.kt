@@ -8,6 +8,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
@@ -22,6 +23,60 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberRunBlocking
 
 @Composable
+fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
+    onOpenSettings: () -> Unit,
+    onOpenFollowList: () -> Unit
+) {
+    val context = context
+
+    // TODO: collectUntilFirst make bottombar glitch
+    val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
+
+    NavContentCommunityScreen(
+        specs = specs,
+        onOpenSettings = onOpenSettings,
+        onOpenFollowList = onOpenFollowList
+    )
+}
+
+@Composable
+private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
+    specs: CodeforcesCommunityScreenSpecs,
+    onOpenSettings: () -> Unit,
+    onOpenFollowList: () -> Unit
+) {
+    val context = context
+    val controller = rememberCodeforcesCommunityController(
+        defaultTab = specs.defaultTab,
+        lostEnabled = specs.lostEnabled
+    )
+
+    screenTitle = remember(controller) {
+        ScreenTitleState {
+            cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
+        }
+    }
+
+    menu = communityMenuBuilder(
+        followEnabled = specs.followEnabled,
+        onOpenSettings = onOpenSettings,
+        onOpenFollowList = {
+            controller.updateFollowUsersInfo(context)
+            onOpenFollowList()
+        }
+    )
+
+    CommunityScreen(
+        controller = controller,
+        renderAllTabs = specs.renderAllTabs
+    )
+
+    bottomBar = communityBottomBarBuilder(
+        controller = controller
+    )
+}
+
+@Composable
 private fun CommunityScreen(
     controller: CodeforcesCommunityController,
     renderAllTabs: Boolean
@@ -31,7 +86,6 @@ private fun CommunityScreen(
         renderAllTabs = renderAllTabs
     )
 }
-
 
 private fun communityBottomBarBuilder(
     controller: CodeforcesCommunityController
@@ -64,42 +118,4 @@ private fun communityMenuBuilder(
             onClick = onOpenFollowList
         )
     }
-}
-
-@Composable
-fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
-    onOpenSettings: () -> Unit,
-    onOpenFollowList: () -> Unit
-) {
-    val context = context
-    val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
-
-    val controller = rememberCodeforcesCommunityController(
-        defaultTab = specs.defaultTab,
-        lostEnabled = specs.lostEnabled
-    )
-
-    screenTitle = remember(controller) {
-        ScreenTitleState {
-            cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
-        }
-    }
-
-    menu = communityMenuBuilder(
-        followEnabled = specs.followEnabled,
-        onOpenSettings = onOpenSettings,
-        onOpenFollowList = {
-            controller.updateFollowUsersInfo(context)
-            onOpenFollowList()
-        }
-    )
-
-    CommunityScreen(
-        controller = controller,
-        renderAllTabs = specs.renderAllTabs
-    )
-
-    bottomBar = communityBottomBarBuilder(
-        controller = controller
-    )
 }
