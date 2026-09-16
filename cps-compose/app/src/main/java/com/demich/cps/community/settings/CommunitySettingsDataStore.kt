@@ -35,9 +35,9 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
 }
 
-val CommunitySettingsDataStore.codeforcesScreenSettings
+val CommunitySettingsDataStore.codeforcesScreenSpecs
     get() = combine {
-        CommunityCodeforcesScreenSettings(
+        CodeforcesCommunityScreenSpecs(
             defaultTab = codeforcesDefaultTab.value,
             followEnabled = codeforcesFollowEnabled.value,
             lostEnabled = codeforcesLostEnabled.value,
@@ -45,7 +45,7 @@ val CommunitySettingsDataStore.codeforcesScreenSettings
         )
     }
 
-data class CommunityCodeforcesScreenSettings(
+data class CodeforcesCommunityScreenSpecs(
     val defaultTab: CodeforcesTab,
     val followEnabled: Boolean,
     val lostEnabled: Boolean,

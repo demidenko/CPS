@@ -8,7 +8,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
-import com.demich.cps.community.settings.codeforcesScreenSettings
+import com.demich.cps.community.settings.codeforcesScreenSpecs
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -72,11 +72,11 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val context = context
-    val screenSettings = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSettings() }
+    val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
 
     val controller = rememberCodeforcesCommunityController(
-        defaultTab = screenSettings.defaultTab,
-        lostEnabled = screenSettings.lostEnabled
+        defaultTab = specs.defaultTab,
+        lostEnabled = specs.lostEnabled
     )
 
     screenTitle = remember(controller) {
@@ -86,7 +86,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     }
 
     menu = communityMenuBuilder(
-        followEnabled = screenSettings.followEnabled,
+        followEnabled = specs.followEnabled,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = {
             controller.updateFollowUsersInfo(context)
@@ -96,7 +96,7 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
 
     CommunityScreen(
         controller = controller,
-        renderAllTabs = screenSettings.renderAllTabs
+        renderAllTabs = specs.renderAllTabs
     )
 
     bottomBar = communityBottomBarBuilder(
