@@ -27,45 +27,47 @@ fun <T> LazyColumnOfData(
     scrollBarEnabled: Boolean = true,
     scrollUpButtonEnabled: Boolean = false,
     autoScrollPredicate: (LazyListItemInfo, LazyListItemInfo) -> Boolean = { prev, cur -> prev.index == 0 && prev.offset == 0 },
-    items: List<T>,
+    items: List<T>?,
     key: ((item: T) -> Any)? = null,
     contentType: (item: T) -> Any? = { null },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
-    Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
-        LazyColumnWithScrollBar(
-            state = state,
-            scrollBarEnabled = scrollBarEnabled,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            itemsNotEmpty(
-                items = items,
-                onEmptyMessage = { Text(text = "List is empty") },
-                key = key,
-                itemContent = itemContent,
-                contentType = contentType
-            )
+    if (items != null) {
+        Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
+            LazyColumnWithScrollBar(
+                state = state,
+                scrollBarEnabled = scrollBarEnabled,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                itemsNotEmpty(
+                    items = items,
+                    onEmptyMessage = { Text(text = "List is empty") },
+                    key = key,
+                    itemContent = itemContent,
+                    contentType = contentType
+                )
+            }
+
+            if (scrollUpButtonEnabled) {
+                LazyListScrollUpButton(
+                    listState = state,
+                    enter = slideInVertically { it },
+                    exit = slideOutVertically { it }, //TODO: bad exit finish because of padding
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            bottom = 8.dp,
+                            end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth }
+                        )
+                )
+            }
         }
 
-        if (scrollUpButtonEnabled) {
-            LazyListScrollUpButton(
-                listState = state,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it }, //TODO: bad exit finish because of padding
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(
-                        bottom = 8.dp,
-                        end = 4.dp.plusIf(scrollBarEnabled) { CPSDefaults.scrollBarWidth }
-                    )
+        LaunchedEffect(state, autoScrollPredicate) {
+            state.autoScrollToTop(
+                predicate = autoScrollPredicate,
+                animationScope = this
             )
         }
-    }
-
-    LaunchedEffect(state, autoScrollPredicate) {
-        state.autoScrollToTop(
-            predicate = autoScrollPredicate,
-            animationScope = this
-        )
     }
 }
