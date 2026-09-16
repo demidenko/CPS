@@ -163,7 +163,7 @@ private fun PanelMovingButtons(
         }.takeIf { index > 0 },
         onDownClick = {
             onSwap(index, index + 1)
-        }.takeIf { index + 1 < visibleOrder.size }
+        }.takeIf { index < visibleOrder.lastIndex }
     )
 }
 
