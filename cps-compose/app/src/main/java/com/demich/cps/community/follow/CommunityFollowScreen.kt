@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.navigation.CPSNavigator
@@ -28,7 +29,6 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
@@ -42,7 +42,9 @@ private fun CommunityFollowScreen(
 
     val loadingStatusState = viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
 
-    val userBlogs by collectAsStateWithLifecycle { context.followRepository.flowOfUserBlogs() }
+    val userBlogs by remember {
+        context.followRepository.flowOfUserBlogs()
+    }.collectAsStateWithLifecycle(initialValue = null)
 
     ProvideSystemTimeEachMinute {
         CodeforcesFollowList(
@@ -77,7 +79,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
 @Composable
 private fun CodeforcesFollowList(
-    userBlogs: List<CodeforcesUserBlogInfo>,
+    userBlogs: List<CodeforcesUserBlogInfo>?,
     isRefreshing: () -> Boolean,
     onOpenBlog: (Long) -> Unit,
     onDeleteUser: (Long) -> Unit,
