@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.api.codeforces.models.problemId
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
@@ -36,7 +38,6 @@ import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import kotlinx.coroutines.flow.map
@@ -141,11 +142,11 @@ private fun UpsolvingSuggestionsList(
     val context = context
     val uriHandler = LocalUriHandler.current
 
-    val problems by collectAsStateWithLifecycle {
+    val problems by remember {
         CodeforcesProfileManager().profileStorage(context)
             .upsolvingSuggestedProblems.asFlow()
             .map { it.valuesSortedByTime().asReversed() }
-    }
+    }.collectAsStateWithLifecycle(initialValue = null)
 
     LazyColumnOfData(
         items = problems,
