@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="165" height="165" viewBox="0 0 165 165" version="1.1" id="svg1" sodipodi:docname="topcoder-logo.svg"
-    inkscape:version="1.4.1 (93de688d07, 2025-03-30)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+<svg width="100" height="100" viewBox="0 0 100 100" version="1.1" id="svg1" sodipodi:docname="logo.svg"
+    inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#"
     xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -16,8 +16,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="4.1077982"
-     inkscape:cx="67.432719"
-     inkscape:cy="91.411502"
+     inkscape:cx="67.554438"
+     inkscape:cy="62.198771"
      inkscape:window-width="1896"
      inkscape:window-height="1116"
      inkscape:window-x="0"
@@ -43,7 +43,7 @@
          id="topcoder-horizontal-black">
         <g
            id="mark"
-           transform="matrix(0.99845021,0,0,1,-3.3969505e-7,112.73489)">
+           transform="matrix(0.60512134,0,0,0.60606061,-8.643391e-5,91.172658)">
           <path
              d="m 82.6552,28.374 c 1.39,-0.543 2.69,-1.055 3.869,-1.531 9.319,-3.763 21.996,-7.534 34.197,-9.713 C 109.6802,6.482 95.8282,0 82.6552,0 c -13.172,0 -27.024,6.482 -38.065,17.13 12.201,2.179 24.877,5.95 34.197,9.713 1.179,0.476 2.478,0.988 3.868,1.531"
              id="Fill-17" />
