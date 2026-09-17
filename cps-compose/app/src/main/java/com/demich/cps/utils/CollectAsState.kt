@@ -45,12 +45,16 @@ inline fun <T> collectItemAsState(
     }
 
 @Composable
-fun <T : R, R> DataStoreValue<T>.collectAsState(
+fun <T: R, R> DataStoreValue<T>.collectAsState(
     initial: R
 ): State<R> =
     produceState(initialValue = initial, key1 = this) {
         asFlow().collect { value = it }
     }
+
+@Composable
+fun <T: Any> DataStoreValue<T>.collectAsNullableState(): State<T?> =
+    collectAsState(initial = null)
 
 @Composable
 inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>, T> =
