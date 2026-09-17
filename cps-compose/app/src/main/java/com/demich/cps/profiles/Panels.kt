@@ -61,6 +61,7 @@ fun <U: UserInfo> ProfilePanel(
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit
 ) {
+    val context = context
     val profilesViewModel = profilesViewModel()
     val (result, manager) = profileResultWithManager
 
@@ -69,16 +70,30 @@ fun <U: UserInfo> ProfilePanel(
     val loadingStatus by collectAsState {
         profilesViewModel.flowOfLoadingStatus(manager)
             .onEach {
+                // TODO
                 if (it == LOADING) lastClickState.value = Instant.DISTANT_PAST
             }
     }
 
-    val clickEnabled = loadingStatus != LOADING && visibleOrder == null
+    val mode = if (visibleOrder != null) {
+        PanelMode.Reorder(
+            index = visibleOrder.indexOf(manager.platform),
+            count = visibleOrder.size
+        )
+    } else {
+        when (loadingStatus) {
+            LOADING -> PanelMode.Reloading
+            else -> PanelMode.Pending(
+                isFailed = loadingStatus == FAILED,
+                lastClick = lastClickState.value
+            )
+        }
+    }
 
     Box(modifier = modifier
         .fillMaxWidth()
         .heightIn(min = 48.dp)
-        .ifThen(clickEnabled) {
+        .ifThen(mode is PanelMode.Pending) {
             pointerInput(lastClickState, onExpandRequest) {
                 detectTapGestures(
                     onPress = {
@@ -95,76 +110,72 @@ fun <U: UserInfo> ProfilePanel(
     ) {
         manager.PanelContent(result)
 
-        if (visibleOrder == null) {
-            PanelUIButtons(
-                loadingStatus = loadingStatus,
-                lastClick = lastClickState.value,
-                onReloadRequest = onReloadRequest,
-                onExpandRequest = onExpandRequest,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        } else {
-            val context = context
-            PanelMovingButtons(
-                platform = manager.platform,
-                visibleOrder = visibleOrder,
-                onSwap = { i, j ->
-                    context.settingsUI.profilesOrder.setValueIn(
-                        scope = profilesViewModel.viewModelScope,
-                        value = visibleOrder.toMutableList().apply { swap(i, j) }
-                    )
-                },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
-
+        PanelUIButtons(
+            mode = mode,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            onReloadRequest = onReloadRequest,
+            onExpandRequest = onExpandRequest,
+            onSwap = { i, j ->
+                val visibleOrder = requireNotNull(visibleOrder) // TODO
+                context.settingsUI.profilesOrder.setValueIn(
+                    scope = profilesViewModel.viewModelScope,
+                    value = visibleOrder.toMutableList().apply { swap(i, j) }
+                )
+            }
+        )
     }
 }
+
 
 @Composable
 private fun PanelUIButtons(
-    loadingStatus: LoadingStatus,
-    lastClick: Instant,
+    mode: PanelMode,
     modifier: Modifier = Modifier,
     onReloadRequest: () -> Unit,
-    onExpandRequest: () -> Unit
+    onExpandRequest: () -> Unit,
+    onSwap: (Int, Int) -> Unit
 ) {
-    Row(modifier = modifier) {
-        val uiAlpha by hidingState(lastClick)
-        if (loadingStatus != LOADING && uiAlpha > 0f) {
-            CPSIconButton(
-                icon = CPSIcons.Expand,
-                modifier = Modifier.alpha(uiAlpha),
-                onClick = onExpandRequest
+    when (mode) {
+        is PanelMode.Reorder -> {
+            val index = mode.index
+            PanelMovingButtons(
+                modifier = modifier,
+                onUpClick = {
+                    onSwap(index - 1, index)
+                }.takeIf { index > 0 },
+                onDownClick = {
+                    onSwap(index, index + 1)
+                }.takeIf { index + 1 < mode.count }
             )
         }
-        if (loadingStatus != PENDING || uiAlpha > 0f) {
+        is PanelMode.Reloading -> {
             CPSReloadingButton(
-                loadingStatus = loadingStatus,
-                modifier = Modifier.alpha(if (loadingStatus == PENDING) uiAlpha else 1f),
-                onClick = onReloadRequest
+                loadingStatus = LOADING,
+                onClick = onReloadRequest,
+                modifier = modifier
             )
+        }
+        is PanelMode.Pending -> {
+            val loadingStatus: LoadingStatus = if (mode.isFailed) FAILED else PENDING
+            Row(modifier = modifier) {
+                val uiAlpha by hidingState(mode.lastClick)
+                if (uiAlpha > 0f) {
+                    CPSIconButton(
+                        icon = CPSIcons.Expand,
+                        modifier = Modifier.alpha(uiAlpha),
+                        onClick = onExpandRequest
+                    )
+                }
+                if (loadingStatus != PENDING || uiAlpha > 0f) {
+                    CPSReloadingButton(
+                        loadingStatus = loadingStatus,
+                        modifier = Modifier.alpha(if (loadingStatus == PENDING) uiAlpha else 1f),
+                        onClick = onReloadRequest
+                    )
+                }
+            }
         }
     }
-}
-
-@Composable
-private fun PanelMovingButtons(
-    platform: Platform,
-    visibleOrder: List<Platform>,
-    onSwap: (Int, Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val index = visibleOrder.indexOf(platform)
-    PanelMovingButtons(
-        modifier = modifier,
-        onUpClick = {
-            onSwap(index - 1, index)
-        }.takeIf { index > 0 },
-        onDownClick = {
-            onSwap(index, index + 1)
-        }.takeIf { index < visibleOrder.lastIndex }
-    )
 }
 
 @Composable
@@ -193,6 +204,20 @@ private fun PanelMovingButtons(
             )
         }
     }
+}
+
+private sealed interface PanelMode {
+    data object Reloading: PanelMode
+
+    data class Pending(
+        val isFailed: Boolean,
+        val lastClick: Instant
+    ): PanelMode
+
+    data class Reorder(
+        val index: Int,
+        val count: Int
+    ): PanelMode
 }
 
 @Composable
