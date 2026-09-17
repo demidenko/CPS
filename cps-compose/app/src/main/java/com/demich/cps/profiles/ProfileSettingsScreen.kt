@@ -27,6 +27,7 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
@@ -53,9 +54,9 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     val context = context
     var showChangeDialog by remember { mutableStateOf(false) }
 
-    val profileResult by collectItemAsState { manager.profileStorage(context).profile }
+    val state = collectItemAsState { manager.profileStorage(context).profile }
 
-    profileResult?.let {
+    state.onNotNull {
         ProfileSettingsItems(
             manager = manager,
             profileResult = it,
