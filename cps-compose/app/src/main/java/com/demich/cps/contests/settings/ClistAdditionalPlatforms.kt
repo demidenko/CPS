@@ -35,8 +35,9 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsNullableState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.rememberUUIDState
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
@@ -51,7 +52,6 @@ internal fun ClistAdditionalResourcesDialog(
     val context = context
     val settings = remember { context.settingsContests }
     val item = remember { settings.clistAdditionalResources }
-    val selected by collectItemAsState { item }
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     val uuidState = rememberUUIDState()
@@ -66,17 +66,21 @@ internal fun ClistAdditionalResourcesDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        DialogContent(
-            fetchState = fetchState,
-            onFetchRetry = uuidState::reset,
-            selected = selected,
-            onSelectResource = {
-                scope.launch { item.edit { add(index = 0, element = it) } }
-            },
-            onUnselectResource = {
-                scope.launch { item.edit { remove(it) } }
-            }
-        )
+        val state = item.collectAsNullableState()
+
+        state.onNotNull { selected ->
+            DialogContent(
+                fetchState = fetchState,
+                onFetchRetry = uuidState::reset,
+                selected = selected,
+                onSelectResource = {
+                    scope.launch { item.edit { add(index = 0, element = it) } }
+                },
+                onUnselectResource = {
+                    scope.launch { item.edit { remove(it) } }
+                }
+            )
+        }
     }
 }
 
