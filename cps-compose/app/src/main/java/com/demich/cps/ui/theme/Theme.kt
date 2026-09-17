@@ -12,15 +12,16 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.uiColorSpecs
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsNullableState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 
 
 enum class DarkLightMode {
@@ -43,11 +44,13 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 @Composable
 private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
-    val specs by collectItemAsState { context.settingsUI.uiColorSpecs }
-    val isDarkMode = specs.darkLightMode.isDarkMode()
-    setSystemBarsStyle(context, isDarkMode)
-    val colors = if (isDarkMode) darkCPSColors(specs.useOriginalColors) else lightCPSColors(specs.useOriginalColors)
-    CompositionLocalProvider(LocalCPSColors provides colors, content = content)
+    val specsState = remember { context.settingsUI.uiColorSpecs }.collectAsNullableState()
+    specsState.onNotNull { specs ->
+        val isDarkMode = specs.darkLightMode.isDarkMode()
+        setSystemBarsStyle(context, isDarkMode)
+        val colors = if (isDarkMode) darkCPSColors(specs.useOriginalColors) else lightCPSColors(specs.useOriginalColors)
+        CompositionLocalProvider(LocalCPSColors provides colors, content = content)
+    }
 }
 
 @Composable
