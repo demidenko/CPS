@@ -12,6 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -41,7 +42,6 @@ import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.ifThen
@@ -67,28 +67,30 @@ fun <U: UserInfo> ProfilePanel(
 
     val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
 
-    val loadingStatus by collectAsState {
+    val loadingStatus by remember(manager, lastClickState) {
         profilesViewModel.flowOfLoadingStatus(manager)
             .onEach {
                 // TODO
                 if (it == LOADING) lastClickState.value = Instant.DISTANT_PAST
             }
-    }
+    }.collectAsState(initial = null)
 
-    val mode = if (visibleOrder != null) {
-        PanelMode.Reorder(
-            index = visibleOrder.indexOf(manager.platform),
-            count = visibleOrder.size
-        )
-    } else {
-        when (loadingStatus) {
-            LOADING -> PanelMode.Reloading
-            else -> PanelMode.Pending(
-                isFailed = loadingStatus == FAILED,
-                lastClick = lastClickState.value
+    val mode: PanelMode? =
+        if (visibleOrder != null) {
+            PanelMode.Reorder(
+                index = visibleOrder.indexOf(manager.platform),
+                count = visibleOrder.size
             )
+        } else {
+            when (loadingStatus) {
+                null -> null
+                LOADING -> PanelMode.Reloading
+                PENDING, FAILED -> PanelMode.Pending(
+                    isFailed = loadingStatus == FAILED,
+                    lastClick = lastClickState.value
+                )
+            }
         }
-    }
 
     Box(modifier = modifier
         .fillMaxWidth()
@@ -110,19 +112,21 @@ fun <U: UserInfo> ProfilePanel(
     ) {
         manager.PanelContent(result)
 
-        PanelUIButtons(
-            mode = mode,
-            modifier = Modifier.align(Alignment.CenterEnd),
-            onReloadRequest = onReloadRequest,
-            onExpandRequest = onExpandRequest,
-            onSwap = { i, j ->
-                val visibleOrder = requireNotNull(visibleOrder) // TODO
-                context.settingsUI.profilesOrder.setValueIn(
-                    scope = profilesViewModel.viewModelScope,
-                    value = visibleOrder.toMutableList().apply { swap(i, j) }
-                )
-            }
-        )
+        if (mode != null) {
+            PanelUIButtons(
+                mode = mode,
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onReloadRequest = onReloadRequest,
+                onExpandRequest = onExpandRequest,
+                onSwap = { i, j ->
+                    val visibleOrder = requireNotNull(visibleOrder) // TODO
+                    context.settingsUI.profilesOrder.setValueIn(
+                        scope = profilesViewModel.viewModelScope,
+                        value = visibleOrder.toMutableList().apply { swap(i, j) }
+                    )
+                }
+            )
+        }
     }
 }
 
