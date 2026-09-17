@@ -10,7 +10,6 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 import kotlin.time.Instant
 
 fun Instant.truncateBySeconds(): Instant {
@@ -47,8 +46,8 @@ private fun Duration.formatHHMMSS(): String = toComponents { hours, minutes, sec
 }
 
 fun Duration.formatExecTime(): String {
-    if (this < 1.seconds) return toString(unit = DurationUnit.MILLISECONDS)
-    return toString(unit = DurationUnit.SECONDS, decimals = 1).replace(',', '.')
+    if (this < 1.seconds) return toString(unit = MILLISECONDS)
+    return toString(unit = SECONDS, decimals = 1).replace(',', '.')
 }
 
 fun Duration.formatDropSeconds(): String =
