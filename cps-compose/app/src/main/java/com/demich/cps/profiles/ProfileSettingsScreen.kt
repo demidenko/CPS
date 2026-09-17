@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
-import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileSettingsProvider
 import com.demich.cps.profiles.managers.profileManagerOf
@@ -25,26 +24,19 @@ import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
-private fun ProfileSettingsScreen(
-    platform: Platform
-) {
-    val manager = remember(platform) { profileManagerOf(platform) }
-    ProfileSettingsScreen(manager = manager)
-}
-
-@Composable
 fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsScreen() {
     val platform = screen.platform
-    
+
     screenTitle = ScreenStaticTitleState("profiles", platform.name, "settings")
-    
-    ProfileSettingsScreen(platform)
+
+    val manager = remember(platform) { profileManagerOf(platform) }
+    ProfileSettingsScreen(manager = manager)
 }
 
 @Composable
@@ -52,24 +44,35 @@ private fun <U: UserInfo> ProfileSettingsScreen(
     manager: ProfileManager<U>
 ) {
     val context = context
-    var showChangeDialog by remember { mutableStateOf(false) }
-
-    val state = collectItemAsState { manager.profileStorage(context).profile }
+    val state = remember { manager.profileStorage(context).profile }.collectAsState(initial = null)
 
     state.onNotNull {
-        ProfileSettingsItems(
+        ProfileSettingsScreen(
             manager = manager,
-            profileResult = it,
-            onUserIdClick = { showChangeDialog = true }
+            profileResult = it
         )
+    }
+}
 
-        if (showChangeDialog) {
-            ChangeSavedProfileDialog(
-                manager = manager,
-                initial = it,
-                onDismissRequest = { showChangeDialog = false }
-            )
-        }
+@Composable
+private fun <U: UserInfo> ProfileSettingsScreen(
+    manager: ProfileManager<U>,
+    profileResult: ProfileResult<U>
+) {
+    var showChangeDialog by remember { mutableStateOf(false) }
+
+    ProfileSettingsItems(
+        manager = manager,
+        profileResult = profileResult,
+        onUserIdClick = { showChangeDialog = true }
+    )
+
+    if (showChangeDialog) {
+        ChangeSavedProfileDialog(
+            manager = manager,
+            initial = profileResult,
+            onDismissRequest = { showChangeDialog = false }
+        )
     }
 }
 
