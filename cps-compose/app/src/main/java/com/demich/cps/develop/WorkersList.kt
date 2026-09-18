@@ -119,9 +119,12 @@ fun WorkersList(modifier: Modifier = Modifier) {
     val context = context
     val progressBarsViewModel = progressBarsViewModel()
     if (showMonitorDialog) {
-        CodeforcesMonitorDialog(onDismissRequest = { showMonitorDialog = false }) { contestId ->
-            progressBarsViewModel.startCodeforcesMonitor(contestId, context)
-        }
+        CodeforcesMonitorDialog(
+            onDismissRequest = { showMonitorDialog = false },
+            onStart = { contestId ->
+                progressBarsViewModel.startCodeforcesMonitor(contestId, context)
+            }
+        )
     }
 }
 
@@ -190,12 +193,12 @@ private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
         .collectAsStateWithLifecycle(initialValue = null)
 
 @Composable
-private fun CPSWork.eventsState(): State<List<CPSWorker.ExecutionEvent>> =
-    collectAsStateWithLifecycle {
+private fun CPSWork.eventsState(): State<List<CPSWorker.ExecutionEvent>?> =
+    remember(name) {
         CPSWorkersDataStore(context).executions.asFlow().map {
             it.getOrElse(name) { emptyList() }
         }
-    }
+    }.collectAsStateWithLifecycle(initialValue = null)
 
 @Composable
 private fun WorkerItem(
@@ -357,7 +360,9 @@ private fun WorkerDialog(
     onDismissRequest: () -> Unit
 ) {
     val workInfo by work.workInfoAsState()
-    val events by work.eventsState()
+    val eventsState = work.eventsState()
+
+    val infoState = remember(work.name) { work.flowOfInfo() }.collectAsStateWithLifecycle(initialValue = null)
 
     CPSDialog(
         modifier = Modifier.fillMaxWidth(),
@@ -383,34 +388,30 @@ private fun WorkerDialog(
                     Text(text = "interval: $it")
                 }
 
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = buildString {
-                        append("events: ")
-                        append(events.count { it.resultType == SUCCESS })
-                        append(" / ")
-                        append(events.size)
-                        append(" (")
-                        append(events.sumOfDurations().formatExecTime())
-                        append(")")
-                    })
+                eventsState.onNotNull { events ->
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = buildString {
+                            append("events: ")
+                            append(events.count { it.resultType == SUCCESS })
+                            append(" / ")
+                            append(events.size)
+                            append(" (")
+                            append(events.sumOfDurations().formatExecTime())
+                            append(")")
+                        })
 
-                    val cpsColors = cpsColors
-                    EventsTimeline(
-                        modifier = Modifier.fillMaxWidth(),
-                        events = events,
-                        period = 24.hours,
-                        pointRadius = 3.dp,
-                        lineWidth = 1.dp,
-                        lineColor = cpsColors.divider,
-                        eventColor = { cpsColors.colorFor(result = it.resultType) }
-                    )
+                        val cpsColors = cpsColors
+                        EventsTimeline(
+                            modifier = Modifier.fillMaxWidth(),
+                            events = events,
+                            period = 24.hours,
+                            pointRadius = 3.dp,
+                            lineWidth = 1.dp,
+                            lineColor = cpsColors.divider,
+                            eventColor = { cpsColors.colorFor(result = it.resultType) }
+                        )
+                    }
                 }
-
-                val infoState = remember(work.name) {
-                    work.flowOfInfo()
-                }.collectAsStateWithLifecycle(initialValue = null)
 
                 infoState.onNotNull { info ->
                     info.forEach { (key, value) ->
