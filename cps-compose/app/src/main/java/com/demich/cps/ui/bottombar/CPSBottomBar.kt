@@ -163,12 +163,13 @@ private fun BottomBarNavigationItems(
         modifier = modifier.clipToBounds(),
         navigationLayoutType = layoutType
     ) {
+        val selectedRootScreen = selectedRootScreen()
         rootScreens.forEach { screen ->
             CPSBottomNavigationItem(
                 icon = screen.bottomBarIcon,
-                isSelected = screen == selectedRootScreen(),
+                isSelected = screen == selectedRootScreen,
                 onClick = {
-                    if (screen != selectedRootScreen()) onSelect(screen)
+                    if (screen != selectedRootScreen) onSelect(screen)
                 },
                 onLongPress = onLongPress,
                 indication = indication,
