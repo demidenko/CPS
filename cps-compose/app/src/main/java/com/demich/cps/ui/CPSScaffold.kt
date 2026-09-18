@@ -31,9 +31,10 @@ import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.backgroundColor
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsNullableState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ifThen
+import com.demich.cps.utils.onNotNull
 
 @Stable
 internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -131,8 +132,7 @@ private fun BottomBarAndNavBar(
     additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
     val context = context
-    // TODO: start collect with null
-    val specs by collectItemAsState { context.settingsUI.bottomNavBarSpecs }
+    val specsState = remember { context.settingsUI.bottomNavBarSpecs }.collectAsNullableState()
 
     val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
 
@@ -147,18 +147,20 @@ private fun BottomBarAndNavBar(
             .navigationBarsPadding()
     ) {
         if (enabled) {
-            CPSBottomBar(
-                selectedRootScreen = selectedRootScreen,
-                onNavigateToScreen = onNavigateToScreen,
-                additionalContent = additionalBottomBar,
-                settingsEnabled = bottomBarSettingsEnabled,
-                onEnableSettings = onEnableBottomBarSettings,
-                onDisableSettings = onDisableBottomBarSettings,
-                backgroundColor = { backgroundColor },
-                specs = specs,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+            specsState.onNotNull { specs ->
+                CPSBottomBar(
+                    selectedRootScreen = selectedRootScreen,
+                    onNavigateToScreen = onNavigateToScreen,
+                    additionalContent = additionalBottomBar,
+                    settingsEnabled = bottomBarSettingsEnabled,
+                    onEnableSettings = onEnableBottomBarSettings,
+                    onDisableSettings = onDisableBottomBarSettings,
+                    backgroundColor = { backgroundColor },
+                    specs = specs,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
