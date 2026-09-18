@@ -32,8 +32,10 @@ import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
+import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -46,10 +48,6 @@ internal fun StatusBarButtons(
     val context = context
     val settingsUI = remember { context.settingsUI }
 
-    val disabledPlatforms by collectItemAsState { settingsUI.statusBarDisabledPlatforms }
-    val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
-    val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
-
     val recordedPlatformsState = remember {
         ProfileManager.ratedEntries().flowOfExisted(context)
             .map { it.map { it.platform } }
@@ -61,12 +59,13 @@ internal fun StatusBarButtons(
     val scope = backgroundCoroutineScope
     recordedPlatformsState.onNotNull { platforms ->
         if (platforms.isNotEmpty()) {
+            val specs by collectItemAsState { settingsUI.combinedColorSpecs }
             StatusBarButtons(
                 modifier = modifier,
-                coloredStatusBar = coloredStatusBar,
-                rankSelector = rankSelector,
+                coloredStatusBar = specs.enabled,
+                rankSelector = specs.selector,
                 platforms = platforms,
-                disabledPlatforms = disabledPlatforms,
+                disabledPlatforms = specs.disabledPlatforms,
                 onSetEnabled = { settingsUI.coloredStatusBar.setValueIn(scope, it) },
                 onSetRankSelector = { settingsUI.statusBarRankSelector.setValueIn(scope, it) },
                 onCheckedChange = { platform, checked ->
@@ -166,3 +165,18 @@ private fun StatusBarPlatformsPopup(
         )
     }
 }
+
+private data class Specs(
+    val enabled: Boolean,
+    val disabledPlatforms: Set<Platform>,
+    val selector: UISettingsDataStore.StatusBarRankSelector
+)
+
+private val UISettingsDataStore.combinedColorSpecs
+    get() = combine {
+        Specs(
+            enabled = coloredStatusBar.value,
+            disabledPlatforms = statusBarDisabledPlatforms.value,
+            selector = statusBarRankSelector.value
+        )
+    }
