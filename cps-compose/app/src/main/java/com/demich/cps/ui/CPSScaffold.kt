@@ -27,6 +27,7 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottombar.CPSBottomBar
+import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateToggleColorAsState
@@ -35,6 +36,8 @@ import com.demich.cps.utils.collectAsNullableState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ifThen
 import com.demich.cps.utils.onNotNull
+import com.demich.datastore_itemized.combine
+import com.demich.datastore_itemized.value
 
 @Stable
 internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -132,7 +135,7 @@ private fun BottomBarAndNavBar(
     additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
     val context = context
-    val specsState = remember { context.settingsUI.bottomNavBarSpecs }.collectAsNullableState()
+    val specsState = remember { context.settingsUI.bottomBarSpecs }.collectAsNullableState()
 
     val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
 
@@ -205,3 +208,15 @@ private fun Scrim(
         )
     }
 }
+
+private val UISettingsDataStore.bottomBarSpecs get() = combine {
+    BottomBarSpecs(
+        devModeEnabled = devModeEnabled.value,
+        layoutType = navigationLayoutType.value
+    )
+}
+
+private data class BottomBarSpecs(
+    val devModeEnabled: Boolean,
+    val layoutType: NavigationLayoutType
+)
