@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +29,9 @@ import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.flow.combine
@@ -49,16 +50,16 @@ internal fun StatusBarButtons(
     val coloredStatusBar by collectItemAsState { settingsUI.coloredStatusBar }
     val rankSelector by collectItemAsState { settingsUI.statusBarRankSelector }
 
-    val recordedPlatformsState = collectAsState {
+    val recordedPlatformsState = remember {
         ProfileManager.ratedEntries().flowOfExisted(context)
             .map { it.map { it.platform } }
             .combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
                 platforms.sortedBy { order.indexOf(it) }
             }
-    }
+    }.collectAsState(initial = null)
 
     val scope = backgroundCoroutineScope
-    recordedPlatformsState.value.let { platforms ->
+    recordedPlatformsState.onNotNull { platforms ->
         if (platforms.isNotEmpty()) {
             StatusBarButtons(
                 modifier = modifier,
