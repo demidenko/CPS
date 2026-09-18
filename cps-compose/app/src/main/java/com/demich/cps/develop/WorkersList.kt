@@ -63,8 +63,8 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundCoroutineScope
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.collectAsStateWithLifecycle
-import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.context
 import com.demich.cps.utils.drawRoundRectWithBorderInside
@@ -224,7 +224,7 @@ private fun CodeforcesMonitorWorkItem(
 ) {
     val context = context
     val workInfo by work.workInfoAsState()
-    val monitorArgs by collectItemAsState { CodeforcesMonitorDataStore(context).args }
+    val monitorArgs by remember { CodeforcesMonitorDataStore(context).args }.collectAsState(initial = null)
 
     WorkerItem(
         modifier = modifier,
