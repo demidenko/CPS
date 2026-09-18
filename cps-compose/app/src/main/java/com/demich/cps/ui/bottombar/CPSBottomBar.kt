@@ -133,7 +133,7 @@ private fun BottomBarBodyMain(
     BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
-        selectedRootScreen = { if (settingsEnabled) null else selectedRootScreen() },
+        selectedRootScreen = if (settingsEnabled) { { null } } else selectedRootScreen,
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = specs.layoutType,
         onSelect = onNavigateToScreen,
