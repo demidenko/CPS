@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+private const val message = "based on runBlocking"
+
+@Deprecated(level = WARNING, message = message)
 @RememberInComposition
 fun <T> Flow<T>.firstBlocking(): T =
     when (this) {
@@ -21,7 +23,7 @@ fun <T> Flow<T>.firstBlocking(): T =
         else -> runBlocking { first() }
     }
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+@Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>, T> =
     remember {
@@ -29,26 +31,26 @@ inline fun <T> rememberWithFirst(crossinline block: () -> Flow<T>): Pair<Flow<T>
         flow to flow.firstBlocking()
     }
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+@Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> rememberRunBlocking(crossinline block: suspend () -> T): T =
     remember { runBlocking { block() } }
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+@Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
     rememberWithFirst(block = block).let { (flow, value) ->
         flow.collectAsState(initial = value)
     }
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+@Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
     rememberWithFirst(block = block).let { (flow, value) ->
         flow.collectAsStateWithLifecycle(initialValue = value)
     }
 
-@Deprecated(level = WARNING, message = "based on runBlocking")
+@Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> collectItemAsState(
     crossinline block: () -> DataStoreValue<T>
