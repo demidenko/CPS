@@ -2,12 +2,14 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,8 +27,8 @@ import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.map
@@ -38,50 +40,52 @@ fun FetchPriorityListDialog(
     availableOptions: Set<ContestsFetchSource>,
     onDismissRequest: () -> Unit
 ) {
-    val context = context
-    val scope = backgroundCoroutineScope
-
-    val settings = remember { context.settingsContests }
-    val priorityList by collectAsState {
-        val platform = platform.toContestPlatform()
-        settings.fetchPriorityLists.asFlow().map { it.getValue(platform) }
-    }
-
     CPSDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        Text(text = "$platform fetch priority list = ")
-        FetchPriorityList(
+        DialogContent(
+            platform = platform,
+            availableOptions = availableOptions
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.DialogContent(
+    platform: Platform,
+    availableOptions: Set<ContestsFetchSource>
+) {
+    val context = context
+
+    val state = remember(platform) {
+        val platform = platform.toContestPlatform()
+        context.settingsContests.fetchPriorityLists.asFlow().map { it.getValue(platform) }
+    }.collectAsState(initial = null)
+
+    Text(text = "$platform fetch priority list = ")
+
+    state.onNotNull { priorityList ->
+        val scope = backgroundCoroutineScope
+        PriorityList(
             modifier = Modifier.padding(vertical = 4.dp),
             priorityList = priorityList,
             availableOptions = availableOptions,
             onListChange = { newList ->
                 scope.launch {
-                    settings.fetchPriorityLists.edit {
+                    context.settingsContests.fetchPriorityLists.edit {
                         set(key = platform.toContestPlatform(), value = newList)
                     }
                 }
             }
         )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = CPSIcons.Info,
-                contentDescription = null,
-                modifier = Modifier.padding(all = 8.dp),
-                tint = cpsColors.contentAdditional
-            )
-            Text(
-                text = "Order of execution of fetching contests until success.",
-                color = cpsColors.contentAdditional,
-                fontSize = 14.sp
-            )
-        }
     }
+
+    Note()
 }
 
 @Composable
-fun FetchPriorityList(
+private fun PriorityList(
     modifier: Modifier = Modifier,
     priorityList: List<ContestsFetchSource>,
     availableOptions: Set<ContestsFetchSource>,
@@ -199,6 +203,28 @@ private fun CPSDropdownMenuScope.FetchSourcesMenu(
             title = "delete",
             icon = CPSIcons.Delete,
             onClick = onDeleteRequest
+        )
+    }
+}
+
+@Composable
+private fun Note(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = CPSIcons.Info,
+            contentDescription = null,
+            modifier = Modifier.padding(all = 8.dp),
+            tint = cpsColors.contentAdditional
+        )
+        Text(
+            text = "Order of execution of fetching contests until success.",
+            color = cpsColors.contentAdditional,
+            fontSize = 14.sp
         )
     }
 }
