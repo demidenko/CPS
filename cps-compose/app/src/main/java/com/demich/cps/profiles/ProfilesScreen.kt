@@ -191,7 +191,7 @@ private fun AddProfileButton(
     var selectedPlatform: Platform? by remember { mutableStateOf(null) }
 
     val progressBarsViewModel = progressBarsViewModel()
-    val clistImportIsRunning by collectAsState { progressBarsViewModel.flowOfClistImportIsRunning() }
+    val clistImportIsRunning by progressBarsViewModel.clistImportIsRunningState()
 
     Box {
         CPSIconButton(

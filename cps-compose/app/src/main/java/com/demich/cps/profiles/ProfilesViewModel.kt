@@ -2,6 +2,9 @@ package com.demich.cps.profiles
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.fetchstate.FetchResult
@@ -123,8 +126,16 @@ class ProfilesViewModel: ViewModel() {
 
 private const val clistImportId = "clist_import"
 
-fun ProgressBarsViewModel.flowOfClistImportIsRunning(): Flow<Boolean> =
-    flowOfProgresses.map { clistImportId in it }
+@Composable
+fun ProgressBarsViewModel.clistImportIsRunningState(): State<Boolean> {
+    val state = flowOfProgresses.collectAsState()
+    return remember {
+        object : State<Boolean> {
+            override val value
+                get() = state.value.contains(clistImportId)
+        }
+    }
+}
 
 private fun getManager(resource: String, userName: String, link: String): Pair<Platform, String>? =
     when (resource) {
