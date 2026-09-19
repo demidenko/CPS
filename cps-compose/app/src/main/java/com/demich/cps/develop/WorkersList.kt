@@ -347,7 +347,7 @@ private fun ResultIcon(
         )
     } else {
         AttentionIcon(
-            safetyLevel = if (result == RETRY) WARNING else ALERT,
+            warningLevel = if (result == RETRY) WARNING else ALERT,
             modifier = modifier
         )
     }

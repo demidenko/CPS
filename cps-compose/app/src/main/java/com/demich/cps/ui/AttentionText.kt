@@ -10,33 +10,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.SafetyLevel
+import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.colorFor
 
 @Composable
 internal fun AttentionText(
     text: String,
-    safetyLevel: SafetyLevel,
+    warningLevel: WarningLevel,
     modifier: Modifier = Modifier
-) = AttentionWithMark(text, safetyLevel, modifier)
+) = AttentionWithMark(text, warningLevel, modifier)
 
 @Composable
 private fun AttentionHighlighted(
     text: String,
-    safetyLevel: SafetyLevel,
+    warningLevel: WarningLevel,
     modifier: Modifier = Modifier
 ) {
     Text(
         text = text,
         modifier = modifier,
-        color = cpsColors.colorFor(safetyLevel)
+        color = cpsColors.colorFor(warningLevel)
     )
 }
 
 @Composable
 private fun AttentionWithMark(
     text: String,
-    safetyLevel: SafetyLevel,
+    warningLevel: WarningLevel,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -45,8 +45,8 @@ private fun AttentionWithMark(
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         Text(text = text)
-        if (safetyLevel != SAFE) {
-            AttentionIcon(safetyLevel = safetyLevel)
+        if (warningLevel != SAFE) {
+            AttentionIcon(warningLevel = warningLevel)
         }
     }
 }
@@ -54,10 +54,10 @@ private fun AttentionWithMark(
 @Composable
 private fun AttentionBoxed(
     text: String,
-    safetyLevel: SafetyLevel,
+    warningLevel: WarningLevel,
     modifier: Modifier = Modifier
 ) {
-    if (safetyLevel == SAFE) {
+    if (warningLevel == SAFE) {
         Text(
             text = text,
             modifier = modifier,
@@ -67,7 +67,7 @@ private fun AttentionBoxed(
             text = text,
             color = cpsColors.background,
             modifier = modifier
-                .background(color = cpsColors.colorFor(safetyLevel))
+                .background(color = cpsColors.colorFor(warningLevel))
                 .border(color = cpsColors.background, width = 0.dp),
         )
     }

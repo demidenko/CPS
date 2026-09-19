@@ -26,7 +26,7 @@ import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.SafetyLevel
+import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.formatTimerFull
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.localCurrentTime
@@ -34,7 +34,7 @@ import com.demich.cps.utils.localCurrentTime
 @Composable
 internal fun ContestExpandedItemContent(
     contest: Contest,
-    collisionLevel: () -> SafetyLevel,
+    collisionLevel: () -> WarningLevel,
     onDeleteRequest: () -> Unit
 ) {
     val phase = contest.phaseAt(localCurrentTime)
@@ -115,14 +115,14 @@ private fun ContestCounter(
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     phase: Contest.Phase,
-    collisionLevel: () -> SafetyLevel,
+    collisionLevel: () -> WarningLevel,
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
                 text = contest.dateRange(),
-                safetyLevel = if (phase == UPCOMING) collisionLevel() else SAFE,
+                warningLevel = if (phase == UPCOMING) collisionLevel() else SAFE,
                 modifier = Modifier.align(Alignment.Center)
             )
         }

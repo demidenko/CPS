@@ -133,7 +133,7 @@ private fun Footer(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (requestFailed) {
                     AttentionIcon(
-                        safetyLevel = ALERT,
+                        warningLevel = ALERT,
                         modifier = Modifier.padding(end = 4.dp)
                     )
                 }

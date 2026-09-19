@@ -23,7 +23,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.SafetyLevel
+import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.toSystemDateTime
@@ -32,7 +32,7 @@ import com.demich.cps.utils.toSystemDateTime
 fun ContestItem(
     contest: Contest,
     isExpanded: () -> Boolean,
-    collisionLevel: () -> SafetyLevel,
+    collisionLevel: () -> WarningLevel,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
@@ -49,7 +49,7 @@ fun ContestItem(
 @Composable
 private fun ContestItemContent(
     contest: Contest,
-    collisionLevel: () -> SafetyLevel
+    collisionLevel: () -> WarningLevel
 ) {
     //TODO: call recomposes two times
     val phase = contest.phaseAt(localCurrentTime)
@@ -130,7 +130,7 @@ inline fun ContestItemFooter(
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
-    collisionLevel: () -> SafetyLevel,
+    collisionLevel: () -> WarningLevel,
     modifier: Modifier = Modifier
 ) {
     ContestItemFooter(
@@ -142,7 +142,7 @@ private fun ContestItemFooter(
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
-                safetyLevel = if (phase == UPCOMING) collisionLevel() else SAFE
+                warningLevel = if (phase == UPCOMING) collisionLevel() else SAFE
             )
         },
         right = {

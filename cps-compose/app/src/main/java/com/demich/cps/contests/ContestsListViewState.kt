@@ -9,7 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.utils.SafetyLevel
+import com.demich.cps.utils.WarningLevel
 import com.demich.kotlin_stdlib_boost.mapToSet
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.sebaslogen.resaca.rememberScoped
@@ -79,7 +79,7 @@ class ContestsListViewState(
 
     private fun Contest.isFinished() = compositeId !in notFinishedIds
 
-    fun collisionLevel(contest: Contest): SafetyLevel {
+    fun collisionLevel(contest: Contest): WarningLevel {
         if (noCollisionMinDuration == null) return SAFE
         val duration = expandedContests.values.minOfNotNull {
             val start = it.startTime
