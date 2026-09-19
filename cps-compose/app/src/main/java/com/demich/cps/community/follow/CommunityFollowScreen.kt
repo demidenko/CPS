@@ -13,13 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.profiles.DialogProfileSelector
+import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -128,7 +128,7 @@ private fun CodeforcesFollowList(
             title = buildAnnotatedString {
                 val result = userBlog.userProfile
                 append("Delete ")
-                append(LocalCodeforcesProfileManager.current.makeHandleSpan(profileResult = result))
+                append(CodeforcesProfileManager().makeHandleSpan(profileResult = result))
                 append(" from follow list?")
             },
             onDismissRequest = { showDeleteDialogForBlog = null },
@@ -149,7 +149,7 @@ fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
 
     if (showChooseDialog) {
         DialogProfileSelector(
-            manager = LocalCodeforcesProfileManager.current,
+            manager = CodeforcesProfileManager(),
             initial = null,
             onDismissRequest = { showChooseDialog = false },
             onResult = {
