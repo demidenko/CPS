@@ -22,10 +22,10 @@ enum class HandleColor {
     }
 }
 
-data class HandleColorBound(
-    val handleColor: HandleColor,
+data class RatingColorBound(
+    val ratingColor: HandleColor,
     val ratingUpperBound: Int
 )
 
-infix fun HandleColor.until(rating: Int): HandleColorBound =
-    HandleColorBound(handleColor = this, ratingUpperBound = rating)
+infix fun HandleColor.until(rating: Int): RatingColorBound =
+    RatingColorBound(ratingColor = this, ratingUpperBound = rating)

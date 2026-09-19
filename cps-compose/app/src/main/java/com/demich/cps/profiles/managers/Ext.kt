@@ -17,7 +17,7 @@ import com.demich.cps.ui.theme.cpsColors
 fun RatedProfileManager<*>.getHandleColor(rating: Int): HandleColor =
     ratingsUpperBounds
         .firstOrNull { rating < it.ratingUpperBound }
-        ?.handleColor ?: RED
+        ?.ratingColor ?: RED
 
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(handleColor: HandleColor): Color =

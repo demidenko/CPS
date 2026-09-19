@@ -6,8 +6,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.profiles.HandleColor
-import com.demich.cps.profiles.HandleColorBound
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColorBound
 import com.demich.cps.profiles.SmallRatedProfilePanel
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
@@ -18,7 +18,7 @@ import kotlin.time.Instant
 abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override val userIdTitle get() = "handle"
 
-    abstract val ratingsUpperBounds: List<HandleColorBound>
+    abstract val ratingsUpperBounds: List<RatingColorBound>
 
     abstract fun originalColor(handleColor: HandleColor): Color?
 
@@ -54,7 +54,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    val ratingUpperBoundRevolutions: List<Pair<Instant, List<HandleColorBound>>>
+    val ratingUpperBoundRevolutions: List<Pair<Instant, List<RatingColorBound>>>
 }
 
 fun RatedProfileManager<*>.originalColorOrThrow(handleColor: HandleColor): Color =
