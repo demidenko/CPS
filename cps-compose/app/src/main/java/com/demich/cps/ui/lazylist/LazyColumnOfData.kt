@@ -32,8 +32,8 @@ fun <T> LazyColumnOfData(
     contentType: (item: T) -> Any? = { null },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
-    if (items != null) {
-        Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
+    Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
+        if (items != null) {
             LazyColumnWithScrollBar(
                 state = state,
                 scrollBarEnabled = scrollBarEnabled,
@@ -61,13 +61,13 @@ fun <T> LazyColumnOfData(
                         )
                 )
             }
-        }
 
-        LaunchedEffect(state, autoScrollPredicate) {
-            state.autoScrollToTop(
-                predicate = autoScrollPredicate,
-                animationScope = this
-            )
+            LaunchedEffect(state, autoScrollPredicate) {
+                state.autoScrollToTop(
+                    predicate = autoScrollPredicate,
+                    animationScope = this
+                )
+            }
         }
     }
 }
