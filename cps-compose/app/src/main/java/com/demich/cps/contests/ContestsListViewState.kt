@@ -79,8 +79,8 @@ class ContestsListViewState(
 
     private fun Contest.isFinished() = compositeId !in notFinishedIds
 
-    fun collisionLevel(contest: Contest): WarningLevel {
-        if (noCollisionMinDuration == null) return SAFE
+    fun collisionLevel(contest: Contest): WarningLevel? {
+        if (noCollisionMinDuration == null) return null
         val duration = expandedContests.values.minOfNotNull {
             val start = it.startTime
             val end = it.endTime
@@ -94,7 +94,7 @@ class ContestsListViewState(
             }
         } ?: Duration.INFINITE
         if (duration < noCollisionMinDuration) return WARNING
-        return SAFE
+        return null
     }
 
     var contestsPage by contestsPageState

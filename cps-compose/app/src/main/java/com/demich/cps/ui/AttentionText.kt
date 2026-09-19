@@ -16,7 +16,7 @@ import com.demich.cps.utils.colorFor
 @Composable
 internal fun AttentionText(
     text: String,
-    warningLevel: WarningLevel,
+    warningLevel: WarningLevel?,
     modifier: Modifier = Modifier
 ) = AttentionWithMark(text, warningLevel, modifier)
 
@@ -36,7 +36,7 @@ private fun AttentionHighlighted(
 @Composable
 private fun AttentionWithMark(
     text: String,
-    warningLevel: WarningLevel,
+    warningLevel: WarningLevel?,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -45,7 +45,7 @@ private fun AttentionWithMark(
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         Text(text = text)
-        if (warningLevel != SAFE) {
+        if (warningLevel != null) {
             AttentionIcon(warningLevel = warningLevel)
         }
     }
@@ -54,10 +54,10 @@ private fun AttentionWithMark(
 @Composable
 private fun AttentionBoxed(
     text: String,
-    warningLevel: WarningLevel,
+    warningLevel: WarningLevel?,
     modifier: Modifier = Modifier
 ) {
-    if (warningLevel == SAFE) {
+    if (warningLevel == null) {
         Text(
             text = text,
             modifier = modifier,

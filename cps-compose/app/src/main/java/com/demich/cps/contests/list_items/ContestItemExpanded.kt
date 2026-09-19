@@ -34,7 +34,7 @@ import com.demich.cps.utils.localCurrentTime
 @Composable
 internal fun ContestExpandedItemContent(
     contest: Contest,
-    collisionLevel: () -> WarningLevel,
+    collisionLevel: () -> WarningLevel?,
     onDeleteRequest: () -> Unit
 ) {
     val phase = contest.phaseAt(localCurrentTime)
@@ -115,14 +115,14 @@ private fun ContestCounter(
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     phase: Contest.Phase,
-    collisionLevel: () -> WarningLevel,
+    collisionLevel: () -> WarningLevel?,
     onDeleteRequest: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
                 text = contest.dateRange(),
-                warningLevel = if (phase == UPCOMING) collisionLevel() else SAFE,
+                warningLevel = if (phase == UPCOMING) collisionLevel() else null,
                 modifier = Modifier.align(Alignment.Center)
             )
         }

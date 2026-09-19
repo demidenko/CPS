@@ -32,7 +32,7 @@ import com.demich.cps.utils.toSystemDateTime
 fun ContestItem(
     contest: Contest,
     isExpanded: () -> Boolean,
-    collisionLevel: () -> WarningLevel,
+    collisionLevel: () -> WarningLevel?,
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
@@ -49,7 +49,7 @@ fun ContestItem(
 @Composable
 private fun ContestItemContent(
     contest: Contest,
-    collisionLevel: () -> WarningLevel
+    collisionLevel: () -> WarningLevel?
 ) {
     //TODO: call recomposes two times
     val phase = contest.phaseAt(localCurrentTime)
@@ -130,7 +130,7 @@ inline fun ContestItemFooter(
 private fun ContestItemFooter(
     contest: Contest,
     phase: Contest.Phase,
-    collisionLevel: () -> WarningLevel,
+    collisionLevel: () -> WarningLevel?,
     modifier: Modifier = Modifier
 ) {
     ContestItemFooter(
@@ -142,7 +142,7 @@ private fun ContestItemFooter(
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
                     FINISHED -> contest.dateRange()
                 },
-                warningLevel = if (phase == UPCOMING) collisionLevel() else SAFE
+                warningLevel = if (phase == UPCOMING) collisionLevel() else null
             )
         },
         right = {
