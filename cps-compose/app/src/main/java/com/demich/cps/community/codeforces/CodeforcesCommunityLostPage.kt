@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -45,7 +46,7 @@ fun CodeforcesCommunityLostPage(
         controller.flowOfTopBlogEntries(context).map { blogEntries ->
             blogEntries.mapToSet { it.id }
         }
-    }.collectAsStateWithLifecycle(initialValue = null)
+    }.collectAsState(initial = null)
 
     val blogEntries by remember {
         controller.flowOfLostBlogEntries(context)
