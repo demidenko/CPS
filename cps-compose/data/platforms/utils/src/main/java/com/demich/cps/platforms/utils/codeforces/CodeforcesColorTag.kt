@@ -1,5 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
+// TODO: sealed interface CodeforcesUserTag? (unrated, rating colors, legendary(?), admin)
 enum class CodeforcesColorTag {
     BLACK,
     GRAY,
