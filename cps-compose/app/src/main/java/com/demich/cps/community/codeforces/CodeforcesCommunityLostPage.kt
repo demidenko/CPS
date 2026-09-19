@@ -19,6 +19,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.workers.CodeforcesLostDataStore
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
@@ -40,11 +41,11 @@ fun CodeforcesCommunityLostPage(
         showNewEntries = true
     )
 
-    val topIds by remember(controller) {
+    val topIdsState = remember(controller) {
         controller.flowOfTopBlogEntries(context).map { blogEntries ->
             blogEntries.mapToSet { it.id }
         }
-    }.collectAsStateWithLifecycle(initialValue = emptySet())
+    }.collectAsStateWithLifecycle(initialValue = null)
 
     val blogEntries by remember {
         controller.flowOfLostBlogEntries(context)
@@ -57,7 +58,9 @@ fun CodeforcesCommunityLostPage(
         modifier = Modifier.fillMaxSize(),
         scrollBarEnabled = true,
         label = {
-            if (it.id in topIds) TopLabel()
+            topIdsState.onNotNull { topIds ->
+                if (it.id in topIds) TopLabel()
+            }
         }
     )
 }
