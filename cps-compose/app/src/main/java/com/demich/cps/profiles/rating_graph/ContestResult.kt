@@ -132,7 +132,7 @@ private fun RatingChange(
 private fun ContestResultTest(
     change: Int?,
     longTitle: Boolean = false,
-    handleColor: HandleColor = HandleColor.ORANGE
+    handleColor: HandleColor = ORANGE
 ) {
     val rating = 2150
     ContestResult(

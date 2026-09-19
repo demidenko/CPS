@@ -83,7 +83,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
     val rating = profile?.userInfoOrNull()?.rating ?: return null
     val handleColor = getHandleColor(rating)
     val rank = when (handleColor) {
-        HandleColor.RED -> Double.POSITIVE_INFINITY
+        RED -> Double.POSITIVE_INFINITY
         else -> {
             val i = rankedHandleColors.indexOfFirst { handleColor == it }
             val j = rankedHandleColors.indexOfLast { handleColor == it }
