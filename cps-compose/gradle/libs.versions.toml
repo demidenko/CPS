@@ -6,6 +6,7 @@ ksp = "2.3.12" # https://github.com/google/ksp/releases
 serialization = "1.11.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 datetime = "0.8.0" # https://github.com/Kotlin/kotlinx-datetime/releases
 coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
+collections-immutable = "0.5.2" # https://github.com/Kotlin/kotlinx.collections.immutable/releases
 
 ktor = "3.6.0" # https://github.com/ktorio/ktor/releases
 
@@ -42,6 +43,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collections-immutable" }
 
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
