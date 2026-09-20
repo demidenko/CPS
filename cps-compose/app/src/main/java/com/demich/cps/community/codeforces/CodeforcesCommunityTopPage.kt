@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.utils.context
 
@@ -49,7 +48,7 @@ private fun CodeforcesCommunityTopBlogEntries(
         showNewEntries = false
     )
 
-    val blogEntries by controller.flowOfTopBlogEntries(context).collectAsStateWithLifecycle()
+    val blogEntries by controller.flowOfTopBlogEntries(context).collectAsState()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,
