@@ -68,11 +68,9 @@ private class ContestsSmartSorter: ContestsSorter {
                 }
             } ?: Instant.DISTANT_FUTURE
 
-        val firstRunningOrUpcoming: Int = sorted.firstRunningOrUpcoming(sortedAt)
-
         val result = SortedContests(
             contests = sorted,
-            firstRunningOrUpcoming = firstRunningOrUpcoming
+            firstRunningOrUpcoming = sorted.firstRunningOrUpcoming(sortedAt)
         )
     }
 
