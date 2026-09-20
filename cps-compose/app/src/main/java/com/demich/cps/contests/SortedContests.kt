@@ -30,9 +30,12 @@ import kotlin.time.Instant
 // FINISHED | RUNNING | UPCOMING
 data class SortedContests(
     val contests: List<Contest>,
-    private val firstRunningOrUpcoming: Int,
-    // TODO: firstUpcoming to get contest with phase
+    val sortedAt: Instant,
 ) {
+    private val firstRunningOrUpcoming: Int =
+        contests.partitionIndex { it.phaseAt(sortedAt) == FINISHED }
+    // TODO: firstUpcoming to get contest with phase
+
     val finished: List<Contest> =
         contests.subList(fromIndex = 0, toIndex = firstRunningOrUpcoming)
 
@@ -44,9 +47,6 @@ private interface ContestsSorter {
     val contests: SortedContests
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
 }
-
-private fun List<Contest>.firstRunningOrUpcoming(currentTime: Instant) =
-    partitionIndex { it.phaseAt(currentTime) == FINISHED }
 
 private class ContestsSmartSorter: ContestsSorter {
     private class SortedData(contests: List<Contest>, time: Instant) {
@@ -70,7 +70,7 @@ private class ContestsSmartSorter: ContestsSorter {
 
         val result = SortedContests(
             contests = sorted,
-            firstRunningOrUpcoming = sorted.firstRunningOrUpcoming(sortedAt)
+            sortedAt = sortedAt
         )
     }
 
