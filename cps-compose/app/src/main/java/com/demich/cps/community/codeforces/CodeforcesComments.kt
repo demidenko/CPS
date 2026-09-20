@@ -46,7 +46,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CodeforcesComments(
-    comments: List<CodeforcesWebComment>,
+    comments: List<CodeforcesWebComment>?,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     showTitle: Boolean = true

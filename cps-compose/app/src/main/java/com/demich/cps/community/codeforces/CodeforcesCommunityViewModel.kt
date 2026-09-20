@@ -65,7 +65,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val topBlogEntries = dataLoader { it.getTopBlogEntries() }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
-    private val topComments = dataLoader(emptyList()) { it.getTopComments() }
+    private val topComments = dataLoader { it.getTopComments() }
     override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
     private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { it.getRecentFeed() }
