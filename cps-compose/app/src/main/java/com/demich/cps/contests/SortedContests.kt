@@ -43,6 +43,15 @@ data class SortedContests(
         contests.subList(fromIndex = firstRunningOrUpcoming, toIndex = contests.size)
 }
 
+private fun SortedContests.nextReorderTime(): Instant =
+    contests.minOfNotNull {
+        when {
+            sortedAt < it.startTime -> it.startTime
+            sortedAt < it.endTime -> it.endTime
+            else -> null
+        }
+    } ?: Instant.DISTANT_FUTURE
+
 private interface ContestsSorter {
     val contests: SortedContests
     fun apply(contests: List<Contest>, currentTime: Instant): Boolean
@@ -59,19 +68,12 @@ private class ContestsSmartSorter: ContestsSorter {
 
         val sortedAt: Instant = time
 
-        val nextReorderTime: Instant =
-            sorted.minOfNotNull {
-                when {
-                    sortedAt < it.startTime -> it.startTime
-                    sortedAt < it.endTime -> it.endTime
-                    else -> null
-                }
-            } ?: Instant.DISTANT_FUTURE
-
         val result = SortedContests(
             contests = sorted,
             sortedAt = sortedAt
         )
+
+        val nextReorderTime: Instant = result.nextReorderTime()
     }
 
     private var last: List<Contest> = emptyList()
