@@ -5,8 +5,13 @@ import java.util.Collections
 fun <T> MutableList<T>.swap(i: Int, j: Int) =
     Collections.swap(this, i, j)
 
-inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> =
-    mapTo(mutableSetOf(), transform)
+inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> {
+    if (this is Collection) {
+        if (isEmpty()) return emptySet()
+        if (size == 1) return setOf(transform(first()))
+    }
+    return mapTo(mutableSetOf(), transform)
+}
 
 inline fun <T, R : Comparable<R>> Iterable<T>.minOfNotNull(selector: (T) -> R?): R? =
     minOfWithOrNull(comparator = nullsLast(), selector = selector)
