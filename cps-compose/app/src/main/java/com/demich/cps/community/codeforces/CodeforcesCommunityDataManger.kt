@@ -14,8 +14,8 @@ interface CodeforcesCommunityDataManger {
 
     fun reload(tabs: List<CodeforcesTab>, context: Context)
 
-    fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>>
-    fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>>
+    fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
+    fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
     fun flowOfTopComments(context: Context): StateFlow<List<CodeforcesWebComment>>
     fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed>
 

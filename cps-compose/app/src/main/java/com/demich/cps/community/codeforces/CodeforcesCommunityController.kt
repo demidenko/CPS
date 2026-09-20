@@ -172,7 +172,7 @@ fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, con
         else -> return null
     }
     return combineToCounters(
-        flowOfIds = flow.map { it.map { it.id } },
+        flowOfIds = flow.map { it?.map { it.id } ?: emptyList() },
         flowOfTypes = CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
     )
 }

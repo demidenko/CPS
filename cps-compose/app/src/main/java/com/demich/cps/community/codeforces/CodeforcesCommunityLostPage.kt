@@ -44,7 +44,7 @@ fun CodeforcesCommunityLostPage(
 
     val topIdsState = remember(controller) {
         controller.flowOfTopBlogEntries(context).map { blogEntries ->
-            blogEntries.mapToSet { it.id }
+            blogEntries?.mapToSet { it.id }
         }
     }.collectAsState(initial = null)
 

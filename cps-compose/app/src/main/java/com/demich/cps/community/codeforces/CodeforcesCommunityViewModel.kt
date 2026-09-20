@@ -59,10 +59,10 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
         }
     }
 
-    private val mainBlogEntries = dataLoader(emptyList()) { it.getMainBlogEntries() }
+    private val mainBlogEntries = dataLoader { it.getMainBlogEntries() }
     override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
 
-    private val topBlogEntries = dataLoader(emptyList()) { it.getTopBlogEntries() }
+    private val topBlogEntries = dataLoader { it.getTopBlogEntries() }
     override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
     private val topComments = dataLoader(emptyList()) { it.getTopComments() }
@@ -156,6 +156,9 @@ private fun <T> CodeforcesDataLoader<T>.flowOfData(context: Context): StateFlow<
 
 private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
+
+private fun <T> ViewModel.dataLoader(getData: suspend (CodeforcesPageContentProvider) -> T) =
+    CodeforcesDataLoader(scope = viewModelScope, init = null, getData = getData)
 
 
 private suspend fun CodeforcesPageContentProvider.getMainBlogEntries() =
