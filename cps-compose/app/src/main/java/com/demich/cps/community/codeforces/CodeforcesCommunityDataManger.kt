@@ -17,7 +17,7 @@ interface CodeforcesCommunityDataManger {
     fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
     fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
     fun flowOfTopComments(context: Context): StateFlow<List<CodeforcesWebComment>?>
-    fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed>
+    fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed?>
 
     fun updateFollowUsersInfo(context: Context)
 }

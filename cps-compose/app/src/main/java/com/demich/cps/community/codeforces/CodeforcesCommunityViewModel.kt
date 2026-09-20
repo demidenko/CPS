@@ -13,7 +13,6 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesCommentsPageParser
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
 import com.demich.cps.utils.FetchValue
 import com.demich.cps.utils.LoadingStatus
@@ -68,7 +67,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     private val topComments = dataLoader { it.getTopComments() }
     override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
-    private val recentActions = dataLoader(CodeforcesRecentFeed(emptyList(), emptyList())) { it.getRecentFeed() }
+    private val recentActions = dataLoader { it.getRecentFeed() }
     override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
     private fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {

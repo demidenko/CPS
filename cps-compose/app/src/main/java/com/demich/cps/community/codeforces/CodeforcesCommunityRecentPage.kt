@@ -30,7 +30,7 @@ fun CodeforcesCommunityRecentPage(
     val recent by controller.flowOfRecent(context).collectAsState()
     val grouped by remember {
         derivedStateOf {
-            recent.grouped()
+            recent?.grouped()
         }
     }
 
@@ -41,7 +41,7 @@ fun CodeforcesCommunityRecentPage(
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntry = type.blogEntry
                 RecentCommentsInBlogEntry(
-                    recentComments = grouped.firstOrNull { it.blogEntry.id == blogEntry.id }
+                    recentComments = grouped?.firstOrNull { it.blogEntry.id == blogEntry.id }
                         ?: CodeforcesRecentCommentsOfBlogEntry(blogEntry = blogEntry, comments = emptyList()),
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
                     onClose = { controller.recentPageType = RecentPageType.RecentFeed },
@@ -52,7 +52,7 @@ fun CodeforcesCommunityRecentPage(
             RecentPageType.RecentComments -> {
                 saveableStateHolder.SaveableStateProvider(key = true) {
                     CodeforcesComments(
-                        comments = recent.comments,
+                        comments = recent?.comments,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -81,7 +81,7 @@ fun CodeforcesCommunityRecentPage(
 
 @Composable
 private fun RecentBlogEntriesPage(
-    recent: List<CodeforcesRecentCommentsOfBlogEntry>,
+    recent: List<CodeforcesRecentCommentsOfBlogEntry>?,
     modifier: Modifier = Modifier,
     onBrowseComment: (CodeforcesRecentFeedBlogEntry, CodeforcesWebComment) -> Unit,
     onBrowseBlogEntry: (CodeforcesRecentFeedBlogEntry) -> Unit,
