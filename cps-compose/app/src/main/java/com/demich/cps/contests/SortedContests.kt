@@ -66,14 +66,15 @@ private class ContestsSmartSorter: ContestsSorter {
                 else it.sortedWith(comparator)
             }
 
-        val sortedAt: Instant = time
-
         val result = SortedContests(
             contests = sorted,
-            sortedAt = sortedAt
+            sortedAt = time
         )
 
         val nextReorderTime: Instant = result.nextReorderTime()
+
+        fun sameOrder(time: Instant): Boolean =
+            time >= result.sortedAt && time < nextReorderTime
     }
 
     private var last: List<Contest> = emptyList()
@@ -89,7 +90,7 @@ private class ContestsSmartSorter: ContestsSorter {
                 sortedLast = SortedData(contests, currentTime)
                 return true
             }
-            if (currentTime >= nextReorderTime || currentTime < sortedAt) {
+            if (!sameOrder(currentTime)) {
                 sortedLast = SortedData(sorted, currentTime)
                 return true
             }
