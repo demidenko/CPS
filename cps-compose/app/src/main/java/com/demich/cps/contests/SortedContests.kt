@@ -71,7 +71,7 @@ private class ContestsSmartSorter: ContestsSorter {
             sortedAt = time
         )
 
-        val nextReorderTime: Instant = result.nextReorderTime()
+        private val nextReorderTime = result.nextReorderTime()
 
         fun sameOrder(time: Instant): Boolean =
             time >= result.sortedAt && time < nextReorderTime
