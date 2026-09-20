@@ -48,20 +48,6 @@ private interface ContestsSorter {
 private fun List<Contest>.firstRunningOrUpcoming(currentTime: Instant) =
     partitionIndex { it.phaseAt(currentTime) == FINISHED }
 
-private class ContestsBruteSorter: ContestsSorter {
-    override var contests: SortedContests = SortedContests(emptyList(), 0)
-        private set
-
-    override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
-        val sorted = contests.sortedWith(Contest.comparatorAt(currentTime))
-        this.contests = SortedContests(
-            contests = sorted,
-            firstRunningOrUpcoming = sorted.firstRunningOrUpcoming(currentTime)
-        )
-        return true
-    }
-}
-
 private class ContestsSmartSorter: ContestsSorter {
     private class SortedData(contests: List<Contest>, time: Instant) {
         val sorted: List<Contest> =
@@ -83,16 +69,18 @@ private class ContestsSmartSorter: ContestsSorter {
             } ?: Instant.DISTANT_FUTURE
 
         val firstRunningOrUpcoming: Int = sorted.firstRunningOrUpcoming(sortedAt)
+
+        val result = SortedContests(
+            contests = sorted,
+            firstRunningOrUpcoming = firstRunningOrUpcoming
+        )
     }
 
     private var last: List<Contest> = emptyList()
     private var sortedLast = SortedData(last, Instant.DISTANT_PAST)
 
     override val contests: SortedContests
-        get() = SortedContests(
-            contests = sortedLast.sorted,
-            firstRunningOrUpcoming = sortedLast.firstRunningOrUpcoming
-        )
+        get() = sortedLast.result
 
     override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
         with(sortedLast) {
