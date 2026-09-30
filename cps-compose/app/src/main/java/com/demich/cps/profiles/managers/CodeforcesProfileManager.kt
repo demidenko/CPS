@@ -295,7 +295,7 @@ private fun ratingUpperBounds() =
         // bs can be optimized if iterate from orange to gray
         // but it speedups whole function only from 3.5us to 2.5us
         val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
-            CodeforcesUserTag.fromRating(rating) <= colorTag
+            CodeforcesRatingColorTag.fromRating(rating) <= colorTag
         }
         val handleColor = checkNotNull(colorTag.toHandleColor())
         handleColor until rating
