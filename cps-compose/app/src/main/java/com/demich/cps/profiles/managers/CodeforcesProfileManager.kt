@@ -28,7 +28,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
-import com.demich.cps.platforms.utils.codeforces.toCodeforcesUserTag
+import com.demich.cps.platforms.utils.codeforces.toUserTag
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
@@ -225,7 +225,7 @@ private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
     LocalCodeforcesProfileManager.current
-        .makeHandleSpan(handle = handle, tag = colorTag.toCodeforcesUserTag(), cpsColors = cpsColors)
+        .makeHandleSpan(handle = handle, tag = colorTag.toUserTag(), cpsColors = cpsColors)
 
 
 class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Context):

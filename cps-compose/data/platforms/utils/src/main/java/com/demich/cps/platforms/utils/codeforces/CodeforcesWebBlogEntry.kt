@@ -27,4 +27,4 @@ fun CodeforcesBlogEntry.toWebBlogEntry(colorTag: CodeforcesColorTag) =
     )
 
 fun CodeforcesBlogEntry.toWebBlogEntry(tag: CodeforcesUserTag) =
-    toWebBlogEntry(colorTag = tag.toCodeforcesColorTag())
+    toWebBlogEntry(colorTag = tag.toColorTag())

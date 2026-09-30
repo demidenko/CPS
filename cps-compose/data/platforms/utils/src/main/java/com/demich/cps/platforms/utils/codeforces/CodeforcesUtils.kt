@@ -12,7 +12,7 @@ suspend fun CodeforcesPageContentProvider.getUserTagOrNull(handle: String): Code
             ?.selectRatedUser()
             ?.extractRatedUser()
             ?.colorTag
-            ?.toCodeforcesUserTag()
+            ?.toUserTag()
     }
 
 suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Sequence<CodeforcesHandle> =
