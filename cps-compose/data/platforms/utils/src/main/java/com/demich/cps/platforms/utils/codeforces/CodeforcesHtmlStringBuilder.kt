@@ -10,7 +10,7 @@ import org.jsoup.select.NodeVisitor
 interface CodeforcesHtmlStringBuilder {
     val length: Int
     fun append(text: String)
-    fun appendRatedSpan(text: String, tag: CodeforcesColorTag)
+    fun appendRatedSpan(text: String, tag: CodeforcesUserTag)
     fun pop()
     fun pushLink()
     fun pushBold()
@@ -43,7 +43,7 @@ private class CodeforcesNodeVisitor(val builder: CodeforcesHtmlStringBuilder): N
 
         if (name.isLink() && e.hasClass("rated-user")) {
             val user = e.extractRatedUser()
-            builder.appendRatedSpan(text = user.handle, tag = user.colorTag)
+            builder.appendRatedSpan(text = user.handle, tag = user.colorTag.toCodeforcesUserTag())
             e.remove()
             return
         }

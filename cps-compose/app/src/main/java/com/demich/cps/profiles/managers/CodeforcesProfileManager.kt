@@ -23,7 +23,6 @@ import com.demich.cps.platforms.api.codeforces.getUserOrNull
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesProblem
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
@@ -210,13 +209,6 @@ class CodeforcesProfileManager :
         )
 
 }
-
-fun CodeforcesProfileManager.makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors) =
-    makeHandleSpan(
-        handle = handle,
-        tag = tag.toCodeforcesUserTag(),
-        cpsColors = cpsColors
-    )
 
 private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
     when (this) {

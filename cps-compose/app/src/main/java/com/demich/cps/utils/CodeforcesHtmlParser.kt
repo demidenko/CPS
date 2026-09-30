@@ -9,11 +9,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.demich.cps.LocalCodeforcesProfileManager
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.parse
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
-import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
@@ -41,7 +40,7 @@ private class CodeforcesHtmlStringBuilderImpl(
 
     override fun append(text: String) = builder.append(text)
 
-    override fun appendRatedSpan(text: String, tag: CodeforcesColorTag) {
+    override fun appendRatedSpan(text: String, tag: CodeforcesUserTag) {
         builder.append(manager.makeHandleSpan(handle = text, tag = tag, cpsColors = cpsColors))
     }
 
