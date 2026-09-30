@@ -59,9 +59,6 @@ enum class CodeforcesRatingColorTag: CodeforcesUserTag {
                 rating < 3000 -> RED
                 else -> LEGENDARY
             }
-
-        fun fromRating(rating: Int?): CodeforcesRatingColorTag? =
-            if (rating == null) null else fromRating(rating)
     }
 }
 

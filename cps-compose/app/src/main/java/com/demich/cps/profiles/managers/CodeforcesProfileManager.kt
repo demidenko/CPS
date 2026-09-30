@@ -133,7 +133,7 @@ class CodeforcesProfileManager :
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         makeHandleSpan(
             handle = text,
-            tag = CodeforcesColorTag.fromRating(rating),
+            tag = CodeforcesRatingColorTag.fromRating(rating),
             cpsColors = cpsColors
         )
 
