@@ -76,6 +76,13 @@ fun CodeforcesRatingColorTag.toCodeforcesColorTag(): CodeforcesColorTag =
         LEGENDARY -> LEGENDARY
     }
 
+fun CodeforcesUserTag.toCodeforcesColorTag(): CodeforcesColorTag =
+    when (this) {
+        is CodeforcesRatingColorTag -> toCodeforcesColorTag()
+        is CodeforcesAdminTag -> ADMIN
+        is CodeforcesUnratedTag -> BLACK
+    }
+
 fun CodeforcesColorTag.toCodeforcesUserTag(): CodeforcesUserTag =
     when (this) {
         BLACK -> CodeforcesUnratedTag
