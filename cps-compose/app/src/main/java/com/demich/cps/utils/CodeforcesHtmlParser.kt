@@ -13,6 +13,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHtmlStringBuilder
 import com.demich.cps.platforms.utils.codeforces.parse
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
+import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 

@@ -26,8 +26,10 @@ import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
+import com.demich.cps.platforms.utils.codeforces.toCodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
@@ -109,17 +111,17 @@ class CodeforcesProfileManager :
             else -> null
         }
 
-    fun makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors): AnnotatedString =
+    fun makeHandleSpan(handle: String, tag: CodeforcesUserTag, cpsColors: CPSColors): AnnotatedString =
         buildAnnotatedString {
             append(handle, color = cpsColors.content)
-            tag.toHandleColor()?.let { handleColor ->
+            if (tag is CodeforcesRatingColorTag) {
                 addStyle(
-                    style = SpanStyle(color = cpsColors.colorFor(handleColor)),
+                    style = SpanStyle(color = cpsColors.colorFor(tag.toHandleColor())),
                     start = if (tag == LEGENDARY) 1 else 0,
                     end = handle.length
                 )
             }
-            if (tag != BLACK) {
+            if (tag !is CodeforcesUnratedTag) {
                 addStyle(
                     style = SpanStyle(fontWeight = FontWeight.Bold),
                     start = 0,
@@ -209,17 +211,12 @@ class CodeforcesProfileManager :
 
 }
 
-private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
-    when (this) {
-        GRAY -> GRAY
-        GREEN -> GREEN
-        CYAN -> CYAN
-        BLUE -> BLUE
-        VIOLET -> VIOLET
-        ORANGE -> ORANGE
-        RED, LEGENDARY -> RED
-        BLACK, ADMIN -> null
-    }
+fun CodeforcesProfileManager.makeHandleSpan(handle: String, tag: CodeforcesColorTag, cpsColors: CPSColors) =
+    makeHandleSpan(
+        handle = handle,
+        tag = tag.toCodeforcesUserTag(),
+        cpsColors = cpsColors
+    )
 
 private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
     when (this) {
@@ -236,7 +233,7 @@ private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
     LocalCodeforcesProfileManager.current
-        .makeHandleSpan(handle = handle, tag = colorTag, cpsColors = cpsColors)
+        .makeHandleSpan(handle = handle, tag = colorTag.toCodeforcesUserTag(), cpsColors = cpsColors)
 
 
 class CodeforcesProfileStorage(manager: CodeforcesProfileManager, context: Context):
