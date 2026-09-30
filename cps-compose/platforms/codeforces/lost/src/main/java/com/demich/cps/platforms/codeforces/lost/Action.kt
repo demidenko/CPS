@@ -5,10 +5,13 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getBlogEntryOrNull
 import com.demich.cps.platforms.api.codeforces.getRecentActions
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedPageParser
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getUsersCatchingFilterFound
+import com.demich.cps.platforms.utils.codeforces.toCodeforcesColorTag
 import kotlin.time.Instant
 
 
@@ -232,19 +235,23 @@ private suspend fun CodeforcesLostStorage.updateLost(
         editNullColorTags(
             colorTag = {
                 users[it.authorHandle]
-                    ?.let { user -> CodeforcesColorTag.fromRating(user.rating) }
+                    ?.let { user ->
+                        val rating = user.rating
+                        if (rating == null) CodeforcesUnratedTag
+                        else CodeforcesRatingColorTag.fromRating(rating)
+                    }
             }
         )
     }
 }
 
 private suspend fun CodeforcesLostStorage.editNullColorTags(
-    colorTag: (CodeforcesLostEntry) -> CodeforcesColorTag?
+    colorTag: (CodeforcesLostEntry) -> CodeforcesUserTag?
 ) {
     editEntries {
         replaceValues {
             if (it.authorColorTag == null) {
-                val colorTag = colorTag(it)
+                val colorTag = colorTag(it)?.toCodeforcesColorTag()
                 if (colorTag != null) {
                     return@replaceValues when (it) {
                         is CodeforcesLostBlogEntry -> it.copy(authorColorTag = colorTag)
