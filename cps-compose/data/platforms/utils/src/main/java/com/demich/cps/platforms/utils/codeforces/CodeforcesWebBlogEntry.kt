@@ -25,3 +25,6 @@ fun CodeforcesBlogEntry.toWebBlogEntry(colorTag: CodeforcesColorTag) =
         rating = rating,
         commentsCount = null
     )
+
+fun CodeforcesBlogEntry.toWebBlogEntry(tag: CodeforcesUserTag) =
+    toWebBlogEntry(colorTag = tag.toCodeforcesColorTag())

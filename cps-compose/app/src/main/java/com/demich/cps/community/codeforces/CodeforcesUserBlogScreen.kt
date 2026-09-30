@@ -25,10 +25,11 @@ import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag.BLACK
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.getRealColorTagOrNull
+import com.demich.cps.platforms.utils.codeforces.getUserTagOrNull
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -181,9 +182,9 @@ private class BlogLoadingViewModel: ViewModel() {
             combine(
                 flow = flow { emit(repository.getAndReloadBlogEntries(handle = user.handle).getOrThrow()) },
                 flow2 = CodeforcesClient().flowOfColorTag(profile = user)
-            ) { blogEntries, colorTag ->
+            ) { blogEntries, tag ->
                 blogEntries.map {
-                    it.toWebBlogEntry(colorTag = colorTag ?: BLACK)
+                    it.toWebBlogEntry(tag = tag ?: CodeforcesUnratedTag)
                 }
             }.let { emitAll(it) }
         }
@@ -193,12 +194,18 @@ private class BlogLoadingViewModel: ViewModel() {
 
 private fun CodeforcesPageContentProvider.flowOfColorTag(
     profile: ProfileResult<CodeforcesUserInfo>
-): Flow<CodeforcesColorTag?> =
+): Flow<CodeforcesUserTag?> =
     flow {
-        when (profile) {
-            is ProfileResult.Success -> emit(CodeforcesColorTag.fromRating(profile.userInfo.rating))
-            else -> emit(null)
-        }
-        val result = fetchResultOf { getRealColorTagOrNull(profile.handle) }
+        val startTag =
+            if (profile is ProfileResult.Success) {
+                val rating = profile.userInfo.rating
+                if (rating == null) CodeforcesUnratedTag
+                else CodeforcesRatingColorTag.fromRating(rating)
+            } else {
+                null
+            }
+        emit(startTag)
+
+        val result = fetchResultOf { getUserTagOrNull(profile.handle) }
         if (result is FetchResult.Success) result.value?.let { emit(it) }
     }

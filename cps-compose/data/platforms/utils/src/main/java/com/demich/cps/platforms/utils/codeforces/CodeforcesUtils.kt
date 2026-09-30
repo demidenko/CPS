@@ -5,13 +5,14 @@ import com.demich.cps.platforms.utils.parseDocument
 import com.demich.cps.platforms.utils.parseHtmlElement
 
 
-suspend fun CodeforcesPageContentProvider.getRealColorTagOrNull(handle: String): CodeforcesColorTag? =
+suspend fun CodeforcesPageContentProvider.getUserTagOrNull(handle: String): CodeforcesUserTag? =
     with(CodeforcesRatedUserSelectorImpl()) {
         getUserPage(handle).parseDocument()
             .selectFirst("div.userbox")
             ?.selectRatedUser()
             ?.extractRatedUser()
             ?.colorTag
+            ?.toCodeforcesUserTag()
     }
 
 suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Sequence<CodeforcesHandle> =
