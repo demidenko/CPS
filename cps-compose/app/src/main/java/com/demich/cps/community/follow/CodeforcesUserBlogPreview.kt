@@ -9,17 +9,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.LocalCodeforcesProfileManager
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
-import com.demich.cps.profiles.managers.toHandleSpan
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.handle
@@ -91,14 +93,22 @@ private fun UserHandle(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = CodeforcesHandle(
-            handle = profile.handle,
-            colorTag = CodeforcesColorTag.fromRating(profile.userInfoOrNull()?.rating)
-        ).toHandleSpan(),
+        text = profile.toHandleSpan(),
         fontSize = CPSFontSize.itemTitle,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
+    )
+}
+
+@Composable
+@ReadOnlyComposable
+private fun ProfileResult<CodeforcesUserInfo>.toHandleSpan(): AnnotatedString {
+    val rating = userInfoOrNull()?.rating
+    return LocalCodeforcesProfileManager.current.makeHandleSpan(
+        handle = handle,
+        tag = if (rating == null) CodeforcesUnratedTag else CodeforcesRatingColorTag.fromRating(rating),
+        cpsColors = cpsColors
     )
 }
 

@@ -11,13 +11,7 @@ enum class CodeforcesColorTag {
     ORANGE,
     RED,
     LEGENDARY,
-    ADMIN;
-
-    companion object {
-        fun fromRating(rating: Int?): CodeforcesColorTag =
-            if (rating == null) BLACK
-            else CodeforcesRatingColorTag.fromRating(rating).toCodeforcesColorTag()
-    }
+    ADMIN
 }
 
 sealed interface CodeforcesUserTag
