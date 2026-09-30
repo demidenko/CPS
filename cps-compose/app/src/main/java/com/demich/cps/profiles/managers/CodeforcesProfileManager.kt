@@ -25,6 +25,8 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesRatingChange
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.HandleColor
@@ -219,6 +221,17 @@ private fun CodeforcesColorTag.toHandleColor(): HandleColor? =
         BLACK, ADMIN -> null
     }
 
+private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
+    when (this) {
+        GRAY -> GRAY
+        GREEN -> GREEN
+        CYAN -> CYAN
+        BLUE -> BLUE
+        VIOLET -> VIOLET
+        ORANGE -> ORANGE
+        RED, LEGENDARY -> RED
+    }
+
 @Composable
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
@@ -274,7 +287,7 @@ class CodeforcesProfileSettingsDataStore(context: Context):
 }
 
 private fun ratingUpperBounds() =
-    listOf<CodeforcesColorTag>(
+    listOf<CodeforcesRatingColorTag>(
         GRAY,
         GREEN,
         CYAN,
@@ -285,7 +298,7 @@ private fun ratingUpperBounds() =
         // bs can be optimized if iterate from orange to gray
         // but it speedups whole function only from 3.5us to 2.5us
         val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
-            CodeforcesColorTag.fromRating(rating) <= colorTag
+            CodeforcesUserTag.fromRating(rating) <= colorTag
         }
         val handleColor = checkNotNull(colorTag.toHandleColor())
         handleColor until rating
