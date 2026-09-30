@@ -14,8 +14,9 @@ enum class CodeforcesColorTag {
     ADMIN;
 
     companion object {
-        fun fromRating(rating: Int): CodeforcesColorTag =
+        fun fromRating(rating: Int?): CodeforcesColorTag =
             when {
+                rating == null -> BLACK
                 rating < 1200 -> GRAY
                 rating < 1400 -> GREEN
                 rating < 1600 -> CYAN
@@ -25,9 +26,6 @@ enum class CodeforcesColorTag {
                 rating < 3000 -> RED
                 else -> LEGENDARY
             }
-
-        fun fromRating(rating: Int?): CodeforcesColorTag =
-            if (rating == null) BLACK else fromRating(rating)
     }
 }
 

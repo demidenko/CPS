@@ -22,7 +22,7 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
     } catch (_: IllegalArgumentException) {
         // user-4000 case
         str.toIntOrNull()?.let {
-            CodeforcesColorTag.fromRating(it)
+            CodeforcesRatingColorTag.fromRating(it).toCodeforcesColorTag()
         }
     }
 }
