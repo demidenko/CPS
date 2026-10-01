@@ -49,15 +49,14 @@ abstract class ProfileManager<U: UserInfo> {
     }
 
     companion object {
-        fun entries(): List<ProfileManager<*>> =
-            listOf(
-                CodeforcesProfileManager(),
-                AtCoderProfileManager(),
-                CodeChefProfileManager(),
-                DmojProfileManager(),
-                ACMPProfileManager(),
-                TimusProfileManager()
-            )
+        fun entries(): List<ProfileManager<*>> = [
+            CodeforcesProfileManager(),
+            AtCoderProfileManager(),
+            CodeChefProfileManager(),
+            DmojProfileManager(),
+            ACMPProfileManager(),
+            TimusProfileManager()
+        ]
 
         fun ratedEntries(): List<RatedProfileManager<*>> =
             entries().filterIsInstance<RatedProfileManager<*>>()
