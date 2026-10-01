@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
@@ -60,7 +59,7 @@ import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
-import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
@@ -470,17 +469,15 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
 
 @Composable
 private fun loadingErrorsMessageState(): State<String?> {
-    val context = context
     val viewModel = contestsViewModel()
+    val errors by collectAsState { viewModel.flowOfLoadingErrors() }
 
-    return collectAsState {
-        combine(
-            flow = viewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsUI.devModeEnabled.asFlow(), //TODO use LocalDevModeEnabled.current
-        ) { errors: List<Pair<ContestsFetchSource?, Throwable>>, exposeAll: Boolean ->
-            when {
-                errors.isEmpty() -> null
-                else -> errors.groupBy(
+    val exposeAll = LocalDevModeEnabled.current
+    return remember(exposeAll) {
+        derivedStateOf {
+            if (errors.isEmpty()) null
+            else {
+                errors.groupBy(
                     keySelector = { (_, e) ->
                         e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
                     },
