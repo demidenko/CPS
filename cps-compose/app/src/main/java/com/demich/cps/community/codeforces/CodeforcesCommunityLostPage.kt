@@ -90,14 +90,14 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
 private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minRatingTag: CodeforcesRatingColorTag?): List<CodeforcesWebBlogEntry> =
     mapNotNull {
         val authorTag = it.authorColorTag
-        if (authorTag != null && authorTag.isGreaterOrEqualTo(minRatingTag)) {
+        if (authorTag != null && (minRatingTag == null || authorTag.isGreaterOrEqualTo(minRatingTag))) {
             it.blogEntry.toWebBlogEntry(tag = authorTag)
         } else null
     }
 
-private fun CodeforcesUserTag.isGreaterOrEqualTo(ratingTag: CodeforcesRatingColorTag?) =
+private fun CodeforcesUserTag.isGreaterOrEqualTo(ratingTag: CodeforcesRatingColorTag) =
     when (this) {
-        is CodeforcesRatingColorTag -> ratingTag == null || this >= ratingTag
-        is CodeforcesUnratedTag -> ratingTag == null
+        is CodeforcesRatingColorTag -> this >= ratingTag
+        is CodeforcesUnratedTag -> false
         is CodeforcesAdminTag -> true
     }
