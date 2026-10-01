@@ -16,7 +16,7 @@ private fun Element.extractUserTag(): CodeforcesUserTag? {
         ?: return null
 
     return try {
-        CodeforcesColorTag.valueOf(str).toUserTag()
+        CodeforcesHandleCssTag.valueOf(str).toUserTag()
     } catch (_: IllegalArgumentException) {
         // user-4000 case
         str.toIntOrNull()?.let {

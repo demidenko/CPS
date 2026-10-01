@@ -4,7 +4,6 @@ import android.content.Context
 import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.jsonCPS

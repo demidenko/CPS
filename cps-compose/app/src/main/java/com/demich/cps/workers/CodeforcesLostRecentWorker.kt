@@ -13,8 +13,8 @@ import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHint
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostHintStorage
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
 import com.demich.cps.platforms.codeforces.lost.updateEntries
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
-import com.demich.cps.platforms.utils.codeforces.toColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandleCssTag
+import com.demich.cps.platforms.utils.codeforces.toCssTag
 import com.demich.cps.platforms.utils.codeforces.toUserTag
 import com.demich.cps.utils.jsonCPS
 import com.demich.cps.utils.toSystemLocalDate
@@ -107,30 +107,30 @@ private class CodeforcesLostRecentWorkerStorage(context: Context): ItemizedDataS
 @Serializable
 private data class Suspect(
     @SerialName("id") val blogEntryId: Int,
-    @SerialName("tag") val authorColorTag: CodeforcesColorTag?
+    @SerialName("tag") val authorColorTag: CodeforcesHandleCssTag?
 )
 
 private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = blogEntryId, authorUserTag = authorColorTag?.toUserTag())
-private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(blogEntryId = blogEntryId, authorColorTag = authorUserTag?.toColorTag())
+private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(blogEntryId = blogEntryId, authorColorTag = authorUserTag?.toCssTag())
 
 @Serializable
 private data class Fresh(
     @SerialName("entry") val blogEntry: CodeforcesBlogEntry,
-    @SerialName("tag") val authorColorTag: CodeforcesColorTag?
+    @SerialName("tag") val authorColorTag: CodeforcesHandleCssTag?
 )
 
 private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorUserTag = authorColorTag?.toUserTag())
-private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, authorColorTag = authorUserTag?.toColorTag())
+private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, authorColorTag = authorUserTag?.toCssTag())
 
 @Serializable
 private data class Lost(
     @SerialName("entry")val blogEntry: CodeforcesBlogEntry,
-    @SerialName("tag") val authorColorTag: CodeforcesColorTag?,
+    @SerialName("tag") val authorColorTag: CodeforcesHandleCssTag?,
     @SerialName("stamp") val timeStamp: Instant
 )
 
 private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorUserTag = authorColorTag?.toUserTag(), timeStamp = timeStamp)
-private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, authorColorTag = authorUserTag?.toColorTag(), timeStamp = timeStamp)
+private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, authorColorTag = authorUserTag?.toCssTag(), timeStamp = timeStamp)
 
 class CodeforcesLostDataStore(context: Context):
     ItemizedDataStore(context.cf_lost_dataStore),

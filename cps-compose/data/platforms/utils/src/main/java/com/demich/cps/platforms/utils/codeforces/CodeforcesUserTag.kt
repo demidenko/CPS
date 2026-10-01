@@ -32,7 +32,8 @@ enum class CodeforcesRatingColorTag: CodeforcesUserTag {
     }
 }
 
-enum class CodeforcesColorTag {
+enum class CodeforcesHandleCssTag {
+    // do not rename entries!
     BLACK,
     GRAY,
     GREEN,
@@ -45,7 +46,7 @@ enum class CodeforcesColorTag {
     ADMIN
 }
 
-fun CodeforcesRatingColorTag.toColorTag(): CodeforcesColorTag =
+fun CodeforcesRatingColorTag.toCssTag(): CodeforcesHandleCssTag =
     when (this) {
         GRAY -> GRAY
         GREEN -> GREEN
@@ -57,14 +58,14 @@ fun CodeforcesRatingColorTag.toColorTag(): CodeforcesColorTag =
         LEGENDARY -> LEGENDARY
     }
 
-fun CodeforcesUserTag.toColorTag(): CodeforcesColorTag =
+fun CodeforcesUserTag.toCssTag(): CodeforcesHandleCssTag =
     when (this) {
-        is CodeforcesRatingColorTag -> toColorTag()
+        is CodeforcesRatingColorTag -> toCssTag()
         is CodeforcesAdminTag -> ADMIN
         is CodeforcesUnratedTag -> BLACK
     }
 
-fun CodeforcesColorTag.toUserTag(): CodeforcesUserTag =
+fun CodeforcesHandleCssTag.toUserTag(): CodeforcesUserTag =
     when (this) {
         BLACK -> CodeforcesUnratedTag
         GRAY -> CodeforcesRatingColorTag.GRAY
