@@ -15,13 +15,21 @@ private fun Element.extractUserTag(): CodeforcesUserTag? {
         ?.uppercase(Locale.ENGLISH)
         ?: return null
 
-    return try {
-        CodeforcesHandleCssTag.valueOf(str).toUserTag()
+    // TODO: Enum.valueOrNull
+    val cssTag = try {
+        CodeforcesHandleCssTag.valueOf(str)
     } catch (_: IllegalArgumentException) {
-        // user-4000 case
-        str.toIntOrNull()?.let {
-            CodeforcesRatingColorTag.fromRating(it)
+        null
+    }
+
+    return when (cssTag) {
+        null -> {
+            // user-4000 case
+            str.toIntOrNull()?.let {
+                CodeforcesRatingColorTag.fromRating(it)
+            }
         }
+        else -> cssTag.toUserTag()
     }
 }
 
