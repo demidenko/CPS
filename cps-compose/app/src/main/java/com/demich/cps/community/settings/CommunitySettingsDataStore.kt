@@ -5,6 +5,7 @@ import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesLocale
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
@@ -28,7 +29,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
     val codeforcesFollowEnabled = itemBoolean(name = "cf_follow_enabled", defaultValue = false)
 
     val codeforcesLostEnabled = itemBoolean(name = "cf_lost_enabled", defaultValue = false)
-    val codeforcesLostMinRatingTag = itemEnum<CodeforcesColorTag>(name = "cf_lost_min_rating", defaultValue = ORANGE)
+    val codeforcesLostMinRatingTag = jsonCPS.item<CodeforcesRatingColorTag?>(name = "cf_lost_min_rating", defaultValue = { ORANGE })
 
     val enabledNewsFeeds = itemEnumSet<CommunityNewsFeed>(name = "news_feeds")
 

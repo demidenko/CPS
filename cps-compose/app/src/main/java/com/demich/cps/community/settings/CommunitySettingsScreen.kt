@@ -23,12 +23,15 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.toColorTag
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.MultiSelectEnum
+import com.demich.cps.ui.settings.Select
 import com.demich.cps.ui.settings.SelectEnum
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.settings.SettingsContainerScope
@@ -161,14 +164,14 @@ private fun LostSettingsItem() {
 @Composable
 context(scope: SettingsContainerScope)
 private fun LostAuthorSettingsItem(
-    item: DataStoreItem<CodeforcesColorTag>
+    item: DataStoreItem<CodeforcesRatingColorTag?>
 ) {
-    SelectEnum(
+    Select(
         item = item,
         title = "Author at least",
         options = remember {
             listOf(
-                BLACK,
+                null,
                 GRAY,
                 GREEN,
                 CYAN,
@@ -180,14 +183,17 @@ private fun LostAuthorSettingsItem(
             )
         },
         optionTitle = { tag ->
-            Text(text = CodeforcesHandle(handle = nameOf(tag), colorTag = tag).toHandleSpan())
+            val handle = remember(tag) {
+                CodeforcesHandle(handle = nameOf(tag), colorTag = tag?.toColorTag() ?: BLACK)
+            }
+            Text(text = handle.toHandleSpan())
         }
     )
 }
 
-private fun nameOf(tag: CodeforcesColorTag): String =
+private fun nameOf(tag: CodeforcesRatingColorTag?): String =
     when (tag) {
-        BLACK -> "Exists"
+        null -> "Exists"
         GRAY -> "Newbie"
         GREEN -> "Pupil"
         CYAN -> "Specialist"
@@ -196,7 +202,6 @@ private fun nameOf(tag: CodeforcesColorTag): String =
         ORANGE -> "Master"
         RED -> "Grandmaster"
         LEGENDARY -> "LGM"
-        ADMIN -> "Admin"
     }
 
 @Composable

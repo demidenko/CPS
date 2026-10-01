@@ -16,6 +16,7 @@ import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.toColorTag
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
@@ -71,12 +72,13 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
     combine(
         flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
         flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()
-    ) { list, minColorTag ->
-        list.sortedByDescending { it.timeStamp }.toWebBlogEntries(minColorTag)
+    ) { list, minRatingTag ->
+        list.sortedByDescending { it.timeStamp }.toWebBlogEntries(minRatingTag)
     }
 
-private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minColorTag: CodeforcesColorTag): List<CodeforcesWebBlogEntry> =
+private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minRatingTag: CodeforcesRatingColorTag?): List<CodeforcesWebBlogEntry> =
     mapNotNull {
+        val minColorTag = minRatingTag?.toColorTag() ?: BLACK //TODO without mappers
         val colorTag = it.authorColorTag?.toColorTag()
         if (colorTag != null && colorTag >= minColorTag) it.blogEntry.toWebBlogEntry(colorTag)
         else null
