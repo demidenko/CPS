@@ -39,10 +39,9 @@ fun CodeforcesCommunityRecentPage(
     CodeforcesReloadablePage(controller = controller, tab = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
-                val blogEntry = type.blogEntry
+                val blogEntryId = type.blogEntry.id
                 RecentCommentsInBlogEntry(
-                    recentComments = grouped?.firstOrNull { it.blogEntry.id == blogEntry.id }
-                        ?: CodeforcesRecentCommentsOfBlogEntry(blogEntry = blogEntry, comments = emptyList()),
+                    recentComments = grouped?.firstOrNull { it.blogEntry.id == blogEntryId },
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
                     onClose = { controller.recentPageType = RecentPageType.RecentFeed },
                     modifier = Modifier.fillMaxSize()
@@ -106,19 +105,23 @@ private fun RecentBlogEntriesPage(
 
 @Composable
 private fun RecentCommentsInBlogEntry(
-    recentComments: CodeforcesRecentCommentsOfBlogEntry,
+    recentComments: CodeforcesRecentCommentsOfBlogEntry?,
     isTabVisible: () -> Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BackHandler(
-        enabled = isTabVisible,
-        onBackPressed = onClose
-    ) {
-        RecentCommentsInBlogEntry(
-            recentComments = recentComments,
-            modifier = modifier
-        )
+    if (recentComments == null) {
+        onClose()
+    } else {
+        BackHandler(
+            enabled = isTabVisible,
+            onBackPressed = onClose
+        ) {
+            RecentCommentsInBlogEntry(
+                recentComments = recentComments,
+                modifier = modifier
+            )
+        }
     }
 }
 
