@@ -163,7 +163,6 @@ context(scope: SettingsContainerScope)
 private fun LostAuthorSettingsItem(
     item: DataStoreItem<CodeforcesColorTag>
 ) {
-    //TODO: restart worker on change?
     SelectEnum(
         item = item,
         title = "Author at least",
