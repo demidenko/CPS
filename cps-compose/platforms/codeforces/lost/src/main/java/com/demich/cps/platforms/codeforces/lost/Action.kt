@@ -11,7 +11,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getUsersCatchingFilterFound
-import com.demich.cps.platforms.utils.codeforces.toColorTag
 import kotlin.time.Instant
 
 
@@ -251,12 +250,12 @@ private suspend fun CodeforcesLostStorage.editNullColorTags(
     editEntries {
         replaceValues {
             if (it.authorColorTag == null) {
-                val colorTag = tag(it)?.toColorTag()
-                if (colorTag != null) {
+                val tag = tag(it)
+                if (tag != null) {
                     return@replaceValues when (it) {
-                        is CodeforcesLostBlogEntry -> it.copy(authorColorTag = colorTag)
-                        is CodeforcesLostBlogEntryFresh -> it.copy(authorColorTag = colorTag)
-                        is CodeforcesLostBlogEntrySuspect -> it.copy(authorColorTag = colorTag)
+                        is CodeforcesLostBlogEntry -> it.copy(authorColorTag = tag)
+                        is CodeforcesLostBlogEntryFresh -> it.copy(authorColorTag = tag)
+                        is CodeforcesLostBlogEntrySuspect -> it.copy(authorColorTag = tag)
                     }
                 }
             }

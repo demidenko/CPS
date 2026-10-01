@@ -17,6 +17,7 @@ import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
+import com.demich.cps.platforms.utils.codeforces.toColorTag
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -76,7 +77,7 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
 
 private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minColorTag: CodeforcesColorTag): List<CodeforcesWebBlogEntry> =
     mapNotNull {
-        val colorTag = it.authorColorTag
+        val colorTag = it.authorColorTag?.toColorTag()
         if (colorTag != null && colorTag >= minColorTag) it.blogEntry.toWebBlogEntry(colorTag)
         else null
     }
