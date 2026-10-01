@@ -31,37 +31,35 @@ import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
-import com.demich.datastore_itemized.DataStoreItem
+import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.edit
+import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
 @Composable
 context(scope: SettingsContainerScope)
 internal fun ContestPlatformsSettingsItem(
-    enabledPlatformsItem: DataStoreItem<Set<Platform>>,
-    clistAdditionalResourcesItem: DataStoreItem<List<ClistResource>>
+    settings: ContestsSettingsDataStore
 ) {
-    val scope = backgroundCoroutineScope
-
-    val enabledPlatforms by collectItemAsState { enabledPlatformsItem }
-    val clistResources by collectItemAsState { clistAdditionalResourcesItem }
+    val combinedEnabled by collectItemAsState { settings.combinedEnabledPlatforms }
 
     Expandable(
         title = "Platforms",
         collapsedContent = {
             EnabledPlatformsSubtitle(
-                enabledPlatforms = enabledPlatforms,
-                clistResources = clistResources
+                enabledPlatforms = combinedEnabled.platforms,
+                clistResources = combinedEnabled.clistResources
             )
         },
         expandedContent = {
+            val scope = backgroundCoroutineScope
             ContestPlatformsSettingsItemExpandedContent(
-                enabledPlatforms = enabledPlatforms,
-                clistResources = clistResources,
+                enabledPlatforms = combinedEnabled.platforms,
+                clistResources = combinedEnabled.clistResources,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
-                        enabledPlatformsItem.edit {
+                        settings.enabledPlatforms.edit {
                             if (checked) add(platform) else remove(platform)
                         }
                     }
@@ -70,6 +68,19 @@ internal fun ContestPlatformsSettingsItem(
         }
     )
 }
+
+private data class CombinedEnabledPlatforms(
+    val platforms: Set<Platform>,
+    val clistResources: List<ClistResource>
+)
+
+private val ContestsSettingsDataStore.combinedEnabledPlatforms
+    get() = combine {
+        CombinedEnabledPlatforms(
+            platforms = enabledPlatforms.value,
+            clistResources = clistAdditionalResources.value
+        )
+    }
 
 @Composable
 context(scope: SettingsContainerScope)

@@ -24,10 +24,7 @@ private fun ContestsSettingsScreen() {
     val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
 
     SettingsColumn {
-        ContestPlatformsSettingsItem(
-            enabledPlatformsItem = settings.enabledPlatforms,
-            clistAdditionalResourcesItem = settings.clistAdditionalResources
-        )
+        ContestPlatformsSettingsItem(settings = settings)
         DateConstraintsSettingsItem(settings = settings)
         ClistApiAccessSettingsItem(settings = settings)
         AutoUpdateSettingsItem(item = settings.autoUpdateInterval)
