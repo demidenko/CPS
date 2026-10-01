@@ -7,7 +7,6 @@ data class CodeforcesRecentFeed(
     val comments: List<CodeforcesWebComment>
 )
 
-@Serializable
 data class CodeforcesRecentFeedBlogEntry(
     val id: Int,
     val title: String,

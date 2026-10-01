@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
 import java.util.Locale
 
-@Serializable
 data class CodeforcesHandle(
     val handle: String,
     val colorTag: CodeforcesColorTag
