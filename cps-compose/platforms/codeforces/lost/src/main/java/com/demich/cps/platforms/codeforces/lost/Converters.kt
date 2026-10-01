@@ -4,7 +4,6 @@ import com.demich.cps.platforms.api.codeforces.models.CodeforcesBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesAdminTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
-import com.demich.cps.platforms.utils.codeforces.userTag
 import kotlin.time.Clock
 
 internal fun CodeforcesRecentFeedBlogEntry.toSuspect(

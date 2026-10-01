@@ -6,24 +6,21 @@ import java.util.Locale
 
 data class CodeforcesHandle(
     val handle: String,
-    val colorTag: CodeforcesColorTag
+    val userTag: CodeforcesUserTag
 )
 
-val CodeforcesHandle.userTag: CodeforcesUserTag
-    get() = colorTag.toUserTag()
-
-private fun Element.extractColorTag(): CodeforcesColorTag? {
+private fun Element.extractUserTag(): CodeforcesUserTag? {
     val str = classNameFirstOrNull { name -> name.startsWith("user-") }
         ?.removePrefix("user-")
         ?.uppercase(Locale.ENGLISH)
         ?: return null
 
     return try {
-        CodeforcesColorTag.valueOf(str)
+        CodeforcesColorTag.valueOf(str).toUserTag()
     } catch (_: IllegalArgumentException) {
         // user-4000 case
         str.toIntOrNull()?.let {
-            CodeforcesRatingColorTag.fromRating(it).toColorTag()
+            CodeforcesRatingColorTag.fromRating(it)
         }
     }
 }
@@ -31,5 +28,5 @@ private fun Element.extractColorTag(): CodeforcesColorTag? {
 internal fun Element.extractRatedUser(): CodeforcesHandle =
     CodeforcesHandle(
         handle = text(),
-        colorTag = extractColorTag() ?: BLACK
+        userTag = extractUserTag() ?: CodeforcesUnratedTag
     )

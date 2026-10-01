@@ -29,7 +29,6 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
-import com.demich.cps.platforms.utils.codeforces.userTag
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.screens.CodeforcesUserInfoExpandedContent

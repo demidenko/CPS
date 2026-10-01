@@ -16,15 +16,12 @@ data class CodeforcesWebBlogEntry(
 fun CodeforcesBlogEntry.extractTitle(): String =
     title.parseHtmlElement().text()
 
-fun CodeforcesBlogEntry.toWebBlogEntry(colorTag: CodeforcesColorTag) =
+fun CodeforcesBlogEntry.toWebBlogEntry(tag: CodeforcesUserTag) =
     CodeforcesWebBlogEntry(
         id = id,
         title = extractTitle(),
-        author = CodeforcesHandle(handle = authorHandle, colorTag = colorTag),
+        author = CodeforcesHandle(handle = authorHandle, userTag = tag),
         creationTime = creationTime,
         rating = rating,
         commentsCount = null
     )
-
-fun CodeforcesBlogEntry.toWebBlogEntry(tag: CodeforcesUserTag) =
-    toWebBlogEntry(colorTag = tag.toColorTag())
