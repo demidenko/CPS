@@ -1,7 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 import com.demich.cps.platforms.utils.classNameFirstOrNull
-import kotlinx.serialization.Serializable
 import org.jsoup.nodes.Element
 import java.util.Locale
 

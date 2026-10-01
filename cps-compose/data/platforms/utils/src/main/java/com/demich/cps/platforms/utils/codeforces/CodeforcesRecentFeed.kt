@@ -1,7 +1,5 @@
 package com.demich.cps.platforms.utils.codeforces
 
-import kotlinx.serialization.Serializable
-
 data class CodeforcesRecentFeed(
     val blogEntries: List<CodeforcesRecentFeedBlogEntry>,
     val comments: List<CodeforcesWebComment>
