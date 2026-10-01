@@ -26,12 +26,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
-import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSBottomNavBarSpecs
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.switchAnimationSpec
+import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.ignoreInputEvents

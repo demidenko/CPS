@@ -13,7 +13,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.ui.uiColorSpecs
+import com.demich.cps.ui.uiSpecs
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
@@ -29,7 +29,7 @@ internal fun UIPanel(
     val context = context
     val settingsUI = remember { context.settingsUI }
 
-    val specs by collectItemAsState { settingsUI.uiColorSpecs }
+    val specs by collectItemAsState { settingsUI.uiSpecs }
 
     Row(modifier = modifier.background(cpsColors.background)) {
         CPSIconButton(icon = CPSIcons.Close, onClick = onClosePanel)

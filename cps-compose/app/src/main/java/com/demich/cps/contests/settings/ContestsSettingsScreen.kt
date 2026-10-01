@@ -2,7 +2,6 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.contests.ContestsInfoDataStore
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.toGeneralPlatform
@@ -11,6 +10,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.settings.SettingsColumn
+import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.utils.LaunchedEffectOneTime
 import com.demich.cps.utils.context
 

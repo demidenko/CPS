@@ -12,13 +12,14 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.settingsUI
-import com.demich.cps.ui.uiColorSpecs
+import com.demich.cps.ui.uiSpecs
 import com.demich.cps.utils.collectAsNullableState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
@@ -44,12 +45,16 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 @Composable
 private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
-    val specsState = remember { context.settingsUI.uiColorSpecs }.collectAsNullableState()
+    val specsState = remember { context.settingsUI.uiSpecs }.collectAsNullableState()
     specsState.onNotNull { specs ->
         val isDarkMode = specs.darkLightMode.isDarkMode()
         setSystemBarsStyle(context, isDarkMode)
         val colors = if (isDarkMode) darkCPSColors(specs.useOriginalColors) else lightCPSColors(specs.useOriginalColors)
-        CompositionLocalProvider(LocalCPSColors provides colors, content = content)
+        CompositionLocalProvider(
+            LocalCPSColors provides colors,
+            LocalDevModeEnabled provides specs.devModeEnabled,
+            content = content
+        )
     }
 }
 
@@ -74,3 +79,5 @@ fun CPSTheme(content: @Composable () -> Unit) {
         }
     }
 }
+
+val LocalDevModeEnabled = compositionLocalOf { false }

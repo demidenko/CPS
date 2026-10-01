@@ -13,10 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.BuildConfig
-import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.settingsUI
+import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
