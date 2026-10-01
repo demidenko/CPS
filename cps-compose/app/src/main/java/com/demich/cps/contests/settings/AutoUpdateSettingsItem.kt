@@ -2,7 +2,6 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import com.demich.cps.ui.settings.SelectSubtitled
 import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.utils.context
@@ -22,9 +21,7 @@ internal fun AutoUpdateSettingsItem(
     SelectSubtitled(
         title = "Background auto update",
         item = item,
-        options = remember {
-            listOf(null, 15.minutes, 30.minutes, 1.hours, 2.hours, 6.hours)
-        },
+        options = [null, 15.minutes, 30.minutes, 1.hours, 2.hours, 6.hours],
         onOptionSaved = {
             with(ContestsWorker.getWork(context)) {
                 if (it == null) stop()

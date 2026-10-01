@@ -115,11 +115,7 @@ private fun DefaultTabSettingsItem() {
     SelectEnum(
         item = context.settingsCommunity.codeforcesDefaultTab,
         title = "Default tab",
-        options = listOf(
-            MAIN,
-            TOP,
-            RECENT
-        )
+        options = [MAIN, TOP, RECENT]
     )
 }
 
@@ -168,19 +164,7 @@ private fun LostAuthorSettingsItem(
     Select(
         item = item,
         title = "Author at least",
-        options = remember {
-            listOf(
-                null,
-                GRAY,
-                GREEN,
-                CYAN,
-                BLUE,
-                VIOLET,
-                ORANGE,
-                RED,
-                LEGENDARY
-            )
-        },
+        options = [null] + CodeforcesRatingColorTag.entries,
         optionTitle = { tag ->
             val handle = remember(tag) {
                 CodeforcesHandle(handle = nameOf(tag), userTag = tag ?: CodeforcesUnratedTag)
