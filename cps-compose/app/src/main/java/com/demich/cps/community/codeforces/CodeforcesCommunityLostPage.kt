@@ -15,10 +15,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
-import com.demich.cps.platforms.utils.codeforces.CodeforcesColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesAdminTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
+import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.platforms.utils.codeforces.toColorTag
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.context
@@ -68,6 +69,16 @@ fun CodeforcesCommunityLostPage(
     )
 }
 
+@Composable
+private fun TopLabel() {
+    Text(
+        text = "TOP",
+        color = cpsColors.contentAdditional,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold
+    )
+}
+
 fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
     combine(
         flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
@@ -78,18 +89,15 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
 
 private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minRatingTag: CodeforcesRatingColorTag?): List<CodeforcesWebBlogEntry> =
     mapNotNull {
-        val minColorTag = minRatingTag?.toColorTag() ?: BLACK //TODO without mappers
-        val colorTag = it.authorColorTag?.toColorTag()
-        if (colorTag != null && colorTag >= minColorTag) it.blogEntry.toWebBlogEntry(colorTag)
-        else null
+        val authorTag = it.authorColorTag
+        if (authorTag != null && authorTag.isGreaterOrEqualTo(minRatingTag)) {
+            it.blogEntry.toWebBlogEntry(tag = authorTag)
+        } else null
     }
 
-@Composable
-private fun TopLabel() {
-    Text(
-        text = "TOP",
-        color = cpsColors.contentAdditional,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Bold
-    )
-}
+private fun CodeforcesUserTag.isGreaterOrEqualTo(ratingTag: CodeforcesRatingColorTag?) =
+    when (this) {
+        is CodeforcesRatingColorTag -> ratingTag == null || this >= ratingTag
+        is CodeforcesUnratedTag -> ratingTag == null
+        is CodeforcesAdminTag -> true
+    }
