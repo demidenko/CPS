@@ -195,9 +195,7 @@ private fun CPSWork.workInfoAsState(): State<WorkInfo?> =
 @Composable
 private fun CPSWork.eventsState(): State<List<CPSWorker.ExecutionEvent>?> =
     remember(name) {
-        CPSWorkersDataStore(context).executions.asFlow().map {
-            it.getOrElse(name) { emptyList() }
-        }
+        CPSWorkersDataStore(context).executions.asFlow().map { it[name] ?: [] }
     }.collectAsStateWithLifecycle(initialValue = null)
 
 @Composable

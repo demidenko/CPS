@@ -74,7 +74,7 @@ private fun rememberTitleCharsState(
     text: () -> String
 ): State<List<Pair<Char, Uuid>>> =
     produceState(
-        initialValue = TitleChars("", emptyList()),
+        initialValue = TitleChars("", []),
         key1 = text
     ) {
         snapshotFlow { text() }

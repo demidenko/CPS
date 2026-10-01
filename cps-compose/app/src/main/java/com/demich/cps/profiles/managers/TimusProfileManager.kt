@@ -32,7 +32,7 @@ class TimusProfileManager :
         )
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
-        if (str.toIntOrNull() != null) return emptyList()
+        if (str.toIntOrNull() != null) return []
         return TimusParser().extractUsersSuggestions(source = TimusClient().getSearchPage(str))
     }
 
@@ -55,7 +55,7 @@ class TimusProfileManager :
         } else {
             SmallProfilePanelTypeArchive(
                 title = profileResult.userId,
-                infoArgs = emptyList()
+                infoArgs = []
             )
         }
     }

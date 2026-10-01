@@ -38,7 +38,7 @@ class ACMPProfileManager :
         }
 
     override suspend fun getSuggestions(str: String): List<UserSuggestion> {
-        if (str.toIntOrNull() != null) return emptyList()
+        if (str.toIntOrNull() != null) return []
         return ACMPParser().extractUsersSuggestions(source = ACMPClient().getUsersSearch(str))
     }
 
@@ -74,7 +74,7 @@ class ACMPProfileManager :
         } else {
             SmallProfilePanelTypeArchive(
                 title = profileResult.userId,
-                infoArgs = emptyList()
+                infoArgs = []
             )
         }
     }

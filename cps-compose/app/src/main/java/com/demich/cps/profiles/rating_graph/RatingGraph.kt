@@ -115,10 +115,10 @@ private fun RatingGraphWithHeader(
     }
 
     val markVerticals: List<Instant> = remember(filterType, ratingChanges, currentTime) {
-        if (filterType == ALL || ratingChanges.size < 2) emptyList()
+        if (filterType == ALL || ratingChanges.size < 2) []
         else {
             createBounds(ratingChanges, filterType, currentTime).run {
-                listOf(startTime, endTime)
+                [startTime, endTime]
             }
         }
     }

@@ -155,7 +155,7 @@ private fun CodeforcesRecentFeed.grouped(): List<CodeforcesRecentCommentsOfBlogE
     return blogEntries.map { blogEntry ->
         CodeforcesRecentCommentsOfBlogEntry(
             blogEntry = blogEntry,
-            comments = commentsGrouped.getOrElse(blogEntry.id) { emptyList() }
+            comments = commentsGrouped[blogEntry.id] ?: []
         )
     }
 }

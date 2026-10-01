@@ -15,7 +15,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeedBlogEntry
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.combineToCounters
@@ -172,7 +171,7 @@ fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, con
         else -> return null
     }
     return combineToCounters(
-        flowOfIds = flow.map { it?.map { it.id } ?: emptyList() },
+        flowOfIds = flow.map { it?.map { it.id } ?: [] },
         flowOfTypes = CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
     )
 }

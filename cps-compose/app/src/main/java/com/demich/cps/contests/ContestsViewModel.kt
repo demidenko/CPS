@@ -40,14 +40,14 @@ class ContestsViewModel: ViewModel() {
     fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
         fetchResults.map {
             it.values.flatMap {
-                if (it.loadingStatus == FAILED) it.errors else emptyList()
+                if (it.loadingStatus == FAILED) it.errors else []
             }
         }
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
 
     private fun Flow<ContestsFetchResult>.trackLoadingStatus(platform: ContestPlatform): Flow<ContestsFetchResult> {
-        var track = FetchTrack(loadingStatus = LOADING, errors = emptyList())
+        var track = FetchTrack(loadingStatus = LOADING, errors = [])
         return onStart {
             fetchResults.set(platform, track)
         }.onEach { (_, source, result) ->
@@ -90,7 +90,7 @@ class ContestsViewModel: ViewModel() {
                 val result = ContestsFetchResult(
                     platform = platform,
                     fetchSource = null,
-                    result = Result.success(emptyList())
+                    result = Result.success(value = [])
                 )
                 platform to flowOf(result)
             }
