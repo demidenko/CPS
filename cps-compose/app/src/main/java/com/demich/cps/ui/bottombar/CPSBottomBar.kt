@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
+import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.navigation.Screen
 import com.demich.cps.ui.CPSBottomNavBarSpecs
 import com.demich.cps.ui.CPSDefaults
@@ -121,12 +122,13 @@ private fun BottomBarBodyMain(
     specs: CPSBottomNavBarSpecs,
     modifier: Modifier = Modifier
 ) {
-    val rootScreens = remember(specs.devModeEnabled) {
+    val devModeEnabled = LocalDevModeEnabled.current
+    val rootScreens = remember(devModeEnabled) {
         buildList {
             add(Screen.Profiles)
             add(Screen.Community)
             add(Screen.Contests)
-            if (specs.devModeEnabled) add(Screen.Development)
+            if (devModeEnabled) add(Screen.Development)
         }
     }
 
