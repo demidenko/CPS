@@ -57,7 +57,7 @@ private suspend fun CodeforcesLostStorage.updateEntries(
         val blogEntries = api.getRecentActionsBlogEntries()
             .mapNotNull {
                 if (isFresh(it.creationTime)) {
-                    it.toFresh(authorColorTag = null)
+                    it.toFresh(authorUserTag = null)
                 } else {
                     null
                 }
@@ -177,7 +177,7 @@ private inline fun List<CodeforcesLostBlogEntrySuspect>.upgradeToFresh(
             val blogEntry = getBlogEntry(suspect.blogEntryId)
 
             if (blogEntry != null && isFresh(blogEntry)) {
-                upgrade(blogEntry.toFresh(authorColorTag = suspect.authorColorTag))
+                upgrade(blogEntry.toFresh(authorUserTag = suspect.authorUserTag))
             } else {
                 remove(suspect)
             }
@@ -222,10 +222,10 @@ private suspend fun CodeforcesLostStorage.updateLost(
 
     val entries = getEntries().values
 
-    if (entries.any { it is CodeforcesLostBlogEntry && it.authorColorTag == null }) {
+    if (entries.any { it is CodeforcesLostBlogEntry && it.authorUserTag == null }) {
         val users = api.getUsersCatchingFilterFound(
             handles = entries.mapNotNull {
-                if (it.authorColorTag == null) it.authorHandle
+                if (it.authorUserTag == null) it.authorHandle
                 else null
             },
             checkHistoricHandles = false
@@ -249,13 +249,13 @@ private suspend fun CodeforcesLostStorage.editNullColorTags(
 ) {
     editEntries {
         replaceValues {
-            if (it.authorColorTag == null) {
+            if (it.authorUserTag == null) {
                 val tag = tag(it)
                 if (tag != null) {
                     return@replaceValues when (it) {
-                        is CodeforcesLostBlogEntry -> it.copy(authorColorTag = tag)
-                        is CodeforcesLostBlogEntryFresh -> it.copy(authorColorTag = tag)
-                        is CodeforcesLostBlogEntrySuspect -> it.copy(authorColorTag = tag)
+                        is CodeforcesLostBlogEntry -> it.copy(authorUserTag = tag)
+                        is CodeforcesLostBlogEntryFresh -> it.copy(authorUserTag = tag)
+                        is CodeforcesLostBlogEntrySuspect -> it.copy(authorUserTag = tag)
                     }
                 }
             }

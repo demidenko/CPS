@@ -89,7 +89,7 @@ fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<
 
 private fun List<CodeforcesLostBlogEntry>.toWebBlogEntries(minRatingTag: CodeforcesRatingColorTag?): List<CodeforcesWebBlogEntry> =
     mapNotNull {
-        val authorTag = it.authorColorTag
+        val authorTag = it.authorUserTag
         if (authorTag != null && (minRatingTag == null || authorTag.isGreaterOrEqualTo(minRatingTag))) {
             it.blogEntry.toWebBlogEntry(tag = authorTag)
         } else null
