@@ -43,7 +43,7 @@ private class CodeforcesNodeVisitor(val builder: CodeforcesHtmlStringBuilder): N
 
         if (name.isLink() && e.hasClass("rated-user")) {
             val user = e.extractRatedUser()
-            builder.appendRatedSpan(text = user.handle, tag = user.colorTag.toUserTag())
+            builder.appendRatedSpan(text = user.handle, tag = user.userTag)
             e.remove()
             return
         }

@@ -11,6 +11,9 @@ data class CodeforcesHandle(
     val colorTag: CodeforcesColorTag
 )
 
+val CodeforcesHandle.userTag: CodeforcesUserTag
+    get() = colorTag.toUserTag()
+
 private fun Element.extractColorTag(): CodeforcesColorTag? {
     val str = classNameFirstOrNull { name -> name.startsWith("user-") }
         ?.removePrefix("user-")

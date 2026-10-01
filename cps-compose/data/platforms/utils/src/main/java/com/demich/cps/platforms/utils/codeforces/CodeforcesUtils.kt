@@ -11,8 +11,7 @@ suspend fun CodeforcesPageContentProvider.getUserTagOrNull(handle: String): Code
             .selectFirst("div.userbox")
             ?.selectRatedUser()
             ?.extractRatedUser()
-            ?.colorTag
-            ?.toUserTag()
+            ?.userTag
     }
 
 suspend fun CodeforcesPageContentProvider.getHandleSuggestions(str: String): Sequence<CodeforcesHandle> =
