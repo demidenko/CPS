@@ -476,7 +476,7 @@ private fun loadingErrorsMessageState(): State<String?> {
     return collectAsState {
         combine(
             flow = viewModel.flowOfLoadingErrors(),
-            flow2 = context.settingsUI.devModeEnabled.asFlow(),
+            flow2 = context.settingsUI.devModeEnabled.asFlow(), //TODO use LocalDevModeEnabled.current
         ) { errors: List<Pair<ContestsFetchSource?, Throwable>>, exposeAll: Boolean ->
             when {
                 errors.isEmpty() -> null
