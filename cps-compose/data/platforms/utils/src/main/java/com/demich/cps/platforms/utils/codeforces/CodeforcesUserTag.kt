@@ -1,19 +1,6 @@
 package com.demich.cps.platforms.utils.codeforces
 
 
-enum class CodeforcesColorTag {
-    BLACK,
-    GRAY,
-    GREEN,
-    CYAN,
-    BLUE,
-    VIOLET,
-    ORANGE,
-    RED,
-    LEGENDARY,
-    ADMIN
-}
-
 sealed interface CodeforcesUserTag
 
 data object CodeforcesUnratedTag: CodeforcesUserTag
@@ -43,6 +30,19 @@ enum class CodeforcesRatingColorTag: CodeforcesUserTag {
                 else -> LEGENDARY
             }
     }
+}
+
+enum class CodeforcesColorTag {
+    BLACK,
+    GRAY,
+    GREEN,
+    CYAN,
+    BLUE,
+    VIOLET,
+    ORANGE,
+    RED,
+    LEGENDARY,
+    ADMIN
 }
 
 fun CodeforcesRatingColorTag.toColorTag(): CodeforcesColorTag =
