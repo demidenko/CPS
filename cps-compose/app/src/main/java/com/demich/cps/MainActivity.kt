@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,8 +28,11 @@ import com.demich.cps.profiles.NavContentProfilesScreen
 import com.demich.cps.profiles.NavContentProfilesSettingsScreen
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.CPSScaffold
+import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.ProvideBackgroundCoroutineScope
+import com.demich.cps.utils.collectAsNullableState
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,10 +49,18 @@ class MainActivity: ComponentActivity() {
             }
         }
 
+        val devModeEnabledItem = settingsUI.devModeEnabled
+
         setContent {
-            ProvideBackgroundCoroutineScope {
-                CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
-                    CPSTheme(content = ::CPSContent)
+            val devModeEnabledState = devModeEnabledItem.collectAsNullableState()
+            devModeEnabledState.onNotNull { devModeEnabled ->
+                ProvideBackgroundCoroutineScope {
+                    CompositionLocalProvider(
+                        LocalCodeforcesProfileManager provides CodeforcesProfileManager(),
+                        LocalDevModeEnabled provides devModeEnabled
+                    ) {
+                        CPSTheme(content = ::CPSContent)
+                    }
                 }
             }
         }
@@ -134,6 +146,8 @@ private fun CPSContent() {
 val LocalCodeforcesProfileManager = staticCompositionLocalOf<CodeforcesProfileManager> {
     throw IllegalAccessException()
 }
+
+val LocalDevModeEnabled = compositionLocalOf { false }
 
 private suspend fun appStartUp(context: Context) {
     //init items with dynamic defaults

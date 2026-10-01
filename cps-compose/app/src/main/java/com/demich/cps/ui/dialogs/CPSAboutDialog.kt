@@ -13,12 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.demich.cps.BuildConfig
+import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
-import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.setValueIn
 import kotlin.time.Clock
@@ -31,7 +31,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     val scope = backgroundCoroutineScope
 
     val context = context
-    val devModeEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
+    val devModeEnabled = LocalDevModeEnabled.current
     var showDevModeLine by remember { mutableStateOf(devModeEnabled) }
 
     val onClick = remember {

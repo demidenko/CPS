@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import com.demich.cps.LocalDevModeEnabled
 import com.demich.cps.R
 import com.demich.cps.community.CommunityNewsFeed
 import com.demich.cps.navigation.CPSNavigator
@@ -38,7 +39,6 @@ import com.demich.cps.ui.settings.SettingsSectionHeader
 import com.demich.cps.ui.settings.Switch
 import com.demich.cps.ui.settings.SwitchByItem
 import com.demich.cps.ui.settings.SwitchByWork
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
@@ -58,7 +58,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 private fun CommunitySettingsScreen() {
     val context = context
-    val devEnabled by collectItemAsState { context.settingsUI.devModeEnabled }
+    val devEnabled = LocalDevModeEnabled.current
 
     val requiredPermissions by remember {
         flowOfNotificationPermissionsRequired(context)
