@@ -39,7 +39,7 @@ fun CodeforcesCommunityRecentPage(
     CodeforcesReloadablePage(controller = controller, tab = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
-                val blogEntryId = type.blogEntry.id
+                val blogEntryId = type.blogEntryId
                 RecentCommentsInBlogEntry(
                     recentComments = grouped?.firstOrNull { it.blogEntry.id == blogEntryId },
                     isTabVisible = { controller.isTabVisible(tab = RECENT) },
@@ -69,7 +69,9 @@ fun CodeforcesCommunityRecentPage(
                         onBrowseBlogEntry = {
                             uriHandler.openUri(CodeforcesUrls.blogEntry(it.id))
                         },
-                        onOpenComments = { controller.recentPageType = RecentPageType.BlogEntryRecentComments(it) }
+                        onOpenComments = {
+                            controller.recentPageType = RecentPageType.BlogEntryRecentComments(it.id)
+                        }
                     )
                 }
             }

@@ -121,7 +121,7 @@ class CodeforcesCommunityController(
         @Serializable
         data object RecentComments : RecentPageType
         @Serializable
-        data class BlogEntryRecentComments(val blogEntry: CodeforcesRecentFeedBlogEntry) : RecentPageType
+        data class BlogEntryRecentComments(val blogEntryId: Int) : RecentPageType
     }
 }
 
