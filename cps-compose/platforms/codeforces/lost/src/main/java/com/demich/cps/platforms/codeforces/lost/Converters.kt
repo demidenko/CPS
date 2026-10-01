@@ -11,24 +11,24 @@ internal fun CodeforcesRecentFeedBlogEntry.toSuspect(
 ): CodeforcesLostBlogEntrySuspect =
     CodeforcesLostBlogEntrySuspect(
         blogEntryId = id,
-        authorColorTag = author.userTag.takeIf { trustColorTag || it is CodeforcesAdminTag }
+        authorUserTag = author.userTag.takeIf { trustColorTag || it is CodeforcesAdminTag }
     )
 
-internal fun CodeforcesBlogEntry.toFresh(authorColorTag: CodeforcesUserTag?): CodeforcesLostBlogEntryFresh =
+internal fun CodeforcesBlogEntry.toFresh(authorUserTag: CodeforcesUserTag?): CodeforcesLostBlogEntryFresh =
     CodeforcesLostBlogEntryFresh(
         blogEntry = this.copy(rating = 0),
-        authorColorTag = authorColorTag
+        authorUserTag = authorUserTag
     )
 
 internal fun CodeforcesLostBlogEntryFresh.toLost(): CodeforcesLostBlogEntry =
     CodeforcesLostBlogEntry(
         blogEntry = blogEntry,
-        authorColorTag = authorColorTag,
+        authorUserTag = authorUserTag,
         timeStamp = Clock.System.now()
     )
 
 internal fun CodeforcesLostBlogEntry.toFresh(): CodeforcesLostBlogEntryFresh =
     CodeforcesLostBlogEntryFresh(
         blogEntry = blogEntry,
-        authorColorTag = authorColorTag
+        authorUserTag = authorUserTag
     )

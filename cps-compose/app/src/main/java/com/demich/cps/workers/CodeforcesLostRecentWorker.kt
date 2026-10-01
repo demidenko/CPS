@@ -110,8 +110,8 @@ private data class Suspect(
     @SerialName("tag") val authorColorTag: CodeforcesColorTag?
 )
 
-private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = blogEntryId, authorColorTag = authorColorTag?.toUserTag())
-private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(blogEntryId = blogEntryId, authorColorTag = authorColorTag?.toColorTag())
+private fun Suspect.toPublic() = CodeforcesLostBlogEntrySuspect(blogEntryId = blogEntryId, authorUserTag = authorColorTag?.toUserTag())
+private fun CodeforcesLostBlogEntrySuspect.toPrivate() = Suspect(blogEntryId = blogEntryId, authorColorTag = authorUserTag?.toColorTag())
 
 @Serializable
 private data class Fresh(
@@ -119,8 +119,8 @@ private data class Fresh(
     @SerialName("tag") val authorColorTag: CodeforcesColorTag?
 )
 
-private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorColorTag = authorColorTag?.toUserTag())
-private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, authorColorTag = authorColorTag?.toColorTag())
+private fun Fresh.toPublic() = CodeforcesLostBlogEntryFresh(blogEntry = blogEntry, authorUserTag = authorColorTag?.toUserTag())
+private fun CodeforcesLostBlogEntryFresh.toPrivate() = Fresh(blogEntry = blogEntry, authorColorTag = authorUserTag?.toColorTag())
 
 @Serializable
 private data class Lost(
@@ -129,8 +129,8 @@ private data class Lost(
     @SerialName("stamp") val timeStamp: Instant
 )
 
-private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorColorTag = authorColorTag?.toUserTag(), timeStamp = timeStamp)
-private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, authorColorTag = authorColorTag?.toColorTag(), timeStamp = timeStamp)
+private fun Lost.toPublic() = CodeforcesLostBlogEntry(blogEntry = blogEntry, authorUserTag = authorColorTag?.toUserTag(), timeStamp = timeStamp)
+private fun CodeforcesLostBlogEntry.toPrivate() = Lost(blogEntry = blogEntry, authorColorTag = authorUserTag?.toColorTag(), timeStamp = timeStamp)
 
 class CodeforcesLostDataStore(context: Context):
     ItemizedDataStore(context.cf_lost_dataStore),

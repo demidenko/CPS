@@ -6,17 +6,17 @@ import kotlin.time.Instant
 
 sealed interface CodeforcesLostEntry {
     val blogEntryId: Int
-    val authorColorTag: CodeforcesUserTag?
+    val authorUserTag: CodeforcesUserTag?
 }
 
 data class CodeforcesLostBlogEntrySuspect(
     override val blogEntryId: Int,
-    override val authorColorTag: CodeforcesUserTag?
+    override val authorUserTag: CodeforcesUserTag?
 ): CodeforcesLostEntry
 
 data class CodeforcesLostBlogEntryFresh(
     val blogEntry: CodeforcesBlogEntry,
-    override val authorColorTag: CodeforcesUserTag?
+    override val authorUserTag: CodeforcesUserTag?
 ): CodeforcesLostEntry {
     override val blogEntryId: Int
         get() = blogEntry.id
@@ -24,7 +24,7 @@ data class CodeforcesLostBlogEntryFresh(
 
 data class CodeforcesLostBlogEntry(
     val blogEntry: CodeforcesBlogEntry,
-    override val authorColorTag: CodeforcesUserTag?,
+    override val authorUserTag: CodeforcesUserTag?,
     val timeStamp: Instant
 ): CodeforcesLostEntry {
     override val blogEntryId: Int
