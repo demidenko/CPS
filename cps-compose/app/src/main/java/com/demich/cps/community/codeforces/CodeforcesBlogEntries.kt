@@ -101,7 +101,7 @@ private fun BlogEntryInfo(
             authorHandle = blogEntry.author.toHandleSpan(),
             rating = blogEntry.rating,
             commentsCount = blogEntry.commentsCount,
-            timeAgo = blogEntry.creationTime.formatTimeAgo(),
+            creationTime = blogEntry.creationTime.formatTimeAgo(),
             markNew = markNew,
             label = label,
             modifier = modifier
@@ -115,7 +115,7 @@ private fun BlogEntryInfo(
     authorHandle: AnnotatedString,
     rating: Int,
     commentsCount: Int?,
-    timeAgo: String,
+    creationTime: String,
     markNew: Boolean,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?
@@ -131,7 +131,7 @@ private fun BlogEntryInfo(
         )
         BlogEntryInfoFooter(
             authorHandle = authorHandle,
-            timeAgo = timeAgo,
+            creationTime = creationTime,
             rating = rating,
             commentsCount = commentsCount,
             label = label,
@@ -166,7 +166,7 @@ private fun BlogEntryInfoHeader(
 @Composable
 private fun BlogEntryInfoFooter(
     authorHandle: AnnotatedString,
-    timeAgo: String,
+    creationTime: String,
     rating: Int,
     commentsCount: Int?,
     label: (@Composable () -> Unit)?,
@@ -183,7 +183,7 @@ private fun BlogEntryInfoFooter(
                 modifier = Modifier.alignByBaseline()
             )
             Text(
-                text = timeAgo,
+                text = creationTime,
                 color = cpsColors.contentAdditional,
                 fontSize = 11.sp,
                 modifier = Modifier.alignByBaseline()
