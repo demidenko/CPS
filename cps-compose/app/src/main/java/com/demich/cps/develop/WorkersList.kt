@@ -158,31 +158,32 @@ private fun WorkersList(
     val periodicWorks = remember { context.getCPSWorks() }
     val monitorWork = remember { CodeforcesMonitorWorker.getWork(context) }
 
-    val executionEvents by collectAsStateWithLifecycle {
-        CPSWorkersDataStore(context).executions.asFlow()
-    }
+    val eventsState = remember { CPSWorkersDataStore(context).executions }
+        .collectAsStateWithLifecycle(initial = null)
 
-    LazyColumn(modifier = modifier) {
-        items(items = periodicWorks, key = { it.name }) { work ->
-            WorkerItem(
-                work = work,
-                executionEvents = executionEvents[work.name],
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onClick(work) }
-                    .padding(all = 4.dp)
-            )
-            Divider()
-        }
-        item {
-            CodeforcesMonitorWorkItem(
-                work = monitorWork,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onCodeforcesMonitorClick(monitorWork) }
-                    .padding(all = 4.dp)
-            )
-            Divider()
+    eventsState.onNotNull { executionEvents ->
+        LazyColumn(modifier = modifier) {
+            items(items = periodicWorks, key = { it.name }) { work ->
+                WorkerItem(
+                    work = work,
+                    executionEvents = executionEvents[work.name],
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onClick(work) }
+                        .padding(all = 4.dp)
+                )
+                Divider()
+            }
+            item {
+                CodeforcesMonitorWorkItem(
+                    work = monitorWork,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onCodeforcesMonitorClick(monitorWork) }
+                        .padding(all = 4.dp)
+                )
+                Divider()
+            }
         }
     }
 }
