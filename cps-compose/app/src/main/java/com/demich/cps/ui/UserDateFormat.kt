@@ -4,7 +4,6 @@ import com.demich.cps.utils.RUSSIAN_ABBREVIATED
 import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
@@ -58,15 +57,32 @@ object CPSDateFormats {
         year()
     }
 
-    val FULL_DATE_TIME = LocalDateTime.Format {
-        date(ddMMYYYY)
-        char(' ')
-        time(HHMM)
+    val ddMMEYYYY = LocalDate.Format {
+        date(ddMME)
+        char(delimiter)
+        year()
     }
+
+    fun dateFormat(
+        showYear: Boolean,
+        showDayOfWeek: Boolean
+    ) =
+        if (showYear) {
+            if (showDayOfWeek) ddMMEYYYY else ddMMYYYY
+        } else {
+            if (showDayOfWeek) ddMME else ddMM
+        }
 }
 
-fun Instant.formatFullDateTime(): String =
-    toSystemDateTime().format(CPSDateFormats.FULL_DATE_TIME)
+fun Instant.formatFullDateTime(
+    showDayOfWeek: Boolean = false,
+    showYear: Boolean = true
+): String =
+    toSystemDateTime().run {
+        val date = date.format(CPSDateFormats.dateFormat(showDayOfWeek = showDayOfWeek, showYear = showYear))
+        val time = time.format(CPSDateFormats.HHMM)
+        "$date $time"
+    }
 
 fun Instant.formatFullDate(): String =
     toSystemDateTime().date.format(CPSDateFormats.ddMMYYYY)
