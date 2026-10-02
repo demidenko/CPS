@@ -6,7 +6,9 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -20,6 +22,10 @@ val localCurrentTime: Instant
 
 val LocalCurrentTime = compositionLocalOf<Instant> {
     throw IllegalAccessException("current time not provided")
+}
+
+val LocalTimeZone = staticCompositionLocalOf<TimeZone> {
+    throw IllegalAccessException("timezone not provided")
 }
 
 @Composable
@@ -40,7 +46,12 @@ fun systemTimeAsState(period: Duration): State<Instant> =
 
 @Composable
 fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalCurrentTime provides currentTimeState.value, content = content)
+    val systemTimeZone = remember { TimeZone.currentSystemDefault() }
+    CompositionLocalProvider(
+        LocalCurrentTime provides currentTimeState.value,
+        LocalTimeZone provides systemTimeZone,
+        content = content
+    )
 }
 
 @Composable
