@@ -29,6 +29,7 @@ import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.CPSScaffold
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.utils.ProvideBackgroundCoroutineScope
+import com.demich.cps.utils.ProvideSystemTimeZone
 import com.demich.cps.workers.enqueueEnabledWorkers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,9 +47,11 @@ class MainActivity: ComponentActivity() {
         }
 
         setContent {
-            ProvideBackgroundCoroutineScope {
-                CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
-                    CPSTheme(content = ::CPSContent)
+            ProvideSystemTimeZone {
+                ProvideBackgroundCoroutineScope {
+                    CompositionLocalProvider(LocalCodeforcesProfileManager provides CodeforcesProfileManager()) {
+                        CPSTheme(content = ::CPSContent)
+                    }
                 }
             }
         }
