@@ -41,10 +41,11 @@ private fun Contest.dateRange(timeZone: TimeZone): String {
     val start = startLocalDateTime.formatContestDate()
     if (startTime == endTime) return start
 
-    val endLocalDateTime = endTime.toLocalDateTime(timeZone)
-    val end = endLocalDateTime.run {
-        if (date == startLocalDateTime.date) formatTime() else formatContestDate()
+    endTime.toLocalDateTime(timeZone).run {
+        return if (date == startLocalDateTime.date) {
+            "$start-${formatTime()}"
+        } else {
+            "$start - ${formatContestDate()}"
+        }
     }
-
-    return "$start - $end"
 }
