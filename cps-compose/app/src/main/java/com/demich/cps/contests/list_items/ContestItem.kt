@@ -139,8 +139,8 @@ private fun ContestItemFooter(
             AttentionText(
                 text = when (phase) {
                     UPCOMING -> contest.dateBriefRange()
-                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate()
-                    FINISHED -> contest.dateRange()
+                    RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate(showDayOfWeek = true)
+                    FINISHED -> contest.dateRange(showDayOfWeek = false)
                 },
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null
             )

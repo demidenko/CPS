@@ -9,10 +9,12 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.hours
 
-private fun LocalDateTime.formatDate() = date.format(CPSDateFormats.ddMME)
 private fun LocalDateTime.formatTime() = time.format(CPSDateFormats.HHMM)
 
-fun LocalDateTime.formatContestDate() = "${formatDate()} ${formatTime()}"
+private fun LocalDateTime.formatDate(showDayOfWeek: Boolean) =
+    date.format(if (showDayOfWeek) CPSDateFormats.ddMME else CPSDateFormats.ddMM)
+
+fun LocalDateTime.formatContestDate(showDayOfWeek: Boolean) = "${formatDate(showDayOfWeek = showDayOfWeek)} ${formatTime()}"
 
 // TODO: rework to context(timezone)
 fun Contest.dateBriefRange(): String = dateBriefRange(timeZone = getSystemTimeZone())
@@ -21,7 +23,7 @@ private fun Contest.dateBriefRange(timeZone: TimeZone): String {
     require(startTime <= endTime)
 
     val startLocalDateTime = startTime.toLocalDateTime(timeZone)
-    val start = startLocalDateTime.formatContestDate()
+    val start = startLocalDateTime.formatContestDate(showDayOfWeek = true)
     if (startTime == endTime) return start
 
     val endLocalDateTime = endTime.toLocalDateTime(timeZone)
@@ -31,21 +33,28 @@ private fun Contest.dateBriefRange(timeZone: TimeZone): String {
 }
 
 // TODO: rework to context(timezone)
-fun Contest.dateRange(): String = dateRange(timeZone = getSystemTimeZone())
+fun Contest.dateRange(showDayOfWeek: Boolean): String =
+    dateRange(
+        timeZone = getSystemTimeZone(),
+        showDayOfWeek = showDayOfWeek
+    )
 
-private fun Contest.dateRange(timeZone: TimeZone): String {
+private fun Contest.dateRange(
+    timeZone: TimeZone,
+    showDayOfWeek: Boolean
+): String {
     require(startTime <= endTime)
 
     //TODO: show year
     val startLocalDateTime = startTime.toLocalDateTime(timeZone)
-    val start = startLocalDateTime.formatContestDate()
+    val start = startLocalDateTime.formatContestDate(showDayOfWeek = showDayOfWeek)
     if (startTime == endTime) return start
 
     endTime.toLocalDateTime(timeZone).run {
         return if (date == startLocalDateTime.date) {
             "$start-${formatTime()}"
         } else {
-            "$start - ${formatContestDate()}"
+            "$start - ${formatContestDate(showDayOfWeek = showDayOfWeek)}"
         }
     }
 }

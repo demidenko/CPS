@@ -121,7 +121,7 @@ private fun ContestItemDatesAndMenuButton(
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
-                text = contest.dateRange(),
+                text = contest.dateRange(showDayOfWeek = true),
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null,
                 modifier = Modifier.align(Alignment.Center)
             )
