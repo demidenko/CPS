@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.generalPlatformOrNull
-import com.demich.cps.contests.dateBriefRange
-import com.demich.cps.contests.dateRange
 import com.demich.cps.contests.formatContestDate
+import com.demich.cps.contests.formatDateRange
+import com.demich.cps.contests.formatDateRangeCompact
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.AttentionText
@@ -138,9 +138,9 @@ private fun ContestItemFooter(
         left = {
             AttentionText(
                 text = when (phase) {
-                    UPCOMING -> contest.dateBriefRange()
+                    UPCOMING -> contest.formatDateRangeCompact()
                     RUNNING -> "ends " + contest.endTime.toSystemDateTime().formatContestDate(showDayOfWeek = true)
-                    FINISHED -> contest.dateRange(showDayOfWeek = false)
+                    FINISHED -> contest.formatDateRange(showDayOfWeek = false)
                 },
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null
             )

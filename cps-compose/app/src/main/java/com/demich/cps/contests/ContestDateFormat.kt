@@ -17,9 +17,9 @@ private fun LocalDateTime.formatDate(showDayOfWeek: Boolean) =
 fun LocalDateTime.formatContestDate(showDayOfWeek: Boolean) = "${formatDate(showDayOfWeek = showDayOfWeek)} ${formatTime()}"
 
 // TODO: rework to context(timezone)
-fun Contest.dateBriefRange(): String = dateBriefRange(timeZone = getSystemTimeZone())
+fun Contest.formatDateRangeCompact(): String = formatDateRangeCompact(timeZone = getSystemTimeZone())
 
-private fun Contest.dateBriefRange(timeZone: TimeZone): String {
+private fun Contest.formatDateRangeCompact(timeZone: TimeZone): String {
     require(startTime <= endTime)
 
     val startLocalDateTime = startTime.toLocalDateTime(timeZone)
@@ -33,13 +33,13 @@ private fun Contest.dateBriefRange(timeZone: TimeZone): String {
 }
 
 // TODO: rework to context(timezone)
-fun Contest.dateRange(showDayOfWeek: Boolean): String =
-    dateRange(
+fun Contest.formatDateRange(showDayOfWeek: Boolean): String =
+    formatDateRange(
         timeZone = getSystemTimeZone(),
         showDayOfWeek = showDayOfWeek
     )
 
-private fun Contest.dateRange(
+private fun Contest.formatDateRange(
     timeZone: TimeZone,
     showDayOfWeek: Boolean
 ): String {

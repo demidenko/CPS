@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.dateRange
+import com.demich.cps.contests.formatDateRange
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.ui.AttentionText
@@ -121,7 +121,7 @@ private fun ContestItemDatesAndMenuButton(
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
-                text = contest.dateRange(showDayOfWeek = true),
+                text = contest.formatDateRange(showDayOfWeek = true),
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null,
                 modifier = Modifier.align(Alignment.Center)
             )
