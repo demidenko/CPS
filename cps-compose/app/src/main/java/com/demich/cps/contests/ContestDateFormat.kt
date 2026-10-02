@@ -1,55 +1,18 @@
 package com.demich.cps.contests
 
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.utils.RUSSIAN_ABBREVIATED
+import com.demich.cps.ui.CPSDateFormats
 import com.demich.cps.utils.getSystemTimeZone
-import com.demich.cps.utils.isRuSystemLanguage
 import com.demich.cps.utils.toSystemDateTime
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DayOfWeekNames
-import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
-private object Formats {
-    //TODO: setup date format in setting
-    private val dateSeparator = if (isRuSystemLanguage()) '.' else '/'
-
-    val HHMM = LocalTime.Format {
-        hour()
-        char(':')
-        minute()
-    }
-
-    val ddMM = LocalDate.Format {
-        day()
-        char(dateSeparator)
-        monthNumber()
-    }
-
-    val ddMME = LocalDate.Format {
-        date(ddMM)
-        char(' ')
-        dayOfWeek(names =
-            if (isRuSystemLanguage()) DayOfWeekNames.RUSSIAN_ABBREVIATED
-            else DayOfWeekNames.ENGLISH_ABBREVIATED
-        )
-    }
-
-    val ddMMYYYY = LocalDate.Format {
-        date(ddMM)
-        char(dateSeparator)
-        year()
-    }
-}
-
-private fun LocalDateTime.formatDate() = date.format(Formats.ddMME)
-private fun LocalDateTime.formatTime() = time.format(Formats.HHMM)
+private fun LocalDateTime.formatDate() = date.format(CPSDateFormats.ddMME)
+private fun LocalDateTime.formatTime() = time.format(CPSDateFormats.HHMM)
 
 fun LocalDateTime.formatContestDate() = "${formatDate()} ${formatTime()}"
 
@@ -89,8 +52,4 @@ private fun Contest.dateRange(timeZone: TimeZone): String {
 }
 
 fun Instant.formatRatingChangeDate(): String =
-    toSystemDateTime().format(LocalDateTime.Format {
-        date(Formats.ddMMYYYY)
-        char(' ')
-        time(Formats.HHMM)
-    })
+    toSystemDateTime().format(CPSDateFormats.FULL_DATE_TIME)
