@@ -3,7 +3,6 @@ package com.demich.cps.contests
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDateFormats
 import com.demich.cps.ui.formatFullDateTime
-import com.demich.cps.utils.getSystemTimeZone
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -12,10 +11,8 @@ import kotlin.time.Duration.Companion.hours
 
 private fun LocalDateTime.formatTime() = time.format(CPSDateFormats.HHMM)
 
-// TODO: rework to context(timezone)
-fun Contest.formatDateRangeCompact(): String = formatDateRangeCompact(timeZone = getSystemTimeZone())
-
-private fun Contest.formatDateRangeCompact(timeZone: TimeZone): String {
+context(timeZone: TimeZone)
+fun Contest.formatDateRangeCompact(): String {
     require(startTime <= endTime)
 
     val startLocalDateTime = startTime.toLocalDateTime(timeZone)
@@ -28,15 +25,8 @@ private fun Contest.formatDateRangeCompact(timeZone: TimeZone): String {
     return "$start-$end"
 }
 
-// TODO: rework to context(timezone)
-fun Contest.formatDateRange(showDayOfWeek: Boolean): String =
-    formatDateRange(
-        timeZone = getSystemTimeZone(),
-        showDayOfWeek = showDayOfWeek
-    )
-
-private fun Contest.formatDateRange(
-    timeZone: TimeZone,
+context(timeZone: TimeZone)
+fun Contest.formatDateRange(
     showDayOfWeek: Boolean
 ): String {
     require(startTime <= endTime)

@@ -29,6 +29,10 @@ val LocalTimeZone = staticCompositionLocalOf<TimeZone> {
 }
 
 @Composable
+inline fun <T> contextLocalTimeZone(block: context(TimeZone) () -> T): T =
+    context(with = LocalTimeZone.current, block = block)
+
+@Composable
 fun Clock.currentTimeAsState(period: Duration): State<Instant> {
     require(period.isPositive())
     val seconds = period.toComponents { seconds: Long, nanoseconds: Int ->

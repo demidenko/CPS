@@ -27,6 +27,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.WarningLevel
+import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerFull
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.localCurrentTime
@@ -121,7 +122,7 @@ private fun ContestItemDatesAndMenuButton(
     Box(modifier = Modifier.fillMaxWidth()) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
-                text = contest.formatDateRange(showDayOfWeek = true),
+                text = contextLocalTimeZone { contest.formatDateRange(showDayOfWeek = true) },
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null,
                 modifier = Modifier.align(Alignment.Center)
             )

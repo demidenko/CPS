@@ -24,6 +24,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.formatFullDateTime
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.WarningLevel
+import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
 
@@ -136,10 +137,12 @@ private fun ContestItemFooter(
         modifier = modifier,
         left = {
             AttentionText(
-                text = when (phase) {
-                    UPCOMING -> contest.formatDateRangeCompact()
-                    RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
-                    FINISHED -> contest.formatDateRange(showDayOfWeek = false)
+                text = contextLocalTimeZone {
+                    when (phase) {
+                        UPCOMING -> contest.formatDateRangeCompact()
+                        RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
+                        FINISHED -> contest.formatDateRange(showDayOfWeek = false)
+                    }
                 },
                 warningLevel = if (phase == UPCOMING) collisionLevel() else null
             )
