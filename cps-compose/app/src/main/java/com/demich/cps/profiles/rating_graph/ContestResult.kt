@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.formatRatingChangeDate
 import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
@@ -26,6 +25,7 @@ import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.ratingDiff
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
+import com.demich.cps.ui.formatFullDateTime
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
@@ -80,7 +80,7 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = date.formatRatingChangeDate() + "  rank: $rank",
+                text = date.formatFullDateTime() + "  rank: $rank",
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
             )

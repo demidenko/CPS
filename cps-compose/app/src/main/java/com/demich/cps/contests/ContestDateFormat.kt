@@ -3,13 +3,11 @@ package com.demich.cps.contests
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSDateFormats
 import com.demich.cps.utils.getSystemTimeZone
-import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Instant
 
 private fun LocalDateTime.formatDate() = date.format(CPSDateFormats.ddMME)
 private fun LocalDateTime.formatTime() = time.format(CPSDateFormats.HHMM)
@@ -50,6 +48,3 @@ private fun Contest.dateRange(timeZone: TimeZone): String {
 
     return "$start - $end"
 }
-
-fun Instant.formatRatingChangeDate(): String =
-    toSystemDateTime().format(CPSDateFormats.FULL_DATE_TIME)

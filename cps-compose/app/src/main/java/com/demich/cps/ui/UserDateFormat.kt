@@ -2,11 +2,14 @@ package com.demich.cps.ui
 
 import com.demich.cps.utils.RUSSIAN_ABBREVIATED
 import com.demich.cps.utils.isRuSystemLanguage
+import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
+import kotlin.time.Instant
 
 /*
 TODO:
@@ -61,3 +64,9 @@ object CPSDateFormats {
         time(HHMM)
     }
 }
+
+fun Instant.formatFullDateTime(): String =
+    toSystemDateTime().format(CPSDateFormats.FULL_DATE_TIME)
+
+fun Instant.formatFullDate(): String =
+    toSystemDateTime().date.format(CPSDateFormats.ddMMYYYY)
