@@ -2,13 +2,14 @@ package com.demich.cps.ui
 
 import com.demich.cps.utils.RUSSIAN_ABBREVIATED
 import com.demich.cps.utils.isRuSystemLanguage
-import com.demich.cps.utils.toSystemDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 /*
@@ -84,10 +85,14 @@ fun LocalDateTime.formatFullDateTime(
     return "$date $time"
 }
 
+context(timeZone: TimeZone)
 fun Instant.formatFullDateTime(
     showYear: Boolean = true,
     showDayOfWeek: Boolean = false
-): String = toSystemDateTime().formatFullDateTime(showYear = showYear, showDayOfWeek = showDayOfWeek)
+): String =
+    toLocalDateTime(timeZone = timeZone)
+        .formatFullDateTime(showYear = showYear, showDayOfWeek = showDayOfWeek)
 
+context(timeZone: TimeZone)
 fun Instant.formatFullDate(): String =
-    toSystemDateTime().date.format(CPSDateFormats.ddMMYYYY)
+    toLocalDateTime(timeZone = timeZone).date.format(CPSDateFormats.ddMMYYYY)

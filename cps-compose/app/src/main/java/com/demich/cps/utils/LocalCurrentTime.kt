@@ -50,7 +50,7 @@ fun systemTimeAsState(period: Duration): State<Instant> =
 
 @Composable
 fun ProvideCurrentTime(currentTimeState: State<Instant>, content: @Composable () -> Unit) {
-    val systemTimeZone = remember { TimeZone.currentSystemDefault() }
+    val systemTimeZone = remember { getSystemTimeZone() }
     CompositionLocalProvider(
         LocalCurrentTime provides currentTimeState.value,
         LocalTimeZone provides systemTimeZone,

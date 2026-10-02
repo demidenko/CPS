@@ -30,6 +30,7 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.toSignedString
+import com.demich.cps.utils.toSystemDateTime
 import kotlin.time.Instant
 
 @Composable
@@ -80,7 +81,7 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = date.formatFullDateTime() + "  rank: $rank",
+                text = date.toSystemDateTime().formatFullDateTime() + "  rank: $rank",
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
             )
