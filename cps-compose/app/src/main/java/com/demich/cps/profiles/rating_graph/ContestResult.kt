@@ -133,7 +133,7 @@ private fun RatingChange(
 private fun ContestResultTest(
     change: Int?,
     longTitle: Boolean = false,
-    handleColor: RatingColor = ORANGE
+    ratingColor: RatingColor = ORANGE
 ) {
     val rating = 2150
     ContestResult(
@@ -142,7 +142,7 @@ private fun ContestResultTest(
         contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
         date = Instant.fromEpochSeconds(1e9.toLong()),
         rank = 345,
-        ratingColor = cpsColors.handleColor(handleColor = handleColor),
+        ratingColor = cpsColors.ratingColor(ratingColor = ratingColor),
         modifier = Modifier
             .background(cpsColors.backgroundAdditional)
             .padding(all = 3.dp)

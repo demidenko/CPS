@@ -288,8 +288,8 @@ private fun ratingUpperBounds() =
         val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
             CodeforcesRatingColorTag.fromRating(rating) <= colorTag
         }
-        val handleColor = checkNotNull(colorTag.toHandleColor())
-        handleColor until rating
+        val ratingColor = checkNotNull(colorTag.toHandleColor())
+        ratingColor until rating
     }
 
 @Composable

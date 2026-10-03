@@ -31,13 +31,13 @@ class CPSColors(
     val newEntry: Color,
     val useOriginalHandleColors: Boolean,
     private val materialInitColors: () -> Colors,
-    handleColor: (RatingColor) -> Color
+    ratingColor: (RatingColor) -> Color
 ) {
     fun votedRating(rating: Int): Color =
         if (rating > 0) success else votedRatingNegative
 
-    private val handleColors = RatingColor.entries.map(handleColor)
-    fun handleColor(handleColor: RatingColor): Color = handleColors[handleColor.ordinal]
+    private val ratingColors = RatingColor.entries.map(ratingColor)
+    fun ratingColor(ratingColor: RatingColor): Color = ratingColors[ratingColor.ordinal]
 
     internal fun materialColors() = materialInitColors().copy(
         background = background,

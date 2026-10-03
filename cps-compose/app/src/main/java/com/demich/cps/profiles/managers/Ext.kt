@@ -22,7 +22,7 @@ fun RatedProfileManager<*>.getHandleColor(rating: Int): RatingColor =
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(ratingColor: RatingColor): Color =
     if (useOriginalHandleColors) manager.originalColorOrThrow(ratingColor)
-    else handleColor(ratingColor)
+    else ratingColor(ratingColor)
 
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(rating: Int): Color =
