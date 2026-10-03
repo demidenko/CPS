@@ -2,15 +2,6 @@ package com.demich.cps.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.profiles.RatingColor
-import com.demich.cps.profiles.RatingColor.BLUE
-import com.demich.cps.profiles.RatingColor.BROWN
-import com.demich.cps.profiles.RatingColor.CYAN
-import com.demich.cps.profiles.RatingColor.GRAY
-import com.demich.cps.profiles.RatingColor.GREEN
-import com.demich.cps.profiles.RatingColor.ORANGE
-import com.demich.cps.profiles.RatingColor.RED
-import com.demich.cps.profiles.RatingColor.VIOLET
-import com.demich.cps.profiles.RatingColor.YELLOW
 
 interface CPSRatingColors {
     fun ratingColor(ratingColor: RatingColor): Color
