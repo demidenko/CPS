@@ -43,6 +43,7 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SwitchByProfilesWork
 import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.theme.CPSColors
+import com.demich.cps.ui.theme.CPSRatingColors
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
@@ -108,7 +109,7 @@ class CodeforcesProfileManager :
             else -> null
         }
 
-    fun makeHandleSpan(handle: String, tag: CodeforcesUserTag, cpsColors: CPSColors): AnnotatedString =
+    fun makeHandleSpan(handle: String, tag: CodeforcesUserTag, cpsColors: CPSRatingColors): AnnotatedString =
         buildAnnotatedString {
             append(handle)
             if (tag is CodeforcesRatingColorTag) {
