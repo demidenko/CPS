@@ -20,18 +20,18 @@ fun RatedProfileManager<*>.getHandleColor(rating: Int): RatingColor =
         ?.ratingColor ?: RED
 
 context(manager: RatedProfileManager<*>)
-fun CPSColors.colorFor(handleColor: RatingColor): Color =
-    if (useOriginalHandleColors) manager.originalColorOrThrow(handleColor)
-    else handleColor(handleColor)
+fun CPSColors.colorFor(ratingColor: RatingColor): Color =
+    if (useOriginalHandleColors) manager.originalColorOrThrow(ratingColor)
+    else handleColor(ratingColor)
 
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(rating: Int): Color =
-    colorFor(handleColor = manager.getHandleColor(rating))
+    colorFor(ratingColor = manager.getHandleColor(rating))
 
 @Composable
 @ReadOnlyComposable
-fun RatedProfileManager<*>.colorFor(handleColor: RatingColor): Color =
-    cpsColors.colorFor(handleColor = handleColor)
+fun RatedProfileManager<*>.colorFor(ratingColor: RatingColor): Color =
+    cpsColors.colorFor(ratingColor = ratingColor)
 
 fun RatedProfileManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
     if (rating == null) AnnotatedString(text = text)

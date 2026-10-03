@@ -45,7 +45,7 @@ fun ratedProfilesColorState(
     }
 
     return colorState(
-        enabledColor = rank?.run { manager.colorFor(handleColor) },
+        enabledColor = rank?.run { manager.colorFor(ratingColor) },
         disabledColor = disabledColor
     )
 }
@@ -75,19 +75,19 @@ private fun colorState(
 @Immutable
 private data class RatedRank(
     val rank: Double,
-    val handleColor: RatingColor,
+    val ratingColor: RatingColor,
     val manager: RatedProfileManager<*>
 )
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
     val rating = profile?.userInfoOrNull()?.rating ?: return null
-    val handleColor = getHandleColor(rating)
-    val rank = when (handleColor) {
+    val ratingColor = getHandleColor(rating)
+    val rank = when (ratingColor) {
         RED -> Double.POSITIVE_INFINITY
         else -> {
-            val i = rankedHandleColors.indexOfFirst { handleColor == it }
-            val j = rankedHandleColors.indexOfLast { handleColor == it }
-            val pos = ratingsUpperBounds.indexOfFirst { it.ratingColor == handleColor }
+            val i = rankedHandleColors.indexOfFirst { ratingColor == it }
+            val j = rankedHandleColors.indexOfLast { ratingColor == it }
+            val pos = ratingsUpperBounds.indexOfFirst { it.ratingColor == ratingColor }
             check(i != -1 && j >= i && pos != -1)
             val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
             val upper = ratingsUpperBounds[pos].ratingUpperBound
@@ -97,7 +97,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
     }
     return RatedRank(
         rank = rank,
-        handleColor = handleColor,
+        ratingColor = ratingColor,
         manager = this
     )
 }

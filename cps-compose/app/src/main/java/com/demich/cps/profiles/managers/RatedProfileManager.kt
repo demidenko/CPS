@@ -20,7 +20,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
     abstract val ratingsUpperBounds: List<RatingColorBound>
 
-    abstract fun originalColor(handleColor: RatingColor): Color?
+    abstract fun originalColor(ratingColor: RatingColor): Color?
 
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
@@ -57,8 +57,8 @@ interface RatingRevolutionsProvider {
     val ratingUpperBoundRevolutions: List<Pair<Instant, List<RatingColorBound>>>
 }
 
-fun RatedProfileManager<*>.originalColorOrThrow(handleColor: RatingColor): Color =
-    originalColor(handleColor = handleColor) ?: throw IllegalArgumentException("platform $platform does not support handle color $handleColor")
+fun RatedProfileManager<*>.originalColorOrThrow(ratingColor: RatingColor): Color =
+    originalColor(ratingColor = ratingColor) ?: throw IllegalArgumentException("platform $platform does not support rating color $ratingColor")
 
 fun RatedProfileManager<*>.availableHandleColors(): List<RatingColor> =
     RatingColor.entries.filter { originalColor(it) != null }

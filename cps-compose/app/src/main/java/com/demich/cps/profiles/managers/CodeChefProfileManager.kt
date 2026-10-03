@@ -95,8 +95,8 @@ class CodeChefProfileManager :
         )
     }
 
-    override fun originalColor(handleColor: RatingColor): Color? =
-        when (handleColor) {
+    override fun originalColor(ratingColor: RatingColor): Color? =
+        when (ratingColor) {
             GRAY -> Color(0xFF666666)
             GREEN -> Color(0xFF1E7D22)
             BLUE -> Color(0xFF3366CC)

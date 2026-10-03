@@ -52,7 +52,7 @@ internal fun RatingGraphCanvas(
         ratingPoints = ratingPoints,
         selectedIndex = selectedIndex,
         markVerticals = markVerticals,
-        getColor = { context(manager) { cpsColors.colorFor(handleColor = it) } },
+        getColor = { context(manager) { cpsColors.colorFor(ratingColor = it) } },
         viewPortState = viewPortState,
         rectangles = rectangles,
         lineColor = Color.Black,
