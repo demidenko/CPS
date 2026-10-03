@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.demich.cps.profiles.RatingColor
 
 val LocalCPSColors = compositionLocalOf<CPSColors> { throw IllegalAccessError() }
 
@@ -29,15 +28,11 @@ class CPSColors(
     val warning: Color,
     private val votedRatingNegative: Color,
     val newEntry: Color,
-    val usePlatformRatingColors: Boolean,
     private val materialInitColors: () -> Colors,
-    ratingColor: (RatingColor) -> Color
-) {
+    val ratingColors: CPSRatingColors
+): CPSRatingColors by ratingColors {
     fun votedRating(rating: Int): Color =
         if (rating > 0) success else votedRatingNegative
-
-    private val ratingColors = RatingColor.entries.map(ratingColor)
-    fun ratingColor(ratingColor: RatingColor): Color = ratingColors[ratingColor.ordinal]
 
     internal fun materialColors() = materialInitColors().copy(
         background = background,
@@ -61,21 +56,9 @@ internal fun lightCPSColors(usePlatformRatingColors: Boolean) = CPSColors(
     warning = Color(200, 100, 0),
     votedRatingNegative = Color(128, 128, 128),
     newEntry = Color(0xFF669900), //android:color/holo_green_dark,
-    usePlatformRatingColors = usePlatformRatingColors,
-    materialInitColors = ::lightColors
-) {
-    when (it) {
-        GRAY -> Color(0xFF808080)
-        BROWN -> Color(0xFF804000)
-        GREEN -> Color(0xFF008000)
-        CYAN -> Color(0xFF03A89E)
-        BLUE -> Color(0xFF0000FF)
-        VIOLET -> Color(0xFFAA00AA)
-        YELLOW -> Color(0xFFDDC000)
-        ORANGE -> Color(0xFFFF8000)
-        RED -> Color(0xFFFF0000)
-    }
-}
+    materialInitColors = ::lightColors,
+    ratingColors = cpsLightThemeRatingColors(usePlatformRatingColors)
+)
 
 internal fun darkCPSColors(usePlatformRatingColors: Boolean) = CPSColors(
     accent = Color(0, 153, 204), //android:color/holo_blue_dark
@@ -90,18 +73,6 @@ internal fun darkCPSColors(usePlatformRatingColors: Boolean) = CPSColors(
     warning = Color(210, 150, 32),
     votedRatingNegative = Color(150, 150, 150),
     newEntry = Color(0xFF99CC00), //android:color/holo_green_light
-    usePlatformRatingColors = usePlatformRatingColors,
-    materialInitColors = ::darkColors
-) {
-    when (it) {
-        GRAY -> Color(0xFF888888)
-        BROWN -> Color(0xFF80461B)
-        GREEN -> Color(0xFF009600)
-        CYAN -> Color(0xFF00A89E)
-        BLUE -> Color(0xFF0F68F0) // TODO: bad contrast https://webaim.org/resources/contrastchecker/?fcolor=0F68F0&bcolor=121212
-        VIOLET -> Color(0xFFBB4ECC)
-        YELLOW -> Color(0xFFCCCC00)
-        ORANGE -> Color(0xFFFB8000)
-        RED -> Color(0xFFED301D)
-    }
-}
+    materialInitColors = ::darkColors,
+    ratingColors = cpsDarkThemeRatingColors(usePlatformRatingColors)
+)
