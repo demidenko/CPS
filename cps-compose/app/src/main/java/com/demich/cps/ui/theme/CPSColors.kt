@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingColor
 
 val LocalCPSColors = compositionLocalOf<CPSColors> { throw IllegalAccessError() }
 
@@ -31,13 +31,13 @@ class CPSColors(
     val newEntry: Color,
     val useOriginalHandleColors: Boolean,
     private val materialInitColors: () -> Colors,
-    handleColor: (HandleColor) -> Color
+    handleColor: (RatingColor) -> Color
 ) {
     fun votedRating(rating: Int): Color =
         if (rating > 0) success else votedRatingNegative
 
-    private val handleColors = HandleColor.entries.map(handleColor)
-    fun handleColor(handleColor: HandleColor): Color = handleColors[handleColor.ordinal]
+    private val handleColors = RatingColor.entries.map(handleColor)
+    fun handleColor(handleColor: RatingColor): Color = handleColors[handleColor.ordinal]
 
     internal fun materialColors() = materialInitColors().copy(
         background = background,

@@ -1,6 +1,6 @@
 package com.demich.cps.profiles
 
-enum class HandleColor {
+enum class RatingColor {
     GRAY,
     BROWN,
     GREEN,
@@ -23,9 +23,9 @@ enum class HandleColor {
 }
 
 data class RatingColorBound(
-    val ratingColor: HandleColor,
+    val ratingColor: RatingColor,
     val ratingUpperBound: Int
 )
 
-infix fun HandleColor.until(rating: Int): RatingColorBound =
+infix fun RatingColor.until(rating: Int): RatingColorBound =
     RatingColorBound(ratingColor = this, ratingUpperBound = rating)

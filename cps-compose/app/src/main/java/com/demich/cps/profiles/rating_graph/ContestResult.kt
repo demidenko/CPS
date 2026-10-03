@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.ratingDiff
@@ -133,7 +133,7 @@ private fun RatingChange(
 private fun ContestResultTest(
     change: Int?,
     longTitle: Boolean = false,
-    handleColor: HandleColor = ORANGE
+    handleColor: RatingColor = ORANGE
 ) {
     val rating = 2150
     ContestResult(

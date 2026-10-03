@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.RatingColorBound
 import com.demich.cps.profiles.SmallRatedProfilePanel
 import com.demich.cps.profiles.userinfo.ProfileResult
@@ -20,7 +20,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
     abstract val ratingsUpperBounds: List<RatingColorBound>
 
-    abstract fun originalColor(handleColor: HandleColor): Color?
+    abstract fun originalColor(handleColor: RatingColor): Color?
 
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
@@ -44,7 +44,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override fun PanelContent(profileResult: ProfileResult<U>) =
         SmallRatedProfilePanel(profileResult)
 
-    abstract val rankedHandleColors: Array<HandleColor>
+    abstract val rankedHandleColors: Array<RatingColor>
 
     protected abstract suspend fun getRatingChanges(userId: String): List<RatingChange>
     suspend fun getRatingChangeHistory(userId: String): List<RatingChange> =
@@ -57,8 +57,8 @@ interface RatingRevolutionsProvider {
     val ratingUpperBoundRevolutions: List<Pair<Instant, List<RatingColorBound>>>
 }
 
-fun RatedProfileManager<*>.originalColorOrThrow(handleColor: HandleColor): Color =
+fun RatedProfileManager<*>.originalColorOrThrow(handleColor: RatingColor): Color =
     originalColor(handleColor = handleColor) ?: throw IllegalArgumentException("platform $platform does not support handle color $handleColor")
 
-fun RatedProfileManager<*>.availableHandleColors(): List<HandleColor> =
-    HandleColor.entries.filter { originalColor(it) != null }
+fun RatedProfileManager<*>.availableHandleColors(): List<RatingColor> =
+    RatingColor.entries.filter { originalColor(it) != null }

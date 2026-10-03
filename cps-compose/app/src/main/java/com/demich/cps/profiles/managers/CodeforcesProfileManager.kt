@@ -29,8 +29,8 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
@@ -94,9 +94,9 @@ class CodeforcesProfileManager :
         ratingUpperBounds()
     }
 
-    override val rankedHandleColors = HandleColor.rankedCodeforces
+    override val rankedHandleColors = RatingColor.rankedCodeforces
 
-    override fun originalColor(handleColor: HandleColor): Color? =
+    override fun originalColor(handleColor: RatingColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF808080)
             GREEN -> Color(0xFF008000)
@@ -174,42 +174,42 @@ class CodeforcesProfileManager :
         get() = listOf(
             //https://codeforces.com/blog/entry/59228
             Instant.fromEpochSeconds(1525364996L) to listOf(
-                HandleColor.GRAY until 1200,
-                HandleColor.GREEN until 1400,
-                HandleColor.CYAN until 1600,
-                HandleColor.BLUE until 1900,
-                HandleColor.VIOLET until 2200,
-                HandleColor.ORANGE until 2400
+                RatingColor.GRAY until 1200,
+                RatingColor.GREEN until 1400,
+                RatingColor.CYAN until 1600,
+                RatingColor.BLUE until 1900,
+                RatingColor.VIOLET until 2200,
+                RatingColor.ORANGE until 2400
             ),
             //https://codeforces.com/blog/entry/20638
             Instant.fromEpochSeconds(1443721088L) to listOf(
-                HandleColor.GRAY until 1200,
-                HandleColor.GREEN until 1500,
-                HandleColor.BLUE until 1700,
-                HandleColor.VIOLET until 1900,
-                HandleColor.ORANGE until 2200
+                RatingColor.GRAY until 1200,
+                RatingColor.GREEN until 1500,
+                RatingColor.BLUE until 1700,
+                RatingColor.VIOLET until 1900,
+                RatingColor.ORANGE until 2200
             ),
             //https://codeforces.com/blog/entry/3064
             Instant.fromEpochSeconds(1320620562L) to listOf(
-                HandleColor.GRAY until 1200,
-                HandleColor.GREEN until 1500,
-                HandleColor.BLUE until 1650,
-                HandleColor.VIOLET until 1800,
-                HandleColor.ORANGE until 2000
+                RatingColor.GRAY until 1200,
+                RatingColor.GREEN until 1500,
+                RatingColor.BLUE until 1650,
+                RatingColor.VIOLET until 1800,
+                RatingColor.ORANGE until 2000
             ),
             //https://codeforces.com/blog/entry/1383
             Instant.fromEpochSeconds(1298914585L) to listOf(
-                HandleColor.GRAY until 1200,
-                HandleColor.GREEN until 1500,
-                HandleColor.BLUE until 1650,
-                HandleColor.YELLOW until 2000
+                RatingColor.GRAY until 1200,
+                RatingColor.GREEN until 1500,
+                RatingColor.BLUE until 1650,
+                RatingColor.YELLOW until 2000
             )
             //https://codeforces.com/blog/entry/126
         )
 
 }
 
-private fun CodeforcesRatingColorTag.toHandleColor(): HandleColor =
+private fun CodeforcesRatingColorTag.toHandleColor(): RatingColor =
     when (this) {
         GRAY -> GRAY
         GREEN -> GREEN

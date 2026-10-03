@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.geom.RectProjector
@@ -65,7 +65,7 @@ private fun RatingGraphCanvas(
     ratingPoints: List<GraphPoint>,
     selectedIndex: Int?,
     markVerticals: List<Instant>,
-    getColor: (HandleColor) -> Color,
+    getColor: (RatingColor) -> Color,
     viewPortState: ViewPortState,
     rectangles: RatingGraphRectangles,
     lineColor: Color,
@@ -197,7 +197,7 @@ private fun DrawScope.drawPoint(
 context(projector: RectProjector)
 private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
-    getColor: (HandleColor) -> Color
+    getColor: (RatingColor) -> Color
 ) {
     rectangles.forEachRect { bottomLeft, topRight, handleColor ->
         toCanvasRect(

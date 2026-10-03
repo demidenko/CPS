@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.Platform
-import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
@@ -75,7 +75,7 @@ private fun colorState(
 @Immutable
 private data class RatedRank(
     val rank: Double,
-    val handleColor: HandleColor,
+    val handleColor: RatingColor,
     val manager: RatedProfileManager<*>
 )
 

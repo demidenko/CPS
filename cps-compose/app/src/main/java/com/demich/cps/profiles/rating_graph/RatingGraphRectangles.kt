@@ -1,7 +1,7 @@
 package com.demich.cps.profiles.rating_graph
 
 import androidx.compose.runtime.Immutable
-import com.demich.cps.profiles.HandleColor
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.RatingColorBound
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
@@ -13,12 +13,12 @@ internal class RatingGraphRectangles(
     manager: RatedProfileManager<*>
 ) {
     //point is upperBound (endTime, ratingUpperBound)
-    private val upperBounds: List<Pair<GraphPoint, HandleColor>> = buildList {
+    private val upperBounds: List<Pair<GraphPoint, RatingColor>> = buildList {
         fun addBounds(x: Instant, bounds: List<RatingColorBound>) {
             bounds.sortedBy { it.ratingUpperBound }.forEach {
                 add(GraphPoint(x = x, y = it.ratingUpperBound) to it.ratingColor)
             }
-            add(GraphPoint(x = x, y = Int.MAX_VALUE) to HandleColor.RED)
+            add(GraphPoint(x = x, y = Int.MAX_VALUE) to RatingColor.RED)
         }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions
@@ -32,13 +32,13 @@ internal class RatingGraphRectangles(
         check(isSortedWith(compareBy({ it.first.x }, { it.first.y })))
     }
 
-    fun getHandleColor(point: GraphPoint): HandleColor =
+    fun getHandleColor(point: GraphPoint): RatingColor =
         upperBounds.first { (r, _) -> point.x < r.x && point.y < r.y }.second
 
-    inline fun forEachUpperBound(block: (GraphPoint, HandleColor) -> Unit) =
+    inline fun forEachUpperBound(block: (GraphPoint, RatingColor) -> Unit) =
         upperBounds.asReversed().forEach { block(it.first, it.second) }
 
-    private val rectangles: List<Triple<GraphPoint, GraphPoint, HandleColor>> = buildList {
+    private val rectangles: List<Triple<GraphPoint, GraphPoint, RatingColor>> = buildList {
         var prevX: Instant = Instant.DISTANT_PAST
         upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
@@ -50,7 +50,7 @@ internal class RatingGraphRectangles(
         }
     }
 
-    inline fun forEachRect(block: (GraphPoint, GraphPoint, HandleColor) -> Unit) {
+    inline fun forEachRect(block: (GraphPoint, GraphPoint, RatingColor) -> Unit) {
         rectangles.forEach { block(it.first, it.second, it.third) }
     }
 }

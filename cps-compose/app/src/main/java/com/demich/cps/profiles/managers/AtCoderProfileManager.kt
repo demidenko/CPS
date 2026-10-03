@@ -11,8 +11,8 @@ import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.atcoder.AtCoderParser
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.AtCoderUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
@@ -58,19 +58,19 @@ class AtCoderProfileManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY until 400,
-            HandleColor.BROWN until 800,
-            HandleColor.GREEN until 1200,
-            HandleColor.CYAN until 1600,
-            HandleColor.BLUE until 2000,
-            HandleColor.YELLOW until 2400,
-            HandleColor.ORANGE until 2800
+            RatingColor.GRAY until 400,
+            RatingColor.BROWN until 800,
+            RatingColor.GREEN until 1200,
+            RatingColor.CYAN until 1600,
+            RatingColor.BLUE until 2000,
+            RatingColor.YELLOW until 2400,
+            RatingColor.ORANGE until 2800
         )
     }
 
-    override val rankedHandleColors = HandleColor.rankedAtCoder
+    override val rankedHandleColors = RatingColor.rankedAtCoder
 
-    override fun originalColor(handleColor: HandleColor): Color? =
+    override fun originalColor(handleColor: RatingColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF808080)
             BROWN -> Color(0xFF804000)

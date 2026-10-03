@@ -11,8 +11,8 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.dmoj.DmojUrls
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.isPageNotFound
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.DmojUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
@@ -56,17 +56,17 @@ class DmojProfileManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY until 1000,
-            HandleColor.GREEN until 1300,
-            HandleColor.BLUE until 1600,
-            HandleColor.VIOLET until 1900,
-            HandleColor.ORANGE until 2400
+            RatingColor.GRAY until 1000,
+            RatingColor.GREEN until 1300,
+            RatingColor.BLUE until 1600,
+            RatingColor.VIOLET until 1900,
+            RatingColor.ORANGE until 2400
         )
     }
 
-    override val rankedHandleColors = HandleColor.rankedDmoj
+    override val rankedHandleColors = RatingColor.rankedDmoj
 
-    override fun originalColor(handleColor: HandleColor): Color? =
+    override fun originalColor(handleColor: RatingColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF999999)
             GREEN -> Color(0xff00a900)

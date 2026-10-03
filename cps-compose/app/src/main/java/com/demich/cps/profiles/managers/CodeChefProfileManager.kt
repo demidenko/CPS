@@ -25,8 +25,8 @@ import com.demich.cps.platforms.api.codechef.CodeChefUrls
 import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
 import com.demich.cps.platforms.utils.CodeChefParser
-import com.demich.cps.profiles.HandleColor
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.SmallProfilePanelTwoLines
 import com.demich.cps.profiles.screens.CodeChefUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
@@ -86,16 +86,16 @@ class CodeChefProfileManager :
 
     override val ratingsUpperBounds by lazy {
         listOf(
-            HandleColor.GRAY until 1400,
-            HandleColor.GREEN until 1600,
-            HandleColor.BLUE until 1800,
-            HandleColor.VIOLET until 2000,
-            HandleColor.YELLOW until 2200,
-            HandleColor.ORANGE until 2500
+            RatingColor.GRAY until 1400,
+            RatingColor.GREEN until 1600,
+            RatingColor.BLUE until 1800,
+            RatingColor.VIOLET until 2000,
+            RatingColor.YELLOW until 2200,
+            RatingColor.ORANGE until 2500
         )
     }
 
-    override fun originalColor(handleColor: HandleColor): Color? =
+    override fun originalColor(handleColor: RatingColor): Color? =
         when (handleColor) {
             GRAY -> Color(0xFF666666)
             GREEN -> Color(0xFF1E7D22)
@@ -107,7 +107,7 @@ class CodeChefProfileManager :
             else -> null
         }
 
-    override val rankedHandleColors = HandleColor.rankedCodeChef
+    override val rankedHandleColors = RatingColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
         return ratingsUpperBounds.partitionIndex { rating >= it.ratingUpperBound } + 1
