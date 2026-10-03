@@ -68,7 +68,7 @@ class AtCoderProfileManager :
         )
     }
 
-    override val rankedHandleColors = RatingColor.rankedAtCoder
+    override val rankedRatingColors = RatingColor.rankedAtCoder
 
     override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {

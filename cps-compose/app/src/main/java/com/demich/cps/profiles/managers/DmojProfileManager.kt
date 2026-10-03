@@ -64,7 +64,7 @@ class DmojProfileManager :
         )
     }
 
-    override val rankedHandleColors = RatingColor.rankedDmoj
+    override val rankedRatingColors = RatingColor.rankedDmoj
 
     override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {

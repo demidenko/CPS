@@ -44,7 +44,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override fun PanelContent(profileResult: ProfileResult<U>) =
         SmallRatedProfilePanel(profileResult)
 
-    abstract val rankedHandleColors: Array<RatingColor>
+    abstract val rankedRatingColors: Array<RatingColor>
 
     protected abstract suspend fun getRatingChanges(userId: String): List<RatingChange>
     suspend fun getRatingChangeHistory(userId: String): List<RatingChange> =

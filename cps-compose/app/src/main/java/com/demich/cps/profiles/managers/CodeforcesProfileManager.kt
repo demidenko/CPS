@@ -94,7 +94,7 @@ class CodeforcesProfileManager :
         ratingUpperBounds()
     }
 
-    override val rankedHandleColors = RatingColor.rankedCodeforces
+    override val rankedRatingColors = RatingColor.rankedCodeforces
 
     override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {
