@@ -169,7 +169,7 @@ private fun LostAuthorSettingsItem(
             val handle = remember(tag) {
                 CodeforcesHandle(handle = nameOf(tag), userTag = tag ?: CodeforcesUnratedTag)
             }
-            Text(text = handle.toHandleSpan())
+            Text(text = handle.toHandleSpan(), color = cpsColors.content)
         }
     )
 }
