@@ -32,7 +32,7 @@ internal class RatingGraphRectangles(
         check(isSortedWith(compareBy({ it.first.x }, { it.first.y })))
     }
 
-    fun getHandleColor(point: GraphPoint): RatingColor =
+    fun getRatingColor(point: GraphPoint): RatingColor =
         upperBounds.first { (r, _) -> point.x < r.x && point.y < r.y }.second
 
     inline fun forEachUpperBound(block: (GraphPoint, RatingColor) -> Unit) =
@@ -42,8 +42,8 @@ internal class RatingGraphRectangles(
         var prevX: Instant = Instant.DISTANT_PAST
         upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
-            upperBounds.subList(l, r).forEach { (point, handleColor) ->
-                add(Triple(GraphPoint(prevX, prevY), point, handleColor))
+            upperBounds.subList(l, r).forEach { (point, ratingColor) ->
+                add(Triple(GraphPoint(prevX, prevY), point, ratingColor))
                 prevY = point.y
             }
             prevX = upperBounds[l].first.x

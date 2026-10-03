@@ -86,7 +86,7 @@ private fun RatingGraphCanvas(
     val dashEffect = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f) }
 
     val pointsWithColors = remember(ratingPoints, rectangles) {
-        ratingPoints.map { it to rectangles.getHandleColor(it) }
+        ratingPoints.map { it to rectangles.getRatingColor(it) }
     }
 
     val shadowLayer = rememberGraphicsLayer()
@@ -146,10 +146,10 @@ private fun RatingGraphCanvas(
                 )
 
                 //rating points
-                pointsWithColors.forEach { (point, handleColor) ->
+                pointsWithColors.forEach { (point, ratingColor) ->
                     drawPoint(
                         center = point.toCanvasPoint(),
-                        color = getColor(handleColor),
+                        color = getColor(ratingColor),
                         borderColor = lineColor,
                         radius = circleRadius,
                         borderWidth = circleBorderWidth,
@@ -199,13 +199,13 @@ private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
     getColor: (RatingColor) -> Color
 ) {
-    rectangles.forEachRect { bottomLeft, topRight, handleColor ->
+    rectangles.forEachRect { bottomLeft, topRight, ratingColor ->
         toCanvasRect(
             bottomLeft = bottomLeft,
             topRight = topRight
         ) { rect ->
             drawRect(
-                color = getColor(handleColor),
+                color = getColor(ratingColor),
                 topLeft = rect.topLeft,
                 size = rect.size
             )

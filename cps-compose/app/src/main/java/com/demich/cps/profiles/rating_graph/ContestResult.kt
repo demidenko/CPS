@@ -46,7 +46,7 @@ internal fun ContestResult(
         contestTitle = ratingChange.contestTitle,
         date = ratingChange.date,
         rank = ratingChange.rank,
-        ratingColor = manager.colorFor(ratingColor = rectangles.getHandleColor(ratingChange.toGraphPoint())),
+        ratingColor = manager.colorFor(ratingColor = rectangles.getRatingColor(ratingChange.toGraphPoint())),
         modifier = modifier
     )
 }
