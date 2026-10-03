@@ -12,6 +12,7 @@ import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
+import com.demich.cps.ui.theme.CPSRatingColors
 import com.demich.cps.ui.theme.cpsColors
 
 fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColor =
@@ -20,12 +21,12 @@ fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColor =
         ?.ratingColor ?: RED
 
 context(manager: RatedProfileManager<*>)
-fun CPSColors.colorFor(ratingColor: RatingColor): Color =
+fun CPSRatingColors.colorFor(ratingColor: RatingColor): Color =
     if (usePlatformRatingColors) manager.platformColorOrThrow(ratingColor)
     else ratingColor(ratingColor)
 
 context(manager: RatedProfileManager<*>)
-fun CPSColors.colorFor(rating: Int): Color =
+fun CPSRatingColors.colorFor(rating: Int): Color =
     colorFor(ratingColor = manager.ratingColorFor(rating))
 
 @Composable
