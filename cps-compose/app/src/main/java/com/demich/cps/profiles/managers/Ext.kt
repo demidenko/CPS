@@ -14,7 +14,7 @@ import com.demich.cps.profiles.userinfo.handle
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
 
-fun RatedProfileManager<*>.getHandleColor(rating: Int): RatingColor =
+fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColor =
     ratingsUpperBounds
         .firstOrNull { rating < it.ratingUpperBound }
         ?.ratingColor ?: RED
@@ -26,7 +26,7 @@ fun CPSColors.colorFor(ratingColor: RatingColor): Color =
 
 context(manager: RatedProfileManager<*>)
 fun CPSColors.colorFor(rating: Int): Color =
-    colorFor(ratingColor = manager.getHandleColor(rating))
+    colorFor(ratingColor = manager.ratingColorFor(rating))
 
 @Composable
 @ReadOnlyComposable

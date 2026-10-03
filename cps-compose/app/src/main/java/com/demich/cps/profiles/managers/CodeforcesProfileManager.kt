@@ -114,7 +114,7 @@ class CodeforcesProfileManager :
             append(handle, color = cpsColors.content)
             if (tag is CodeforcesRatingColorTag) {
                 addStyle(
-                    style = SpanStyle(color = cpsColors.colorFor(tag.toHandleColor())),
+                    style = SpanStyle(color = cpsColors.colorFor(tag.toRatingColor())),
                     start = if (tag == LEGENDARY) 1 else 0,
                     end = handle.length
                 )
@@ -209,7 +209,7 @@ class CodeforcesProfileManager :
 
 }
 
-private fun CodeforcesRatingColorTag.toHandleColor(): RatingColor =
+private fun CodeforcesRatingColorTag.toRatingColor(): RatingColor =
     when (this) {
         GRAY -> GRAY
         GREEN -> GREEN
@@ -288,7 +288,7 @@ private fun ratingUpperBounds() =
         val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
             CodeforcesRatingColorTag.fromRating(rating) <= colorTag
         }
-        val ratingColor = checkNotNull(colorTag.toHandleColor())
+        val ratingColor = checkNotNull(colorTag.toRatingColor())
         ratingColor until rating
     }
 

@@ -60,5 +60,5 @@ interface RatingRevolutionsProvider {
 fun RatedProfileManager<*>.originalColorOrThrow(ratingColor: RatingColor): Color =
     originalColor(ratingColor = ratingColor) ?: throw IllegalArgumentException("platform $platform does not support rating color $ratingColor")
 
-fun RatedProfileManager<*>.availableHandleColors(): List<RatingColor> =
+fun RatedProfileManager<*>.availableRatingColors(): List<RatingColor> =
     RatingColor.entries.filter { originalColor(it) != null }
