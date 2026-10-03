@@ -28,7 +28,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
 
     val darkLightMode = itemEnum<DarkLightMode>(name = "dark_light_mode", defaultValue = SYSTEM)
 
-    val useOriginalColors = itemBoolean(name = "use_original_colors", defaultValue = false)
+    val usePlatformColors = itemBoolean(name = "use_platform_colors", defaultValue = false)
 
     val coloredStatusBar = itemBoolean(name = "use_status_bar", defaultValue = true)
     val statusBarDisabledPlatforms = itemEnumSet<Platform>(name = "status_bar_disabled_platforms")
@@ -45,7 +45,7 @@ val UISettingsDataStore.uiSpecs get() = combine {
     CPSUISpecs(
         devModeEnabled = devModeEnabled.value,
         darkLightMode = darkLightMode.value,
-        useOriginalColors = useOriginalColors.value
+        usePlatformColors = usePlatformColors.value
     )
 }
 
@@ -58,7 +58,7 @@ val UISettingsDataStore.bottomNavBarSpecs get() = combine {
 data class CPSUISpecs(
     val devModeEnabled: Boolean,
     val darkLightMode: DarkLightMode,
-    val useOriginalColors: Boolean
+    val usePlatformColors: Boolean
 )
 
 data class CPSBottomNavBarSpecs(

@@ -49,7 +49,7 @@ private fun ProvideCPSColors(content: @Composable () -> Unit) {
     specsState.onNotNull { specs ->
         val isDarkMode = specs.darkLightMode.isDarkMode()
         setSystemBarsStyle(context, isDarkMode)
-        val colors = if (isDarkMode) darkCPSColors(specs.useOriginalColors) else lightCPSColors(specs.useOriginalColors)
+        val colors = if (isDarkMode) darkCPSColors(specs.usePlatformColors) else lightCPSColors(specs.usePlatformColors)
         CompositionLocalProvider(
             LocalCPSColors provides colors,
             LocalDevModeEnabled provides specs.devModeEnabled,

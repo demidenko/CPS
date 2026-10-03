@@ -38,8 +38,8 @@ internal fun UIPanel(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CPSIconButton(icon = CPSIcons.Colors, onState = specs.useOriginalColors) {
-                settingsUI.useOriginalColors.setValueIn(scope, !specs.useOriginalColors)
+            CPSIconButton(icon = CPSIcons.Colors, onState = specs.usePlatformColors) {
+                settingsUI.usePlatformColors.setValueIn(scope, !specs.usePlatformColors)
             }
             StatusBarButtons()
             DarkLightModeButton(
