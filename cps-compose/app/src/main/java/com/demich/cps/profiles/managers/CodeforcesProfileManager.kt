@@ -96,7 +96,7 @@ class CodeforcesProfileManager :
 
     override val rankedHandleColors = RatingColor.rankedCodeforces
 
-    override fun originalColor(ratingColor: RatingColor): Color? =
+    override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {
             GRAY -> Color(0xFF808080)
             GREEN -> Color(0xFF008000)

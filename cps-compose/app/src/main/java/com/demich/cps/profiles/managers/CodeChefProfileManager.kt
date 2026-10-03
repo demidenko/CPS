@@ -95,7 +95,7 @@ class CodeChefProfileManager :
         )
     }
 
-    override fun originalColor(ratingColor: RatingColor): Color? =
+    override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {
             GRAY -> Color(0xFF666666)
             GREEN -> Color(0xFF1E7D22)

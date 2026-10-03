@@ -70,7 +70,7 @@ class AtCoderProfileManager :
 
     override val rankedHandleColors = RatingColor.rankedAtCoder
 
-    override fun originalColor(ratingColor: RatingColor): Color? =
+    override fun platformColor(ratingColor: RatingColor): Color? =
         when (ratingColor) {
             GRAY -> Color(0xFF808080)
             BROWN -> Color(0xFF804000)
