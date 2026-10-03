@@ -29,7 +29,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsNullableState
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.setValueIn
@@ -64,7 +64,7 @@ private fun CloseRow(
 private fun LayoutSelectRow() {
     val context = context
     val scope = backgroundCoroutineScope
-    val layoutTypeState = remember { context.settingsUI.navigationLayoutType }.collectAsNullableState()
+    val layoutTypeState = remember { context.settingsUI.navigationLayoutType }.collectAsStateWithNull()
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

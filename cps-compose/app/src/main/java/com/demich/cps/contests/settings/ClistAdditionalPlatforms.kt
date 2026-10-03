@@ -35,7 +35,7 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
-import com.demich.cps.utils.collectAsNullableState
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.rememberUUIDState
@@ -66,7 +66,7 @@ internal fun ClistAdditionalResourcesDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
-        val state = item.collectAsNullableState()
+        val state = item.collectAsStateWithNull()
 
         state.onNotNull { selected ->
             DialogContent(

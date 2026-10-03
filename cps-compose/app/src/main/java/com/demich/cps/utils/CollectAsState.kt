@@ -74,7 +74,7 @@ fun <T: R, R> DataStoreValue<T>.collectAsStateWithLifecycle(
     remember(this) { asFlow() }.collectAsStateWithLifecycle(initialValue = initial)
 
 @Composable
-fun <T: Any> DataStoreValue<T>.collectAsNullableState(): State<T?> =
+fun <T: Any> DataStoreValue<T>.collectAsStateWithNull(): State<T?> =
     collectAsState(initial = null)
 
 @Composable

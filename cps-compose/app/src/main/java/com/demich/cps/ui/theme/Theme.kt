@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.uiSpecs
-import com.demich.cps.utils.collectAsNullableState
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 
@@ -45,7 +45,7 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 @Composable
 private fun ProvideCPSColors(content: @Composable () -> Unit) {
     val context = context
-    val specsState = remember { context.settingsUI.uiSpecs }.collectAsNullableState()
+    val specsState = remember { context.settingsUI.uiSpecs }.collectAsStateWithNull()
     specsState.onNotNull { specs ->
         val isDarkMode = specs.darkLightMode.isDarkMode()
         setSystemBarsStyle(context, isDarkMode)
