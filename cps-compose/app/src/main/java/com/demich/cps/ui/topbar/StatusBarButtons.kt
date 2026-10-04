@@ -29,7 +29,7 @@ import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.combine
@@ -56,26 +56,29 @@ internal fun StatusBarButtons(
             }
     }.collectAsState(initial = null)
 
+    val specsState = remember { settingsUI.combinedColorSpecs }.collectAsStateWithNull()
+
     val scope = backgroundCoroutineScope
     recordedPlatformsState.onNotNull { platforms ->
         if (platforms.isNotEmpty()) {
-            val specs by collectItemAsState { settingsUI.combinedColorSpecs }
-            StatusBarButtons(
-                modifier = modifier,
-                coloredStatusBar = specs.enabled,
-                rankSelector = specs.selector,
-                platforms = platforms,
-                disabledPlatforms = specs.disabledPlatforms,
-                onSetEnabled = { settingsUI.coloredStatusBar.setValueIn(scope, it) },
-                onSetRankSelector = { settingsUI.statusBarRankSelector.setValueIn(scope, it) },
-                onCheckedChange = { platform, checked ->
-                    scope.launch {
-                        settingsUI.statusBarDisabledPlatforms.edit {
-                            if (checked) remove(platform) else add(platform)
+            specsState.onNotNull { specs ->
+                StatusBarButtons(
+                    modifier = modifier,
+                    coloredStatusBar = specs.enabled,
+                    rankSelector = specs.selector,
+                    platforms = platforms,
+                    disabledPlatforms = specs.disabledPlatforms,
+                    onSetEnabled = { settingsUI.coloredStatusBar.setValueIn(scope, it) },
+                    onSetRankSelector = { settingsUI.statusBarRankSelector.setValueIn(scope, it) },
+                    onCheckedChange = { platform, checked ->
+                        scope.launch {
+                            settingsUI.statusBarDisabledPlatforms.edit {
+                                if (checked) remove(platform) else add(platform)
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
