@@ -50,28 +50,28 @@ object CPSDateFormats {
         minute()
     }
 
-    val ddMM = LocalDate.Format {
+    private val dM = LocalDate.Format {
         day()
         char(delimiter)
         monthNumber()
     }
 
-    val ddMME = LocalDate.Format {
-        date(ddMM)
-        char(' ')
+    private val dME = LocalDate.Format {
         dayOfWeek(names = dayOfWeekShortNames)
+        chars(" ")
+        date(dM)
     }
 
-    val ddMMYYYY = LocalDate.Format {
-        date(ddMM)
+    private val dMY = LocalDate.Format {
+        date(dM)
         char(delimiter)
         year()
     }
 
-    val ddMMEYYYY = LocalDate.Format {
-        date(ddMME)
-        char(delimiter)
-        year()
+    private val dMYE = LocalDate.Format {
+        dayOfWeek(names = dayOfWeekShortNames)
+        chars(" ")
+        date(dMY)
     }
 
     fun dateFormat(
@@ -79,9 +79,9 @@ object CPSDateFormats {
         showDayOfWeek: Boolean
     ) =
         if (showYear) {
-            if (showDayOfWeek) ddMMEYYYY else ddMMYYYY
+            if (showDayOfWeek) dMYE else dMY
         } else {
-            if (showDayOfWeek) ddMME else ddMM
+            if (showDayOfWeek) dME else dM
         }
 }
 
@@ -104,4 +104,5 @@ fun Instant.formatFullDateTime(
 
 context(timeZone: TimeZone)
 fun Instant.formatFullDate(): String =
-    toLocalDateTime(timeZone = timeZone).date.format(CPSDateFormats.ddMMYYYY)
+    toLocalDateTime(timeZone = timeZone).date
+        .format(CPSDateFormats.dateFormat(showYear = true, showDayOfWeek = false))
