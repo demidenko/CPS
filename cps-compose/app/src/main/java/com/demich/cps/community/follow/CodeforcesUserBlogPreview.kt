@@ -170,7 +170,7 @@ private fun UserOnlineInfo(
     UserOnlineInfo(
         modifier = modifier,
         text = "online: " + time.formatTimeAgo(),
-        showWarning = contextLocalTimeZone { localCurrentTime.yearsUntil(time, timeZone = contextOf<TimeZone>()) > 0 }
+        showWarning = contextLocalTimeZone { time.yearsUntil(localCurrentTime, timeZone = contextOf<TimeZone>()) > 0 }
     )
 }
 
