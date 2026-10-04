@@ -32,7 +32,7 @@ resaca = "5.1.5" # https://github.com/sebaslogen/resaca/releases
 
 korlibs = "6.0.1"
 
-accompanist = "0.37.0"
+accompanist = "0.37.3"
 
 junit = "4.13.2"
 androidx-junit = "1.2.1"
