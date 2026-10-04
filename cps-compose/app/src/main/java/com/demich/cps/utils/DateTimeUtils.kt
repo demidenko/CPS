@@ -3,7 +3,6 @@ package com.demich.cps.utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.format.DayOfWeekNames
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -33,6 +32,3 @@ fun Clock.flowOfTruncatedCurrentTime(seconds: Long): Flow<Instant> {
         }
     }
 }
-
-val DayOfWeekNames.Companion.RUSSIAN_ABBREVIATED: DayOfWeekNames
-    get() = DayOfWeekNames(listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс"))

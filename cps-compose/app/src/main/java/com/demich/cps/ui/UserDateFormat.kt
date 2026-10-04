@@ -1,7 +1,7 @@
 package com.demich.cps.ui
 
-import com.demich.cps.utils.RUSSIAN_ABBREVIATED
-import com.demich.cps.utils.isRuSystemLanguage
+import android.icu.text.DateFormatSymbols
+import android.icu.util.Calendar
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -30,6 +30,18 @@ TODO:
 
 
 object CPSDateFormats {
+    private val dayOfWeekShortNames = DateFormatSymbols().shortWeekdays.let { array ->
+        DayOfWeekNames(
+            monday = array[Calendar.MONDAY],
+            tuesday = array[Calendar.TUESDAY],
+            wednesday = array[Calendar.WEDNESDAY],
+            thursday = array[Calendar.THURSDAY],
+            friday = array[Calendar.FRIDAY],
+            saturday = array[Calendar.SATURDAY],
+            sunday = array[Calendar.SUNDAY]
+        )
+    }
+
     private const val delimiter = '.'
 
     val HHMM = LocalTime.Format {
@@ -47,10 +59,7 @@ object CPSDateFormats {
     val ddMME = LocalDate.Format {
         date(ddMM)
         char(' ')
-        dayOfWeek(names =
-            if (isRuSystemLanguage()) DayOfWeekNames.RUSSIAN_ABBREVIATED
-            else DayOfWeekNames.ENGLISH_ABBREVIATED
-        )
+        dayOfWeek(names = dayOfWeekShortNames)
     }
 
     val ddMMYYYY = LocalDate.Format {
