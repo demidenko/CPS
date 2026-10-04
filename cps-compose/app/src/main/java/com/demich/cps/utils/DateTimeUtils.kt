@@ -69,9 +69,16 @@ fun Duration.formatRoundedTime(): String =
 
 context(timeZone: TimeZone)
 fun Instant.formatRoundedTime(until: Instant): String {
-    yearsUntil(until, timeZone = timeZone).let { if (it > 1) return "$it years" }
-    monthsUntil(until, timeZone = timeZone).let { if (it > 1) return "$it months" }
-    daysUntil(until, timeZone = timeZone).let { if (it > 1) return "$it days" }
+    daysUntil(until, timeZone = timeZone).let { days ->
+        if (days > 0) monthsUntil(until, timeZone = timeZone).let { months ->
+            if (months > 0) yearsUntil(until, timeZone = timeZone).let { years ->
+                if (years > 1) return "$years years"
+            }
+            if (months > 1) return "$months months"
+        }
+        if (days > 1) return "$days days"
+    }
+
     return (until - this).formatRoundedTime()
 }
 
