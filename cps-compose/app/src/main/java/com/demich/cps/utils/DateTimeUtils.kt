@@ -3,7 +3,11 @@ package com.demich.cps.utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.monthsUntil
+import kotlinx.datetime.yearsUntil
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -62,6 +66,14 @@ fun Duration.formatRoundedTime(): String =
         this < 365.days * 2 -> "${inWholeDays / 31} months"
         else -> "${inWholeDays / 365} years"
     }
+
+context(timeZone: TimeZone)
+fun Instant.formatRoundedTime(until: Instant): String {
+    yearsUntil(until, timeZone = timeZone).let { if (it > 1) return "$it years" }
+    monthsUntil(until, timeZone = timeZone).let { if (it > 1) return "$it months" }
+    daysUntil(until, timeZone = timeZone).let { if (it > 1) return "$it days" }
+    return (until - this).formatRoundedTime()
+}
 
 fun Duration.formatTimerShort(): String =
     if (this < 48.hours) formatHHMMSS() else formatRoundedTime()

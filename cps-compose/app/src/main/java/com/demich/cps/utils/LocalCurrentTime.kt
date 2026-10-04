@@ -55,4 +55,6 @@ fun ProvideSystemTimeEachMinute(content: @Composable () -> Unit) =
 @Composable
 @ReadOnlyComposable
 fun Instant.formatTimeAgo(): String =
-    (localCurrentTime - this).formatRoundedTime() + " ago"
+    contextLocalTimeZone {
+        formatRoundedTime(until = localCurrentTime) + " ago"
+    }
