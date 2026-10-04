@@ -2,13 +2,13 @@ package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.ui.CPSSwitch
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
+import com.demich.cps.utils.onNotNull
 import com.demich.cps.workers.CPSPeriodicWorkProvider
 import com.demich.cps.workers.ProfilesWorker
 import com.demich.datastore_itemized.DataStoreItem
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 @Composable
 context(scope: SettingsContainerScope)
 fun Switch(
-    checked: Boolean,
+    checked: Boolean?,
     title: String,
     description: String = "",
     onCheckedChange: (Boolean) -> Unit
@@ -27,11 +27,13 @@ fun Switch(
         title = title,
         description = description
     ) {
-        CPSSwitch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.padding(start = 5.dp)
-        )
+        if (checked != null) {
+            CPSSwitch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                modifier = Modifier.padding(start = 5.dp)
+            )
+        }
     }
 }
 
@@ -43,16 +45,18 @@ private inline fun SwitchByItem(
     description: String = "",
     crossinline onCheckedChange: suspend CoroutineScope.(Boolean) -> Unit
 ) {
-    val scope = backgroundCoroutineScope
-    val checked by collectItemAsState { item }
-    Switch(
-        checked = checked,
-        title = title,
-        description = description
-    ) {
-        scope.launch {
-            item.setValue(it)
-            onCheckedChange(it)
+    val state = item.collectAsStateWithNull()
+    state.onNotNull { checked ->
+        val scope = backgroundCoroutineScope
+        Switch(
+            checked = checked,
+            title = title,
+            description = description
+        ) {
+            scope.launch {
+                item.setValue(it)
+                onCheckedChange(it)
+            }
         }
     }
 }
