@@ -17,7 +17,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -51,16 +51,15 @@ private fun NotificationsPermissionPanel(modifier: Modifier) {
     if (!state.status.isGranted) {
         PermissionPanel(
             modifier = modifier,
-            message = "Some features you turned on use notifications for full functionality. Please grant the permission for CPS to post notifications.",
+            message = message,
             onClick = { state.launchPermissionRequest() },
         )
     }
 
-    DisposableEffect(state) {
+    SideEffect(state) {
         if (!state.status.isGranted && !state.status.shouldShowRationale) {
             state.launchPermissionRequest()
         }
-        onDispose {  }
     }
 }
 
@@ -120,3 +119,5 @@ private fun PreviewPermissionPanel() {
         )
     }
 }
+
+private const val message = "Some features you turned on use notifications for full functionality. Grant the permission for CPS to post notifications."
