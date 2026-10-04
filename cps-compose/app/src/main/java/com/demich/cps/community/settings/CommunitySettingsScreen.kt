@@ -41,6 +41,7 @@ import com.demich.cps.ui.settings.SwitchByWork
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
+import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
@@ -193,11 +194,12 @@ private fun RuEnabledSettingsItem() {
     val context = context
     val scope = backgroundCoroutineScope
 
-    val locale by collectItemAsState { context.settingsCommunity.codeforcesLocale }
+    val locale by remember { context.settingsCommunity.codeforcesLocale }
+        .collectAsStateWithNull()
 
     Switch(
         title = "Russian content",
-        checked = locale == RU,
+        checked = locale?.let { it == RU },
         onCheckedChange = { checked ->
             context.settingsCommunity.codeforcesLocale.setValueIn(
                 scope = scope,
