@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,16 +45,15 @@ fun rememberNotificationsPermissionsState(): State<PermissionStatus> {
         val state = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
         return remember(state) {
-            object : State<PermissionStatus> {
-                override val value: PermissionStatus
-                    get() = when (val it = state.status) {
-                        is com.google.accompanist.permissions.PermissionStatus.Granted -> Granted
-                        is com.google.accompanist.permissions.PermissionStatus.Denied ->
-                            PermissionStatus.NotGranted(
-                                canForceRequest = !it.shouldShowRationale,
-                                permissionRequest = state::launchPermissionRequest
-                            )
-                    }
+            derivedStateOf {
+                when (val it = state.status) {
+                    is com.google.accompanist.permissions.PermissionStatus.Granted -> PermissionStatus.Granted
+                    is com.google.accompanist.permissions.PermissionStatus.Denied ->
+                        PermissionStatus.NotGranted(
+                            canForceRequest = !it.shouldShowRationale,
+                            permissionRequest = state::launchPermissionRequest
+                        )
+                }
             }
         }
     } else {
