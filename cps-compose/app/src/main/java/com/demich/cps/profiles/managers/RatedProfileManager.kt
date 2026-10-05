@@ -57,6 +57,9 @@ interface RatingRevolutionsProvider {
     fun ratingUpperBoundRevolutions(): List<Pair<Instant, List<RatingColorBound>>>
 }
 
+infix fun List<RatingColorBound>.until(endTime: Instant) =
+    Pair(endTime, this)
+
 fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColor): Color =
     platformColor(ratingColor = ratingColor) ?: throw IllegalArgumentException("platform $platform does not support rating color $ratingColor")
 
