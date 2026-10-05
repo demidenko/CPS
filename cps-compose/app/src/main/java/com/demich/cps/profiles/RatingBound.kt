@@ -20,7 +20,7 @@ class RatingBounds(
             }
         }
 
-    constructor(vararg bound: RatingBound): this(bound.asList())
+    constructor(vararg bounds: RatingBound): this(bounds.asList())
 
     override val size get() = bounds.size
 
