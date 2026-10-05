@@ -22,10 +22,3 @@ enum class RatingColor {
     }
 }
 
-data class RatingColorBound(
-    val ratingColor: RatingColor,
-    val ratingUpperBound: Int
-)
-
-infix fun RatingColor.until(rating: Int): RatingColorBound =
-    RatingColorBound(ratingColor = this, ratingUpperBound = rating)
