@@ -18,6 +18,8 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +33,39 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 
+sealed interface PermissionStatus {
+    data object Granted: PermissionStatus
+    data class NotGranted(val permissionRequest: () -> Unit): PermissionStatus
+}
+
+@Composable
+fun rememberNotificationsPermissionsState(): State<PermissionStatus> {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val state = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+
+        SideEffect(state) {
+            if (!state.status.isGranted && !state.status.shouldShowRationale) {
+                state.launchPermissionRequest()
+            }
+        }
+
+        return remember(state) {
+            object : State<PermissionStatus> {
+                override val value: PermissionStatus
+                    get() = when (state.status) {
+                        is com.google.accompanist.permissions.PermissionStatus.Granted -> Granted
+                        is com.google.accompanist.permissions.PermissionStatus.Denied -> PermissionStatus.NotGranted(state::launchPermissionRequest)
+                    }
+            }
+        }
+    } else {
+        return remember {
+            object : State<PermissionStatus> {
+                override val value: PermissionStatus get() = Granted
+            }
+        }
+    }
+}
 
 @Composable
 fun NotificationsPermissionPanel(
