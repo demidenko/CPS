@@ -35,7 +35,10 @@ import com.google.accompanist.permissions.shouldShowRationale
 
 sealed interface PermissionStatus {
     data object Granted: PermissionStatus
-    data class NotGranted(val permissionRequest: () -> Unit): PermissionStatus
+    data class NotGranted(
+        val canForceRequest: Boolean,
+        val permissionRequest: () -> Unit
+    ): PermissionStatus
 }
 
 @Composable
@@ -43,18 +46,16 @@ fun rememberNotificationsPermissionsState(): State<PermissionStatus> {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val state = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
 
-        SideEffect(state) {
-            if (!state.status.isGranted && !state.status.shouldShowRationale) {
-                state.launchPermissionRequest()
-            }
-        }
-
         return remember(state) {
             object : State<PermissionStatus> {
                 override val value: PermissionStatus
-                    get() = when (state.status) {
+                    get() = when (val it = state.status) {
                         is com.google.accompanist.permissions.PermissionStatus.Granted -> Granted
-                        is com.google.accompanist.permissions.PermissionStatus.Denied -> PermissionStatus.NotGranted(state::launchPermissionRequest)
+                        is com.google.accompanist.permissions.PermissionStatus.Denied ->
+                            PermissionStatus.NotGranted(
+                                canForceRequest = !it.shouldShowRationale,
+                                permissionRequest = state::launchPermissionRequest
+                            )
                     }
             }
         }
