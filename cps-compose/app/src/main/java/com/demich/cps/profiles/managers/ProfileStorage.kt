@@ -15,7 +15,6 @@ import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
 import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.value
-import kotlinx.coroutines.flow.Flow
 
 abstract class ProfileStorage<U: UserInfo>(
     dataStoreWrapper: DataStoreWrapper
@@ -78,8 +77,6 @@ interface ProfileSettingsProvider {
     @Composable
     context(scope: SettingsContainerScope)
     fun SettingsItems() { }
-
-    fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean>? = null
 }
 
 fun profileDataStoreWrapper(platform: Platform) =

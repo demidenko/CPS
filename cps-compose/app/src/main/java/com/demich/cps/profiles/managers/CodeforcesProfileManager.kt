@@ -57,7 +57,6 @@ import com.demich.datastore_itemized.edit
 import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 import com.demich.kotlin_stdlib_boost.binarySearchFirstFalse
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
@@ -161,9 +160,6 @@ class CodeforcesProfileManager :
             profileStorage = profileStorage(context)
         )
     }
-
-    override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        settingsStorage(context).flowOfNotificationsRequired()
 
     override val ratingUpperBoundRevolutions
         get() = listOf(

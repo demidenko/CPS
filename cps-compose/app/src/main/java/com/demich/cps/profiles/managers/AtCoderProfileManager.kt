@@ -24,7 +24,6 @@ import com.demich.cps.ui.settings.SettingsContainerScope
 import com.demich.cps.ui.settings.SwitchByProfilesWork
 import com.demich.cps.utils.context
 import com.demich.datastore_itemized.ItemizedDataStore
-import kotlinx.coroutines.flow.Flow
 
 
 class AtCoderProfileManager :
@@ -108,9 +107,6 @@ class AtCoderProfileManager :
             title = "Rating changes observer"
         )
     }
-
-    override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        AtCoderProfileSettingsDataStore(context).flowOfNotificationsRequired()
 
 }
 
