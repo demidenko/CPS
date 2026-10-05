@@ -1,5 +1,6 @@
 package com.demich.cps.ui.topbar
 
+import android.content.Context
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.profiles.managers.AtCoderProfileSettingsDataStore
+import com.demich.cps.profiles.managers.CodeforcesProfileSettingsDataStore
+import com.demich.cps.profiles.managers.flowOfNotificationsRequired
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
@@ -27,12 +32,16 @@ import com.demich.cps.ui.PermissionStatus
 import com.demich.cps.ui.dialogs.CPSAboutDialog
 import com.demich.cps.ui.rememberNotificationsPermissionsState
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.context
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 @Composable
 fun CPSTopBar(
     subtitle: () -> String,
     additionalMenu: () -> CPSMenuBuilder?,
 ) {
+    val context = context
     var showUIPanel by rememberSaveable { mutableStateOf(false) }
     var showAbout by rememberSaveable { mutableStateOf(false) }
 
@@ -59,7 +68,8 @@ fun CPSTopBar(
             }
         }
 
-        val notificationsRequired by remember { mutableStateOf(false) } // TODO collect
+        val notificationsRequired by remember { flowOfNotificationsRequired(context) }
+            .collectAsState(initial = false)
 
         val notificationPermissionState = rememberNotificationsPermissionsState()
         val notificationPermissionStatus = notificationPermissionState.value
@@ -119,3 +129,11 @@ private fun MainMenuButton(
         }
     }
 }
+
+private fun flowOfNotificationsRequired(context: Context): Flow<Boolean> =
+    combine(
+        AtCoderProfileSettingsDataStore(context).flowOfNotificationsRequired(),
+        CodeforcesProfileSettingsDataStore(context).flowOfNotificationsRequired()
+    ) { booleans ->
+        booleans.any { it }
+    }
