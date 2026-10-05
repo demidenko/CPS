@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Divider
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,7 +23,9 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
+import com.demich.cps.ui.PermissionStatus
 import com.demich.cps.ui.dialogs.CPSAboutDialog
+import com.demich.cps.ui.rememberNotificationsPermissionsState
 import com.demich.cps.ui.theme.cpsColors
 
 @Composable
@@ -55,10 +59,21 @@ fun CPSTopBar(
             }
         }
 
+        val notificationsRequired by remember { mutableStateOf(false) } // TODO collect
+
+        val notificationPermissionState = rememberNotificationsPermissionsState()
+        val notificationPermissionStatus = notificationPermissionState.value
+        SideEffect(notificationPermissionStatus, notificationsRequired) {
+            if (notificationPermissionStatus is PermissionStatus.NotGranted && notificationPermissionStatus.canForceRequest) {
+                if (notificationsRequired) notificationPermissionStatus.permissionRequest()
+            }
+        }
+
         MainMenuButton(
             additionalMenu = additionalMenu,
             onAboutClick = { showAbout = true },
-            onUISettingsClick = { showUIPanel = true }
+            onUISettingsClick = { showUIPanel = true },
+            onGrantRequestClick = if (notificationPermissionStatus is PermissionStatus.NotGranted && notificationsRequired) notificationPermissionStatus.permissionRequest else null
         )
     }
 
@@ -71,6 +86,7 @@ private fun MainMenuButton(
     additionalMenu: () -> CPSMenuBuilder?,
     onAboutClick: () -> Unit,
     onUISettingsClick: () -> Unit,
+    onGrantRequestClick: (() -> Unit)?
 ) {
     CPSDropdownMenuButton(
         modifier = modifier,
@@ -82,11 +98,21 @@ private fun MainMenuButton(
             icon = CPSIcons.SettingsUI,
             onClick = onUISettingsClick
         )
+
         CPSDropdownMenuItem(
             title = "About",
             icon = CPSIcons.Info,
             onClick = onAboutClick
         )
+
+        if (onGrantRequestClick != null) {
+            CPSDropdownMenuItem(
+                title = "Grant permissions",
+                icon = CPSIcons.Attention,
+                onClick = onGrantRequestClick
+            )
+        }
+
         additionalMenu()?.let {
             Divider(color = cpsColors.divider)
             it()
