@@ -1,10 +1,6 @@
 package com.demich.cps.community.settings
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.Text
@@ -43,6 +39,8 @@ import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.containsSomethingExcept
 import com.demich.cps.utils.context
+import com.demich.cps.utils.enterInColumn
+import com.demich.cps.utils.exitInColumn
 import com.demich.cps.workers.CodeforcesFollowWorker
 import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.NewsWorker
@@ -132,9 +130,8 @@ private fun LostSettingsItem() {
         )
         AnimatedVisibility(
             visible = enabled,
-            // TODO: copy pasted from ColumnScope.AnimatedVisibility
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically(),
+            enter = enterInColumn(),
+            exit = exitInColumn(),
         ) {
             LostAuthorSettingsItem(item = settings.codeforcesLostMinRatingTag)
         }
