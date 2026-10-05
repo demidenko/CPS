@@ -110,7 +110,7 @@ class AtCoderProfileManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        AtCoderProfileSettingsDataStore(context).observeRating.asFlow()
+        AtCoderProfileSettingsDataStore(context).flowOfNotificationsRequired()
 
 }
 
@@ -139,3 +139,6 @@ class AtCoderProfileSettingsDataStore(context: Context):
     val observeRating = itemBoolean(name = "observe_rating", defaultValue = false)
 
 }
+
+fun AtCoderProfileSettingsDataStore.flowOfNotificationsRequired() =
+    observeRating.asFlow()

@@ -163,12 +163,7 @@ class CodeforcesProfileManager :
     }
 
     override fun flowOfRequiredNotificationsPermission(context: Context): Flow<Boolean> =
-        settingsStorage(context).flowOf {
-            observeRating.value ||
-            monitorEnabled.value ||
-            upsolvingSuggestionsEnabled.value ||
-            observeContribution.value
-        }
+        settingsStorage(context).flowOfNotificationsRequired()
 
     override val ratingUpperBoundRevolutions
         get() = listOf(
@@ -271,8 +266,15 @@ class CodeforcesProfileSettingsDataStore(context: Context):
     val observeContribution = itemBoolean(name = "observe_contribution", defaultValue = false)
     val monitorEnabled = itemBoolean(name = "monitor_enabled", defaultValue = false)
     val upsolvingSuggestionsEnabled = itemBoolean(name = "upsolving_suggestions", defaultValue = false)
-
 }
+
+fun CodeforcesProfileSettingsDataStore.flowOfNotificationsRequired() =
+    flowOf {
+        observeRating.value ||
+        monitorEnabled.value ||
+        upsolvingSuggestionsEnabled.value ||
+        observeContribution.value
+    }
 
 private fun ratingUpperBounds() =
     listOf<CodeforcesRatingColorTag>(
