@@ -21,7 +21,7 @@ internal class RatingGraphRectangles(
             add(GraphPoint(x = x, y = Int.MAX_VALUE) to RatingColor.RED)
         }
         if (manager is RatingRevolutionsProvider) {
-            manager.ratingUpperBoundRevolutions
+            manager.ratingUpperBoundRevolutions()
                 .sortedBy { it.first }
                 .forEach { (endTime, bounds) ->
                     addBounds(x = endTime, bounds = bounds)

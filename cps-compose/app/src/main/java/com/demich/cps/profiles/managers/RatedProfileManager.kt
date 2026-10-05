@@ -54,7 +54,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    val ratingUpperBoundRevolutions: List<Pair<Instant, List<RatingColorBound>>>
+    fun ratingUpperBoundRevolutions(): List<Pair<Instant, List<RatingColorBound>>>
 }
 
 fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColor): Color =
