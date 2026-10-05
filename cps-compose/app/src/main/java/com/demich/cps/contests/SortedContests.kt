@@ -8,10 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
+import com.demich.cps.platforms.Platform
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
 import com.demich.cps.utils.flowOfTruncatedCurrentTime
@@ -141,7 +141,7 @@ private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestComposit
     ) { ignored, monitorContestId ->
         buildSet {
             addAll(ignored)
-            monitorContestId?.let { add(ContestPlatform.codeforces to it.toString()) }
+            monitorContestId?.let { add(Platform.codeforces to it.toString()) }
         }
     }
 
