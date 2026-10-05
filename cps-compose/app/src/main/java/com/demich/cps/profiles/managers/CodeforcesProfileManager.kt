@@ -164,37 +164,37 @@ class CodeforcesProfileManager :
 
     override fun ratingUpperBoundRevolutions() = [
         //https://codeforces.com/blog/entry/59228
-        [
+        RatingBounds(
             RatingColor.GRAY until 1200,
             RatingColor.GREEN until 1400,
             RatingColor.CYAN until 1600,
             RatingColor.BLUE until 1900,
             RatingColor.VIOLET until 2200,
             RatingColor.ORANGE until 2400
-        ] until Instant.fromEpochSeconds(1525364996L),
+        ) until Instant.fromEpochSeconds(1525364996L),
         //https://codeforces.com/blog/entry/20638
-        [
+        RatingBounds(
             RatingColor.GRAY until 1200,
             RatingColor.GREEN until 1500,
             RatingColor.BLUE until 1700,
             RatingColor.VIOLET until 1900,
             RatingColor.ORANGE until 2200
-        ] until Instant.fromEpochSeconds(1443721088L),
+        ) until Instant.fromEpochSeconds(1443721088L),
         //https://codeforces.com/blog/entry/3064
-        [
+        RatingBounds(
             RatingColor.GRAY until 1200,
             RatingColor.GREEN until 1500,
             RatingColor.BLUE until 1650,
             RatingColor.VIOLET until 1800,
             RatingColor.ORANGE until 2000
-        ] until Instant.fromEpochSeconds(1320620562L),
+        ) until Instant.fromEpochSeconds(1320620562L),
         //https://codeforces.com/blog/entry/1383
-        [
+        RatingBounds(
             RatingColor.GRAY until 1200,
             RatingColor.GREEN until 1500,
             RatingColor.BLUE until 1650,
             RatingColor.YELLOW until 2000
-        ] until Instant.fromEpochSeconds(1298914585L)
+        ) until Instant.fromEpochSeconds(1298914585L)
         //https://codeforces.com/blog/entry/126
     ]
 
