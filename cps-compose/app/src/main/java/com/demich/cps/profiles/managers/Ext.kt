@@ -17,7 +17,7 @@ import com.demich.cps.ui.theme.cpsColors
 
 fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColor =
     ratingsUpperBounds
-        .firstOrNull { rating < it.ratingUpperBound }
+        .firstOrNull { rating < it.upperBound }
         ?.ratingColor ?: RED
 
 context(manager: RatedProfileManager<*>)

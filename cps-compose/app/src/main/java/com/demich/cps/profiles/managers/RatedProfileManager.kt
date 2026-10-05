@@ -5,10 +5,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.profiles.RatingBound
 import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
-import com.demich.cps.profiles.RatingColorBound
 import com.demich.cps.profiles.SmallRatedProfilePanel
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
@@ -55,10 +55,10 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
 interface RatingRevolutionsProvider {
     //list of (last time, bounds)
-    fun ratingUpperBoundRevolutions(): List<Pair<Instant, List<RatingColorBound>>>
+    fun ratingUpperBoundRevolutions(): List<Pair<Instant, List<RatingBound>>>
 }
 
-infix fun List<RatingColorBound>.until(endTime: Instant) =
+infix fun List<RatingBound>.until(endTime: Instant) =
     Pair(endTime, this)
 
 fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColor): Color =

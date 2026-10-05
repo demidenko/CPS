@@ -89,8 +89,8 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
             val j = rankedRatingColors.indexOfLast { ratingColor == it }
             val pos = ratingsUpperBounds.indexOfFirst { it.ratingColor == ratingColor }
             check(i != -1 && j >= i && pos != -1)
-            val lower = if (pos > 0) ratingsUpperBounds[pos-1].ratingUpperBound else 0
-            val upper = ratingsUpperBounds[pos].ratingUpperBound
+            val lower = if (pos > 0) ratingsUpperBounds[pos-1].upperBound else 0
+            val upper = ratingsUpperBounds[pos].upperBound
             val blockLength = (upper - lower).toDouble() / (j - i + 1)
             i + (rating - lower) / blockLength
         }

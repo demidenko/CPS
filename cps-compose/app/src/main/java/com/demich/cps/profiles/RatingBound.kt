@@ -1,17 +1,17 @@
 package com.demich.cps.profiles
 
-data class RatingColorBound(
+data class RatingBound(
     val ratingColor: RatingColor,
-    val ratingUpperBound: Int
+    val upperBound: Int
 )
 
-infix fun RatingColor.until(rating: Int): RatingColorBound =
-    RatingColorBound(ratingColor = this, ratingUpperBound = rating)
+infix fun RatingColor.until(rating: Int): RatingBound =
+    RatingBound(ratingColor = this, upperBound = rating)
 
 class RatingBounds(
-    source: Collection<RatingColorBound>
-): AbstractList<RatingColorBound>() {
-    private val bounds = source.sortedBy { it.ratingUpperBound }
+    source: Collection<RatingBound>
+): AbstractList<RatingBound>() {
+    private val bounds = source.sortedBy { it.upperBound }
         .also {
             for (i in 1 until it.size) {
                 check(it[i-1].ratingColor < it[i].ratingColor) {
@@ -20,7 +20,7 @@ class RatingBounds(
             }
         }
 
-    constructor(vararg bound: RatingColorBound): this(bound.asList())
+    constructor(vararg bound: RatingBound): this(bound.asList())
 
     override val size get() = bounds.size
 

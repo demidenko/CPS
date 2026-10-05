@@ -111,7 +111,7 @@ class CodeChefProfileManager :
     override val rankedRatingColors = RatingColor.rankedCodeChef
 
     private fun getRatingStarNumber(rating: Int): Int {
-        return ratingsUpperBounds.partitionIndex { rating >= it.ratingUpperBound } + 1
+        return ratingsUpperBounds.partitionIndex { rating >= it.upperBound } + 1
     }
 
     override fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors) =
