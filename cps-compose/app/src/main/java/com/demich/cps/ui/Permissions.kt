@@ -4,7 +4,6 @@ package com.demich.cps.ui
 
 import android.Manifest
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 
 sealed interface PermissionStatus {
     data object Granted: PermissionStatus
@@ -80,21 +77,19 @@ fun NotificationsPermissionPanel(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun NotificationsPermissionPanel(modifier: Modifier) {
-    val state = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-    if (!state.status.isGranted) {
+    val state = rememberNotificationsPermissionsState()
+    val status = state.value
+    if (status is PermissionStatus.NotGranted) {
         PermissionPanel(
             modifier = modifier,
             message = message,
-            onClick = { state.launchPermissionRequest() },
+            onClick = status.permissionRequest,
         )
-    }
 
-    SideEffect(state) {
-        if (!state.status.isGranted && !state.status.shouldShowRationale) {
-            state.launchPermissionRequest()
+        SideEffect(status) {
+            if (status.canForceRequest) status.permissionRequest()
         }
     }
 }
