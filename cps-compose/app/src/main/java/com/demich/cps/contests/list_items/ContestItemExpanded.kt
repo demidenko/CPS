@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.contests.ContestPlatformIcon
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.generalPlatformOrNull
 import com.demich.cps.contests.formatDateRange
 import com.demich.cps.contests.isVirtual
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
@@ -57,7 +58,8 @@ internal fun ContestExpandedItemContent(
     )
 }
 
-private fun Contest.platformName() = host ?: platform.name
+private fun Contest.platformTitle(): String =
+    generalPlatformOrNull()?.name ?: host ?: ""
 
 @Composable
 private fun ContestPlatform(
@@ -70,7 +72,7 @@ private fun ContestPlatform(
             color = cpsColors.contentAdditional
         )
         Text(
-            text = contest.platformName(),
+            text = contest.platformTitle(),
             style = CPSDefaults.MonospaceTextStyle.copy(
                 fontSize = 13.sp,
                 color = cpsColors.contentAdditional
