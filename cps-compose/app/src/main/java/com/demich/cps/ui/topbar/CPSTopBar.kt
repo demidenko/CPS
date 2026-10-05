@@ -55,24 +55,41 @@ fun CPSTopBar(
             }
         }
 
-        CPSDropdownMenuButton(
-            icon = CPSIcons.More,
-            color = cpsColors.content,
-        ) {
-            CPSDropdownMenuItem(title = "UI", icon = CPSIcons.SettingsUI) {
-                showUIPanel = true
-            }
-            CPSDropdownMenuItem(title = "About", icon = CPSIcons.Info) {
-                showAbout = true
-            }
-            additionalMenu()?.let {
-                Divider(color = cpsColors.divider)
-                it()
-            }
-        }
+        MainMenuButton(
+            additionalMenu = additionalMenu,
+            onAboutClick = { showAbout = true },
+            onUISettingsClick = { showUIPanel = true }
+        )
     }
 
     if (showAbout) CPSAboutDialog(onDismissRequest = { showAbout = false })
 }
 
-
+@Composable
+private fun MainMenuButton(
+    modifier: Modifier = Modifier,
+    additionalMenu: () -> CPSMenuBuilder?,
+    onAboutClick: () -> Unit,
+    onUISettingsClick: () -> Unit,
+) {
+    CPSDropdownMenuButton(
+        modifier = modifier,
+        icon = CPSIcons.More,
+        color = cpsColors.content,
+    ) {
+        CPSDropdownMenuItem(
+            title = "UI",
+            icon = CPSIcons.SettingsUI,
+            onClick = onUISettingsClick
+        )
+        CPSDropdownMenuItem(
+            title = "About",
+            icon = CPSIcons.Info,
+            onClick = onAboutClick
+        )
+        additionalMenu()?.let {
+            Divider(color = cpsColors.divider)
+            it()
+        }
+    }
+}
