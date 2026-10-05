@@ -22,9 +22,9 @@ internal class RatingGraphRectangles(
         }
         if (manager is RatingRevolutionsProvider) {
             manager.ratingUpperBoundRevolutions()
-                .sortedBy { it.first }
-                .forEach { (endTime, bounds) ->
-                    addBounds(x = endTime, bounds = bounds)
+                .sortedBy { it.endTime }
+                .forEach {
+                    addBounds(x = it.endTime, bounds = it.bounds)
                 }
         }
         addBounds(x = Instant.DISTANT_FUTURE, bounds = manager.ratingsUpperBounds)

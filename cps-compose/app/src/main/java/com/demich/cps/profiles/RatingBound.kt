@@ -1,5 +1,7 @@
 package com.demich.cps.profiles
 
+import kotlin.time.Instant
+
 data class RatingBound(
     val ratingColor: RatingColor,
     val upperBound: Int
@@ -26,3 +28,11 @@ class RatingBounds(
 
     override fun get(index: Int) = bounds[index]
 }
+
+class ArchiveRatingBounds(
+    val bounds: RatingBounds,
+    val endTime: Instant
+)
+
+infix fun RatingBounds.until(endTime: Instant) =
+    ArchiveRatingBounds(bounds = this, endTime = endTime)
