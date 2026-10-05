@@ -11,6 +11,7 @@ import com.demich.cps.platforms.api.atcoder.AtCoderUrls
 import com.demich.cps.platforms.clients.AtCoderClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.platforms.utils.atcoder.AtCoderParser
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.AtCoderUserInfoExpandedContent
@@ -56,7 +57,7 @@ class AtCoderProfileManager :
         }
 
     override val ratingsUpperBounds by lazy {
-        listOf(
+        RatingBounds(
             RatingColor.GRAY until 400,
             RatingColor.BROWN until 800,
             RatingColor.GREEN until 1200,

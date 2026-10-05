@@ -11,6 +11,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.platforms.api.dmoj.DmojUrls
 import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.isPageNotFound
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.DmojUserInfoExpandedContent
@@ -55,7 +56,7 @@ class DmojProfileManager :
         DmojClient().getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
-        listOf(
+        RatingBounds(
             RatingColor.GRAY until 1000,
             RatingColor.GREEN until 1300,
             RatingColor.BLUE until 1600,

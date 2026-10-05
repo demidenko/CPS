@@ -25,6 +25,7 @@ import com.demich.cps.platforms.api.codechef.CodeChefUrls
 import com.demich.cps.platforms.clients.CodeChefClient
 import com.demich.cps.platforms.clients.isRedirect
 import com.demich.cps.platforms.utils.CodeChefParser
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.SmallProfilePanelTwoLines
@@ -85,7 +86,7 @@ class CodeChefProfileManager :
         CodeChefClient.getRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy {
-        listOf(
+        RatingBounds(
             RatingColor.GRAY until 1400,
             RatingColor.GREEN until 1600,
             RatingColor.BLUE until 1800,

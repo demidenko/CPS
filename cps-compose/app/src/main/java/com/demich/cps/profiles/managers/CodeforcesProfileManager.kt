@@ -29,6 +29,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.screens.CodeforcesUserInfoExpandedContent
@@ -90,7 +91,7 @@ class CodeforcesProfileManager :
         CodeforcesClient().getUserRatingChanges(handle = userId).map { it.toRatingChange() }
 
     override val ratingsUpperBounds by lazy(mode = NONE) {
-        ratingUpperBounds()
+        RatingBounds(ratingUpperBounds())
     }
 
     override val rankedRatingColors = RatingColor.rankedCodeforces

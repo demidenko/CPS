@@ -20,6 +20,8 @@ class RatingBounds(
             }
         }
 
+    constructor(vararg bound: RatingColorBound): this(bound.asList())
+
     override val size get() = bounds.size
 
     override fun get(index: Int) = bounds[index]

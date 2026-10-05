@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.RatingColorBound
@@ -18,7 +19,7 @@ import kotlin.time.Instant
 abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override val userIdTitle get() = "handle"
 
-    abstract val ratingsUpperBounds: List<RatingColorBound>
+    abstract val ratingsUpperBounds: RatingBounds
 
     abstract fun platformColor(ratingColor: RatingColor): Color?
 
