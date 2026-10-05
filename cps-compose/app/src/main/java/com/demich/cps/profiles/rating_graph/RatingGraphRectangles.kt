@@ -1,7 +1,7 @@
 package com.demich.cps.profiles.rating_graph
 
 import androidx.compose.runtime.Immutable
-import com.demich.cps.profiles.RatingBound
+import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
@@ -14,8 +14,8 @@ internal class RatingGraphRectangles(
 ) {
     //point is upperBound (endTime, ratingUpperBound)
     private val upperBounds: List<Pair<GraphPoint, RatingColor>> = buildList {
-        fun addBounds(x: Instant, bounds: List<RatingBound>) {
-            bounds.sortedBy { it.upperBound }.forEach {
+        fun addBounds(x: Instant, bounds: RatingBounds) {
+            bounds.forEach {
                 add(GraphPoint(x = x, y = it.upperBound) to it.ratingColor)
             }
             add(GraphPoint(x = x, y = Int.MAX_VALUE) to RatingColor.RED)
