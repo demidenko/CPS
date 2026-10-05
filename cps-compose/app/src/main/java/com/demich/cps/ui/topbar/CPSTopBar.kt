@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.demich.cps.community.settings.CommunitySettingsDataStore
+import com.demich.cps.community.settings.flowOfNotificationsRequired
 import com.demich.cps.profiles.managers.AtCoderProfileSettingsDataStore
 import com.demich.cps.profiles.managers.CodeforcesProfileSettingsDataStore
 import com.demich.cps.profiles.managers.flowOfNotificationsRequired
@@ -133,7 +135,8 @@ private fun MainMenuButton(
 private fun flowOfNotificationsRequired(context: Context): Flow<Boolean> =
     combine(
         AtCoderProfileSettingsDataStore(context).flowOfNotificationsRequired(),
-        CodeforcesProfileSettingsDataStore(context).flowOfNotificationsRequired()
+        CodeforcesProfileSettingsDataStore(context).flowOfNotificationsRequired(),
+        CommunitySettingsDataStore(context).flowOfNotificationsRequired()
     ) { booleans ->
         booleans.any { it }
     }

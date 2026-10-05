@@ -10,6 +10,7 @@ import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
+import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.value
 
 val Context.settingsCommunity: CommunitySettingsDataStore
@@ -51,3 +52,8 @@ data class CodeforcesCommunityScreenSpecs(
     val lostEnabled: Boolean,
     val renderAllTabs: Boolean
 )
+
+fun CommunitySettingsDataStore.flowOfNotificationsRequired() =
+    flowOf {
+        codeforcesFollowEnabled.value || enabledNewsFeeds.value.isNotEmpty()
+    }
