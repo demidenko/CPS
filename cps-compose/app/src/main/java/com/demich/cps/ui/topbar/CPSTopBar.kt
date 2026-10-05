@@ -70,6 +70,7 @@ fun CPSTopBar(
             }
         }
 
+        // TODO: add badge on icon
         val notificationsRequired by remember { flowOfNotificationsRequired(context) }
             .collectAsState(initial = false)
 
