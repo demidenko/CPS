@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -130,10 +131,7 @@ private const val clistImportId = "clist_import"
 fun ProgressBarsViewModel.clistImportIsRunningState(): State<Boolean> {
     val state = flowOfProgresses.collectAsState()
     return remember {
-        object : State<Boolean> {
-            override val value
-                get() = state.value.contains(clistImportId)
-        }
+        derivedStateOf { state.value.contains(clistImportId) }
     }
 }
 
