@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +26,6 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.ProfileSettings>.NavContentProfilesSettingsScreen() {
@@ -82,14 +80,7 @@ private fun <U: UserInfo> ProfileSettingsItems(
     profileResult: ProfileResult<U>,
     onUserIdClick: () -> Unit
 ) {
-    val context = context
-    val requiredPermission by remember(manager) {
-        (manager as? ProfileSettingsProvider)
-            ?.flowOfRequiredNotificationsPermission(context)
-            ?: emptyFlow()
-    }.collectAsState(initial = false)
-
-    SettingsColumn(requiredNotificationsPermission = requiredPermission) {
+    SettingsColumn {
         UserIdSettingsItem(
             userId = profileResult.userId,
             userIdTitle = manager.userIdTitle,

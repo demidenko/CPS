@@ -1,6 +1,5 @@
 package com.demich.cps.community.settings
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -50,23 +48,14 @@ import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.flowOf
 import com.demich.datastore_itemized.setValueIn
-import com.demich.datastore_itemized.value
-import kotlinx.coroutines.flow.Flow
 
 
 @Composable
 private fun CommunitySettingsScreen() {
-    val context = context
     val devEnabled = LocalDevModeEnabled.current
 
-    val requiredPermissions by remember {
-        flowOfNotificationPermissionsRequired(context)
-    }.collectAsState(initial = false)
-
     SettingsColumn(
-        requiredNotificationsPermission = requiredPermissions,
         modifier = Modifier.fillMaxHeight()
     ) {
         SettingsSectionHeader(
@@ -103,11 +92,6 @@ fun CPSNavigator.ScreenScope<Screen.CommunitySettings>.NavContentCommunitySettin
 
     CommunitySettingsScreen()
 }
-
-private fun flowOfNotificationPermissionsRequired(context: Context): Flow<Boolean> =
-    context.settingsCommunity.flowOf {
-        codeforcesFollowEnabled.value || enabledNewsFeeds.value.isNotEmpty()
-    }
 
 @Composable
 context(scope: SettingsContainerScope)
