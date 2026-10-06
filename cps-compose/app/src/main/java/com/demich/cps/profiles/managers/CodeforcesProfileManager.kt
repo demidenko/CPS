@@ -211,6 +211,24 @@ private fun CodeforcesRatingColorTag.toRatingColor(): RatingColor =
         RED, LEGENDARY -> RED
     }
 
+private fun ratingUpperBounds() =
+    listOf<CodeforcesRatingColorTag>(
+        GRAY,
+        GREEN,
+        CYAN,
+        BLUE,
+        VIOLET,
+        ORANGE
+    ).map { colorTag ->
+        // bs can be optimized if iterate from orange to gray
+        // but it speedups whole function only from 3.5us to 2.5us
+        val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
+            CodeforcesRatingColorTag.fromRating(rating) <= colorTag
+        }
+        val ratingColor = checkNotNull(colorTag.toRatingColor())
+        ratingColor until rating
+    }
+
 @Composable
 @ReadOnlyComposable
 fun CodeforcesHandle.toHandleSpan() =
@@ -270,24 +288,6 @@ fun CodeforcesProfileSettingsDataStore.flowOfNotificationsRequired() =
         monitorEnabled.value ||
         upsolvingSuggestionsEnabled.value ||
         observeContribution.value
-    }
-
-private fun ratingUpperBounds() =
-    listOf<CodeforcesRatingColorTag>(
-        GRAY,
-        GREEN,
-        CYAN,
-        BLUE,
-        VIOLET,
-        ORANGE
-    ).map { colorTag ->
-        // bs can be optimized if iterate from orange to gray
-        // but it speedups whole function only from 3.5us to 2.5us
-        val rating = binarySearchFirstFalse(first = 0, last = Int.MAX_VALUE) { rating ->
-            CodeforcesRatingColorTag.fromRating(rating) <= colorTag
-        }
-        val ratingColor = checkNotNull(colorTag.toRatingColor())
-        ratingColor until rating
     }
 
 @Composable
