@@ -29,11 +29,16 @@ import kotlin.time.Instant
 // FINISHED | RUNNING | UPCOMING
 data class SortedContests(
     val contests: List<Contest>,
-    val sortedAt: Instant,
-) {
-    private val firstRunningOrUpcoming: Int =
-        contests.partitionIndex { it.phaseAt(sortedAt) == FINISHED }
+    private val firstRunningOrUpcoming: Int
     // TODO: firstUpcoming to get contest with phase
+) {
+    constructor(
+        contests: List<Contest>,
+        sortedAt: Instant
+    ): this(
+        contests = contests,
+        firstRunningOrUpcoming = contests.partitionIndex { it.phaseAt(sortedAt) == FINISHED }
+    )
 
     val finished: List<Contest> =
         contests.subList(fromIndex = 0, toIndex = firstRunningOrUpcoming)
@@ -42,8 +47,8 @@ data class SortedContests(
         contests.subList(fromIndex = firstRunningOrUpcoming, toIndex = contests.size)
 }
 
-private fun SortedContests.nextReorderTime(): Instant =
-    contests.minOfNotNull {
+private fun List<Contest>.nextReorderTime(sortedAt: Instant): Instant =
+    minOfNotNull {
         when {
             sortedAt < it.startTime -> it.startTime
             sortedAt < it.endTime -> it.endTime
@@ -65,15 +70,17 @@ private class ContestsSmartSorter: ContestsSorter {
                 else it.sortedWith(comparator)
             }
 
-        val result = SortedContests(
-            contests = sorted,
-            sortedAt = time
-        )
+        private val sortedAt: Instant = time
 
-        private val nextReorderTime = result.nextReorderTime()
+        private val nextReorderTime: Instant = sorted.nextReorderTime(sortedAt)
 
         fun sameOrder(time: Instant): Boolean =
-            time >= result.sortedAt && time < nextReorderTime
+            time >= sortedAt && time < nextReorderTime
+
+        val result = SortedContests(
+            contests = sorted,
+            sortedAt = sortedAt
+        )
     }
 
     private var last: List<Contest> = emptyList()
