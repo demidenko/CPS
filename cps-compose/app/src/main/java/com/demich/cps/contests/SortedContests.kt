@@ -56,21 +56,31 @@ private fun List<Contest>.nextReorderTime(sortedAt: Instant): Instant =
         }
     } ?: Instant.DISTANT_FUTURE
 
+private fun List<Contest>.sortedOrThisAt(at: Instant): List<Contest> {
+    val comparator = Contest.comparatorAt(at)
+    return if (isSortedWith(comparator)) this
+    else sortedWith(comparator)
+}
+
 private interface ContestsSorter {
     val contests: SortedContests
     fun apply(contests: List<Contest>, time: Instant): Boolean
 }
 
 private class ContestsSmartSorter: ContestsSorter {
-    private class SortedData(contests: List<Contest>, time: Instant) {
-        val sorted: List<Contest> =
-            contests.let {
-                val comparator = Contest.comparatorAt(time)
-                if (it.isSortedWith(comparator)) it
-                else it.sortedWith(comparator)
-            }
-
-        private val sortedAt: Instant = time
+    private class SortedData private constructor(
+        val source: List<Contest>,
+        val sortedAt: Instant,
+        val sorted: List<Contest>
+    ) {
+        constructor(
+            source: List<Contest>,
+            sortedAt: Instant
+        ): this(
+            source = source,
+            sortedAt = sortedAt,
+            sorted = source.sortedOrThisAt(sortedAt)
+        )
 
         private val nextReorderTime: Instant = sorted.nextReorderTime(sortedAt)
 
@@ -81,27 +91,32 @@ private class ContestsSmartSorter: ContestsSorter {
             contests = sorted,
             sortedAt = sortedAt
         )
-    }
 
-    private var last: List<Contest> = emptyList()
-    private var sortedLast = SortedData(last, Instant.DISTANT_PAST)
+        fun sort(at: Instant) =
+            // !sameOrder
+            SortedData(
+                source = source,
+                sortedAt = at,
+                sorted = sorted.sortedOrThisAt(at)
+            )
+    }
+    private var last = SortedData(source = emptyList(), sortedAt = Instant.DISTANT_PAST)
 
     override val contests: SortedContests
-        get() = sortedLast.result
+        get() = last.result
 
     override fun apply(contests: List<Contest>, time: Instant): Boolean {
-        with(sortedLast) {
-            if (last != contests) {
-                last = contests
-                sortedLast = SortedData(contests, time)
+        with(last) {
+            if (source != contests) {
+                last = SortedData(source = contests, sortedAt = time)
                 return true
             }
             if (!sameOrder(time)) {
-                sortedLast = SortedData(sorted, time)
+                last = sort(at = time)
                 return true
             }
+            return false
         }
-        return false
     }
 }
 
