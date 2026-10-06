@@ -81,21 +81,21 @@ private class ContestsSorter: State<SortedContests> {
 
         private val nextReorderTime: Instant = sorted.nextReorderTime(sortedAt)
 
-        fun sameOrder(time: Instant): Boolean =
-            time >= sortedAt && time < nextReorderTime
-
         val result = SortedContests(
             contests = sorted,
             sortedAt = sortedAt
         )
 
-        fun sort(at: Instant) =
-            // !sameOrder
-            SortedData(
-                source = source,
-                sortedAt = at,
-                sorted = sorted.sortedOrThisAt(at)
-            )
+        fun sort(time: Instant): SortedData =
+            if (time >= sortedAt && time < nextReorderTime) {
+                this
+            } else {
+                SortedData(
+                    source = source,
+                    sortedAt = time,
+                    sorted = sorted.sortedOrThisAt(time)
+                )
+            }
     }
 
     private var last by mutableStateOf(
@@ -106,14 +106,11 @@ private class ContestsSorter: State<SortedContests> {
         get() = last.result
 
     fun update(contests: List<Contest>, time: Instant) {
-        with(last) {
-            if (source != contests) {
+        last.let {
+            if (it.source != contests) {
                 last = SortedData(source = contests, sortedAt = time)
-                return
-            }
-            if (!sameOrder(time)) {
-                last = sort(at = time)
-                return
+            } else {
+                last = it.sort(time = time)
             }
         }
     }
