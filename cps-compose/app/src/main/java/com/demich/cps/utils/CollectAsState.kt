@@ -15,7 +15,6 @@ import kotlinx.coroutines.runBlocking
 
 private const val message = "based on runBlocking"
 
-@Deprecated(level = WARNING, message = message)
 @RememberInComposition
 fun <T> Flow<T>.firstBlocking(): T =
     when (this) {
