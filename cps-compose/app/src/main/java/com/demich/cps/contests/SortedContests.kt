@@ -120,7 +120,7 @@ internal fun produceSortedContestsWithTime(
 ): Pair<State<SortedContests?>, State<Instant>> {
     val context = context
 
-    val init = rememberScoped {
+    val states = rememberScoped {
         val sorter = ContestsSorter()
         val initTime = clock.now().truncateBySeconds()
         val currentTimeState = mutableStateOf(initTime)
@@ -129,9 +129,9 @@ internal fun produceSortedContestsWithTime(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner, init) {
+    LaunchedEffect(lifecycleOwner, states) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
-            val (sorter: ContestsSorter, currentTimeState) = init
+            val (sorter, currentTimeState) = states
             flowOfContests(context).combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
                 sorter.update(contests, currentTime)
                 currentTimeState.value = currentTime
@@ -139,7 +139,7 @@ internal fun produceSortedContestsWithTime(
         }
     }
 
-    return init
+    return states
 }
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
