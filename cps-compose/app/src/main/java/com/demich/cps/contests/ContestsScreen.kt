@@ -147,7 +147,7 @@ private fun ContestsPager(
     modifier: Modifier = Modifier
 ) {
     val (
-        contestsState: State<SortedContests>,
+        contestsState: State<SortedContests?>,
         currentTimeState: State<Instant>
     ) = produceSortedContestsWithTime(clock = Clock.System)
 
@@ -157,14 +157,15 @@ private fun ContestsPager(
         val sortedContests by contestsState
 
         SideEffect(sortedContests, viewState) {
-            filterState.available = sortedContests.contests.isNotEmpty()
-            viewState.syncExpanded(sortedContests)
+            val sortedContests = contestsState.value
+            filterState.available = sortedContests != null && sortedContests.contests.isNotEmpty()
+            if (sortedContests != null) viewState.syncExpanded(sortedContests)
         }
 
         val page = viewState.contestsPage
         saveableStateHolder.SaveableStateProvider(key = page) {
             ContestsPage(
-                contests = sortedContests.sublist(page),
+                contests = sortedContests?.sublist(page),
                 viewState = viewState,
                 filterState = filterState,
                 modifier = modifier
@@ -190,7 +191,7 @@ private fun List<Contest>.filterBy(state: FilterState) =
 
 @Composable
 private fun ContestsPage(
-    contests: List<Contest>,
+    contests: List<Contest>?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
@@ -198,9 +199,9 @@ private fun ContestsPage(
     val context = context
     val scope = backgroundCoroutineScope
 
-    val filtered: List<Contest> by remember(contests, filterState) {
+    val filtered: List<Contest>? by remember(contests, filterState) {
         derivedStateOf {
-            contests.filterBy(filterState)
+            contests?.filterBy(filterState)
         }
     }
 
@@ -219,7 +220,7 @@ private fun ContestsPage(
 
 @Composable
 private fun ContestsColumn(
-    contests: List<Contest>,
+    contests: List<Contest>?,
     viewState: ContestsListViewState,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
