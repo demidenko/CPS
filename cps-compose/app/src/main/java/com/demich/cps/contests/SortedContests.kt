@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
@@ -62,12 +64,7 @@ private fun List<Contest>.sortedOrThisAt(at: Instant): List<Contest> {
     else sortedWith(comparator)
 }
 
-private interface ContestsSorter {
-    val contests: SortedContests
-    fun apply(contests: List<Contest>, time: Instant): Boolean
-}
-
-private class ContestsSmartSorter: ContestsSorter {
+private class ContestsSorter: State<SortedContests> {
     private class SortedData private constructor(
         val source: List<Contest>,
         val sortedAt: Instant,
@@ -100,22 +97,24 @@ private class ContestsSmartSorter: ContestsSorter {
                 sorted = sorted.sortedOrThisAt(at)
             )
     }
-    private var last = SortedData(source = emptyList(), sortedAt = Instant.DISTANT_PAST)
 
-    override val contests: SortedContests
+    private var last by mutableStateOf(
+        SortedData(source = emptyList(), sortedAt = Instant.DISTANT_PAST)
+    )
+
+    override val value: SortedContests
         get() = last.result
 
-    override fun apply(contests: List<Contest>, time: Instant): Boolean {
+    fun update(contests: List<Contest>, time: Instant) {
         with(last) {
             if (source != contests) {
                 last = SortedData(source = contests, sortedAt = time)
-                return true
+                return
             }
             if (!sameOrder(time)) {
                 last = sort(at = time)
-                return true
+                return
             }
-            return false
         }
     }
 }
@@ -128,31 +127,27 @@ internal fun produceSortedContestsWithTime(
     val context = context
 
     val init = rememberScoped {
-        val sorter = ContestsSmartSorter()
+        val sorter = ContestsSorter()
         val initContests = flowOfContests(context).firstBlocking()
         val initTime = clock.now().truncateBySeconds()
-        sorter.apply(initContests, initTime)
-        val contestsState = mutableStateOf(sorter.contests)
+        sorter.update(initContests, initTime)
         val currentTimeState = mutableStateOf(initTime)
-        Pair(Pair(contestsState, currentTimeState), sorter)
+        Pair(sorter, currentTimeState)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(lifecycleOwner, init) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
-            val (states, sorter: ContestsSorter) = init
-            val (contestsState, currentTimeState) = states
+            val (sorter: ContestsSorter, currentTimeState) = init
             flowOfContests(context).combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
-                if (sorter.apply(contests, currentTime)) {
-                    contestsState.value = sorter.contests
-                }
+                sorter.update(contests, currentTime)
                 currentTimeState.value = currentTime
             }.collect()
         }
     }
 
-    return init.first
+    return init
 }
 
 private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
