@@ -29,10 +29,10 @@ class RatingBounds(
     override fun get(index: Int) = bounds[index]
 }
 
-class ArchiveRatingBounds(
+class RatingBoundsArchived(
     val bounds: RatingBounds,
     val endTime: Instant
 )
 
 infix fun RatingBounds.until(endTime: Instant) =
-    ArchiveRatingBounds(bounds = this, endTime = endTime)
+    RatingBoundsArchived(bounds = this, endTime = endTime)

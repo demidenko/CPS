@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.demich.cps.profiles.ArchiveRatingBounds
 import com.demich.cps.profiles.RatingBounds
+import com.demich.cps.profiles.RatingBoundsArchived
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.SmallRatedProfilePanel
@@ -53,7 +53,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 }
 
 interface RatingRevolutionsProvider {
-    fun ratingUpperBoundRevolutions(): List<ArchiveRatingBounds>
+    fun ratingUpperBoundRevolutions(): List<RatingBoundsArchived>
 }
 
 fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColor): Color =
