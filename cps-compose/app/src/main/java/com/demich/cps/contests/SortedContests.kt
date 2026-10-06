@@ -53,7 +53,7 @@ private fun SortedContests.nextReorderTime(): Instant =
 
 private interface ContestsSorter {
     val contests: SortedContests
-    fun apply(contests: List<Contest>, currentTime: Instant): Boolean
+    fun apply(contests: List<Contest>, time: Instant): Boolean
 }
 
 private class ContestsSmartSorter: ContestsSorter {
@@ -82,15 +82,15 @@ private class ContestsSmartSorter: ContestsSorter {
     override val contests: SortedContests
         get() = sortedLast.result
 
-    override fun apply(contests: List<Contest>, currentTime: Instant): Boolean {
+    override fun apply(contests: List<Contest>, time: Instant): Boolean {
         with(sortedLast) {
             if (last != contests) {
                 last = contests
-                sortedLast = SortedData(contests, currentTime)
+                sortedLast = SortedData(contests, time)
                 return true
             }
-            if (!sameOrder(currentTime)) {
-                sortedLast = SortedData(sorted, currentTime)
+            if (!sameOrder(time)) {
+                sortedLast = SortedData(sorted, time)
                 return true
             }
         }
