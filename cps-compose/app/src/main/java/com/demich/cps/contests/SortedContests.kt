@@ -11,7 +11,6 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
-import com.demich.cps.platforms.Platform
 import com.demich.cps.utils.context
 import com.demich.cps.utils.firstBlocking
 import com.demich.cps.utils.flowOfTruncatedCurrentTime
@@ -139,10 +138,8 @@ private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestComposit
         flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
         flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
     ) { ignored, monitorContestId ->
-        buildSet {
-            addAll(ignored)
-            monitorContestId?.let { add(Platform.codeforces to it.toString()) }
-        }
+        if (monitorContestId == null) ignored
+        else ignored + Pair(codeforces, monitorContestId.toString())
     }
 
 private fun flowOfContests(context: Context): Flow<List<Contest>> =
