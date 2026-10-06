@@ -14,7 +14,6 @@ import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.utils.context
-import com.demich.cps.utils.firstBlocking
 import com.demich.cps.utils.flowOfTruncatedCurrentTime
 import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -64,7 +63,7 @@ private fun List<Contest>.sortedOrThisAt(at: Instant): List<Contest> {
     else sortedWith(comparator)
 }
 
-private class ContestsSorter: State<SortedContests> {
+private class ContestsSorter: State<SortedContests?> {
     private class SortedData private constructor(
         val source: List<Contest>,
         val sortedAt: Instant,
@@ -98,16 +97,14 @@ private class ContestsSorter: State<SortedContests> {
             }
     }
 
-    private var last by mutableStateOf(
-        SortedData(source = emptyList(), sortedAt = Instant.DISTANT_PAST)
-    )
+    private var last: SortedData? by mutableStateOf(null)
 
-    override val value: SortedContests
-        get() = last.result
+    override val value: SortedContests?
+        get() = last?.result
 
     fun update(contests: List<Contest>, time: Instant) {
         last.let {
-            if (it.source != contests) {
+            if (it == null || it.source != contests) {
                 last = SortedData(source = contests, sortedAt = time)
             } else {
                 last = it.sort(time = time)
@@ -120,14 +117,12 @@ private class ContestsSorter: State<SortedContests> {
 @Composable
 internal fun produceSortedContestsWithTime(
     clock: Clock
-): Pair<State<SortedContests>, State<Instant>> {
+): Pair<State<SortedContests?>, State<Instant>> {
     val context = context
 
     val init = rememberScoped {
         val sorter = ContestsSorter()
-        val initContests = flowOfContests(context).firstBlocking()
         val initTime = clock.now().truncateBySeconds()
-        sorter.update(initContests, initTime)
         val currentTimeState = mutableStateOf(initTime)
         Pair(sorter, currentTimeState)
     }
