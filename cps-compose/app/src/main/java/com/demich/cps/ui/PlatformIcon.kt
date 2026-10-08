@@ -26,10 +26,11 @@ fun PlatformIcon(
 
 @Composable
 fun platformLogoPainter(platform: Platform): Painter =
-    painterResource(platformLogoResId(platform))
+    painterResource(platformLogoResIdOrThrow(platform))
 
 
-fun platformLogoResId(platform: Platform): Int =
+// TODO: return nullable instead of throw
+fun platformLogoResIdOrThrow(platform: Platform): Int =
     when (platform) {
         codeforces -> R.drawable.logo_codeforces
         atcoder -> R.drawable.logo_atcoder
