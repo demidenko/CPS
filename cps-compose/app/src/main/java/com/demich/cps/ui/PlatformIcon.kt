@@ -29,6 +29,7 @@ fun platformLogoPainter(platform: Platform): Painter =
     painterResource(platformLogoResId(platform))
 
 
+// TODO: return nullable instead of throw
 fun platformLogoResId(platform: Platform): Int =
     when (platform) {
         codeforces -> R.drawable.logo_codeforces
