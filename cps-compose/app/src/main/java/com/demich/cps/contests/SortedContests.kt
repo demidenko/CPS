@@ -1,6 +1,5 @@
 package com.demich.cps.contests
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -10,10 +9,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.contestsRepository
-import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
-import com.demich.cps.contests.monitors.flowOfContestId
-import com.demich.cps.utils.context
 import com.demich.cps.utils.flowOfTruncatedCurrentTime
 import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.minOfNotNull
@@ -22,7 +17,6 @@ import com.sebaslogen.resaca.rememberScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -115,11 +109,10 @@ private class ContestsSorter: State<SortedContests?> {
 
 
 @Composable
-internal fun produceSortedContestsWithTime(
+fun produceSortedContestsWithTime(
+    flow: Flow<List<Contest>>,
     clock: Clock
 ): Pair<State<SortedContests?>, State<Instant>> {
-    val context = context
-
     val states = rememberScoped {
         val sorter = ContestsSorter()
         val initTime = clock.now().truncateBySeconds()
@@ -129,10 +122,10 @@ internal fun produceSortedContestsWithTime(
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner, states) {
+    LaunchedEffect(lifecycleOwner, flow, states) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
             val (sorter, currentTimeState) = states
-            flowOfContests(context).combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
+            flow.combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
                 sorter.update(contests, currentTime)
                 currentTimeState.value = currentTime
             }.collect()
@@ -141,20 +134,3 @@ internal fun produceSortedContestsWithTime(
 
     return states
 }
-
-private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
-    combine(
-        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
-        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
-    ) { ignored, monitorContestId ->
-        if (monitorContestId == null) ignored
-        else ignored + Pair(codeforces, monitorContestId.toString())
-    }
-
-private fun flowOfContests(context: Context): Flow<List<Contest>> =
-    context.contestsRepository.flowOfContests()
-        .distinctUntilChanged()
-        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
-            if (ignored.isEmpty()) list
-            else list.filter { contest -> contest.compositeId !in ignored }
-        }

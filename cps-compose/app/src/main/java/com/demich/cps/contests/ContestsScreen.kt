@@ -1,5 +1,6 @@
 package com.demich.cps.contests
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -30,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
 import com.demich.cps.contests.monitors.contestId
 import com.demich.cps.contests.monitors.flowOfContestData
+import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
 import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
@@ -79,7 +82,9 @@ import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.state
 import com.demich.datastore_itemized.fromSnapshot
 import com.demich.datastore_itemized.value
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -146,10 +151,13 @@ private fun ContestsPager(
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
+    val context = context
+    val contestsFlow = remember { flowOfContests(context) }
+
     val (
         contestsState: State<SortedContests?>,
         currentTimeState: State<Instant>
-    ) = produceSortedContestsWithTime(clock = Clock.System)
+    ) = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -493,3 +501,20 @@ private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
     fromSnapshot {
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
     }
+
+private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
+    combine(
+        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
+        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
+    ) { ignored, monitorContestId ->
+        if (monitorContestId == null) ignored
+        else ignored + Pair(codeforces, monitorContestId.toString())
+    }
+
+private fun flowOfContests(context: Context): Flow<List<Contest>> =
+    context.contestsRepository.flowOfContests()
+        .distinctUntilChanged()
+        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
+            if (ignored.isEmpty()) list
+            else list.filter { contest -> contest.compositeId !in ignored }
+        }
