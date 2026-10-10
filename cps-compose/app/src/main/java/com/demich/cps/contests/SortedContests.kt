@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -113,18 +114,17 @@ fun produceSortedContestsWithTime(
     flow: Flow<List<Contest>>,
     clock: Clock
 ): Pair<State<SortedContests?>, State<Instant>> {
-    val states = rememberScoped {
-        val sorter = ContestsSorter()
+    val sorter = rememberScoped { ContestsSorter() }
+
+    val currentTimeState = remember(clock) {
         val initTime = clock.now().truncateBySeconds()
-        val currentTimeState = mutableStateOf(initTime)
-        Pair(sorter, currentTimeState)
+        mutableStateOf(initTime)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner, flow, states) {
+    LaunchedEffect(lifecycleOwner, flow, sorter, currentTimeState) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
-            val (sorter, currentTimeState) = states
             flow.combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
                 sorter.update(contests, currentTime)
                 currentTimeState.value = currentTime
@@ -132,5 +132,5 @@ fun produceSortedContestsWithTime(
         }
     }
 
-    return states
+    return Pair(sorter, currentTimeState)
 }
