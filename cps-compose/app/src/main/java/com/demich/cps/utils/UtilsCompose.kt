@@ -282,9 +282,9 @@ fun rememberUUIDState(): ResetableUUIDState {
 
 //TODO: remove it (use default includeFontPadding = false)
 @Composable
-fun IncludeFontPadding(includeFontPadding: Boolean = true, content: @Composable () -> Unit) {
+fun IncludeFontPadding(content: @Composable () -> Unit) {
     ProvideTextStyle(
-        value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = includeFontPadding)),
+        value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
         content = content
     )
 }
