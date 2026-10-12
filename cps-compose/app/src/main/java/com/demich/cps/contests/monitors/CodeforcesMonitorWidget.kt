@@ -2,6 +2,7 @@ package com.demich.cps.contests.monitors
 
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -131,12 +132,12 @@ private fun Footer(
                 Rank(contestantRank = contestantRank)
             },
             right = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     if (requestFailed) {
-                        AttentionIcon(
-                            warningLevel = ALERT,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
+                        AttentionIcon(warningLevel = ALERT)
                     }
                     PhaseTitle(contestPhase = contestPhase)
                 }
