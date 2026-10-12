@@ -47,15 +47,21 @@ internal fun ContestExpandedItemContent(
     ContestTitle(
         contest = contest,
         phase = phase,
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(top = 2.dp)
+            .fillMaxWidth()
     )
     ContestItemDatesAndMenuButton(
         contest = contest,
         phase = phase,
+        modifier = Modifier.fillMaxWidth(),
         collisionLevel = collisionLevel,
         onDeleteRequest = onDeleteRequest
     )
     ContestCounter(
-        contest = contest
+        contest = contest,
+        modifier = Modifier.padding(top = 2.dp)
     )
 }
 
@@ -90,21 +96,20 @@ private fun ContestPlatform(
 private fun ContestTitle(
     contest: Contest,
     phase: Contest.Phase,
+    modifier: Modifier = Modifier
 ) {
     ContestTitleExpanded(
         title = contest.title,
         phase = phase,
         isVirtual = contest.isVirtual,
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(top = 2.dp)
-            .fillMaxWidth()
+        modifier = modifier
     )
 }
 
 @Composable
 private fun ContestCounter(
-    contest: Contest
+    contest: Contest,
+    modifier: Modifier = Modifier
 ) {
     ProvideContestSubtitleTextStyle {
         Text(
@@ -113,7 +118,7 @@ private fun ContestCounter(
                 running = { "ends in ${it.formatTimerFull()}" },
                 finished = { "finished" }
             ),
-            modifier = Modifier.padding(top = 2.dp)
+            modifier = modifier
         )
     }
 }
@@ -122,10 +127,11 @@ private fun ContestCounter(
 private fun ContestItemDatesAndMenuButton(
     contest: Contest,
     phase: Contest.Phase,
+    modifier: Modifier = Modifier,
     collisionLevel: () -> WarningLevel?,
     onDeleteRequest: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier) {
         ProvideContestSubtitleTextStyle {
             AttentionText(
                 text = contextLocalTimeZone { contest.formatDateRange(showDayOfWeek = true) },
