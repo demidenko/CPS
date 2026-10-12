@@ -74,31 +74,28 @@ private fun CodeforcesMonitor(
     requestFailed: Boolean,
     modifier: Modifier
 ) {
-    IncludeFontPadding {
-        Column(modifier) {
-            Header(
-                contestTitle = contestData.contestInfo.name,
-                contestPhase = contestData.contestPhase,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Footer(
-                contestantRank = contestData.contestantRank,
-                contestPhase = contestData.contestPhase,
-                requestFailed = requestFailed,
-                modifier = Modifier.fillMaxWidth()
-            )
-            StandingsRow(
-                problems = contestData.problems,
-                contestType = contestData.contestInfo.type,
-                modifier = Modifier
-                    .padding(top = 2.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(color = cpsColors.backgroundAdditional)
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-
-            )
-        }
+    Column(modifier) {
+        Header(
+            contestTitle = contestData.contestInfo.name,
+            contestPhase = contestData.contestPhase,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Footer(
+            contestantRank = contestData.contestantRank,
+            contestPhase = contestData.contestPhase,
+            requestFailed = requestFailed,
+            modifier = Modifier.fillMaxWidth()
+        )
+        StandingsRow(
+            problems = contestData.problems,
+            contestType = contestData.contestInfo.type,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(color = cpsColors.backgroundAdditional)
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
     }
 }
 
@@ -127,23 +124,25 @@ private fun Footer(
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
-    ContestItemFooter(
-        modifier = modifier,
-        left = {
-            Rank(contestantRank = contestantRank)
-        },
-        right = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (requestFailed) {
-                    AttentionIcon(
-                        warningLevel = ALERT,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
+    IncludeFontPadding {
+        ContestItemFooter(
+            modifier = modifier,
+            left = {
+                Rank(contestantRank = contestantRank)
+            },
+            right = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (requestFailed) {
+                        AttentionIcon(
+                            warningLevel = ALERT,
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                    }
+                    PhaseTitle(contestPhase = contestPhase)
                 }
-                PhaseTitle(contestPhase = contestPhase)
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -226,15 +225,17 @@ private fun ProblemColumn(
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = problemName)
-        ProblemResultCell(
-            problemResult = problemResult,
-            contestType = contestType
-        )
+    IncludeFontPadding {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = problemName)
+            ProblemResultCell(
+                problemResult = problemResult,
+                contestType = contestType
+            )
+        }
     }
 }
 

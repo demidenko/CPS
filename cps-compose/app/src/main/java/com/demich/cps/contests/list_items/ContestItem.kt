@@ -52,21 +52,19 @@ private fun ContestItemContent(
     contest: Contest,
     collisionLevel: () -> WarningLevel?
 ) {
-    IncludeFontPadding {
-        //TODO: call recomposes two times
-        val phase = contest.phaseAt(localCurrentTime)
-        ContestItemHeader(
-            contest = contest,
-            phase = phase,
-            modifier = Modifier.fillMaxWidth()
-        )
-        ContestItemFooter(
-            contest = contest,
-            phase = phase,
-            collisionLevel = collisionLevel,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    //TODO: call recomposes two times
+    val phase = contest.phaseAt(localCurrentTime)
+    ContestItemHeader(
+        contest = contest,
+        phase = phase,
+        modifier = Modifier.fillMaxWidth()
+    )
+    ContestItemFooter(
+        contest = contest,
+        phase = phase,
+        collisionLevel = collisionLevel,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @Composable
@@ -136,24 +134,26 @@ private fun ContestItemFooter(
     collisionLevel: () -> WarningLevel?,
     modifier: Modifier = Modifier
 ) {
-    ContestItemFooter(
-        modifier = modifier,
-        left = {
-            AttentionText(
-                text = contextLocalTimeZone {
-                    when (phase) {
-                        UPCOMING -> contest.formatDateRangeCompact()
-                        RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
-                        FINISHED -> contest.formatDateRange(showDayOfWeek = false)
-                    }
-                },
-                warningLevel = if (phase == UPCOMING) collisionLevel() else null
-            )
-        },
-        right = {
-            ContestCounter(contest = contest)
-        }
-    )
+    IncludeFontPadding {
+        ContestItemFooter(
+            modifier = modifier,
+            left = {
+                AttentionText(
+                    text = contextLocalTimeZone {
+                        when (phase) {
+                            UPCOMING -> contest.formatDateRangeCompact()
+                            RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
+                            FINISHED -> contest.formatDateRange(showDayOfWeek = false)
+                        }
+                    },
+                    warningLevel = if (phase == UPCOMING) collisionLevel() else null
+                )
+            },
+            right = {
+                ContestCounter(contest = contest)
+            }
+        )
+    }
 }
 
 @Composable
