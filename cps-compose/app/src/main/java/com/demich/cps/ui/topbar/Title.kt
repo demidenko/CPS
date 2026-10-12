@@ -8,7 +8,6 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -51,20 +50,24 @@ internal fun Title(
 
 @Composable
 private fun SubTitle(
-    modifier: Modifier = Modifier,
     text: () -> String
 ) {
-    val titleChars by rememberTitleCharsState(text)
+    val state = rememberTitleCharsState(text)
+    val titleChars = state.value
 
-    LazyRow(modifier = modifier) {
-        items(
-            items = titleChars,
-            key = { it }
-        ) {
-            Text(
-                text = "${it.first}",
-                modifier = Modifier.animateItem()
-            )
+    if (titleChars.isEmpty()) {
+        Text("")
+    } else {
+        LazyRow {
+            items(
+                items = titleChars,
+                key = { it }
+            ) {
+                Text(
+                    text = "${it.first}",
+                    modifier = Modifier.animateItem()
+                )
+            }
         }
     }
 }
