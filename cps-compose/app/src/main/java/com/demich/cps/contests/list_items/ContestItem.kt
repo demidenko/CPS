@@ -37,15 +37,13 @@ fun ContestItem(
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    IncludeFontPadding {
-        val expanded = isExpanded()
-        Column(
-            modifier = modifier,
-            horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
-        ) {
-            if (!expanded) ContestItemContent(contest, collisionLevel)
-            else ContestExpandedItemContent(contest, collisionLevel, onDeleteRequest = onDeleteRequest)
-        }
+    val expanded = isExpanded()
+    Column(
+        modifier = modifier,
+        horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
+    ) {
+        if (!expanded) ContestItemContent(contest, collisionLevel)
+        else ContestExpandedItemContent(contest, collisionLevel, onDeleteRequest = onDeleteRequest)
     }
 }
 
@@ -54,19 +52,21 @@ private fun ContestItemContent(
     contest: Contest,
     collisionLevel: () -> WarningLevel?
 ) {
-    //TODO: call recomposes two times
-    val phase = contest.phaseAt(localCurrentTime)
-    ContestItemHeader(
-        contest = contest,
-        phase = phase,
-        modifier = Modifier.fillMaxWidth()
-    )
-    ContestItemFooter(
-        contest = contest,
-        phase = phase,
-        collisionLevel = collisionLevel,
-        modifier = Modifier.fillMaxWidth()
-    )
+    IncludeFontPadding {
+        //TODO: call recomposes two times
+        val phase = contest.phaseAt(localCurrentTime)
+        ContestItemHeader(
+            contest = contest,
+            phase = phase,
+            modifier = Modifier.fillMaxWidth()
+        )
+        ContestItemFooter(
+            contest = contest,
+            phase = phase,
+            collisionLevel = collisionLevel,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Composable

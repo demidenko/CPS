@@ -27,6 +27,7 @@ import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerFull
@@ -39,23 +40,25 @@ internal fun ContestExpandedItemContent(
     collisionLevel: () -> WarningLevel?,
     onDeleteRequest: () -> Unit
 ) {
-    val phase = contest.phaseAt(localCurrentTime)
-    ContestPlatform(
-        contest = contest
-    )
-    ContestTitle(
-        contest = contest,
-        phase = phase,
-    )
-    ContestItemDatesAndMenuButton(
-        contest = contest,
-        phase = phase,
-        collisionLevel = collisionLevel,
-        onDeleteRequest = onDeleteRequest
-    )
-    ContestCounter(
-        contest = contest
-    )
+    IncludeFontPadding {
+        val phase = contest.phaseAt(localCurrentTime)
+        ContestPlatform(
+            contest = contest
+        )
+        ContestTitle(
+            contest = contest,
+            phase = phase,
+        )
+        ContestItemDatesAndMenuButton(
+            contest = contest,
+            phase = phase,
+            collisionLevel = collisionLevel,
+            onDeleteRequest = onDeleteRequest
+        )
+        ContestCounter(
+            contest = contest
+        )
+    }
 }
 
 private fun Contest.platformTitle(): String =

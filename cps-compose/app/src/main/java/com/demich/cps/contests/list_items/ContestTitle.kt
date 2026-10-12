@@ -29,7 +29,6 @@ internal fun ContestTitleCollapsed(
     isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
-
     IncludeFontPadding(false) {
         Text(
             text = contestTitleSpan(title = title, bracketsColor = cpsColors.contentAdditional),
