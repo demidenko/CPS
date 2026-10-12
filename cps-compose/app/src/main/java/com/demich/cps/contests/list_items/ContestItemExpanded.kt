@@ -28,7 +28,6 @@ import com.demich.cps.ui.CPSDropdownMenuButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerFull
@@ -49,17 +48,15 @@ internal fun ContestExpandedItemContent(
         contest = contest,
         phase = phase,
     )
-    IncludeFontPadding {
-        ContestItemDatesAndMenuButton(
-            contest = contest,
-            phase = phase,
-            collisionLevel = collisionLevel,
-            onDeleteRequest = onDeleteRequest
-        )
-        ContestCounter(
-            contest = contest
-        )
-    }
+    ContestItemDatesAndMenuButton(
+        contest = contest,
+        phase = phase,
+        collisionLevel = collisionLevel,
+        onDeleteRequest = onDeleteRequest
+    )
+    ContestCounter(
+        contest = contest
+    )
 }
 
 private fun Contest.platformTitle(): String =
@@ -115,7 +112,8 @@ private fun ContestCounter(
                 upcoming = { "starts in ${it.formatTimerFull()}" },
                 running = { "ends in ${it.formatTimerFull()}" },
                 finished = { "finished" }
-            )
+            ),
+            modifier = Modifier.padding(top = 2.dp)
         )
     }
 }
