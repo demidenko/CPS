@@ -32,7 +32,6 @@ import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.plusIf
 
@@ -95,18 +94,16 @@ private fun BlogEntryInfo(
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?
 ) {
-    IncludeFontPadding(false) {
-        BlogEntryInfo(
-            title = blogEntry.title,
-            authorHandle = blogEntry.author.toHandleSpan(),
-            rating = blogEntry.rating,
-            commentsCount = blogEntry.commentsCount,
-            creationTime = blogEntry.creationTime.formatTimeAgo(),
-            markNew = markNew,
-            label = label,
-            modifier = modifier
-        )
-    }
+    BlogEntryInfo(
+        title = blogEntry.title,
+        authorHandle = blogEntry.author.toHandleSpan(),
+        rating = blogEntry.rating,
+        commentsCount = blogEntry.commentsCount,
+        creationTime = blogEntry.creationTime.formatTimeAgo(),
+        markNew = markNew,
+        label = label,
+        modifier = modifier
+    )
 }
 
 @Composable

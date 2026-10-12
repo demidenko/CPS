@@ -28,6 +28,7 @@ import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 
 @Composable
 internal fun CodeforcesRecentBlogEntries(
@@ -101,20 +102,22 @@ internal fun RecentBlogEntry(
     isLowRated: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        BlogEntryTitleWithArrow(
-            title = title,
-            titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
-            singleLine = false,
-            modifier = Modifier.fillMaxWidth()
-        )
-        RecentBlogEntryFooter(
-            authorHandle = authorHandle,
-            commentators = commentators,
-            fontSize = 13.sp,
-            iconSize = 12.sp,
-            modifier = Modifier.fillMaxWidth()
-        )
+    IncludeFontPadding {
+        Column(modifier = modifier) {
+            BlogEntryTitleWithArrow(
+                title = title,
+                titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
+                singleLine = false,
+                modifier = Modifier.fillMaxWidth()
+            )
+            RecentBlogEntryFooter(
+                authorHandle = authorHandle,
+                commentators = commentators,
+                fontSize = 13.sp,
+                iconSize = 12.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

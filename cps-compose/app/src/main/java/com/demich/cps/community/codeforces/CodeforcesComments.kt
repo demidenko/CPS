@@ -40,6 +40,7 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.codeforcesHtmlContentToAnnotatedString
 import com.demich.cps.utils.formatTimeAgo
 import kotlin.math.roundToInt
@@ -81,14 +82,16 @@ private fun Comment(
     showBlogEntryTitle: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Comment(
-        modifier = modifier,
-        authorHandle = comment.author.toHandleSpan(),
-        blogEntryTitle = comment.blogEntryTitle.takeIf { showBlogEntryTitle },
-        rating = comment.rating,
-        timeAgo = comment.creationTime.formatTimeAgo(),
-        commentHtml = comment.html
-    )
+    IncludeFontPadding {
+        Comment(
+            modifier = modifier,
+            authorHandle = comment.author.toHandleSpan(),
+            blogEntryTitle = comment.blogEntryTitle.takeIf { showBlogEntryTitle },
+            rating = comment.rating,
+            timeAgo = comment.creationTime.formatTimeAgo(),
+            commentHtml = comment.html
+        )
+    }
 }
 
 @Composable
