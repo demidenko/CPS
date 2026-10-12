@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.formatFullDateTime
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerShort
@@ -63,7 +63,7 @@ private fun ContestItemContent(
         contest = contest,
         phase = phase,
         collisionLevel = collisionLevel,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
     )
 }
 
@@ -134,26 +134,24 @@ private fun ContestItemFooter(
     collisionLevel: () -> WarningLevel?,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding {
-        ContestItemFooter(
-            modifier = modifier,
-            left = {
-                AttentionText(
-                    text = contextLocalTimeZone {
-                        when (phase) {
-                            UPCOMING -> contest.formatDateRangeCompact()
-                            RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
-                            FINISHED -> contest.formatDateRange(showDayOfWeek = false)
-                        }
-                    },
-                    warningLevel = if (phase == UPCOMING) collisionLevel() else null
-                )
-            },
-            right = {
-                ContestCounter(contest = contest)
-            }
-        )
-    }
+    ContestItemFooter(
+        modifier = modifier,
+        left = {
+            AttentionText(
+                text = contextLocalTimeZone {
+                    when (phase) {
+                        UPCOMING -> contest.formatDateRangeCompact()
+                        RUNNING -> "ends " + contest.endTime.formatFullDateTime(showDayOfWeek = true, showYear = false)
+                        FINISHED -> contest.formatDateRange(showDayOfWeek = false)
+                    }
+                },
+                warningLevel = if (phase == UPCOMING) collisionLevel() else null
+            )
+        },
+        right = {
+            ContestCounter(contest = contest)
+        }
+    )
 }
 
 @Composable
