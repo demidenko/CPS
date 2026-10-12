@@ -29,7 +29,6 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.topbar.CPSTopBar
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.context
@@ -192,7 +191,6 @@ class CPSNavigator(
 
 context(builder: NavGraphBuilder)
 inline fun <reified T: Screen> CPSNavigator.navEntry(
-    includeFontPadding: Boolean = false,
     crossinline content: @Composable CPSNavigator.ScreenScope<T>.() -> Unit
 ) {
     builder.composable<T> {
@@ -203,9 +201,7 @@ inline fun <reified T: Screen> CPSNavigator.navEntry(
             }
         }
         Surface(modifier = Modifier.fillMaxSize()) {
-            IncludeFontPadding(includeFontPadding) {
-                scope.content()
-            }
+            scope.content()
         }
     }
 }
