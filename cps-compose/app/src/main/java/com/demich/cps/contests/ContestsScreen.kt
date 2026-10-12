@@ -64,7 +64,6 @@ import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
 import com.demich.cps.utils.add
@@ -131,19 +130,17 @@ private fun ContestsReloadableContent(
         onRefresh = onReload,
         modifier = modifier
     ) {
-        IncludeFontPadding {
-            Column {
-                LoadingError(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-                ContestsPager(
-                    viewState = viewState,
-                    filterState = filterState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            }
+        Column {
+            LoadingError(
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            ContestsPager(
+                viewState = viewState,
+                filterState = filterState,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
         }
     }
 }

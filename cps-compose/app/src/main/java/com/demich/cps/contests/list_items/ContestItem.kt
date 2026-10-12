@@ -23,6 +23,7 @@ import com.demich.cps.ui.AttentionText
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.formatFullDateTime
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.WarningLevel
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimerShort
@@ -36,13 +37,15 @@ fun ContestItem(
     modifier: Modifier = Modifier,
     onDeleteRequest: () -> Unit
 ) {
-    val expanded = isExpanded()
-    Column(
-        modifier = modifier,
-        horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
-    ) {
-        if (!expanded) ContestItemContent(contest, collisionLevel)
-        else ContestExpandedItemContent(contest, collisionLevel, onDeleteRequest = onDeleteRequest)
+    IncludeFontPadding {
+        val expanded = isExpanded()
+        Column(
+            modifier = modifier,
+            horizontalAlignment = if (expanded) Alignment.CenterHorizontally else Alignment.Start
+        ) {
+            if (!expanded) ContestItemContent(contest, collisionLevel)
+            else ContestExpandedItemContent(contest, collisionLevel, onDeleteRequest = onDeleteRequest)
+        }
     }
 }
 
