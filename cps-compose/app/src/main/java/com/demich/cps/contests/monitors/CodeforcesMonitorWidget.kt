@@ -75,7 +75,10 @@ private fun CodeforcesMonitor(
     requestFailed: Boolean,
     modifier: Modifier
 ) {
-    Column(modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         Header(
             contestTitle = contestData.contestInfo.name,
             contestPhase = contestData.contestPhase,
@@ -85,15 +88,12 @@ private fun CodeforcesMonitor(
             contestantRank = contestData.contestantRank,
             contestPhase = contestData.contestPhase,
             requestFailed = requestFailed,
-            modifier = Modifier
-                .padding(top = 2.dp)
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
         StandingsRow(
             problems = contestData.problems,
             contestType = contestData.contestInfo.type,
             modifier = Modifier
-                .padding(top = 2.dp)
                 .clip(RoundedCornerShape(6.dp))
                 .background(color = cpsColors.backgroundAdditional)
                 .fillMaxWidth()
