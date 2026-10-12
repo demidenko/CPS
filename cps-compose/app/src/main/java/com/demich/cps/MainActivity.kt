@@ -88,7 +88,7 @@ private fun CPSContent() {
             NavContentProfilesSettingsScreen()
         }
 
-        navigator.navEntry<Screen.Community>(includeFontPadding = true) {
+        navigator.navEntry<Screen.Community> {
             NavContentCommunityScreen(
                 onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
                 onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }

@@ -27,6 +27,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
@@ -45,16 +46,18 @@ fun CodeforcesCommunityScreen(
     controller: CodeforcesCommunityController,
     renderAllTabs: Boolean
 ) {
-    Column {
-        CodeforcesPagerHeader(
-            controller = controller,
-            modifier = Modifier.fillMaxWidth()
-        )
-        CodeforcesPager(
-            controller = controller,
-            renderAllTabs = renderAllTabs,
-            modifier = Modifier.fillMaxSize()
-        )
+    IncludeFontPadding {
+        Column {
+            CodeforcesPagerHeader(
+                controller = controller,
+                modifier = Modifier.fillMaxWidth()
+            )
+            CodeforcesPager(
+                controller = controller,
+                renderAllTabs = renderAllTabs,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
