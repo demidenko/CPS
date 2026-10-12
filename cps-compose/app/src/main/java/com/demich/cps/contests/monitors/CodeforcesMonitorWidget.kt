@@ -85,7 +85,9 @@ private fun CodeforcesMonitor(
             contestantRank = contestData.contestantRank,
             contestPhase = contestData.contestPhase,
             requestFailed = requestFailed,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .fillMaxWidth()
         )
         StandingsRow(
             problems = contestData.problems,
@@ -125,25 +127,23 @@ private fun Footer(
     requestFailed: Boolean,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding {
-        ContestItemFooter(
-            modifier = modifier,
-            left = {
-                Rank(contestantRank = contestantRank)
-            },
-            right = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    if (requestFailed) {
-                        AttentionIcon(warningLevel = ALERT)
-                    }
-                    PhaseTitle(contestPhase = contestPhase)
+    ContestItemFooter(
+        modifier = modifier,
+        left = {
+            Rank(contestantRank = contestantRank)
+        },
+        right = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (requestFailed) {
+                    AttentionIcon(warningLevel = ALERT)
                 }
+                PhaseTitle(contestPhase = contestPhase)
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable
