@@ -1,5 +1,6 @@
 package com.demich.cps.contests.list_items
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,15 +41,15 @@ internal fun ContestExpandedItemContent(
     collisionLevel: () -> WarningLevel?,
     onDeleteRequest: () -> Unit
 ) {
+    val phase = contest.phaseAt(localCurrentTime)
+    ContestPlatform(
+        contest = contest
+    )
+    ContestTitle(
+        contest = contest,
+        phase = phase,
+    )
     IncludeFontPadding {
-        val phase = contest.phaseAt(localCurrentTime)
-        ContestPlatform(
-            contest = contest
-        )
-        ContestTitle(
-            contest = contest,
-            phase = phase,
-        )
         ContestItemDatesAndMenuButton(
             contest = contest,
             phase = phase,
@@ -68,7 +69,10 @@ private fun Contest.platformTitle(): String =
 private fun ContestPlatform(
     contest: Contest
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
         ContestPlatformIcon(
             contest = contest,
             size = 18.sp,
@@ -80,8 +84,7 @@ private fun ContestPlatform(
                 fontSize = 13.sp,
                 color = cpsColors.contentAdditional
             ),
-            maxLines = 1,
-            modifier = Modifier.padding(start = 5.dp)
+            maxLines = 1
         )
     }
 }

@@ -18,7 +18,6 @@ import com.demich.cps.contests.database.Contest
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.append
 import com.demich.kotlin_stdlib_boost.splitTrailingBrackets
 
@@ -47,25 +46,23 @@ internal fun ContestTitleExpanded(
     isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding(false) {
-        // TODO: find better solution
-        var isMultiline by rememberSaveable(title) { mutableStateOf(false) }
-        Text(
-            text = contestTitleSpan(
-                title = title,
-                bracketsColor = cpsColors.contentAdditional,
-                useNewLine = isMultiline
-            ),
-            color = cpsColors.colorFor(phase, isVirtual),
-            fontSize = CPSFontSize.itemTitle,
-            fontWeight = FontWeight.Bold,
-            modifier = modifier,
-            textAlign = TextAlign.Center,
-            onTextLayout = {
-                isMultiline = it.lineCount > 1
-            }
-        )
-    }
+    // TODO: find better solution
+    var isMultiline by rememberSaveable(title) { mutableStateOf(false) }
+    Text(
+        text = contestTitleSpan(
+            title = title,
+            bracketsColor = cpsColors.contentAdditional,
+            useNewLine = isMultiline
+        ),
+        color = cpsColors.colorFor(phase, isVirtual),
+        fontSize = CPSFontSize.itemTitle,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier,
+        textAlign = TextAlign.Center,
+        onTextLayout = {
+            isMultiline = it.lineCount > 1
+        }
+    )
 }
 
 fun CPSColors.colorFor(phase: Contest.Phase, isVirtual: Boolean): Color =
