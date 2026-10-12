@@ -111,7 +111,7 @@ private fun CPSContent() {
             NavContentCodeforcesBlog()
         }
 
-        navigator.navEntry<Screen.Contests>(includeFontPadding = true) {
+        navigator.navEntry<Screen.Contests> {
             NavContentContestsScreen(
                 onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )

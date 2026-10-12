@@ -64,6 +64,7 @@ import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
 import com.demich.cps.utils.add
@@ -97,22 +98,24 @@ private fun ContestsScreen(
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
-    Column {
-        CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
-        if (anyPlatformEnabled) {
-            ContestsReloadableContent(
-                viewState = viewState,
-                filterState = filterState,
-                isReloading = isReloading,
-                onReload = onReload,
-                modifier = Modifier.weight(1f, false)
-            )
-            FilterTextField(
-                filterState = filterState,
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            NoneEnabledMessage(modifier = Modifier.fillMaxSize())
+    IncludeFontPadding {
+        Column {
+            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
+            if (anyPlatformEnabled) {
+                ContestsReloadableContent(
+                    viewState = viewState,
+                    filterState = filterState,
+                    isReloading = isReloading,
+                    onReload = onReload,
+                    modifier = Modifier.weight(1f, false)
+                )
+                FilterTextField(
+                    filterState = filterState,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                NoneEnabledMessage(modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
