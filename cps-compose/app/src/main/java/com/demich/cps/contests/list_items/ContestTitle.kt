@@ -29,17 +29,15 @@ internal fun ContestTitleCollapsed(
     isVirtual: Boolean,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding(false) {
-        Text(
-            text = contestTitleSpan(title = title, bracketsColor = cpsColors.contentAdditional),
-            color = cpsColors.colorFor(phase, isVirtual),
-            fontSize = CPSFontSize.itemTitle,
-            fontWeight = FontWeight.Bold,
-            modifier = modifier,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+    Text(
+        text = contestTitleSpan(title = title, bracketsColor = cpsColors.contentAdditional),
+        color = cpsColors.colorFor(phase, isVirtual),
+        fontSize = CPSFontSize.itemTitle,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
