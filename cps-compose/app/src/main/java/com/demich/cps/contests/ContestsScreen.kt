@@ -98,24 +98,22 @@ private fun ContestsScreen(
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
-    IncludeFontPadding {
-        Column {
-            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
-            if (anyPlatformEnabled) {
-                ContestsReloadableContent(
-                    viewState = viewState,
-                    filterState = filterState,
-                    isReloading = isReloading,
-                    onReload = onReload,
-                    modifier = Modifier.weight(1f, false)
-                )
-                FilterTextField(
-                    filterState = filterState,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                NoneEnabledMessage(modifier = Modifier.fillMaxSize())
-            }
+    Column {
+        CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
+        if (anyPlatformEnabled) {
+            ContestsReloadableContent(
+                viewState = viewState,
+                filterState = filterState,
+                isReloading = isReloading,
+                onReload = onReload,
+                modifier = Modifier.weight(1f, false)
+            )
+            FilterTextField(
+                filterState = filterState,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            NoneEnabledMessage(modifier = Modifier.fillMaxSize())
         }
     }
 }
@@ -133,17 +131,19 @@ private fun ContestsReloadableContent(
         onRefresh = onReload,
         modifier = modifier
     ) {
-        Column {
-            LoadingError(
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            ContestsPager(
-                viewState = viewState,
-                filterState = filterState,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+        IncludeFontPadding {
+            Column {
+                LoadingError(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                ContestsPager(
+                    viewState = viewState,
+                    filterState = filterState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -417,7 +417,8 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
             Text("Platforms are not selected")
             Row(
                 modifier = Modifier.padding(top = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("goto ")
                 Icon(imageVector = CPSIcons.More, contentDescription = null)

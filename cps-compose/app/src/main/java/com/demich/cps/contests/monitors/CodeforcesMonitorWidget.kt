@@ -32,6 +32,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.springIntLow
 import com.demich.cps.utils.systemTimeAsState
@@ -73,29 +74,31 @@ private fun CodeforcesMonitor(
     requestFailed: Boolean,
     modifier: Modifier
 ) {
-    Column(modifier) {
-        Header(
-            contestTitle = contestData.contestInfo.name,
-            contestPhase = contestData.contestPhase,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Footer(
-            contestantRank = contestData.contestantRank,
-            contestPhase = contestData.contestPhase,
-            requestFailed = requestFailed,
-            modifier = Modifier.fillMaxWidth()
-        )
-        StandingsRow(
-            problems = contestData.problems,
-            contestType = contestData.contestInfo.type,
-            modifier = Modifier
-                .padding(top = 2.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(color = cpsColors.backgroundAdditional)
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
+    IncludeFontPadding {
+        Column(modifier) {
+            Header(
+                contestTitle = contestData.contestInfo.name,
+                contestPhase = contestData.contestPhase,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Footer(
+                contestantRank = contestData.contestantRank,
+                contestPhase = contestData.contestPhase,
+                requestFailed = requestFailed,
+                modifier = Modifier.fillMaxWidth()
+            )
+            StandingsRow(
+                problems = contestData.problems,
+                contestType = contestData.contestInfo.type,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(color = cpsColors.backgroundAdditional)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
 
-        )
+            )
+        }
     }
 }
 
