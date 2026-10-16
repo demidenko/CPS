@@ -28,7 +28,6 @@ import com.demich.cps.ui.CPSDropdownMenuScope
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 
 @Composable
 internal fun CodeforcesRecentBlogEntries(
@@ -114,7 +113,9 @@ internal fun RecentBlogEntry(
             commentators = commentators,
             fontSize = 13.sp,
             iconSize = 12.sp,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp)
         )
     }
 }
@@ -127,29 +128,26 @@ private fun RecentBlogEntryFooter(
     fontSize: TextUnit,
     iconSize: TextUnit
 ) {
-
-    IncludeFontPadding {
-        Row(modifier = modifier.fillMaxWidth()) {
-            Text(
-                text = authorHandle,
-                fontSize = fontSize,
-                maxLines = 1,
-            )
-            if (commentators.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 10.dp)
-                        .fillMaxWidth()
-                ) {
-                    CommentsRow(
-                        text = commentators,
-                        fontSize = fontSize,
-                        iconSize = iconSize,
-                        spaceSize = 1.dp,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    )
-                }
+    Row(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = authorHandle,
+            fontSize = fontSize,
+            maxLines = 1,
+        )
+        if (commentators.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp)
+                    .fillMaxWidth()
+            ) {
+                CommentsRow(
+                    text = commentators,
+                    fontSize = fontSize,
+                    iconSize = iconSize,
+                    spaceSize = 1.dp,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
             }
         }
     }
