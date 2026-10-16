@@ -109,21 +109,20 @@ private fun Comment(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        IncludeFontPadding {
-            CommentInfo(
-                authorHandle = authorHandle,
-                rating = rating,
-                timeAgo = timeAgo,
-                modifier = Modifier.fillMaxWidth()
-            )
-            CommentBox(
-                commentHtml = commentHtml,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .fillMaxWidth()
-            )
-        }
+        CommentInfo(
+            authorHandle = authorHandle,
+            rating = rating,
+            timeAgo = timeAgo,
+            modifier = Modifier.fillMaxWidth()
+        )
+        CommentBox(
+            commentHtml = commentHtml,
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth()
+        )
     }
 }
 
@@ -135,31 +134,33 @@ private fun CommentInfo(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        Row(
-            modifier = Modifier.align(Alignment.TopStart)
-        ) {
-            IconSp(
-                imageVector = CPSIcons.CommentSingle,
-                size = 13.sp,
-                color = cpsColors.contentAdditional,
-                modifier = Modifier
-                    .padding(start = 2.dp, end = 2.dp)
-                    .alignBy { (it.measuredHeight * 0.75f).roundToInt() }
-            )
-            Text(
-                text = authorHandle,
-                fontSize = 13.sp,
-                modifier = Modifier
-                    .alignByBaseline()
-            )
-            Text(
-                text = timeAgo,
-                color = cpsColors.contentAdditional,
-                fontSize = 11.sp,
-                modifier = Modifier
-                    .padding(start = 5.dp)
-                    .alignByBaseline()
-            )
+        IncludeFontPadding {
+            Row(
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+                IconSp(
+                    imageVector = CPSIcons.CommentSingle,
+                    size = 13.sp,
+                    color = cpsColors.contentAdditional,
+                    modifier = Modifier
+                        .padding(start = 2.dp, end = 2.dp)
+                        .alignBy { (it.measuredHeight * 0.75f).roundToInt() }
+                )
+                Text(
+                    text = authorHandle,
+                    fontSize = 13.sp,
+                    modifier = Modifier
+                        .alignByBaseline()
+                )
+                Text(
+                    text = timeAgo,
+                    color = cpsColors.contentAdditional,
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .alignByBaseline()
+                )
+            }
         }
         VotedRating(
             rating = rating,
