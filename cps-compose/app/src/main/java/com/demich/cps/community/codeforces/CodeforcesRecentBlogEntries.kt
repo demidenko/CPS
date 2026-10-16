@@ -102,22 +102,20 @@ internal fun RecentBlogEntry(
     isLowRated: Boolean,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding {
-        Column(modifier = modifier) {
-            BlogEntryTitleWithArrow(
-                title = title,
-                titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
-                singleLine = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-            RecentBlogEntryFooter(
-                authorHandle = authorHandle,
-                commentators = commentators,
-                fontSize = 13.sp,
-                iconSize = 12.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+    Column(modifier = modifier) {
+        BlogEntryTitleWithArrow(
+            title = title,
+            titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
+            singleLine = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+        RecentBlogEntryFooter(
+            authorHandle = authorHandle,
+            commentators = commentators,
+            fontSize = 13.sp,
+            iconSize = 12.sp,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -129,26 +127,29 @@ private fun RecentBlogEntryFooter(
     fontSize: TextUnit,
     iconSize: TextUnit
 ) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = authorHandle,
-            fontSize = fontSize,
-            maxLines = 1,
-        )
-        if (commentators.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp)
-                    .fillMaxWidth()
-            ) {
-                CommentsRow(
-                    text = commentators,
-                    fontSize = fontSize,
-                    iconSize = iconSize,
-                    spaceSize = 1.dp,
-                    modifier = Modifier.align(Alignment.TopEnd)
-                )
+
+    IncludeFontPadding {
+        Row(modifier = modifier.fillMaxWidth()) {
+            Text(
+                text = authorHandle,
+                fontSize = fontSize,
+                maxLines = 1,
+            )
+            if (commentators.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp)
+                        .fillMaxWidth()
+                ) {
+                    CommentsRow(
+                        text = commentators,
+                        fontSize = fontSize,
+                        iconSize = iconSize,
+                        spaceSize = 1.dp,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    )
+                }
             }
         }
     }

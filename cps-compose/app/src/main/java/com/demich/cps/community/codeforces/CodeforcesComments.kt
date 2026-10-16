@@ -82,16 +82,14 @@ private fun Comment(
     showBlogEntryTitle: Boolean,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding {
-        Comment(
-            modifier = modifier,
-            authorHandle = comment.author.toHandleSpan(),
-            blogEntryTitle = comment.blogEntryTitle.takeIf { showBlogEntryTitle },
-            rating = comment.rating,
-            timeAgo = comment.creationTime.formatTimeAgo(),
-            commentHtml = comment.html
-        )
-    }
+    Comment(
+        modifier = modifier,
+        authorHandle = comment.author.toHandleSpan(),
+        blogEntryTitle = comment.blogEntryTitle.takeIf { showBlogEntryTitle },
+        rating = comment.rating,
+        timeAgo = comment.creationTime.formatTimeAgo(),
+        commentHtml = comment.html
+    )
 }
 
 @Composable
@@ -111,19 +109,21 @@ private fun Comment(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        CommentInfo(
-            authorHandle = authorHandle,
-            rating = rating,
-            timeAgo = timeAgo,
-            modifier = Modifier.fillMaxWidth()
-        )
-        CommentBox(
-            commentHtml = commentHtml,
-            fontSize = 14.sp,
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth()
-        )
+        IncludeFontPadding {
+            CommentInfo(
+                authorHandle = authorHandle,
+                rating = rating,
+                timeAgo = timeAgo,
+                modifier = Modifier.fillMaxWidth()
+            )
+            CommentBox(
+                commentHtml = commentHtml,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth()
+            )
+        }
     }
 }
 
