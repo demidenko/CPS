@@ -118,7 +118,9 @@ fun <U: UserInfo> DialogProfileSelector(
 }
 
 private enum class TextValueSource {
-    INIT, SELECT, TYPING
+    RUNTIME_INIT,
+    USER_SELECT,
+    USER_TYPING
 }
 
 private data class TextFieldValueExt(
@@ -133,7 +135,7 @@ private fun textFieldValueSaver() = Saver<TextFieldValueExt, Any>(
     restore = {
         TextFieldValueExt(
             value = with(TextFieldValue.Saver) { restore(it) as TextFieldValue },
-            source = INIT
+            source = RUNTIME_INIT
         )
     }
 )
@@ -150,7 +152,7 @@ private fun <U: UserInfo> DialogContent(
 
     val textFieldValueState = rememberSaveable(stateSaver = textFieldValueSaver()) {
         val text = initial?.userId.orEmpty()
-        mutableStateOf(TextFieldValueExt(text.toTextFieldValue(), INIT))
+        mutableStateOf(TextFieldValueExt(text.toTextFieldValue(), RUNTIME_INIT))
     }
 
     val profileLoading by profileFetchState(
@@ -177,7 +179,7 @@ private fun <U: UserInfo> DialogContent(
                 it.copy(text = it.text.filter(charValidator))
             }
 
-            textFieldValue = TextFieldValueExt(it, TYPING)
+            textFieldValue = TextFieldValueExt(it, USER_TYPING)
         },
         modifier = Modifier
             .focusRequester(focusRequester)
@@ -203,13 +205,13 @@ private fun <U: UserInfo> DialogContent(
             isLoading = loadingSuggestionsInProgressState.value,
             modifier = Modifier.fillMaxWidth(),
             onClick = { suggestion ->
-                textFieldValue = TextFieldValueExt(suggestion.userId.toTextFieldValue(), SELECT)
+                textFieldValue = TextFieldValueExt(suggestion.userId.toTextFieldValue(), USER_SELECT)
             }
         )
 
         //TODO: rework this to flow
         LaunchedEffect(userIdExt) {
-             if (userIdExt.second != TYPING) {
+             if (userIdExt.second != USER_TYPING) {
                  return@LaunchedEffect
              }
             val userId = userIdExt.first
@@ -231,6 +233,12 @@ private fun <U: UserInfo> DialogContent(
     }
 }
 
+private fun TextValueSource.isUserChange() =
+    when (this) {
+        USER_TYPING, USER_SELECT -> true
+        RUNTIME_INIT -> false
+    }
+
 // TODO: change to State<FetchResult<U?>>
 @Composable
 private fun <U: UserInfo> profileFetchState(
@@ -240,7 +248,7 @@ private fun <U: UserInfo> profileFetchState(
 ): State<FetchValue<ProfileResult<U>?>> =
     remember(textState, manager) {
         snapshotFlow { textState.value }
-            .filter { it.source == TYPING || it.source == SELECT }
+            .filter { it.source.isUserChange() }
             .map { it.value.text }
             .transformLatest { userId ->
                 emit(FetchValue(null))
