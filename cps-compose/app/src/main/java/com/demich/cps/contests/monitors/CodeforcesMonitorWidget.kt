@@ -35,10 +35,9 @@ import com.demich.cps.ui.theme.CPSTheme
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.formatTimerShort
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.springIntLow
-import com.demich.cps.utils.systemTimeAsState
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
@@ -153,11 +152,10 @@ private fun PhaseTitle(
 ) {
     when (contestPhase) {
         is CodeforcesMonitorData.ContestPhase.Coding -> {
-            val currentTime by systemTimeAsState(period = 1.seconds)
             PhaseTitle(
                 phase = contestPhase.phase,
                 modifier = modifier,
-                info = (contestPhase.endTime - currentTime).coerceAtLeast(Duration.ZERO).formatTimerShort()
+                info = (contestPhase.endTime - localCurrentTime).coerceAtLeast(Duration.ZERO).formatTimerShort()
             )
         }
         is CodeforcesMonitorData.ContestPhase.SystemTesting -> {
