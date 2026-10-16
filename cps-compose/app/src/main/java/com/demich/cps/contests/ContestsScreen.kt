@@ -97,28 +97,40 @@ private fun ContestsScreen(
     isReloading: () -> Boolean,
     onReload: () -> Unit
 ) {
-    Column {
-        CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
-        if (anyPlatformEnabled) {
-            ContestsReloadableContent(
-                viewState = viewState,
-                filterState = filterState,
-                isReloading = isReloading,
-                onReload = onReload,
-                modifier = Modifier.weight(1f, false)
-            )
-            FilterTextField(
-                filterState = filterState,
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            NoneEnabledMessage(modifier = Modifier.fillMaxSize())
+    val context = context
+    val contestsFlow = remember { flowOfContests(context) }
+
+    val (
+        contestsState: State<SortedContests?>,
+        currentTimeState: State<Instant>
+    ) = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
+
+    ProvideCurrentTime(currentTimeState) {
+        Column {
+            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
+            if (anyPlatformEnabled) {
+                ContestsReloadablePager(
+                    sortedContests = contestsState.value,
+                    viewState = viewState,
+                    filterState = filterState,
+                    isReloading = isReloading,
+                    onReload = onReload,
+                    modifier = Modifier.weight(1f, false)
+                )
+                FilterTextField(
+                    filterState = filterState,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                NoneEnabledMessage(modifier = Modifier.fillMaxSize())
+            }
         }
     }
 }
 
 @Composable
-private fun ContestsReloadableContent(
+private fun ContestsReloadablePager(
+    sortedContests: SortedContests?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     isReloading: () -> Boolean,
@@ -136,6 +148,7 @@ private fun ContestsReloadableContent(
                     .fillMaxWidth()
             )
             ContestsPager(
+                sortedContests = sortedContests,
                 viewState = viewState,
                 filterState = filterState,
                 modifier = Modifier
@@ -147,38 +160,25 @@ private fun ContestsReloadableContent(
 
 @Composable
 private fun ContestsPager(
+    sortedContests: SortedContests?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val contestsFlow = remember { flowOfContests(context) }
-
-    val (
-        contestsState: State<SortedContests?>,
-        currentTimeState: State<Instant>
-    ) = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
+    SideEffect(sortedContests, viewState) {
+        filterState.available = sortedContests != null && sortedContests.contests.isNotEmpty()
+        if (sortedContests != null) viewState.syncExpanded(sortedContests)
+    }
 
     val saveableStateHolder = rememberSaveableStateHolder()
-
-    ProvideCurrentTime(currentTimeState) {
-        val sortedContests by contestsState
-
-        SideEffect(sortedContests, viewState) {
-            val sortedContests = contestsState.value
-            filterState.available = sortedContests != null && sortedContests.contests.isNotEmpty()
-            if (sortedContests != null) viewState.syncExpanded(sortedContests)
-        }
-
-        val page = viewState.contestsPage
-        saveableStateHolder.SaveableStateProvider(key = page) {
-            ContestsPage(
-                contests = sortedContests?.sublist(page),
-                viewState = viewState,
-                filterState = filterState,
-                modifier = modifier
-            )
-        }
+    val page = viewState.contestsPage
+    saveableStateHolder.SaveableStateProvider(key = page) {
+        ContestsPage(
+            contests = sortedContests?.sublist(page),
+            viewState = viewState,
+            filterState = filterState,
+            modifier = modifier
+        )
     }
 }
 
