@@ -197,11 +197,14 @@ private fun BlogEntryInfoFooter(
             )
             if (commentsCount != null) {
                 CommentsRow(
-                    text = AnnotatedString(commentsCount.toString()),
-                    fontSize = 14.sp,
                     iconSize = 14.sp,
                     spaceSize = 2.dp
-                )
+                ) {
+                    Text(
+                        text = commentsCount.toString(),
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
     }
