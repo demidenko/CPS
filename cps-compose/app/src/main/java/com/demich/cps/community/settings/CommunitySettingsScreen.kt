@@ -50,6 +50,19 @@ import com.demich.datastore_itemized.setValueIn
 
 
 @Composable
+fun CPSNavigator.ScreenScope<Screen.CommunitySettings>.NavContentCommunitySettingsScreen() {
+    val context = context
+    val storage = remember { context.settingsCommunity }
+
+    screenTitle = ScreenStaticTitleState("community", "settings")
+
+    context(storage) {
+        CommunitySettingsScreen()
+    }
+}
+
+@Composable
+context(storage: CommunitySettingsDataStore)
 private fun CommunitySettingsScreen() {
     val devEnabled = LocalDevModeEnabled.current
 
@@ -85,29 +98,20 @@ private fun CommunitySettingsScreen() {
 }
 
 @Composable
-fun CPSNavigator.ScreenScope<Screen.CommunitySettings>.NavContentCommunitySettingsScreen() {
-    screenTitle = ScreenStaticTitleState("community", "settings")
-
-    CommunitySettingsScreen()
-}
-
-@Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun DefaultTabSettingsItem() {
-    val context = context
     SelectEnum(
-        item = context.settingsCommunity.codeforcesDefaultTab,
+        item = storage.codeforcesDefaultTab,
         title = "Default tab",
         options = [MAIN, TOP, RECENT]
     )
 }
 
 @Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun FollowSettingsItem() {
-    val context = context
     SwitchByWork(
-        item = context.settingsCommunity.codeforcesFollowEnabled,
+        item = storage.codeforcesFollowEnabled,
         title = "Follow",
         description = stringResource(id = R.string.community_settings_cf_follow_description),
         workProvider = CodeforcesFollowWorker
@@ -115,11 +119,9 @@ private fun FollowSettingsItem() {
 }
 
 @Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun LostSettingsItem() {
-    val context = context
-    val settings = remember { context.settingsCommunity }
-    val item = remember { settings.codeforcesLostEnabled }
+    val item = remember { storage.codeforcesLostEnabled }
     val enabled by collectItemAsState { item }
     Item {
         SwitchByWork(
@@ -133,7 +135,7 @@ private fun LostSettingsItem() {
             enter = enterInColumn(),
             exit = exitInColumn(),
         ) {
-            LostAuthorSettingsItem(item = settings.codeforcesLostMinRatingTag)
+            LostAuthorSettingsItem(item = storage.codeforcesLostMinRatingTag)
         }
     }
 }
@@ -170,19 +172,18 @@ private fun nameOf(tag: CodeforcesRatingColorTag?): String =
     }
 
 @Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun RuEnabledSettingsItem() {
-    val context = context
     val scope = backgroundCoroutineScope
+    val item = remember { storage.codeforcesLocale }
 
-    val locale by remember { context.settingsCommunity.codeforcesLocale }
-        .collectAsStateWithNull()
+    val locale by item.collectAsStateWithNull()
 
     Switch(
         title = "Russian content",
         checked = locale?.let { it == RU },
         onCheckedChange = { checked ->
-            context.settingsCommunity.codeforcesLocale.setValueIn(
+            item.setValueIn(
                 scope = scope,
                 value = if (checked) RU else EN
             )
@@ -214,10 +215,10 @@ private val CommunityNewsFeed.link: String
 
 
 @Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun NewsFeedsSettingsItem() {
     val context = context
-    val enabledItem = remember { context.settingsCommunity.enabledNewsFeeds }
+    val enabledItem = remember { storage.enabledNewsFeeds }
 
     MultiSelectEnum(
         title = "Subscriptions",
@@ -246,11 +247,10 @@ private fun NewsFeedsSettingsItem() {
 }
 
 @Composable
-context(scope: SettingsContainerScope)
+context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
 private fun RenderAllTabs() {
-    val context = context
     SwitchByItem(
-        item = context.settingsCommunity.renderAllTabs,
+        item = storage.renderAllTabs,
         title = "Render all tabs"
     )
 }
