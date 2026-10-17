@@ -108,24 +108,43 @@ private fun ContestsScreen(
     ) = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
 
     ProvideCurrentTime(currentTimeState) {
-        Column {
-            CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
-            if (anyPlatformEnabled) {
-                ContestsReloadablePager(
-                    sortedContests = contestsState.value,
-                    viewState = viewState,
-                    filterState = filterState,
-                    isReloading = isReloading,
-                    onReload = onReload,
-                    modifier = Modifier.weight(1f, false)
-                )
-                FilterTextField(
-                    filterState = filterState,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                NoneEnabledMessage(modifier = Modifier.fillMaxSize())
-            }
+        ContestsScreen(
+            sortedContests = contestsState.value,
+            viewState = viewState,
+            filterState = filterState,
+            anyPlatformEnabled = anyPlatformEnabled,
+            isReloading = isReloading,
+            onReload = onReload,
+        )
+    }
+}
+
+@Composable
+private fun ContestsScreen(
+    sortedContests: SortedContests?,
+    viewState: ContestsListViewState,
+    filterState: FilterState,
+    anyPlatformEnabled: Boolean,
+    isReloading: () -> Boolean,
+    onReload: () -> Unit
+) {
+    Column {
+        CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
+        if (anyPlatformEnabled) {
+            ContestsReloadablePager(
+                sortedContests = sortedContests,
+                viewState = viewState,
+                filterState = filterState,
+                isReloading = isReloading,
+                onReload = onReload,
+                modifier = Modifier.weight(1f, false)
+            )
+            FilterTextField(
+                filterState = filterState,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            NoneEnabledMessage(modifier = Modifier.fillMaxSize())
         }
     }
 }
