@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.database.Contest
+import com.demich.cps.contests.database.ContestsRepository
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
@@ -509,19 +510,34 @@ private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
     }
 
-private fun flowOfIgnoredOrMonitored(context: Context): Flow<Set<ContestCompositeId>> =
+private fun flowOfContests(context: Context): Flow<List<Contest>> =
+    flowOfContests(
+        repository = context.contestsRepository,
+        infoStorage = ContestsInfoDataStore(context),
+        monitorStorage = CodeforcesMonitorDataStore(context)
+    )
+
+private fun flowOfContests(
+    repository: ContestsRepository,
+    infoStorage: ContestsInfoDataStore,
+    monitorStorage: CodeforcesMonitorDataStore
+): Flow<List<Contest>> =
     combine(
-        flow = ContestsInfoDataStore(context).ignoredContests.asFlow(),
-        flow2 = CodeforcesMonitorDataStore(context).flowOfContestId()
+        repository.flowOfContests().distinctUntilChanged(),
+        flowOfHidden(infoStorage, monitorStorage)
+    ) { list, hidden ->
+        if (hidden.isEmpty()) list
+        else list.filter { contest -> contest.compositeId !in hidden }
+    }
+
+private fun flowOfHidden(
+    infoStorage: ContestsInfoDataStore,
+    monitorStorage: CodeforcesMonitorDataStore
+): Flow<Set<ContestCompositeId>> =
+    combine(
+        flow = infoStorage.ignoredContests.asFlow(),
+        flow2 = monitorStorage.flowOfContestId()
     ) { ignored, monitorContestId ->
         if (monitorContestId == null) ignored
         else ignored + Pair(codeforces, monitorContestId.toString())
     }
-
-private fun flowOfContests(context: Context): Flow<List<Contest>> =
-    context.contestsRepository.flowOfContests()
-        .distinctUntilChanged()
-        .combine(flowOfIgnoredOrMonitored(context)) { list, ignored ->
-            if (ignored.isEmpty()) list
-            else list.filter { contest -> contest.compositeId !in ignored }
-        }
