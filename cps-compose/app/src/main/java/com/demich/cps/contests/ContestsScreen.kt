@@ -76,6 +76,7 @@ import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.rememberRunBlocking
+import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CodeforcesMonitorWorker
 import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
@@ -297,6 +298,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
 ) {
     val context = context
     val contestsViewModel = contestsViewModel()
+    val contestsWork = remember { ContestsWorker.getWork(context) }
+
     val viewState = rememberContestsListViewState()
     val filterState = rememberFilterState()
 
@@ -315,7 +318,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
 
     val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
 
-    val loadingStatus by contestsViewModel.combinedLoadingStatusState()
+    val loadingStatus by combinedLoadingStatusState(viewModel = contestsViewModel, work = contestsWork)
     val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
@@ -396,16 +399,19 @@ private fun ContestsPageSwitchButton(
 
 
 @Composable
-private fun ContestsViewModel.combinedLoadingStatusState(): State<LoadingStatus?> {
-    val context = context
-    return remember(this) {
-        flowOfLoadingStatus()
-            .combine(ContestsWorker.getWork(context).flowOfWorkInfo()) { loadingStatus, workInfo ->
-                if (workInfo.isRunning) LOADING
-                else loadingStatus
-            }
+private fun combinedLoadingStatusState(
+    viewModel: ContestsViewModel,
+    work: CPSPeriodicWork
+): State<LoadingStatus?> =
+    remember(viewModel, work) {
+        combine(
+            viewModel.flowOfLoadingStatus(),
+            work.flowOfWorkInfo()
+        ) { loadingStatus, workInfo ->
+            if (workInfo.isRunning) LOADING
+            else loadingStatus
+        }
     }.collectAsStateWithLifecycle(initialValue = null)
-}
 
 @Composable
 private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
