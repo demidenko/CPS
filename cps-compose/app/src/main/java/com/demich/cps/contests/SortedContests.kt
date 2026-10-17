@@ -63,8 +63,8 @@ private fun ImmutableList<Contest>.sortedAt(at: Instant): ImmutableList<Contest>
     else ImmutableListAdapter(sortedWith(comparator))
 }
 
-private class ContestsSorter: State<SortedContests?> {
-    private class SortedData private constructor(
+private abstract class ContestsSorter {
+    protected class SortedData private constructor(
         val source: ImmutableList<Contest>,
         val sortedAt: Instant,
         val sorted: ImmutableList<Contest>
@@ -96,21 +96,26 @@ private class ContestsSorter: State<SortedContests?> {
                 )
             }
     }
+    protected abstract var last: SortedData?
 
-    private var last: SortedData? by mutableStateOf(null)
-
-    override val value: SortedContests?
-        get() = last?.result
-
-    fun update(contests: ImmutableList<Contest>, time: Instant) {
+    fun update(source: ImmutableList<Contest>, time: Instant) {
         last.let {
-            if (it == null || it.source != contests) {
-                last = SortedData(source = contests, sortedAt = time)
+            if (it == null || it.source != source) {
+                last = SortedData(source = source, sortedAt = time)
             } else {
                 last = it.sort(time = time)
             }
         }
     }
+}
+
+private class SortedContestsState: ContestsSorter(), State<SortedContests?> {
+
+    override var last: SortedData? by mutableStateOf(null)
+
+    override val value: SortedContests?
+        get() = last?.result
+
 }
 
 
@@ -119,7 +124,7 @@ fun produceSortedContestsWithTime(
     flow: Flow<List<Contest>>,
     clock: Clock
 ): Pair<State<SortedContests?>, State<Instant>> {
-    val sorter = rememberScoped { ContestsSorter() }
+    val sorter = rememberScoped { SortedContestsState() }
 
     val currentTimeState = remember(clock) {
         val initTime = clock.now().truncateBySeconds()
