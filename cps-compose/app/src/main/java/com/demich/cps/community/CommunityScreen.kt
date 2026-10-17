@@ -12,6 +12,7 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
@@ -29,12 +30,14 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val context = context
+    val followRepository = remember { context.followRepository }
 
     // TODO: collectUntilFirst make bottombar glitch
     val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
 
     NavContentCommunityScreen(
         specs = specs,
+        followRepository = followRepository,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = onOpenFollowList
     )
@@ -43,16 +46,14 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
 @Composable
 private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     specs: CodeforcesCommunityScreenSpecs,
+    followRepository: CodeforcesFollowRepository,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ) {
-    val context = context
     val controller = rememberCodeforcesCommunityController(
         defaultTab = specs.defaultTab,
         lostEnabled = specs.lostEnabled
     )
-
-    val repository = remember { context.followRepository }
 
     screenTitle = remember(controller) {
         ScreenTitleState {
@@ -64,7 +65,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         followEnabled = specs.followEnabled,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = {
-            controller.updateFollowUsersInfo(repository = repository) // TODO: not proper place to call?
+            controller.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
             onOpenFollowList()
         }
     )
