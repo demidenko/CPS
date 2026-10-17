@@ -8,6 +8,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
 import com.demich.cps.community.settings.settingsCommunity
@@ -51,6 +52,8 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         lostEnabled = specs.lostEnabled
     )
 
+    val repository = remember { context.followRepository }
+
     screenTitle = remember(controller) {
         ScreenTitleState {
             cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
@@ -61,7 +64,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         followEnabled = specs.followEnabled,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = {
-            controller.updateFollowUsersInfo(context)
+            controller.updateFollowUsersInfo(repository = repository) // TODO: not proper place to call?
             onOpenFollowList()
         }
     )

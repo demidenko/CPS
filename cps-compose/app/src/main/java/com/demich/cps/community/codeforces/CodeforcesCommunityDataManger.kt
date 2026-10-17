@@ -1,6 +1,7 @@
 package com.demich.cps.community.codeforces
 
 import android.content.Context
+import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
@@ -19,7 +20,7 @@ interface CodeforcesCommunityDataManger {
     fun flowOfTopComments(context: Context): StateFlow<List<CodeforcesWebComment>?>
     fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed?>
 
-    fun updateFollowUsersInfo(context: Context)
+    fun updateFollowUsersInfo(repository: CodeforcesFollowRepository)
 }
 
 fun CodeforcesCommunityDataManger.reload(tab: CodeforcesTab, context: Context) {

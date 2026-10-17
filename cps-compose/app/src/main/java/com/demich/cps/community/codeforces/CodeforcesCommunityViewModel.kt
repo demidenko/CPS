@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
+import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.toFetchResultFlow
@@ -95,13 +95,11 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
         field = MutableStateFlow(PENDING)
 
-    override fun updateFollowUsersInfo(context: Context) {
+    override fun updateFollowUsersInfo(repository: CodeforcesFollowRepository) {
         viewModelScope.launch(Dispatchers.Default) {
             if (!flowOfFollowUpdateLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
-            context.followRepository.run {
-                updateProfiles()
-                updateFailedBlogEntries()
-            }
+            repository.updateProfiles()
+            repository.updateFailedBlogEntries()
             flowOfFollowUpdateLoadingStatus.value = PENDING
         }
     }
