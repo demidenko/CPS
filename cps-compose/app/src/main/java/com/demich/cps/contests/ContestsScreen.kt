@@ -92,6 +92,56 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Composable
+fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
+    onOpenSettings: () -> Unit
+) {
+    val context = context
+    val contestsViewModel = contestsViewModel()
+    val contestsWork = remember { ContestsWorker.getWork(context) }
+
+    val viewState = rememberContestsListViewState()
+    val filterState = rememberFilterState()
+
+    screenTitle = remember(viewState) {
+        ScreenTitleState {
+            when (viewState.contestsPage) {
+                Finished -> cpsScreenTitleOf("contests", "finished")
+                RunningOrUpcoming -> cpsScreenTitleOf("contests")
+            }
+        }
+    }
+
+    menu = contestsMenuBuilder(
+        onOpenSettings = onOpenSettings
+    )
+
+    val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
+
+    val loadingStatus by combinedLoadingStatusState(viewModel = contestsViewModel, work = contestsWork)
+    val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
+
+    ContestsScreen(
+        viewState = viewState,
+        filterState = filterState,
+        anyPlatformEnabled = anyPlatformEnabled,
+        isReloading = { loadingStatus == LOADING },
+        onReload = onReload
+    )
+
+    bottomBar = contestsBottomBarBuilder(
+        viewState = viewState,
+        filterState = filterState,
+        anyPlatformEnabled = anyPlatformEnabled,
+        loadingStatus = { loadingStatus },
+        onReloadClick = onReload
+    )
+
+    SideEffect(contestsViewModel) {
+        contestsViewModel.applyChangedSettings(context)
+    }
+}
+
+@Composable
 private fun ContestsScreen(
     viewState: ContestsListViewState,
     filterState: FilterState,
@@ -309,56 +359,6 @@ private fun LoadingError(
                 .heightIn(max = 200.dp)
                 .verticalScroll(rememberScrollState())
         )
-    }
-}
-
-@Composable
-fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
-    onOpenSettings: () -> Unit
-) {
-    val context = context
-    val contestsViewModel = contestsViewModel()
-    val contestsWork = remember { ContestsWorker.getWork(context) }
-
-    val viewState = rememberContestsListViewState()
-    val filterState = rememberFilterState()
-
-    screenTitle = remember(viewState) {
-        ScreenTitleState {
-            when (viewState.contestsPage) {
-                Finished -> cpsScreenTitleOf("contests", "finished")
-                RunningOrUpcoming -> cpsScreenTitleOf("contests")
-            }
-        }
-    }
-
-    menu = contestsMenuBuilder(
-        onOpenSettings = onOpenSettings
-    )
-
-    val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
-
-    val loadingStatus by combinedLoadingStatusState(viewModel = contestsViewModel, work = contestsWork)
-    val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
-
-    ContestsScreen(
-        viewState = viewState,
-        filterState = filterState,
-        anyPlatformEnabled = anyPlatformEnabled,
-        isReloading = { loadingStatus == LOADING },
-        onReload = onReload
-    )
-
-    bottomBar = contestsBottomBarBuilder(
-        viewState = viewState,
-        filterState = filterState,
-        anyPlatformEnabled = anyPlatformEnabled,
-        loadingStatus = { loadingStatus },
-        onReloadClick = onReload
-    )
-
-    SideEffect(contestsViewModel) {
-        contestsViewModel.applyChangedSettings(context)
     }
 }
 
