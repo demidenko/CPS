@@ -36,13 +36,11 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 
 @Composable
-context(scope: SettingsContainerScope)
-internal fun DateConstraintsSettingsItem(
-    settings: ContestsSettingsDataStore
-) {
+context(scope: SettingsContainerScope, storage: ContestsSettingsDataStore)
+internal fun DateConstraintsSettingsItem() {
     val scope = backgroundCoroutineScope
 
-    val dateConstraints by collectItemAsState { settings.contestsDateConstraints }
+    val dateConstraints by collectItemAsState { storage.contestsDateConstraints }
 
     Expandable(
         title = "Date constraints",
@@ -54,17 +52,17 @@ internal fun DateConstraintsSettingsItem(
                 DurationRow(
                     title = "Max duration = ",
                     duration = dateConstraints.maxDuration,
-                    onDurationChange = { settings.contestMaxDuration.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxDuration.setValueIn(scope, it) }
                 )
                 DurationRow(
                     title = "Max start - now = ",
                     duration = dateConstraints.nowToStartTimeMaxDuration,
-                    onDurationChange = { settings.contestMaxNowToStart.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxNowToStart.setValueIn(scope, it) }
                 )
                 DurationRow(
                     title = "Max now - end = ",
                     duration = dateConstraints.endTimeToNowMaxDuration,
-                    onDurationChange = { settings.contestMaxEndToNow.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxEndToNow.setValueIn(scope, it) }
                 )
             }
         }

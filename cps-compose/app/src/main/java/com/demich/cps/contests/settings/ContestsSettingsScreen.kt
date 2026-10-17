@@ -17,23 +17,25 @@ import com.demich.cps.utils.context
 @Composable
 private fun ContestsSettingsScreen() {
     val context = context
-    val settings = remember { context.settingsContests }
+    val settingsStorage = remember { context.settingsContests }
 
     val devModeEnabled = LocalDevModeEnabled.current
 
-    SettingsColumn {
-        ContestPlatformsSettingsItem(settings = settings)
-        DateConstraintsSettingsItem(settings = settings)
-        ClistApiAccessSettingsItem(settings = settings)
-        AutoUpdateSettingsItem(item = settings.autoUpdateInterval)
+    context(settingsStorage) {
+        SettingsColumn {
+            ContestPlatformsSettingsItem()
+            DateConstraintsSettingsItem()
+            ClistApiAccessSettingsItem()
+            AutoUpdateSettingsItem(item = settingsStorage.autoUpdateInterval)
 
-        if (devModeEnabled) {
-            DeletedContestsSettingsItem(item = ContestsInfoDataStore(context).ignoredContests)
+            if (devModeEnabled) {
+                DeletedContestsSettingsItem(item = ContestsInfoDataStore(context).ignoredContests)
+            }
         }
     }
 
     LaunchedEffectOneTime {
-        val snapshot = context.settingsContests.fetchSettingsSnapshot()
+        val snapshot = settingsStorage.fetchSettingsSnapshot()
         ContestsInfoDataStore(context).settingsSnapshot.update {
             // do not override
             it ?: snapshot

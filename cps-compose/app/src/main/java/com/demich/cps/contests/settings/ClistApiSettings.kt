@@ -19,15 +19,13 @@ import com.demich.datastore_itemized.value
 import kotlinx.coroutines.launch
 
 @Composable
-context(scope: SettingsContainerScope)
-internal fun ClistApiAccessSettingsItem(
-    settings: ContestsSettingsDataStore
-) {
+context(scope: SettingsContainerScope, storage: ContestsSettingsDataStore)
+internal fun ClistApiAccessSettingsItem() {
     val uriHandler = LocalUriHandler.current
     val scope = backgroundCoroutineScope
 
     ApiAccessSettingsItem(
-        item = settings.clistApiAccess,
+        item = storage.clistApiAccess,
         itemTitle = "Clist API access",
         itemSubtitle = {
             if (it == null) {
@@ -54,7 +52,7 @@ internal fun ClistApiAccessSettingsItem(
         },
         onSave = {
             scope.launch {
-                settings.edit {
+                storage.edit {
                     clistApiLogin.value = it.login
                     clistApiKey.value = it.key
                 }

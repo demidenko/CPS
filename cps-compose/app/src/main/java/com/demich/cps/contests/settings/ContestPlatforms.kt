@@ -38,11 +38,9 @@ import com.demich.kotlin_stdlib_boost.toEnumSet
 import kotlinx.coroutines.launch
 
 @Composable
-context(scope: SettingsContainerScope)
-internal fun ContestPlatformsSettingsItem(
-    settings: ContestsSettingsDataStore
-) {
-    val combinedEnabled by collectItemAsState { settings.combinedEnabledPlatforms }
+context(scope: SettingsContainerScope, storage: ContestsSettingsDataStore)
+internal fun ContestPlatformsSettingsItem() {
+    val combinedEnabled by collectItemAsState { storage.combinedEnabledPlatforms }
 
     Expandable(
         title = "Platforms",
@@ -59,7 +57,7 @@ internal fun ContestPlatformsSettingsItem(
                 clistResources = combinedEnabled.clistResources,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
-                        settings.enabledPlatforms.edit {
+                        storage.enabledPlatforms.edit {
                             if (checked) add(platform) else remove(platform)
                         }
                     }
