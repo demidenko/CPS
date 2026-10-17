@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.demich.cps.contests.database.ContestPlatform
 import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.fetching.ContestsFetchSource
 import com.demich.cps.platforms.Platform
@@ -29,6 +30,7 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
+import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.map
@@ -40,13 +42,17 @@ fun FetchPriorityListDialog(
     availableOptions: Set<ContestsFetchSource>,
     onDismissRequest: () -> Unit
 ) {
+    val context = context
+    val item = remember { context.settingsContests.fetchPriorityLists }
+
     CPSDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
         DialogContent(
             platform = platform,
-            availableOptions = availableOptions
+            availableOptions = availableOptions,
+            item = item
         )
     }
 }
@@ -54,13 +60,12 @@ fun FetchPriorityListDialog(
 @Composable
 private fun ColumnScope.DialogContent(
     platform: Platform,
-    availableOptions: Set<ContestsFetchSource>
+    availableOptions: Set<ContestsFetchSource>,
+    item: DataStoreItem<Map<ContestPlatform, List<ContestsFetchSource>>>
 ) {
-    val context = context
-
     val state = remember(platform) {
         val platform = platform.toContestPlatform()
-        context.settingsContests.fetchPriorityLists.asFlow().map { it.getValue(platform) }
+        item.asFlow().map { it.getValue(platform) }
     }.collectAsState(initial = null)
 
     Text(text = "$platform fetch priority list = ")
@@ -73,7 +78,7 @@ private fun ColumnScope.DialogContent(
             availableOptions = availableOptions,
             onListChange = { newList ->
                 scope.launch {
-                    context.settingsContests.fetchPriorityLists.edit {
+                    item.edit {
                         set(key = platform.toContestPlatform(), value = newList)
                     }
                 }
