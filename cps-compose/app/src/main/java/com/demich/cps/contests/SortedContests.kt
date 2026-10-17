@@ -15,9 +15,14 @@ import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.demich.kotlin_stdlib_boost.partitionIndex
 import com.sebaslogen.resaca.rememberScoped
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.adapters.ImmutableListAdapter
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -52,25 +57,25 @@ private fun List<Contest>.nextReorderTime(sortedAt: Instant): Instant =
         }
     } ?: Instant.DISTANT_FUTURE
 
-private fun List<Contest>.sortedOrThisAt(at: Instant): List<Contest> {
+private fun ImmutableList<Contest>.sortedAt(at: Instant): ImmutableList<Contest> {
     val comparator = Contest.comparatorAt(at)
     return if (isSortedWith(comparator)) this
-    else sortedWith(comparator)
+    else ImmutableListAdapter(sortedWith(comparator))
 }
 
 private class ContestsSorter: State<SortedContests?> {
     private class SortedData private constructor(
-        val source: List<Contest>,
+        val source: ImmutableList<Contest>,
         val sortedAt: Instant,
-        val sorted: List<Contest>
+        val sorted: ImmutableList<Contest>
     ) {
         constructor(
-            source: List<Contest>,
+            source: ImmutableList<Contest>,
             sortedAt: Instant
         ): this(
             source = source,
             sortedAt = sortedAt,
-            sorted = source.sortedOrThisAt(sortedAt)
+            sorted = source.sortedAt(sortedAt)
         )
 
         private val nextReorderTime: Instant = sorted.nextReorderTime(sortedAt)
@@ -87,7 +92,7 @@ private class ContestsSorter: State<SortedContests?> {
                 SortedData(
                     source = source,
                     sortedAt = time,
-                    sorted = sorted.sortedOrThisAt(time)
+                    sorted = sorted.sortedAt(time)
                 )
             }
     }
@@ -97,7 +102,7 @@ private class ContestsSorter: State<SortedContests?> {
     override val value: SortedContests?
         get() = last?.result
 
-    fun update(contests: List<Contest>, time: Instant) {
+    fun update(contests: ImmutableList<Contest>, time: Instant) {
         last.let {
             if (it == null || it.source != contests) {
                 last = SortedData(source = contests, sortedAt = time)
@@ -125,7 +130,10 @@ fun produceSortedContestsWithTime(
 
     LaunchedEffect(lifecycleOwner, flow, sorter, currentTimeState) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
-            flow.combine(clock.flowOfTruncatedCurrentTime(1)) { contests, currentTime ->
+            combine(
+                flow = flow.distinctUntilChanged().map { it.toImmutableList() },
+                flow2 = clock.flowOfTruncatedCurrentTime(1)
+            ) { contests, currentTime ->
                 sorter.update(contests, currentTime)
                 currentTimeState.value = currentTime
             }.collect()
