@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.demich.cps.community.follow.CodeforcesUserBlogPreview
 import com.demich.cps.community.follow.followRepository
+import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.fetchstate.FetchResult
 import com.demich.cps.fetchstate.FetchState
@@ -74,16 +74,17 @@ private fun CodeforcesUserBlogScreen(
     filterState: FilterState
 ) {
     val context = context
+    val repository = remember { context.followRepository }
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     val uuidState = rememberUUIDState()
 
     val blogEntries by viewModel
-        .flowOfFetchBlogEntries(blogId = blogId, context = context, key = uuidState.value)
+        .flowOfFetchBlogEntries(blogId = blogId, repository = repository, key = uuidState.value)
         .collectAsState()
 
     val userBlogInfo by collectAsStateWithLifecycle {
-        context.followRepository.flowOfUserBlogInfo(blogId = blogId)
+        repository.flowOfUserBlogInfo(blogId = blogId)
     }
 
     CodeforcesUserBlogScreen(
@@ -175,12 +176,16 @@ private class BlogLoadingViewModel: ViewModel() {
 
     private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
 
-    fun flowOfFetchBlogEntries(blogId: Long, context: Context, key: Any) = blogEntriesLoader.run {
-        val repository = context.followRepository
-        executeFlow(key = Pair(blogId, key)) {
+    fun flowOfFetchBlogEntries(
+        blogId: Long,
+        repository: CodeforcesFollowRepository,
+        key: Any
+    ) = blogEntriesLoader.executeFlow(key = Pair(blogId, key)) {
             val user = repository.blog(blogId = blogId).userProfile
             combine(
-                flow = flow { emit(repository.getAndReloadBlogEntries(handle = user.handle).getOrThrow()) },
+                flow = flow {
+                    emit(repository.getAndReloadBlogEntries(handle = user.handle).getOrThrow())
+                },
                 flow2 = CodeforcesClient().flowOfColorTag(profile = user)
             ) { blogEntries, tag ->
                 blogEntries.map {
@@ -188,8 +193,6 @@ private class BlogLoadingViewModel: ViewModel() {
                 }
             }.let { emitAll(it) }
         }
-    }
-
 }
 
 private fun CodeforcesPageContentProvider.flowOfColorTag(
