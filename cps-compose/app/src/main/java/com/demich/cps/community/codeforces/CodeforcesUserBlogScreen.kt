@@ -156,6 +156,7 @@ private fun BlogEntriesList(
         CodeforcesBlogEntries(
             blogEntries = filtered,
             newEntriesState = remember { object : CodeforcesNewEntriesState() {} },
+            showType = DATE,
             scrollBarEnabled = true,
             scrollUpButtonEnabled = true,
             modifier = Modifier.fillMaxWidth().weight(1f)
