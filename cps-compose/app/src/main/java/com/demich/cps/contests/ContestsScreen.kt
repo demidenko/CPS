@@ -197,6 +197,14 @@ private fun ContestsScreen(
             NoneEnabledMessage(modifier = Modifier.fillMaxSize())
         }
     }
+
+    SideEffect(sortedContests, filterState) {
+        filterState.available = sortedContests != null && sortedContests.contests.isNotEmpty()
+    }
+
+    SideEffect(sortedContests, viewState) {
+        if (sortedContests != null) viewState.syncExpanded(sortedContests)
+    }
 }
 
 @Composable
@@ -236,11 +244,6 @@ private fun ContestsPager(
     filterState: FilterState,
     modifier: Modifier = Modifier
 ) {
-    SideEffect(sortedContests, viewState) {
-        filterState.available = sortedContests != null && sortedContests.contests.isNotEmpty()
-        if (sortedContests != null) viewState.syncExpanded(sortedContests)
-    }
-
     val saveableStateHolder = rememberSaveableStateHolder()
     val page = viewState.contestsPage
     saveableStateHolder.SaveableStateProvider(key = page) {
