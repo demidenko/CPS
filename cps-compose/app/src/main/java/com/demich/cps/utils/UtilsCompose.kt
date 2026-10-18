@@ -71,7 +71,7 @@ fun ProvideContentColor(color: Color, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalContentColor provides color, content = content)
 }
 
-inline fun <T> State<T>.onNotNull(block: (T & Any) -> Unit) {
+inline fun <T: Any> State<T?>.onNotNull(block: (T) -> Unit) {
     value?.let(block)
 }
 
