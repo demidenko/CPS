@@ -28,10 +28,12 @@ import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.formatFullDate
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimeAgo
 import com.demich.cps.utils.plusIf
 
@@ -40,6 +42,7 @@ import com.demich.cps.utils.plusIf
 fun CodeforcesBlogEntries(
     blogEntries: List<CodeforcesWebBlogEntry>?,
     newEntriesState: CodeforcesNewEntriesState,
+    showType: DateShowType = TIME_AGO,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     scrollBarEnabled: Boolean = false,
@@ -62,6 +65,7 @@ fun CodeforcesBlogEntries(
             BlogEntryInfo(
                 blogEntry = blogEntry,
                 markNew = newEntriesState.isNew(blogEntry.id),
+                showType = showType,
                 label = label?.let { { it(blogEntry) } },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,6 +84,10 @@ fun CodeforcesBlogEntries(
     }
 }
 
+enum class DateShowType {
+    DATE, TIME_AGO
+}
+
 private data object CodeforcesBlogEntryContentType
 
 fun LazyListState.visibleBlogEntriesIds(requiredVisiblePart: Float): List<Int> =
@@ -90,6 +98,7 @@ fun LazyListState.visibleBlogEntriesIds(requiredVisiblePart: Float): List<Int> =
 @Composable
 private fun BlogEntryInfo(
     blogEntry: CodeforcesWebBlogEntry,
+    showType: DateShowType,
     markNew: Boolean,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)?
@@ -99,7 +108,10 @@ private fun BlogEntryInfo(
         authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount,
-        creationTime = blogEntry.creationTime.formatTimeAgo(),
+        creationTime = when (showType) {
+            TIME_AGO -> blogEntry.creationTime.formatTimeAgo()
+            DATE -> contextLocalTimeZone { blogEntry.creationTime.formatFullDate() }
+        },
         markNew = markNew,
         label = label,
         modifier = modifier
