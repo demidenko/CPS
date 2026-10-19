@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 @Composable
-fun <T: Any> AnimatedVisibleByNotNull(
+fun <T: Any> AnimatedVisibleOfNotNull(
     value: T?,
     modifier: Modifier = Modifier,
     enter: EnterTransition,
@@ -45,7 +45,7 @@ fun <T: Any> AnimatedVisibleByNotNull(
     exit: ExitTransition,
     content: @Composable (T) -> Unit
 ) {
-    AnimatedVisibleByNotNull(
+    AnimatedVisibleOfNotNull(
         value = value(),
         modifier = modifier,
         enter = enter,
