@@ -170,20 +170,18 @@ private fun CodeforcesCommunityTab(
         tab = tab,
         index = controller.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = controller.badgeCounter(tab, counters),
+        badgeCount = counters?.toBadgeCounter(controller, tab)?.takeIf { it != 0 },
         pagerState = controller.pagerState,
         modifier = modifier
     )
 }
 
-private fun CodeforcesCommunityController.badgeCounter(
-    tab: CodeforcesTab,
-    counters: NewEntryTypeCounters?
-): Int? =
-    counters?.let {
-        if (currentTab == tab) it.seenCount + it.unseenCount
-        else it.unseenCount
-    }?.takeIf { it != 0 }
+private fun NewEntryTypeCounters.toBadgeCounter(
+    controller: CodeforcesCommunityController,
+    tab: CodeforcesTab
+): Int =
+    if (controller.currentTab == tab) seenCount + unseenCount
+    else unseenCount
 
 @Composable
 private fun CodeforcesCommunityTab(
