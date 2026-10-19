@@ -26,7 +26,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.CListProfileManager
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.ProfileResultWithManager
-import com.demich.cps.profiles.managers.flowOfExisted
+import com.demich.cps.profiles.managers.flowOfEnabledProfiles
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.managers.profilePlatforms
@@ -122,7 +122,7 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
 private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
-            flow = ProfileManager.entries().flowOfExisted(this),
+            flow = ProfileManager.entries().flowOfEnabledProfiles(this),
             flow2 = settingsProfiles.platformsOrder.asFlow()
         ) { profiles, order ->
             order.mapNotNull { platform ->

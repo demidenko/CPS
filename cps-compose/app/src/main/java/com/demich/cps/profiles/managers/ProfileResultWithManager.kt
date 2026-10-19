@@ -21,5 +21,5 @@ fun <U: UserInfo> ProfileManager<U>.flowWithProfileResult(context: Context) =
         result?.let { ProfileResultWithManager(it, this) }
     }
 
-fun Collection<ProfileManager<*>>.flowOfExisted(context: Context) =
+fun Collection<ProfileManager<*>>.flowOfEnabledProfiles(context: Context) =
     combine(flows = map { it.flowWithProfileResult(context) }) { it.filterNotNull() }

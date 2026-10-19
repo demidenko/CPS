@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
-import com.demich.cps.profiles.managers.flowOfExisted
+import com.demich.cps.profiles.managers.flowOfEnabledProfiles
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.profiles.settingsProfiles
 import com.demich.cps.ui.CPSCheckBox
@@ -49,8 +49,8 @@ internal fun StatusBarButtons(
     val context = context
     val settingsUI = remember { context.settingsUI }
 
-    val recordedPlatformsState = remember {
-        ProfileManager.ratedEntries().flowOfExisted(context)
+    val enabledPlatformsState = remember {
+        ProfileManager.ratedEntries().flowOfEnabledProfiles(context)
             .map { it.map { it.platform } }
             .combine(context.settingsProfiles.platformsOrder.asFlow()) { platforms, order ->
                 platforms.sortedBy { order.indexOf(it) }
@@ -60,7 +60,7 @@ internal fun StatusBarButtons(
     val specsState = remember { settingsUI.combinedColorSpecs }.collectAsStateWithNull()
 
     val scope = backgroundCoroutineScope
-    recordedPlatformsState.onNotNull { platforms ->
+    enabledPlatformsState.onNotNull { platforms ->
         if (platforms.isNotEmpty()) {
             specsState.onNotNull { specs ->
                 StatusBarButtons(
