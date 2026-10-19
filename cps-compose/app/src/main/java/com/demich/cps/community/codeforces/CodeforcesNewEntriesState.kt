@@ -10,19 +10,19 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.UriHandler
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
-import com.demich.cps.utils.NewEntriesMap
+import com.demich.cps.utils.NewEntryType
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectItemAsState
+import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.cps.utils.getType
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 
 interface NewEntriesState {
-    val types: NewEntriesMap
+    val types: Map<Int, NewEntryType>
     fun markSeen(ids: List<Int>)
     fun markOpened(id: Int)
 }
@@ -32,7 +32,7 @@ fun rememberNewEntriesState(): NewEntriesState {
     val context = context
     val scope = backgroundCoroutineScope
     val item = remember { CodeforcesNewEntriesDataStore(context).commonNewEntries }
-    val typesState = collectItemAsState { item }
+    val typesState = collectAsState { item.asFlow().map { it.mapValues { it.value.type } } }
     return remember {
         object : NewEntriesState {
             override val types by typesState
@@ -90,7 +90,7 @@ fun rememberCodeforcesNewEntriesState(
 
             override fun isNew(id: Int): Boolean {
                 if (!showNewEntries) return false
-                val type = newEntriesState.types.getType(id)
+                val type = newEntriesState.types[id]
                 return type == null || type == SEEN
             }
         }
