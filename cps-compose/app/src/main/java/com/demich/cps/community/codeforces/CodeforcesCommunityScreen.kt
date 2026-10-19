@@ -170,7 +170,7 @@ private fun CodeforcesCommunityTab(
         tab = tab,
         index = controller.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = { controller.badgeCounter(tab, counters) },
+        badgeCount = controller.badgeCounter(tab, counters),
         pagerState = controller.pagerState,
         modifier = modifier
     )
@@ -190,7 +190,7 @@ private fun CodeforcesCommunityTab(
     tab: CodeforcesTab,
     index: Int,
     loadingStatus: LoadingStatus,
-    badgeCount: () -> Int?,
+    badgeCount: Int?,
     pagerState: PagerState,
     modifier: Modifier = Modifier
 ) {

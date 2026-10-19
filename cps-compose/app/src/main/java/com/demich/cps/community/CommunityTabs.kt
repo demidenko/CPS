@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.AnimatedVisibleByNotNull
+import com.demich.cps.ui.AnimatedVisibleOfNotNull
 import com.demich.cps.ui.CPSCountBadge
 import com.demich.cps.ui.theme.cpsColors
 import kotlin.math.max
@@ -54,7 +54,7 @@ fun CommunityTabRow(
 fun CommunityTab(
     title: String,
     index: Int,
-    badgeCount: () -> Int?,
+    badgeCount: Int?,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     selectedTextColor: Color,
@@ -64,7 +64,7 @@ fun CommunityTab(
         BadgedBox(
             modifier = Modifier.align(Alignment.Center),
             badge = {
-                AnimatedVisibleByNotNull(
+                AnimatedVisibleOfNotNull(
                     value = badgeCount,
                     enter = scaleIn(),
                     exit = scaleOut(),
