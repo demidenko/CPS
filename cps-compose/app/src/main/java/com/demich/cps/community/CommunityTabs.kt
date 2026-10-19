@@ -64,12 +64,14 @@ fun CommunityTab(
         BadgedBox(
             modifier = Modifier.align(Alignment.Center),
             badge = {
-                AnimatedVisibleOfNotNull(
-                    value = badgeCount,
-                    enter = scaleIn(),
-                    exit = scaleOut(),
-                    content = { CPSCountBadge(count = it) }
-                )
+                if (badgeCount != null) { // TODO: not proper, use sealed?
+                    AnimatedVisibleOfNotNull(
+                        value = badgeCount.takeIf { it != 0 },
+                        enter = scaleIn(),
+                        exit = scaleOut(),
+                        content = { CPSCountBadge(count = it) }
+                    )
+                }
             }
         ) {
             Text(
