@@ -32,7 +32,6 @@ import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
-import com.demich.cps.utils.firstBlocking
 import com.demich.cps.utils.stateOfNull
 import kotlinx.coroutines.launch
 
@@ -154,7 +153,7 @@ private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesT
     return if (flow == null) {
         stateOfNull()
     } else {
-        flow.collectAsStateWithLifecycle(initialValue = remember { flow.firstBlocking() })
+        flow.collectAsStateWithLifecycle(initialValue = null)
     }
 }
 
