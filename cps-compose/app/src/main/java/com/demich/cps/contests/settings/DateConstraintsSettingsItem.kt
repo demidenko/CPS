@@ -92,7 +92,7 @@ private fun DurationRow(
         )
     }
 
-    if(showDialog) {
+    if (showDialog) {
         DurationPickerDialog(
             title = title,
             initDuration = duration,
