@@ -44,6 +44,7 @@ fun CodeforcesCommunityScreen(
     controller: CodeforcesCommunityController,
     renderAllTabs: Boolean
 ) {
+    val newEntriesState = rememberNewEntriesState() // TODO: pass to header for badges
     Column {
         CodeforcesPagerHeader(
             controller = controller,
@@ -52,6 +53,7 @@ fun CodeforcesCommunityScreen(
         CodeforcesPager(
             controller = controller,
             renderAllTabs = renderAllTabs,
+            newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -77,9 +79,9 @@ fun CodeforcesReloadablePage(
 private fun CodeforcesPager(
     controller: CodeforcesCommunityController,
     renderAllTabs: Boolean,
+    newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
-    val newEntriesState = rememberNewEntriesState()
     ProvideSystemTimeEachMinute {
         HorizontalPager(
             beyondViewportPageCount = if (renderAllTabs) controller.tabs.size - 1 else 0,
