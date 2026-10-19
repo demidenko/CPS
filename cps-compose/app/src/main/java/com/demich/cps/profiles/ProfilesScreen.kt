@@ -39,7 +39,6 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsState
@@ -89,12 +88,12 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
     onExpandProfile: (Platform) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
-    val profilesOrder by profilesOrderState()
+    val profiles by profilesOrderState()
 
     screenTitle = ScreenStaticTitleState("profiles")
 
     menu =
-        if (profilesOrder.size > 1) {
+        if (profiles.size > 1) {
             {
                 CPSDropdownMenuItem(
                     title = "Reorder",
@@ -107,13 +106,13 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
         }
 
     ProfilesScreen(
-        profiles = profilesOrder,
+        profiles = profiles,
         onExpandProfile = onExpandProfile,
         reorderEnabled = reorderEnabled
     )
 
     bottomBar = profilesBottomBarBuilder(
-        profiles = profilesOrder,
+        profiles = profiles,
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
@@ -124,7 +123,7 @@ private fun profilesOrderState() = with(context) {
     collectAsState {
         combine(
             flow = ProfileManager.entries().flowOfExisted(this),
-            flow2 = settingsUI.profilesOrder.asFlow()
+            flow2 = settingsProfiles.platformsOrder.asFlow()
         ) { profiles, order ->
             order.mapNotNull { platform ->
                 profiles.find { it.platform == platform }

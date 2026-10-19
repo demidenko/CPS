@@ -38,7 +38,6 @@ import com.demich.cps.profiles.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
@@ -120,7 +119,7 @@ fun <U: UserInfo> ProfilePanel(
                 onExpandRequest = onExpandRequest,
                 onSwap = { i, j ->
                     val visibleOrder = requireNotNull(visibleOrder) // TODO
-                    context.settingsUI.profilesOrder.setValueIn(
+                    context.settingsProfiles.platformsOrder.setValueIn(
                         scope = profilesViewModel.viewModelScope,
                         value = visibleOrder.toMutableList().apply { swap(i, j) }
                     )

@@ -2,10 +2,8 @@ package com.demich.cps.ui
 
 import android.content.Context
 import com.demich.cps.platforms.Platform
-import com.demich.cps.profiles.managers.profilePlatforms
 import com.demich.cps.ui.bottombar.NavigationLayoutType
 import com.demich.cps.ui.theme.DarkLightMode
-import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.dataStoreWrapper
@@ -33,10 +31,6 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
     val coloredStatusBar = itemBoolean(name = "use_status_bar", defaultValue = true)
     val statusBarDisabledPlatforms = itemEnumSet<Platform>(name = "status_bar_disabled_platforms")
     val statusBarRankSelector = itemEnum<StatusBarRankSelector>(name = "status_bar_rank_selector", defaultValue = Max)
-
-    val profilesOrder = jsonCPS.itemList<Platform>(name = "profiles_order").mapGetter { order ->
-        order.filter { it in profilePlatforms } + profilePlatforms.filter { it !in order }
-    }
 
     val navigationLayoutType = itemEnum<NavigationLayoutType>(name = "navigation_bar_layout", defaultValue = start)
 }

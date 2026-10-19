@@ -20,6 +20,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.flowOfExisted
 import com.demich.cps.profiles.managers.platform
+import com.demich.cps.profiles.settingsProfiles
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
@@ -51,7 +52,7 @@ internal fun StatusBarButtons(
     val recordedPlatformsState = remember {
         ProfileManager.ratedEntries().flowOfExisted(context)
             .map { it.map { it.platform } }
-            .combine(settingsUI.profilesOrder.asFlow()) { platforms, order ->
+            .combine(context.settingsProfiles.platformsOrder.asFlow()) { platforms, order ->
                 platforms.sortedBy { order.indexOf(it) }
             }
     }.collectAsState(initial = null)
