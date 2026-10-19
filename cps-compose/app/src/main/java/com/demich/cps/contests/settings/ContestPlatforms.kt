@@ -40,21 +40,19 @@ import kotlinx.coroutines.launch
 @Composable
 context(scope: SettingsContainerScope, storage: ContestsSettingsDataStore)
 internal fun ContestPlatformsSettingsItem() {
-    val combinedEnabled by collectItemAsState { storage.combinedEnabledPlatforms }
+    val enabledPlatforms by collectItemAsState { storage.combinedEnabledPlatforms }
 
     Expandable(
         title = "Platforms",
         collapsedContent = {
             EnabledPlatformsSubtitle(
-                enabledPlatforms = combinedEnabled.platforms,
-                clistResources = combinedEnabled.clistResources
+                enabledPlatforms = enabledPlatforms
             )
         },
         expandedContent = {
             val scope = backgroundCoroutineScope
             ContestPlatformsSettingsItemExpandedContent(
-                enabledPlatforms = combinedEnabled.platforms,
-                clistResources = combinedEnabled.clistResources,
+                enabledPlatforms = enabledPlatforms,
                 onCheckedChange = { platform, checked ->
                     scope.launch {
                         storage.enabledPlatforms.edit {
@@ -83,14 +81,13 @@ private val ContestsSettingsDataStore.combinedEnabledPlatforms
 @Composable
 context(scope: SettingsContainerScope)
 private fun EnabledPlatformsSubtitle(
-    enabledPlatforms: Collection<Platform>,
-    clistResources: Collection<ClistResource>
+    enabledPlatforms: CombinedEnabledPlatforms
 ) {
     Subtitle(
-        selected = remember(key1 = enabledPlatforms, key2 = clistResources) {
+        selected = remember(enabledPlatforms) {
             buildList {
-                enabledPlatforms.sortedBy { it.ordinal }.forEach { add(it.name) }
-                clistResources.forEach { add(it.name) }
+                enabledPlatforms.platforms.sortedBy { it.ordinal }.forEach { add(it.name) }
+                enabledPlatforms.clistResources.forEach { add(it.name) }
             }
         }
     )
@@ -98,8 +95,7 @@ private fun EnabledPlatformsSubtitle(
 
 @Composable
 private fun ContestPlatformsSettingsItemExpandedContent(
-    enabledPlatforms: Set<Platform>,
-    clistResources: List<ClistResource>,
+    enabledPlatforms: CombinedEnabledPlatforms,
     onCheckedChange: (Platform, Boolean) -> Unit
 ) {
     val availableSources = remember {
@@ -114,12 +110,12 @@ private fun ContestPlatformsSettingsItemExpandedContent(
             PlatformCheckRow(
                 platform = platform,
                 availableSources = availableSources.getValue(platform),
-                isChecked = platform in enabledPlatforms,
+                isChecked = platform in enabledPlatforms.platforms,
                 onCheckedChange = { onCheckedChange(platform, it) }
             )
         }
         ClistAdditionalRow(
-            resources = clistResources
+            resources = enabledPlatforms.clistResources
         )
     }
 }
