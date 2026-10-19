@@ -12,14 +12,12 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun <T: Any> AnimatedVisibleByNotNull(
-    value: () -> T?,
+    value: T?,
     modifier: Modifier = Modifier,
     enter: EnterTransition,
     exit: ExitTransition,
     content: @Composable (T) -> Unit
 ) {
-    val value = value()
-
     val lastNotNullState = remember { mutableStateOf<T?>(null) }.also {
         if (value != null) it.value = value
     }
@@ -37,4 +35,21 @@ fun <T: Any> AnimatedVisibleByNotNull(
             content(notNullState.value)
         }
     }
+}
+
+@Composable
+fun <T: Any> AnimatedVisibleByNotNull(
+    value: () -> T?,
+    modifier: Modifier = Modifier,
+    enter: EnterTransition,
+    exit: ExitTransition,
+    content: @Composable (T) -> Unit
+) {
+    AnimatedVisibleByNotNull(
+        value = value(),
+        modifier = modifier,
+        enter = enter,
+        exit = exit,
+        content = content
+    )
 }
