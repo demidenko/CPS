@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,6 +32,7 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
+import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.utils.stateOfNull
 import kotlinx.coroutines.launch
@@ -44,10 +46,11 @@ fun CodeforcesCommunityScreen(
     controller: CodeforcesCommunityController,
     renderAllTabs: Boolean
 ) {
-    val newEntriesState = rememberNewEntriesState() // TODO: pass to header for badges
+    val newEntriesState = rememberNewEntriesState()
     Column {
         CodeforcesPagerHeader(
             controller = controller,
+            newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxWidth()
         )
         CodeforcesPager(
@@ -103,6 +106,7 @@ private fun CodeforcesPager(
 @Composable
 private fun CodeforcesPagerHeader(
     controller: CodeforcesCommunityController,
+    newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
     val animationScope = rememberCoroutineScope()
@@ -136,6 +140,7 @@ private fun CodeforcesPagerHeader(
                 CodeforcesCommunityTab(
                     tab = title,
                     controller = controller,
+                    newEntriesState = newEntriesState,
                     modifier = Modifier.clickableNoRipple {
                         animationScope.launch { controller.scrollTo(title) }
                     }
@@ -146,10 +151,10 @@ private fun CodeforcesPagerHeader(
 }
 
 @Composable
-private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesTab): State<NewEntryTypeCounters?> {
+private fun CodeforcesCommunityController.entriesIdsState(tab: CodeforcesTab): State<List<Int>?> {
     val context = context
     val flow = remember(key1 = tab, key2 = this) {
-        flowOfNewEntryCounters(tab = tab, context = context)
+        flowOfEntryIds(tab = tab, context = context)
     }
 
     return if (flow == null) {
@@ -163,15 +168,25 @@ private fun CodeforcesCommunityController.newEntryCountersState(tab: CodeforcesT
 private fun CodeforcesCommunityTab(
     tab: CodeforcesTab,
     controller: CodeforcesCommunityController,
+    newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
     val loadingStatus by controller.loadingStatusState(tab)
-    val counters by controller.newEntryCountersState(tab)
+
+    val entriesIdsState = controller.entriesIdsState(tab)
+    val badgeCount by remember(controller, entriesIdsState) {
+        derivedStateOf {
+            val ids = entriesIdsState.value
+            if (ids == null) null
+            else combineToCounters(ids, newEntriesState.types).toBadgeCounter(controller, tab)
+        }
+    }
+
     CodeforcesCommunityTab(
         tab = tab,
         index = controller.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = counters?.toBadgeCounter(controller, tab),
+        badgeCount = badgeCount,
         pagerState = controller.pagerState,
         modifier = modifier
     )
