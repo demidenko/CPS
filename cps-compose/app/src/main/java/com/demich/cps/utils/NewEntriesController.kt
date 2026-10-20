@@ -64,8 +64,8 @@ data class NewEntryTypeCounters(
     val seenCount: Int
 )
 
-fun combineToCounters(ids: Iterable<Int>, types: NewEntriesMap) =
+fun combineToCounters(ids: Iterable<Int>, types: Map<Int, NewEntryType>) =
     NewEntryTypeCounters(
-        unseenCount = ids.count { types.getType(it) == null },
-        seenCount = ids.count { types.getType(it) == SEEN }
+        unseenCount = ids.count { types[it] == null },
+        seenCount = ids.count { types[it] == SEEN }
     )

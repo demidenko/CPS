@@ -16,14 +16,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.NewEntryTypeCounters
-import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -172,16 +169,6 @@ fun CodeforcesCommunityDataManger.flowOfEntryIds(tab: CodeforcesTab, context: Co
         else -> return null
     }
     return flow.map { it?.map { it.id } ?: [] }
-}
-
-fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, context: Context): Flow<NewEntryTypeCounters>? {
-    val flowOfIds = flowOfEntryIds(tab, context) ?: return null
-    return combine(
-        flowOfIds,
-        CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
-    ) { ids, types ->
-        combineToCounters(ids, types)
-    }
 }
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
