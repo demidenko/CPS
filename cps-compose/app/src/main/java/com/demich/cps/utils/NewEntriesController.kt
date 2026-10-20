@@ -3,8 +3,6 @@ package com.demich.cps.utils
 import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.edit
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
@@ -66,10 +64,8 @@ data class NewEntryTypeCounters(
     val seenCount: Int
 )
 
-fun combineToCounters(flowOfIds: Flow<List<Int>>, flowOfTypes: Flow<NewEntriesMap>) =
-    combine(flowOfIds, flowOfTypes) { ids, types ->
-        NewEntryTypeCounters(
-            unseenCount = ids.count { types.getType(it) == null },
-            seenCount = ids.count { types.getType(it) == SEEN }
-        )
-    }
+fun combineToCounters(ids: Iterable<Int>, types: NewEntriesMap) =
+    NewEntryTypeCounters(
+        unseenCount = ids.count { types.getType(it) == null },
+        seenCount = ids.count { types.getType(it) == SEEN }
+    )

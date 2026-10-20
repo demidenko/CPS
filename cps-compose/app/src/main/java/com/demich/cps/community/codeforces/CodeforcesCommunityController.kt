@@ -23,6 +23,7 @@ import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -174,11 +175,13 @@ fun CodeforcesCommunityDataManger.flowOfEntryIds(tab: CodeforcesTab, context: Co
 }
 
 fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, context: Context): Flow<NewEntryTypeCounters>? {
-    val flow = flowOfEntryIds(tab, context) ?: return null
-    return combineToCounters(
-        flowOfIds = flow,
-        flowOfTypes = CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
-    )
+    val flowOfIds = flowOfEntryIds(tab, context) ?: return null
+    return combine(
+        flowOfIds,
+        CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
+    ) { ids, types ->
+        combineToCounters(ids, types)
+    }
 }
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
