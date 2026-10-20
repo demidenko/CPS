@@ -164,14 +164,19 @@ private fun controllerSaver(
     }
 )
 
-fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, context: Context): Flow<NewEntryTypeCounters>? {
+fun CodeforcesCommunityDataManger.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
     val flow = when (tab) {
         MAIN -> flowOfMainBlogEntries(context)
         LOST -> flowOfLostBlogEntries(context)
         else -> return null
     }
+    return flow.map { it?.map { it.id } ?: [] }
+}
+
+fun CodeforcesCommunityDataManger.flowOfNewEntryCounters(tab: CodeforcesTab, context: Context): Flow<NewEntryTypeCounters>? {
+    val flow = flowOfEntryIds(tab, context) ?: return null
     return combineToCounters(
-        flowOfIds = flow.map { it?.map { it.id } ?: [] },
+        flowOfIds = flow,
         flowOfTypes = CodeforcesNewEntriesDataStore(context).commonNewEntries.asFlow()
     )
 }
