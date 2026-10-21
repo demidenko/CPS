@@ -38,21 +38,16 @@ fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewMod
 
 class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
 
+    private fun Collection<CodeforcesDataLoader<*>>.flowOfLoadingStatus() =
+        map { it.flowOfLoadingStatus() }.combine()
+
     override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-        listOf(
-            mainBlogEntries.flowOfLoadingStatus(),
-            topBlogEntries.flowOfLoadingStatus(),
-            topComments.flowOfLoadingStatus(),
-            recentActions.flowOfLoadingStatus()
-        ).combine()
+        [mainBlogEntries, topBlogEntries, topComments, recentActions].flowOfLoadingStatus()
 
     override fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus> {
         return when (tab) {
             MAIN -> mainBlogEntries.flowOfLoadingStatus()
-            TOP -> {
-                listOf(topBlogEntries.flowOfLoadingStatus(), topComments.flowOfLoadingStatus())
-                    .combine()
-            }
+            TOP -> [topBlogEntries, topComments].flowOfLoadingStatus()
             RECENT -> recentActions.flowOfLoadingStatus()
             LOST -> throw IllegalArgumentException(tab.name)
         }
