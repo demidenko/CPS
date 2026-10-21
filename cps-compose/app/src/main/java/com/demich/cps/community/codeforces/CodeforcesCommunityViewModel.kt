@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewModel()
 
-class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityDataManger {
+class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityBackgroundLoader {
 
     private fun Collection<CodeforcesDataLoader<*>>.flowOfLoadingStatus() =
         map { it.flowOfLoadingStatus() }.combine()

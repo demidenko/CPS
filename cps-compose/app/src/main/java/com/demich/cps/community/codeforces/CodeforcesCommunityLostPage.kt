@@ -79,7 +79,7 @@ private fun TopLabel() {
     )
 }
 
-fun CodeforcesCommunityDataManger.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
+fun CodeforcesCommunityBackgroundLoader.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
     combine(
         flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
         flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()

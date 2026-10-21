@@ -9,7 +9,7 @@ import com.demich.cps.utils.LoadingStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface CodeforcesCommunityDataManger {
+interface CodeforcesCommunityBackgroundLoader {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
     fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus>
 
@@ -23,6 +23,6 @@ interface CodeforcesCommunityDataManger {
     fun updateFollowUsersInfo(repository: CodeforcesFollowRepository)
 }
 
-fun CodeforcesCommunityDataManger.reload(tab: CodeforcesTab, context: Context) {
+fun CodeforcesCommunityBackgroundLoader.reload(tab: CodeforcesTab, context: Context) {
     reload(tabs = listOf(tab), context = context)
 }

@@ -65,15 +65,15 @@ fun CodeforcesCommunityScreen(
 
 @Composable
 fun CodeforcesReloadablePage(
-    controller: CodeforcesCommunityDataManger,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
     tab: CodeforcesTab,
     content: @Composable () -> Unit
 ) {
     val context = context
-    val loadingStatus by controller.loadingStatusState(tab = tab)
+    val loadingStatus by backgroundLoader.loadingStatusState(tab = tab)
     CPSSwipeRefreshBox(
         isRefreshing = { loadingStatus == LOADING },
-        onRefresh = { controller.reload(tab = tab, context = context) },
+        onRefresh = { backgroundLoader.reload(tab = tab, context = context) },
         content = content
     )
 }
@@ -171,7 +171,7 @@ private fun CodeforcesCommunityTab(
 }
 
 @Composable
-private fun CodeforcesCommunityDataManger.newEntryCountersState(
+private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
     tab: CodeforcesTab,
     newEntriesState: NewEntriesState
 ): State<NewEntryTypeCounters?> {

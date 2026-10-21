@@ -36,7 +36,7 @@ fun CodeforcesCommunityRecentPage(
 
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, tab = RECENT) {
+    CodeforcesReloadablePage(backgroundLoader = controller, tab = RECENT) {
         when (val type = controller.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntryId = type.blogEntryId

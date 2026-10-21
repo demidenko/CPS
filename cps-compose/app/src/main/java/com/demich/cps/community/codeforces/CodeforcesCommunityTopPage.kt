@@ -17,7 +17,7 @@ fun CodeforcesCommunityTopPage(
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(controller = controller, tab = TOP) {
+    CodeforcesReloadablePage(backgroundLoader = controller, tab = TOP) {
         when (val key = controller.topPageType) {
             BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {

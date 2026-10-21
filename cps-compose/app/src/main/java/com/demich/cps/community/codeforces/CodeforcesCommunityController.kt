@@ -46,7 +46,7 @@ fun rememberCodeforcesCommunityController(
     val controller = rememberSaveable(saver = controllerSaver(viewModel, tabs)) {
         CodeforcesCommunityController(
             tabs = tabs,
-            dataManager = viewModel,
+            backgroundLoader = viewModel,
             pagerData = CodeforcesCommunityPagerData(
                 selectedTab = defaultTab,
                 topPageType = BlogEntries,
@@ -72,9 +72,9 @@ data class CodeforcesCommunityPagerData(
 @Stable
 class CodeforcesCommunityController(
     val tabs: List<CodeforcesTab>,
-    dataManager: CodeforcesCommunityDataManger,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
     pagerData: CodeforcesCommunityPagerData
-): CodeforcesCommunityDataManger by dataManager {
+): CodeforcesCommunityBackgroundLoader by backgroundLoader {
 
     //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
     val pagerState = object : PagerState(
@@ -123,11 +123,11 @@ class CodeforcesCommunityController(
 }
 
 @Composable
-fun CodeforcesCommunityDataManger.loadingStatusState(): State<LoadingStatus?> =
+fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<LoadingStatus?> =
     remember { flowOfLoadingStatus() }.collectAsState(initial = null)
 
 @Composable
-fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
+fun CodeforcesCommunityBackgroundLoader.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
     if (tab == LOST) {
         val context = context
         return remember {
@@ -143,7 +143,7 @@ fun CodeforcesCommunityDataManger.loadingStatusState(tab: CodeforcesTab): State<
 
 
 private fun controllerSaver(
-    dataManager: CodeforcesCommunityDataManger,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
     tabs: List<CodeforcesTab>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
@@ -156,13 +156,13 @@ private fun controllerSaver(
     restore = {
         CodeforcesCommunityController(
             tabs = tabs,
-            dataManager = dataManager,
+            backgroundLoader = backgroundLoader,
             pagerData = Json.decodeFromString(it)
         )
     }
 )
 
-fun CodeforcesCommunityDataManger.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
+fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
     val flow = when (tab) {
         MAIN -> flowOfMainBlogEntries(context)
         LOST -> flowOfLostBlogEntries(context)

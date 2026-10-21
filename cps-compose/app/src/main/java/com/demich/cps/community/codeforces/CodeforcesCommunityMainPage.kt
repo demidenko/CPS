@@ -14,7 +14,7 @@ fun CodeforcesCommunityMainPage(
     controller: CodeforcesCommunityController,
     newEntriesState: NewEntriesState
 ) {
-    CodeforcesReloadablePage(controller = controller, tab = MAIN) {
+    CodeforcesReloadablePage(backgroundLoader = controller, tab = MAIN) {
         CodeforcesCommunityMainList(controller, newEntriesState)
     }
 }
