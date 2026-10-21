@@ -36,7 +36,8 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
-import com.demich.cps.utils.rememberRunBlocking
+import com.demich.cps.utils.onNotNull
+import com.demich.cps.utils.suspendAsState
 import com.demich.datastore_itemized.DataStoreValue
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -68,19 +69,24 @@ internal fun <T> ApiAccessSettingsItem(
     )
 
     if (showDialog) {
-        val init = rememberRunBlocking { item() }
-
-        ApiDialog(
-            title = dialogTitle,
-            fields = fields.map { (title, prop) ->
+        val fieldsState = suspendAsState {
+            val init = item()
+            fields.map { (title, prop) ->
                 Field(title = title, initValue = init?.let { prop.get(it) } ?: "")
-            },
-            decode = decode,
-            onSave = onSave,
-            onDismissRequest = { showDialog = false },
-            onHelp = onHelp,
-            checkBlock = checkBlock
-        )
+            }
+        }
+
+        fieldsState.onNotNull { fields ->
+            ApiDialog(
+                title = dialogTitle,
+                fields = fields,
+                decode = decode,
+                onSave = onSave,
+                onDismissRequest = { showDialog = false },
+                onHelp = onHelp,
+                checkBlock = checkBlock
+            )
+        }
     }
 }
 
