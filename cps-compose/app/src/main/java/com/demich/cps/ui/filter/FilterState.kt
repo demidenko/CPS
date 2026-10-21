@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.cps.utils.filterByTokensAsSubsequence
+import kotlinx.collections.immutable.ImmutableList
 
 
 @Composable
@@ -43,10 +44,10 @@ class FilterState(
         }
 }
 
-inline fun <T> List<T>.filterByTokensAsSubsequence(
+inline fun <T> Collection<T>.filterByTokensAsSubsequence(
     filterState: FilterState,
     toCheck: T.() -> Sequence<String>
 ): List<T> {
-    if (!filterState.enabled) return this
+    if (!filterState.enabled) return this as? ImmutableList ?: toList()
     return filterByTokensAsSubsequence(filter = filterState.string, toCheck = toCheck)
 }

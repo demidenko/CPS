@@ -1,12 +1,14 @@
 package com.demich.cps.utils
 
+import kotlinx.collections.immutable.ImmutableList
 
-inline fun <T> List<T>.filterByTokensAsSubsequence(
+
+inline fun <T> Collection<T>.filterByTokensAsSubsequence(
     filter: String,
     toCheck: T.() -> Sequence<String>
 ): List<T> {
     val filter = filter.trim()
-    if (filter.isEmpty()) return this
+    if (filter.isEmpty()) return this as? ImmutableList ?: toList()
 
     val tokens = filter.split("\\s+".toRegex())
 
