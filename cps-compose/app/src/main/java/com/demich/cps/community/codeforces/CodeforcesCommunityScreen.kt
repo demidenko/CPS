@@ -65,7 +65,7 @@ fun CodeforcesCommunityScreen(
 
 @Composable
 fun CodeforcesReloadablePage(
-    controller: CodeforcesCommunityController,
+    controller: CodeforcesCommunityDataManger,
     tab: CodeforcesTab,
     content: @Composable () -> Unit
 ) {
@@ -171,7 +171,7 @@ private fun CodeforcesCommunityTab(
 }
 
 @Composable
-private fun CodeforcesCommunityController.newEntryCountersState(
+private fun CodeforcesCommunityDataManger.newEntryCountersState(
     tab: CodeforcesTab,
     newEntriesState: NewEntriesState
 ): State<NewEntryTypeCounters?> {
