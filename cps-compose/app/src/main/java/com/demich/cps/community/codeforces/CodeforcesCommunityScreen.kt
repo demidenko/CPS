@@ -158,23 +158,23 @@ private fun CodeforcesCommunityTab(
     modifier: Modifier = Modifier
 ) {
     val loadingStatus by controller.loadingStatusState(tab)
-    val badgeCount by controller.tabBadgeCountState(tab, newEntriesState)
+    val counters by controller.newEntryCountersState(tab, newEntriesState)
 
     CodeforcesCommunityTab(
         tab = tab,
         index = controller.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = badgeCount,
+        badgeCount = counters?.toBadgeCounter(controller, tab),
         pagerState = controller.pagerState,
         modifier = modifier
     )
 }
 
 @Composable
-private fun CodeforcesCommunityController.tabBadgeCountState(
+private fun CodeforcesCommunityController.newEntryCountersState(
     tab: CodeforcesTab,
     newEntriesState: NewEntriesState
-): State<Int?> {
+): State<NewEntryTypeCounters?> {
     val context = context
     val flowIds = remember(key1 = tab, key2 = this) {
         flowOfEntryIds(tab = tab, context = context)
@@ -183,11 +183,11 @@ private fun CodeforcesCommunityController.tabBadgeCountState(
     if (flowIds == null) return stateOfNull()
 
     val entriesIdsState = flowIds.collectAsStateWithLifecycle(initialValue = null)
-    return remember(this, tab, newEntriesState) {
+    return remember(newEntriesState) {
         derivedStateOf {
             when (val ids = entriesIdsState.value) {
                 null -> null
-                else -> combineToCounters(ids, newEntriesState.types).toBadgeCounter(this, tab)
+                else -> combineToCounters(ids, newEntriesState.types)
             }
         }
     }
