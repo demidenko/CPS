@@ -32,8 +32,8 @@ import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
-import com.demich.cps.utils.combineToCounters
 import com.demich.cps.utils.context
+import com.demich.cps.utils.newEntriesCountersBy
 import com.demich.cps.utils.stateOfNull
 import kotlinx.coroutines.launch
 
@@ -187,7 +187,7 @@ private fun CodeforcesCommunityController.newEntryCountersState(
         derivedStateOf {
             when (val ids = entriesIdsState.value) {
                 null -> null
-                else -> combineToCounters(ids, newEntriesState.types)
+                else -> ids.newEntriesCountersBy(newEntriesState.types)
             }
         }
     }
