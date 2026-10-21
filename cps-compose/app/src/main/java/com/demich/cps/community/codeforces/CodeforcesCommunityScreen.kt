@@ -151,20 +151,6 @@ private fun CodeforcesPagerHeader(
 }
 
 @Composable
-private fun CodeforcesCommunityController.entriesIdsState(tab: CodeforcesTab): State<List<Int>?> {
-    val context = context
-    val flow = remember(key1 = tab, key2 = this) {
-        flowOfEntryIds(tab = tab, context = context)
-    }
-
-    return if (flow == null) {
-        stateOfNull()
-    } else {
-        flow.collectAsStateWithLifecycle(initialValue = null)
-    }
-}
-
-@Composable
 private fun CodeforcesCommunityTab(
     tab: CodeforcesTab,
     controller: CodeforcesCommunityController,
@@ -172,15 +158,7 @@ private fun CodeforcesCommunityTab(
     modifier: Modifier = Modifier
 ) {
     val loadingStatus by controller.loadingStatusState(tab)
-
-    val entriesIdsState = controller.entriesIdsState(tab)
-    val badgeCount by remember(controller, entriesIdsState) {
-        derivedStateOf {
-            val ids = entriesIdsState.value
-            if (ids == null) null
-            else combineToCounters(ids, newEntriesState.types).toBadgeCounter(controller, tab)
-        }
-    }
+    val badgeCount by controller.tabBadgeCountState(tab, newEntriesState)
 
     CodeforcesCommunityTab(
         tab = tab,
@@ -190,6 +168,29 @@ private fun CodeforcesCommunityTab(
         pagerState = controller.pagerState,
         modifier = modifier
     )
+}
+
+@Composable
+private fun CodeforcesCommunityController.tabBadgeCountState(
+    tab: CodeforcesTab,
+    newEntriesState: NewEntriesState
+): State<Int?> {
+    val context = context
+    val flowIds = remember(key1 = tab, key2 = this) {
+        flowOfEntryIds(tab = tab, context = context)
+    }
+
+    if (flowIds == null) return stateOfNull()
+
+    val entriesIdsState = flowIds.collectAsStateWithLifecycle(initialValue = null)
+    return remember(this, tab, newEntriesState) {
+        derivedStateOf {
+            when (val ids = entriesIdsState.value) {
+                null -> null
+                else -> combineToCounters(ids, newEntriesState.types).toBadgeCounter(this, tab)
+            }
+        }
+    }
 }
 
 private fun NewEntryTypeCounters.toBadgeCounter(
