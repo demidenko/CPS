@@ -6,9 +6,11 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.codeforces.follow.storage.CodeforcesUserBlogInfo
 import com.demich.cps.platforms.codeforces.follow.storage.handle
+import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.jsonCPS
+import com.demich.datastore_itemized.DataStoreValue
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.edit
 import kotlin.time.Duration.Companion.hours
@@ -46,16 +48,13 @@ class CodeforcesFollowWorker(
         val blogs = repository.blogs()
 
         val lastOnlineItem = CodeforcesFollowWorkerStorage(context).usersLastOnlineTime
-        val blogsToUpdate = lastOnlineItem().let { last ->
-            blogs.filterNot {
-                // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
-                val canSkip = profiles[it.handle].let { profile ->
-                    // TODO: investigate do not skip if last > currentTime - 24h
-                    profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == last[it.id]
-                }
-                canSkip && it.blogSize != null
-            }
-        }
+
+        val skipper = SkippingHeuristic(
+            profiles = profiles,
+            lastOnline = lastOnlineItem
+        )
+
+        val blogsToUpdate = skipper.filter(blogs)
 
         blogsToUpdate
             .sortedByDescending { it.userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST }
@@ -76,4 +75,23 @@ private class CodeforcesFollowWorkerStorage(context: Context): ItemizedDataStore
 
     //TODO: clean up unused ids sometimes
     val usersLastOnlineTime = jsonCPS.itemMap<Long, Instant?>(name = "users_last_online")
+}
+
+private class SkippingHeuristic(
+    val profiles: Map<String, ProfileResult<CodeforcesUserInfo>>,
+    val lastOnline: DataStoreValue<Map<Long, Instant?>>
+) {
+    suspend fun filter(blogs: Collection<CodeforcesUserBlogInfo>): List<CodeforcesUserBlogInfo> {
+        if (blogs.isEmpty()) return emptyList()
+
+        val last = lastOnline()
+        return blogs.filterNot {
+            // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
+            val canSkip = profiles[it.handle].let { profile ->
+                // TODO: investigate do not skip if last > currentTime - 24h
+                profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == last[it.id]
+            }
+            canSkip && it.blogSize != null
+        }
+    }
 }
