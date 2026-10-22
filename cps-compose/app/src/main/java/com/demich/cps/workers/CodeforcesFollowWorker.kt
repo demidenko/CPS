@@ -12,6 +12,7 @@ import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.jsonCPS
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.edit
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
@@ -40,7 +41,6 @@ class CodeforcesFollowWorker(
     override suspend fun runWork() {
         val repository = context.followRepository
 
-        //TODO: consider skip this if blogs.size is small
         //update userInfo to keep fresh lastOnlineTime
         val profiles = repository.updateProfiles()
 
@@ -50,7 +50,9 @@ class CodeforcesFollowWorker(
 
         val skipper = SkippingHeuristic(
             profiles = profiles,
-            lastOnline = lastOnlineItem()
+            lastOnline = lastOnlineItem(),
+            currentTime = workerStartTime,
+            safeToSkipDuration = 24.hours
         )
 
         val blogsToUpdate = skipper.filter(blogs)
@@ -78,7 +80,9 @@ private class CodeforcesFollowWorkerStorage(context: Context): ItemizedDataStore
 
 private class SkippingHeuristic(
     val profiles: Map<String, ProfileResult<CodeforcesUserInfo>>,
-    val lastOnline: Map<Long, Instant?>
+    val lastOnline: Map<Long, Instant?>,
+    val currentTime: Instant,
+    val safeToSkipDuration: Duration
 ) {
     fun filter(blogs: Collection<CodeforcesUserBlogInfo>): List<CodeforcesUserBlogInfo> {
         if (blogs.isEmpty()) return emptyList()
@@ -88,10 +92,12 @@ private class SkippingHeuristic(
     private fun canSkip(blog: CodeforcesUserBlogInfo): Boolean {
         val profile = profiles[blog.handle]
 
-        // TODO: investigate do not skip if last > currentTime - 24h
         // can't just check blog.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
-        if (profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == lastOnline[blog.id]) {
-            return true
+        if (profile is ProfileResult.Success) {
+            val lastOnlineTime = lastOnline[blog.id]
+            if (profile.userInfo.lastOnlineTime == lastOnlineTime) {
+                return currentTime - lastOnlineTime >= safeToSkipDuration
+            }
         }
 
         return false
