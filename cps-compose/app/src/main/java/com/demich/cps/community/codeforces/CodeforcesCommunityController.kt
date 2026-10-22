@@ -25,7 +25,6 @@ fun rememberCodeforcesCommunityController(
     lostEnabled: Boolean
 ): CodeforcesCommunityController {
     val context = context
-    val viewModel = codeforcesCommunityViewModel()
 
     val tabs = remember(lostEnabled) {
         buildList<CodeforcesTab> {
@@ -36,17 +35,22 @@ fun rememberCodeforcesCommunityController(
         }
     }
 
-    val controller = rememberSaveable(saver = controllerSaver(viewModel, tabs)) {
+    val pagerState = rememberSaveable(saver = codeforcesPagerSaver(tabs = tabs)) {
+        CodeforcesCommunityPagerState(
+            tabs = tabs,
+            pagerData = CodeforcesCommunityPagerData(
+                selectedTab = defaultTab,
+                topPageType = BlogEntries,
+                recentPageType = RecentFeed
+            )
+        )
+    }
+
+    val viewModel = codeforcesCommunityViewModel()
+    val controller = remember(pagerState, viewModel) {
         CodeforcesCommunityController(
             backgroundLoader = viewModel,
-            pagerState = CodeforcesCommunityPagerState(
-                tabs = tabs,
-                pagerData = CodeforcesCommunityPagerData(
-                    selectedTab = defaultTab,
-                    topPageType = BlogEntries,
-                    recentPageType = RecentFeed
-                )
-            )
+            pagerState = pagerState
         )
     }
 
@@ -85,22 +89,20 @@ fun CodeforcesCommunityBackgroundLoader.loadingStatusState(tab: CodeforcesTab): 
 }
 
 
-private fun controllerSaver(
-    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+private fun codeforcesPagerSaver(
     tabs: List<CodeforcesTab>
-) = Saver<CodeforcesCommunityController, String>(
+) = Saver<CodeforcesCommunityPagerState, String>(
     save = {
-        val pagerState = it.pagerState
         Json.encodeToString(CodeforcesCommunityPagerData(
-            selectedTab = pagerState.currentTab,
-            topPageType = pagerState.topPageType,
-            recentPageType = pagerState.recentPageType
+            selectedTab = it.currentTab,
+            topPageType = it.topPageType,
+            recentPageType = it.recentPageType
         ))
     },
     restore = {
-        CodeforcesCommunityController(
-            backgroundLoader = backgroundLoader,
-            pagerState = CodeforcesCommunityPagerState(tabs = tabs, pagerData = Json.decodeFromString(it))
+        CodeforcesCommunityPagerState(
+            tabs = tabs,
+            pagerData = Json.decodeFromString(it)
         )
     }
 )
