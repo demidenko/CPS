@@ -50,6 +50,7 @@ class CodeforcesFollowWorker(
             blogs.filterNot {
                 // can't just check it.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
                 val canSkip = profiles[it.handle].let { profile ->
+                    // TODO: investigate do not skip if last > currentTime - 24h
                     profile is ProfileResult.Success && profile.userInfo.lastOnlineTime == last[it.id]
                 }
                 canSkip && it.blogSize != null
