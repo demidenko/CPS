@@ -18,7 +18,7 @@ fun CodeforcesCommunityTopPage(
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(backgroundLoader = controller, tab = TOP) {
-        when (val key = controller.topPageType) {
+        when (val key = controller.pagerState.topPageType) {
             BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
                     CodeforcesCommunityTopBlogEntries(controller, newEntriesState)
@@ -42,7 +42,7 @@ private fun CodeforcesCommunityTopBlogEntries(
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isListVisible = { controller.isTabVisible(tab = TOP) },
+        isListVisible = { controller.pagerState.isTabVisible(tab = TOP) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = false

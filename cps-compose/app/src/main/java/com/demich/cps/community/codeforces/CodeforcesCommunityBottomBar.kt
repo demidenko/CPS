@@ -8,19 +8,19 @@ import com.demich.cps.ui.CPSIcons
 
 @Composable
 fun CodeforcesCommunityBottomBar(
-    controller: CodeforcesCommunityController,
+    pagerState: CodeforcesCommunityPagerState,
 ) {
-    when (controller.currentTab) {
+    when (pagerState.currentTab) {
         TOP -> {
             TopPageButton(
-                pageType = controller.topPageType,
-                onPageChange = { controller.topPageType = it }
+                pageType = pagerState.topPageType,
+                onPageChange = { pagerState.topPageType = it }
             )
         }
         RECENT -> {
             RecentPageButton(
-                pageType = controller.recentPageType,
-                onPageChange = { controller.recentPageType = it }
+                pageType = pagerState.recentPageType,
+                onPageChange = { pagerState.recentPageType = it }
             )
         }
         else -> Unit

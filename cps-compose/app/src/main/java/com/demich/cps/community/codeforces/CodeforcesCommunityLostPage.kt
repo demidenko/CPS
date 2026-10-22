@@ -39,7 +39,7 @@ fun CodeforcesCommunityLostPage(
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isListVisible = { controller.isTabVisible(tab = LOST) },
+        isListVisible = { controller.pagerState.isTabVisible(tab = LOST) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true

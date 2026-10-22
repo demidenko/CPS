@@ -1,25 +1,19 @@
 package com.demich.cps.community.codeforces
 
 import android.content.Context
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.isRunning
-import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -44,12 +38,14 @@ fun rememberCodeforcesCommunityController(
 
     val controller = rememberSaveable(saver = controllerSaver(viewModel, tabs)) {
         CodeforcesCommunityController(
-            tabs = tabs,
             backgroundLoader = viewModel,
-            pagerData = CodeforcesCommunityPagerData(
-                selectedTab = defaultTab,
-                topPageType = BlogEntries,
-                recentPageType = RecentFeed
+            pagerState = CodeforcesCommunityPagerState(
+                tabs = tabs,
+                pagerData = CodeforcesCommunityPagerData(
+                    selectedTab = defaultTab,
+                    topPageType = BlogEntries,
+                    recentPageType = RecentFeed
+                )
             )
         )
     }
@@ -63,41 +59,10 @@ fun rememberCodeforcesCommunityController(
 
 @Stable
 class CodeforcesCommunityController(
-    val tabs: List<CodeforcesTab>,
     backgroundLoader: CodeforcesCommunityBackgroundLoader,
-    pagerData: CodeforcesCommunityPagerData
+    val pagerState: CodeforcesCommunityPagerState
 ): CodeforcesCommunityBackgroundLoader by backgroundLoader {
 
-    //TODO: future support for dynamic tabs (selectedIndex can be out of bounds)
-    val pagerState = object : PagerState(
-        currentPage = tabs.indexOf(pagerData.selectedTab).let { if (it != -1) it else 0 }
-    ) {
-        override val pageCount: Int
-            get() = tabs.size
-    }
-
-    val currentTab: CodeforcesTab
-        get() = tabs[pagerState.currentPage]
-
-    // relies that tabs are always fixed!
-    // not saved/restored!
-    //TODO: incorrect?????
-    val visitedTabs by tabs.toMutableList().let { list ->
-        derivedStateOf {
-            val pos = list.indexOf(currentTab)
-            for (i in pos downTo 1) list.swap(i, i-1)
-            list.toList()
-        }
-    }
-
-    fun isTabVisible(tab: CodeforcesTab) = tab == currentTab && !pagerState.isScrollInProgress
-
-    suspend fun scrollTo(tab: CodeforcesTab) =
-        pagerState.animateScrollToPage(page = tabs.indexOf(tab))
-
-
-    var topPageType by mutableStateOf(pagerData.topPageType)
-    var recentPageType by mutableStateOf(pagerData.recentPageType)
 }
 
 @Composable
@@ -125,17 +90,17 @@ private fun controllerSaver(
     tabs: List<CodeforcesTab>
 ) = Saver<CodeforcesCommunityController, String>(
     save = {
+        val pagerState = it.pagerState
         Json.encodeToString(CodeforcesCommunityPagerData(
-            selectedTab = it.currentTab,
-            topPageType = it.topPageType,
-            recentPageType = it.recentPageType
+            selectedTab = pagerState.currentTab,
+            topPageType = pagerState.topPageType,
+            recentPageType = pagerState.recentPageType
         ))
     },
     restore = {
         CodeforcesCommunityController(
-            tabs = tabs,
             backgroundLoader = backgroundLoader,
-            pagerData = Json.decodeFromString(it)
+            pagerState = CodeforcesCommunityPagerState(tabs = tabs, pagerData = Json.decodeFromString(it))
         )
     }
 )
@@ -150,11 +115,11 @@ fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(tab: CodeforcesTab, conte
 }
 
 private fun CodeforcesCommunityController.touchFlows(context: Context) {
-    visitedTabs.forEach { tab ->
+    pagerState.visitedTabs.forEach { tab ->
         when (tab) {
             MAIN -> flowOfMainBlogEntries(context)
             TOP -> {
-                when (topPageType) {
+                when (pagerState.topPageType) {
                     BlogEntries -> flowOfTopBlogEntries(context)
                     Comments -> flowOfTopComments(context)
                 }

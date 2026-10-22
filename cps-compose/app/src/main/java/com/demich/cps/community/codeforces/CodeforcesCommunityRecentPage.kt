@@ -34,16 +34,17 @@ fun CodeforcesCommunityRecentPage(
         }
     }
 
+    val pagerState = controller.pagerState
     val saveableStateHolder = rememberSaveableStateHolder()
 
     CodeforcesReloadablePage(backgroundLoader = controller, tab = RECENT) {
-        when (val type = controller.recentPageType) {
+        when (val type = pagerState.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntryId = type.blogEntryId
                 RecentCommentsInBlogEntry(
                     recentComments = grouped?.firstOrNull { it.blogEntry.id == blogEntryId },
-                    isTabVisible = { controller.isTabVisible(tab = RECENT) },
-                    onClose = { controller.recentPageType = RecentPageType.RecentFeed },
+                    isTabVisible = { pagerState.isTabVisible(tab = RECENT) },
+                    onClose = { pagerState.recentPageType = RecentPageType.RecentFeed },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -70,7 +71,7 @@ fun CodeforcesCommunityRecentPage(
                             uriHandler.openUri(CodeforcesUrls.blogEntry(it.id))
                         },
                         onOpenComments = {
-                            controller.recentPageType = RecentPageType.BlogEntryRecentComments(it.id)
+                            pagerState.recentPageType = RecentPageType.BlogEntryRecentComments(it.id)
                         }
                     )
                 }

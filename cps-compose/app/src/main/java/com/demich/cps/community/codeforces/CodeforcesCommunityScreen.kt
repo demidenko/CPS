@@ -85,14 +85,15 @@ private fun CodeforcesPager(
     newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
+    val pagerState = controller.pagerState
     ProvideSystemTimeEachMinute {
         HorizontalPager(
-            beyondViewportPageCount = if (renderAllTabs) controller.tabs.size - 1 else 0,
-            state = controller.pagerState,
-            key = { index -> controller.tabs[index] },
+            beyondViewportPageCount = if (renderAllTabs) pagerState.tabs.size - 1 else 0,
+            state = pagerState,
+            key = { index -> pagerState.tabs[index] },
             modifier = modifier
         ) { index ->
-            when (controller.tabs[index]) {
+            when (pagerState.tabs[index]) {
                 MAIN -> CodeforcesCommunityMainPage(controller, newEntriesState)
                 TOP -> CodeforcesCommunityTopPage(controller, newEntriesState)
                 RECENT -> CodeforcesCommunityRecentPage(controller = controller)
@@ -132,17 +133,18 @@ private fun CodeforcesPagerHeader(
             )
         }
 
+        val pagerState = controller.pagerState
         CommunityTabRow(
             modifier = Modifier.fillMaxSize(),
-            pagerState = controller.pagerState
+            pagerState = pagerState
         ) {
-            controller.tabs.forEach { title ->
+            pagerState.tabs.forEach { title ->
                 CodeforcesCommunityTab(
                     tab = title,
                     controller = controller,
                     newEntriesState = newEntriesState,
                     modifier = Modifier.clickableNoRipple {
-                        animationScope.launch { controller.scrollTo(title) }
+                        animationScope.launch { pagerState.scrollTo(title) }
                     }
                 )
             }
@@ -160,12 +162,13 @@ private fun CodeforcesCommunityTab(
     val loadingStatus by controller.loadingStatusState(tab)
     val counters by controller.newEntryCountersState(tab, newEntriesState)
 
+    val pagerState = controller.pagerState
     CodeforcesCommunityTab(
         tab = tab,
-        index = controller.tabs.indexOf(tab),
+        index = pagerState.tabs.indexOf(tab),
         loadingStatus = loadingStatus,
-        badgeCount = counters?.toBadgeCounter(controller, tab),
-        pagerState = controller.pagerState,
+        badgeCount = counters?.toBadgeCounter(pagerState, tab),
+        pagerState = pagerState,
         modifier = modifier
     )
 }
@@ -194,10 +197,10 @@ private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
 }
 
 private fun NewEntryTypeCounters.toBadgeCounter(
-    controller: CodeforcesCommunityController,
+    pagerState: CodeforcesCommunityPagerState,
     tab: CodeforcesTab
 ): Int =
-    if (controller.currentTab == tab) seenCount + unseenCount
+    if (pagerState.currentTab == tab) seenCount + unseenCount
     else unseenCount
 
 @Composable

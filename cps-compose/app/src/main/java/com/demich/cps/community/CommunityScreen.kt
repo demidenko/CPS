@@ -55,9 +55,11 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         lostEnabled = specs.lostEnabled
     )
 
-    screenTitle = remember(controller) {
+    val pagerState = controller.pagerState
+
+    screenTitle = remember(pagerState) {
         ScreenTitleState {
-            cpsScreenTitleOf("community", "codeforces", controller.currentTab.name)
+            cpsScreenTitleOf("community", "codeforces", pagerState.currentTab.name)
         }
     }
 
@@ -96,11 +98,12 @@ private fun communityBottomBarBuilder(
 ): AdditionalBottomBarBuilder = {
     val context = context
 
-    CodeforcesCommunityBottomBar(controller = controller)
+    val pagerState = controller.pagerState
+    CodeforcesCommunityBottomBar(pagerState = pagerState)
 
     val loadingStatus by controller.loadingStatusState()
     CPSReloadingButton(loadingStatus = loadingStatus) {
-        controller.reload(tabs = controller.visitedTabs, context = context)
+        controller.reload(tabs = pagerState.visitedTabs, context = context)
     }
 }
 
