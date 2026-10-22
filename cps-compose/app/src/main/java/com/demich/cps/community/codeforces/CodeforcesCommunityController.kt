@@ -22,7 +22,6 @@ import com.demich.cps.workers.isRunning
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 
@@ -50,7 +49,7 @@ fun rememberCodeforcesCommunityController(
             pagerData = CodeforcesCommunityPagerData(
                 selectedTab = defaultTab,
                 topPageType = BlogEntries,
-                recentPageType = CodeforcesCommunityPagerState.RecentPageType.RecentFeed
+                recentPageType = RecentFeed
             )
         )
     }
@@ -61,13 +60,6 @@ fun rememberCodeforcesCommunityController(
 
     return controller
 }
-
-@Serializable
-data class CodeforcesCommunityPagerData(
-    val selectedTab: CodeforcesTab,
-    val topPageType: CodeforcesCommunityPagerState.TopPageType,
-    val recentPageType: CodeforcesCommunityPagerState.RecentPageType
-)
 
 @Stable
 class CodeforcesCommunityController(

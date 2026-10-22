@@ -18,3 +18,10 @@ class CodeforcesCommunityPagerState {
         data class BlogEntryRecentComments(val blogEntryId: Int) : RecentPageType
     }
 }
+
+@Serializable
+data class CodeforcesCommunityPagerData(
+    val selectedTab: CodeforcesTab,
+    val topPageType: CodeforcesCommunityPagerState.TopPageType,
+    val recentPageType: CodeforcesCommunityPagerState.RecentPageType
+)
