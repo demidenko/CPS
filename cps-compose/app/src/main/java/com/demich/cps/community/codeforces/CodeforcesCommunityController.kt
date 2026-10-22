@@ -50,7 +50,7 @@ fun rememberCodeforcesCommunityController(
             pagerData = CodeforcesCommunityPagerData(
                 selectedTab = defaultTab,
                 topPageType = BlogEntries,
-                recentPageType = CodeforcesCommunityController.RecentPageType.RecentFeed
+                recentPageType = CodeforcesCommunityPagerState.RecentPageType.RecentFeed
             )
         )
     }
@@ -65,8 +65,8 @@ fun rememberCodeforcesCommunityController(
 @Serializable
 data class CodeforcesCommunityPagerData(
     val selectedTab: CodeforcesTab,
-    val topPageType: CodeforcesCommunityController.TopPageType,
-    val recentPageType: CodeforcesCommunityController.RecentPageType
+    val topPageType: CodeforcesCommunityPagerState.TopPageType,
+    val recentPageType: CodeforcesCommunityPagerState.RecentPageType
 )
 
 @Stable
@@ -106,20 +106,6 @@ class CodeforcesCommunityController(
 
     var topPageType by mutableStateOf(pagerData.topPageType)
     var recentPageType by mutableStateOf(pagerData.recentPageType)
-
-    enum class TopPageType {
-        BlogEntries, Comments
-    }
-
-    @Serializable
-    sealed interface RecentPageType {
-        @Serializable
-        data object RecentFeed : RecentPageType
-        @Serializable
-        data object RecentComments : RecentPageType
-        @Serializable
-        data class BlogEntryRecentComments(val blogEntryId: Int) : RecentPageType
-    }
 }
 
 @Composable

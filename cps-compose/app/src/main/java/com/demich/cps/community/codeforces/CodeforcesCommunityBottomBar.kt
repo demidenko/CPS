@@ -1,8 +1,8 @@
 package com.demich.cps.community.codeforces
 
 import androidx.compose.runtime.Composable
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.RecentPageType
-import com.demich.cps.community.codeforces.CodeforcesCommunityController.TopPageType
+import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState.RecentPageType
+import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState.TopPageType
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 
