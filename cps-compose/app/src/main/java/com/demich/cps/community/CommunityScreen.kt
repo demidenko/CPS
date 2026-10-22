@@ -2,6 +2,8 @@ package com.demich.cps.community
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
@@ -10,7 +12,6 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.touchFlows
 import com.demich.cps.community.follow.followRepository
@@ -26,6 +27,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberRunBlocking
 
@@ -149,3 +151,7 @@ private fun communityMenuBuilder(
         )
     }
 }
+
+@Composable
+private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<LoadingStatus?> =
+    remember { flowOfLoadingStatus() }.collectAsState(initial = null)

@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,12 +30,16 @@ import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
+import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.NewEntryTypeCounters
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
 import com.demich.cps.utils.newEntriesCountersBy
 import com.demich.cps.utils.stateOfNull
+import com.demich.cps.workers.CodeforcesLostRecentWorker
+import com.demich.cps.workers.isRunning
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 enum class CodeforcesTab {
@@ -76,6 +81,21 @@ fun CodeforcesReloadablePage(
         onRefresh = { backgroundLoader.reload(tab = tab, context = context) },
         content = content
     )
+}
+
+@Composable
+private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(tab: CodeforcesTab): State<LoadingStatus> {
+    if (tab == LOST) {
+        val context = context
+        return remember {
+            CodeforcesLostRecentWorker.getWork(context)
+                .flowOfWorkInfo()
+                .map { if (it.isRunning) LoadingStatus.LOADING else PENDING }
+        }.collectAsStateWithLifecycle(initialValue = PENDING)
+    }
+
+    return remember(tab) { flowOfLoadingStatus(tab) }
+        .collectAsState(initial = PENDING) //TODO: be sure this fake is ok
 }
 
 @Composable
