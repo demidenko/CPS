@@ -3,8 +3,10 @@ package com.demich.cps.community
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
+import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.loadingStatusState
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
@@ -78,7 +80,8 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
     )
 
     bottomBar = communityBottomBarBuilder(
-        controller = controller
+        pagerState = pagerState,
+        backgroundLoader = controller
     )
 }
 
@@ -94,17 +97,20 @@ private fun CommunityScreen(
 }
 
 private fun communityBottomBarBuilder(
-    controller: CodeforcesCommunityController
+    pagerState: CodeforcesCommunityPagerState,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader
 ): AdditionalBottomBarBuilder = {
     val context = context
 
-    val pagerState = controller.pagerState
     CodeforcesCommunityBottomBar(pagerState = pagerState)
 
-    val loadingStatus by controller.loadingStatusState()
-    CPSReloadingButton(loadingStatus = loadingStatus) {
-        controller.reload(tabs = pagerState.visitedTabs, context = context)
-    }
+    val loadingStatus by backgroundLoader.loadingStatusState()
+    CPSReloadingButton(
+        loadingStatus = loadingStatus,
+        onClick = {
+            backgroundLoader.reload(tabs = pagerState.visitedTabs, context = context)
+        }
+    )
 }
 
 private fun communityMenuBuilder(
