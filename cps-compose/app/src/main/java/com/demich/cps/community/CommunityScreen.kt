@@ -1,6 +1,7 @@
 package com.demich.cps.community
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
@@ -8,8 +9,10 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
+import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.community.codeforces.loadingStatusState
-import com.demich.cps.community.codeforces.rememberCodeforcesCommunityController
+import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
+import com.demich.cps.community.codeforces.touchFlows
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
@@ -34,12 +37,15 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     val context = context
     val followRepository = remember { context.followRepository }
 
+    val viewModel = codeforcesCommunityViewModel()
+
     // TODO: collectUntilFirst make bottombar glitch
     val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
 
     NavContentCommunityScreen(
         specs = specs,
         followRepository = followRepository,
+        backgroundLoader = viewModel,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = onOpenFollowList
     )
@@ -49,15 +55,26 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
 private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     specs: CodeforcesCommunityScreenSpecs,
     followRepository: CodeforcesFollowRepository,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
 ) {
-    val controller = rememberCodeforcesCommunityController(
+    val pagerState = rememberCodeforcesCommunityPagerState(
         defaultTab = specs.defaultTab,
         lostEnabled = specs.lostEnabled
     )
 
-    val pagerState = controller.pagerState
+    val controller = remember(pagerState, backgroundLoader) {
+        CodeforcesCommunityController(
+            backgroundLoader = backgroundLoader,
+            pagerState = pagerState
+        )
+    }
+
+    val context = context
+    SideEffect(controller) {
+        controller.touchFlows(context)
+    }
 
     screenTitle = remember(pagerState) {
         ScreenTitleState {

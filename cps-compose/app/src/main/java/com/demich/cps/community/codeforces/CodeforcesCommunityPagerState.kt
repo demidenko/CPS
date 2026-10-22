@@ -1,12 +1,17 @@
 package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 class CodeforcesCommunityPagerState(
     val tabs: List<CodeforcesTab>,
@@ -58,4 +63,50 @@ data class CodeforcesCommunityPagerData(
     val selectedTab: CodeforcesTab,
     val topPageType: CodeforcesCommunityPagerState.TopPageType,
     val recentPageType: CodeforcesCommunityPagerState.RecentPageType
+)
+
+@Composable
+fun rememberCodeforcesCommunityPagerState(
+    defaultTab: CodeforcesTab,
+    lostEnabled: Boolean
+): CodeforcesCommunityPagerState {
+    val tabs = remember(lostEnabled) {
+        buildList<CodeforcesTab> {
+            add(MAIN)
+            add(TOP)
+            add(RECENT)
+            if (lostEnabled) add(LOST)
+        }
+    }
+
+    val pagerState = rememberSaveable(saver = codeforcesPagerSaver(tabs = tabs)) {
+        CodeforcesCommunityPagerState(
+            tabs = tabs,
+            pagerData = CodeforcesCommunityPagerData(
+                selectedTab = defaultTab,
+                topPageType = BlogEntries,
+                recentPageType = RecentFeed
+            )
+        )
+    }
+
+    return pagerState
+}
+
+private fun codeforcesPagerSaver(
+    tabs: List<CodeforcesTab>
+) = Saver<CodeforcesCommunityPagerState, String>(
+    save = {
+        Json.encodeToString(CodeforcesCommunityPagerData(
+            selectedTab = it.currentTab,
+            topPageType = it.topPageType,
+            recentPageType = it.recentPageType
+        ))
+    },
+    restore = {
+        CodeforcesCommunityPagerState(
+            tabs = tabs,
+            pagerData = Json.decodeFromString(it)
+        )
+    }
 )
