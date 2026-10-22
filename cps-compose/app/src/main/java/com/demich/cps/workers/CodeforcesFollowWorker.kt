@@ -41,10 +41,8 @@ class CodeforcesFollowWorker(
     override suspend fun runWork() {
         val repository = context.followRepository
 
-        //update userInfo to keep fresh lastOnlineTime
+        // update userInfo to keep fresh lastOnlineTime
         val profiles = repository.updateProfiles()
-
-        val blogs = repository.blogs()
 
         val lastOnlineItem = CodeforcesFollowWorkerStorage(context).usersLastOnlineTime
 
@@ -55,7 +53,9 @@ class CodeforcesFollowWorker(
             safeToSkipDuration = 24.hours
         )
 
-        val blogsToUpdate = skipper.filter(blogs)
+        val blogsToUpdate = repository.blogs().filter {
+            it.blogSize == null || !skipper.canSkip(it)
+        }
 
         blogsToUpdate
             .sortedByDescending { it.userLastOnlineTimeOrNull() ?: Instant.DISTANT_PAST }
@@ -84,12 +84,7 @@ private class SkippingHeuristic(
     val currentTime: Instant,
     val safeToSkipDuration: Duration
 ) {
-    fun filter(blogs: Collection<CodeforcesUserBlogInfo>): List<CodeforcesUserBlogInfo> {
-        if (blogs.isEmpty()) return emptyList()
-        return blogs.filter { it.blogSize == null || !canSkip(it) }
-    }
-
-    private fun canSkip(blog: CodeforcesUserBlogInfo): Boolean {
+    fun canSkip(blog: CodeforcesUserBlogInfo): Boolean {
         val profile = profiles[blog.handle]
 
         // can't just check blog.userLastOnlineTime because of possible ProfileResult.Failed in updateUsers
