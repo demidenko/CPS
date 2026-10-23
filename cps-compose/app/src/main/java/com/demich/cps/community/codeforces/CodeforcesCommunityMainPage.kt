@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityMainPage(
@@ -30,7 +29,6 @@ private fun CodeforcesCommunityMainList(
     pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
-    val context = context
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
@@ -40,7 +38,7 @@ private fun CodeforcesCommunityMainList(
         showNewEntries = true
     )
 
-    val blogEntries by backgroundLoader.flowOfMainBlogEntries(context).collectAsState()
+    val blogEntries by backgroundLoader.flowOfMainBlogEntries().collectAsState()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,

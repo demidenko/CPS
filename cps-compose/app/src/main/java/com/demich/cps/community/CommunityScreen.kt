@@ -11,6 +11,8 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
+import com.demich.cps.community.codeforces.CodeforcesCommunityViewModel
+import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
 import com.demich.cps.community.follow.followRepository
@@ -36,17 +38,20 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     onOpenFollowList: () -> Unit
 ) {
     val context = context
-    val followRepository = remember { context.followRepository }
 
     val viewModel = codeforcesCommunityViewModel()
+    val backgroundLoader = remember(viewModel) {
+        CodeforcesCommunityBackgroundLoader(viewModel, context)
+    }
 
     // TODO: collectUntilFirst make bottombar glitch
     val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
 
+    val followRepository = remember { context.followRepository }
     NavContentCommunityScreen(
         specs = specs,
         followRepository = followRepository,
-        backgroundLoader = viewModel,
+        backgroundLoader = backgroundLoader,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = onOpenFollowList
     )
@@ -65,9 +70,8 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         lostEnabled = specs.lostEnabled
     )
 
-    val context = context
     SideEffect(backgroundLoader, pagerState) {
-        backgroundLoader.touchFlows(context = context, pagerState = pagerState)
+        backgroundLoader.touchFlows(pagerState = pagerState)
     }
 
     screenTitle = remember(pagerState) {
@@ -101,15 +105,13 @@ private fun communityBottomBarBuilder(
     pagerState: CodeforcesCommunityPagerState,
     backgroundLoader: CodeforcesCommunityBackgroundLoader
 ): AdditionalBottomBarBuilder = {
-    val context = context
-
     CodeforcesCommunityBottomBar(pagerState = pagerState)
 
     val loadingStatus by backgroundLoader.loadingStatusState()
     CPSReloadingButton(
         loadingStatus = loadingStatus,
         onClick = {
-            backgroundLoader.reload(tabs = pagerState.visitedTabs, context = context)
+            backgroundLoader.reload(tabs = pagerState.visitedTabs)
         }
     )
 }
@@ -139,20 +141,48 @@ private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<Load
     remember { flowOfLoadingStatus() }.collectAsState(initial = null)
 
 private fun CodeforcesCommunityBackgroundLoader.touchFlows(
-    context: Context,
     pagerState: CodeforcesCommunityPagerState
 ) {
     pagerState.visitedTabs.forEach { tab ->
         when (tab) {
-            MAIN -> flowOfMainBlogEntries(context)
+            MAIN -> flowOfMainBlogEntries()
             TOP -> {
                 when (pagerState.topPageType) {
-                    BlogEntries -> flowOfTopBlogEntries(context)
-                    Comments -> flowOfTopComments(context)
+                    BlogEntries -> flowOfTopBlogEntries()
+                    Comments -> flowOfTopComments()
                 }
             }
-            RECENT -> flowOfRecent(context)
+            RECENT -> flowOfRecent()
             else -> { }
         }
     }
+}
+
+private fun CodeforcesCommunityBackgroundLoader(
+    viewModel: CodeforcesCommunityViewModel,
+    context: Context
+): CodeforcesCommunityBackgroundLoader = object : CodeforcesCommunityBackgroundLoader {
+    override fun flowOfLoadingStatus() =
+        viewModel.flowOfLoadingStatus()
+
+    override fun flowOfLoadingStatus(tab: CodeforcesTab) =
+        viewModel.flowOfLoadingStatus(tab = tab)
+
+    override fun reload(tabs: List<CodeforcesTab>) =
+        viewModel.reload(tabs = tabs, context = context)
+
+    override fun flowOfMainBlogEntries() =
+        viewModel.flowOfMainBlogEntries(context = context)
+
+    override fun flowOfTopBlogEntries() =
+        viewModel.flowOfTopBlogEntries(context = context)
+
+    override fun flowOfTopComments() =
+        viewModel.flowOfTopComments(context = context)
+
+    override fun flowOfRecent() =
+        viewModel.flowOfRecent(context = context)
+
+    override fun updateFollowUsersInfo(repository: CodeforcesFollowRepository) =
+        viewModel.updateFollowUsersInfo(repository = repository)
 }

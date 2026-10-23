@@ -36,15 +36,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun codeforcesCommunityViewModel(): CodeforcesCommunityViewModel = sharedViewModel()
 
-class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityBackgroundLoader {
+class CodeforcesCommunityViewModel: ViewModel() {
 
     private fun Collection<CodeforcesDataLoader<*>>.flowOfLoadingStatus() =
         map { it.flowOfLoadingStatus() }.combine()
 
-    override fun flowOfLoadingStatus(): Flow<LoadingStatus> =
+    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         [mainBlogEntries, topBlogEntries, topComments, recentActions].flowOfLoadingStatus()
 
-    override fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus> {
+    fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus> {
         return when (tab) {
             MAIN -> mainBlogEntries.flowOfLoadingStatus()
             TOP -> [topBlogEntries, topComments].flowOfLoadingStatus()
@@ -54,16 +54,16 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityBackgroundLo
     }
 
     private val mainBlogEntries = dataLoader { it.getMainBlogEntries() }
-    override fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
+    fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
 
     private val topBlogEntries = dataLoader { it.getTopBlogEntries() }
-    override fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
+    fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
 
     private val topComments = dataLoader { it.getTopComments() }
-    override fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
+    fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
 
     private val recentActions = dataLoader { it.getRecentFeed() }
-    override fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
+    fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
 
     private fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {
         when (tab) {
@@ -78,7 +78,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityBackgroundLo
         }
     }
 
-    override fun reload(tabs: List<CodeforcesTab>, context: Context) {
+    fun reload(tabs: List<CodeforcesTab>, context: Context) {
         val provider = viewModelScope.async(
             context = Dispatchers.Default,
             start = LAZY,
@@ -90,7 +90,7 @@ class CodeforcesCommunityViewModel: ViewModel(), CodeforcesCommunityBackgroundLo
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
         field = MutableStateFlow(PENDING)
 
-    override fun updateFollowUsersInfo(repository: CodeforcesFollowRepository) {
+    fun updateFollowUsersInfo(repository: CodeforcesFollowRepository) {
         viewModelScope.launch(Dispatchers.Default) {
             if (!flowOfFollowUpdateLoadingStatus.compareAndSet(PENDING, LOADING)) return@launch
             repository.updateProfiles()

@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityTopPage(
@@ -44,7 +43,6 @@ private fun CodeforcesCommunityTopBlogEntries(
     pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
-    val context = context
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
@@ -54,7 +52,7 @@ private fun CodeforcesCommunityTopBlogEntries(
         showNewEntries = false
     )
 
-    val blogEntries by backgroundLoader.flowOfTopBlogEntries(context).collectAsState()
+    val blogEntries by backgroundLoader.flowOfTopBlogEntries().collectAsState()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,
@@ -68,8 +66,7 @@ private fun CodeforcesCommunityTopBlogEntries(
 private fun CodeforcesCommunityTopComments(
     backgroundLoader: CodeforcesCommunityBackgroundLoader
 ) {
-    val context = context
-    val comments by backgroundLoader.flowOfTopComments(context).collectAsState()
+    val comments by backgroundLoader.flowOfTopComments().collectAsState()
     CodeforcesComments(
         comments = comments,
         modifier = Modifier.fillMaxSize()

@@ -20,15 +20,13 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.BackHandler
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityRecentPage(
     backgroundLoader: CodeforcesCommunityBackgroundLoader,
     pagerState: CodeforcesCommunityPagerState,
 ) {
-    val context = context
-    val recent by backgroundLoader.flowOfRecent(context).collectAsState()
+    val recent by backgroundLoader.flowOfRecent().collectAsState()
     val grouped by remember {
         derivedStateOf {
             recent?.grouped()

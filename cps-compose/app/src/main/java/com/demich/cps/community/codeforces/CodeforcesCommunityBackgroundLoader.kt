@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
@@ -13,16 +12,16 @@ interface CodeforcesCommunityBackgroundLoader {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
     fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus>
 
-    fun reload(tabs: List<CodeforcesTab>, context: Context)
+    fun reload(tabs: List<CodeforcesTab>)
 
-    fun flowOfMainBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
-    fun flowOfTopBlogEntries(context: Context): StateFlow<List<CodeforcesWebBlogEntry>?>
-    fun flowOfTopComments(context: Context): StateFlow<List<CodeforcesWebComment>?>
-    fun flowOfRecent(context: Context): StateFlow<CodeforcesRecentFeed?>
+    fun flowOfMainBlogEntries(): StateFlow<List<CodeforcesWebBlogEntry>?>
+    fun flowOfTopBlogEntries(): StateFlow<List<CodeforcesWebBlogEntry>?>
+    fun flowOfTopComments(): StateFlow<List<CodeforcesWebComment>?>
+    fun flowOfRecent(): StateFlow<CodeforcesRecentFeed?>
 
     fun updateFollowUsersInfo(repository: CodeforcesFollowRepository)
 }
 
-fun CodeforcesCommunityBackgroundLoader.reload(tab: CodeforcesTab, context: Context) {
-    reload(tabs = listOf(tab), context = context)
+fun CodeforcesCommunityBackgroundLoader.reload(tab: CodeforcesTab) {
+    reload(tabs = listOf(tab))
 }

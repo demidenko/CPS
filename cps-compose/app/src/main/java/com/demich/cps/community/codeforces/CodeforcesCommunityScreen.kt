@@ -79,11 +79,10 @@ fun CodeforcesReloadablePage(
     tab: CodeforcesTab,
     content: @Composable () -> Unit
 ) {
-    val context = context
     val loadingStatus by backgroundLoader.loadingStatusState(tab = tab)
     CPSSwipeRefreshBox(
         isRefreshing = { loadingStatus == LOADING },
-        onRefresh = { backgroundLoader.reload(tab = tab, context = context) },
+        onRefresh = { backgroundLoader.reload(tab = tab) },
         content = content
     )
 }
@@ -224,7 +223,7 @@ private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
 
 private fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
     val flow = when (tab) {
-        MAIN -> flowOfMainBlogEntries(context)
+        MAIN -> flowOfMainBlogEntries()
         LOST -> flowOfLostBlogEntries(context)
         else -> return null
     }
