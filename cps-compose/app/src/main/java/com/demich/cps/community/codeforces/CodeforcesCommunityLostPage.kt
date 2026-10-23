@@ -32,27 +32,28 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun CodeforcesCommunityLostPage(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
     val context = context
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isListVisible = { controller.pagerState.isTabVisible(tab = LOST) },
+        isListVisible = { pagerState.isTabVisible(tab = LOST) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true
     )
 
-    val topIdsState = remember(controller) {
-        controller.flowOfTopBlogEntries(context).map { blogEntries ->
+    val topIdsState = remember(backgroundLoader) {
+        backgroundLoader.flowOfTopBlogEntries(context).map { blogEntries ->
             blogEntries?.mapToSet { it.id }
         }
     }.collectAsState(initial = null)
 
     val blogEntries by remember {
-        controller.flowOfLostBlogEntries(context)
+        backgroundLoader.flowOfLostBlogEntries(context)
     }.collectAsStateWithLifecycle(initialValue = null)
 
     CodeforcesBlogEntriesFollowAddable(

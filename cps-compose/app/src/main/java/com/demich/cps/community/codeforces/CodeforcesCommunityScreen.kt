@@ -119,7 +119,7 @@ private fun CodeforcesPager(
                 MAIN -> CodeforcesCommunityMainPage(controller, pagerState, newEntriesState)
                 TOP -> CodeforcesCommunityTopPage(controller, pagerState, newEntriesState)
                 RECENT -> CodeforcesCommunityRecentPage(controller, pagerState)
-                LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
+                LOST -> CodeforcesCommunityLostPage(controller, pagerState, newEntriesState)
             }
         }
     }
