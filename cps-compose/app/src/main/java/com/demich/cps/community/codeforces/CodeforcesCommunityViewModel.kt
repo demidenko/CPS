@@ -78,11 +78,11 @@ class CodeforcesCommunityViewModel: ViewModel() {
         }
     }
 
-    fun reload(tabs: List<CodeforcesTab>, context: Context) {
+    fun reload(tabs: List<CodeforcesTab>, provider: suspend () -> CodeforcesPageContentProvider) {
         val provider = viewModelScope.async(
             context = Dispatchers.Default,
             start = LAZY,
-            block = { defaultProvider(context) }
+            block = { provider() }
         )
         tabs.forEach { reload(tab = it, provider = provider::await) }
     }

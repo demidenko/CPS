@@ -23,6 +23,8 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
+import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
@@ -159,6 +161,9 @@ private fun CodeforcesCommunityBackgroundLoader(
     viewModel: CodeforcesCommunityViewModel,
     context: Context
 ): CodeforcesCommunityBackgroundLoader = object : CodeforcesCommunityBackgroundLoader {
+    val locale = context.settingsCommunity.codeforcesLocale
+    suspend fun provider(): CodeforcesPageContentProvider = CodeforcesClient(locale = locale())
+
     override fun flowOfLoadingStatus() =
         viewModel.flowOfLoadingStatus()
 
@@ -166,7 +171,7 @@ private fun CodeforcesCommunityBackgroundLoader(
         viewModel.flowOfLoadingStatus(tab = tab)
 
     override fun reload(tabs: List<CodeforcesTab>) =
-        viewModel.reload(tabs = tabs, context = context)
+        viewModel.reload(tabs = tabs, provider = ::provider)
 
     override fun flowOfMainBlogEntries() =
         viewModel.flowOfMainBlogEntries(context = context)
