@@ -12,21 +12,26 @@ import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityTopPage(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(backgroundLoader = controller, tab = TOP) {
-        when (val key = controller.pagerState.topPageType) {
+    CodeforcesReloadablePage(backgroundLoader = backgroundLoader, tab = TOP) {
+        when (val key = pagerState.topPageType) {
             BlogEntries -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
-                    CodeforcesCommunityTopBlogEntries(controller, newEntriesState)
+                    CodeforcesCommunityTopBlogEntries(
+                        backgroundLoader = backgroundLoader,
+                        pagerState = pagerState,
+                        newEntriesState = newEntriesState
+                    )
                 }
             }
             Comments -> {
                 saveableStateHolder.SaveableStateProvider(key = key) {
-                    CodeforcesCommunityTopComments(controller = controller)
+                    CodeforcesCommunityTopComments(backgroundLoader = backgroundLoader)
                 }
             }
         }
@@ -35,20 +40,21 @@ fun CodeforcesCommunityTopPage(
 
 @Composable
 private fun CodeforcesCommunityTopBlogEntries(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
     val context = context
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isListVisible = { controller.pagerState.isTabVisible(tab = TOP) },
+        isListVisible = { pagerState.isTabVisible(tab = TOP) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = false
     )
 
-    val blogEntries by controller.flowOfTopBlogEntries(context).collectAsState()
+    val blogEntries by backgroundLoader.flowOfTopBlogEntries(context).collectAsState()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,
@@ -60,10 +66,10 @@ private fun CodeforcesCommunityTopBlogEntries(
 
 @Composable
 private fun CodeforcesCommunityTopComments(
-    controller: CodeforcesCommunityController
+    backgroundLoader: CodeforcesCommunityBackgroundLoader
 ) {
     val context = context
-    val comments by controller.flowOfTopComments(context).collectAsState()
+    val comments by backgroundLoader.flowOfTopComments(context).collectAsState()
     CodeforcesComments(
         comments = comments,
         modifier = Modifier.fillMaxSize()
