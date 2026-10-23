@@ -51,7 +51,7 @@ enum class CodeforcesTab {
 @Composable
 fun CodeforcesCommunityScreen(
     controller: CodeforcesCommunityController,
-    renderAllTabs: Boolean
+    renderAllPages: Boolean
 ) {
     val newEntriesState = rememberNewEntriesState()
     Column {
@@ -62,7 +62,7 @@ fun CodeforcesCommunityScreen(
         )
         CodeforcesPager(
             controller = controller,
-            renderAllTabs = renderAllTabs,
+            renderAllPages = renderAllPages,
             newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxSize()
         )
@@ -103,14 +103,14 @@ private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(tab: Codeforc
 @Composable
 private fun CodeforcesPager(
     controller: CodeforcesCommunityController,
-    renderAllTabs: Boolean,
+    renderAllPages: Boolean,
     newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
     val pagerState = controller.pagerState
     ProvideSystemTimeEachMinute {
         HorizontalPager(
-            beyondViewportPageCount = if (renderAllTabs) pagerState.tabs.size - 1 else 0,
+            beyondViewportPageCount = if (renderAllPages) pagerState.tabs.size - 1 else 0,
             state = pagerState,
             key = { index -> pagerState.tabs[index] },
             modifier = modifier

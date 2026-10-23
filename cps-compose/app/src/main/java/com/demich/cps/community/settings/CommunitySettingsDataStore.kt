@@ -33,7 +33,7 @@ class CommunitySettingsDataStore(context: Context): ItemizedDataStore(context.co
 
     val enabledNewsFeeds = itemEnumSet<CommunityNewsFeed>(name = "news_feeds")
 
-    val renderAllTabs = itemBoolean(name = "tabs_render_all", defaultValue = true)
+    val renderAllPages = itemBoolean(name = "render_all_pages", defaultValue = true)
 }
 
 val CommunitySettingsDataStore.codeforcesScreenSpecs
@@ -42,7 +42,7 @@ val CommunitySettingsDataStore.codeforcesScreenSpecs
             defaultTab = codeforcesDefaultTab.value,
             followEnabled = codeforcesFollowEnabled.value,
             lostEnabled = codeforcesLostEnabled.value,
-            renderAllTabs = renderAllTabs.value
+            renderAllPages = renderAllPages.value
         )
     }
 
@@ -50,7 +50,7 @@ data class CodeforcesCommunityScreenSpecs(
     val defaultTab: CodeforcesTab,
     val followEnabled: Boolean,
     val lostEnabled: Boolean,
-    val renderAllTabs: Boolean
+    val renderAllPages: Boolean
 )
 
 fun CommunitySettingsDataStore.flowOfNotificationsRequired() =

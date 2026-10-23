@@ -91,7 +91,7 @@ private fun CommunitySettingsScreen() {
                 title = "dev",
                 painter = rememberVectorPainter(image = CPSIcons.Development)
             ) {
-                RenderAllTabs()
+                RenderAllPages()
             }
         }
     }
@@ -248,9 +248,9 @@ private fun NewsFeedsSettingsItem() {
 
 @Composable
 context(scope: SettingsContainerScope, storage: CommunitySettingsDataStore)
-private fun RenderAllTabs() {
+private fun RenderAllPages() {
     SwitchByItem(
-        item = storage.renderAllTabs,
+        item = storage.renderAllPages,
         title = "Render all tabs"
     )
 }

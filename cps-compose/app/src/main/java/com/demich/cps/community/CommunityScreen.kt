@@ -95,7 +95,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
 
     CommunityScreen(
         controller = controller,
-        renderAllTabs = specs.renderAllTabs
+        renderAllPages = specs.renderAllPages
     )
 
     bottomBar = communityBottomBarBuilder(
@@ -107,11 +107,11 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
 @Composable
 private fun CommunityScreen(
     controller: CodeforcesCommunityController,
-    renderAllTabs: Boolean
+    renderAllPages: Boolean
 ) {
     CodeforcesCommunityScreen(
         controller = controller,
-        renderAllTabs = renderAllTabs
+        renderAllPages = renderAllPages
     )
 }
 
