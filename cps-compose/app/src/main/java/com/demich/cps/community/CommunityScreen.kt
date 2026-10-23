@@ -1,5 +1,6 @@
 package com.demich.cps.community
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
@@ -13,7 +14,6 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
-import com.demich.cps.community.codeforces.touchFlows
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
@@ -75,7 +75,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
 
     val context = context
     SideEffect(controller) {
-        controller.touchFlows(context)
+        controller.touchFlows(context = context, pagerState = pagerState)
     }
 
     screenTitle = remember(pagerState) {
@@ -155,3 +155,22 @@ private fun communityMenuBuilder(
 @Composable
 private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<LoadingStatus?> =
     remember { flowOfLoadingStatus() }.collectAsState(initial = null)
+
+private fun CodeforcesCommunityBackgroundLoader.touchFlows(
+    context: Context,
+    pagerState: CodeforcesCommunityPagerState
+) {
+    pagerState.visitedTabs.forEach { tab ->
+        when (tab) {
+            MAIN -> flowOfMainBlogEntries(context)
+            TOP -> {
+                when (pagerState.topPageType) {
+                    BlogEntries -> flowOfTopBlogEntries(context)
+                    Comments -> flowOfTopComments(context)
+                }
+            }
+            RECENT -> flowOfRecent(context)
+            else -> { }
+        }
+    }
+}
