@@ -24,20 +24,20 @@ import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityRecentPage(
-    controller: CodeforcesCommunityController
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
 ) {
     val context = context
-    val recent by controller.flowOfRecent(context).collectAsState()
+    val recent by backgroundLoader.flowOfRecent(context).collectAsState()
     val grouped by remember {
         derivedStateOf {
             recent?.grouped()
         }
     }
 
-    val pagerState = controller.pagerState
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    CodeforcesReloadablePage(backgroundLoader = controller, tab = RECENT) {
+    CodeforcesReloadablePage(backgroundLoader = backgroundLoader, tab = RECENT) {
         when (val type = pagerState.recentPageType) {
             is RecentPageType.BlogEntryRecentComments -> {
                 val blogEntryId = type.blogEntryId

@@ -118,7 +118,7 @@ private fun CodeforcesPager(
             when (pagerState.tabs[index]) {
                 MAIN -> CodeforcesCommunityMainPage(controller, pagerState, newEntriesState)
                 TOP -> CodeforcesCommunityTopPage(controller, pagerState, newEntriesState)
-                RECENT -> CodeforcesCommunityRecentPage(controller = controller)
+                RECENT -> CodeforcesCommunityRecentPage(controller, pagerState)
                 LOST -> CodeforcesCommunityLostPage(controller, newEntriesState)
             }
         }
