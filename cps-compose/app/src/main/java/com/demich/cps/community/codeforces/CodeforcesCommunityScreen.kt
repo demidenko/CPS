@@ -56,7 +56,8 @@ fun CodeforcesCommunityScreen(
     val newEntriesState = rememberNewEntriesState()
     Column {
         CodeforcesPagerHeader(
-            controller = controller,
+            backgroundLoader = controller,
+            pagerState = controller.pagerState,
             newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxWidth()
         )
@@ -128,7 +129,8 @@ private fun CodeforcesPager(
 
 @Composable
 private fun CodeforcesPagerHeader(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
@@ -155,7 +157,6 @@ private fun CodeforcesPagerHeader(
             )
         }
 
-        val pagerState = controller.pagerState
         CommunityTabRow(
             modifier = Modifier.fillMaxSize(),
             pagerState = pagerState
@@ -163,7 +164,8 @@ private fun CodeforcesPagerHeader(
             pagerState.tabs.forEach { title ->
                 CodeforcesCommunityTab(
                     tab = title,
-                    controller = controller,
+                    backgroundLoader = backgroundLoader,
+                    pagerState = pagerState,
                     newEntriesState = newEntriesState,
                     modifier = Modifier.clickableNoRipple {
                         animationScope.launch { pagerState.scrollTo(title) }
@@ -177,14 +179,14 @@ private fun CodeforcesPagerHeader(
 @Composable
 private fun CodeforcesCommunityTab(
     tab: CodeforcesTab,
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
-    val loadingStatus by controller.loadingStatusState(tab)
-    val counters by controller.newEntryCountersState(tab, newEntriesState)
+    val loadingStatus by backgroundLoader.loadingStatusState(tab)
+    val counters by backgroundLoader.newEntryCountersState(tab, newEntriesState)
 
-    val pagerState = controller.pagerState
     CodeforcesCommunityTab(
         tab = tab,
         index = pagerState.tabs.indexOf(tab),
