@@ -48,13 +48,12 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     // TODO: collectUntilFirst make bottombar glitch
     val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
 
-    val followRepository = remember { context.followRepository }
     NavContentCommunityScreen(
         specs = specs,
         backgroundLoader = backgroundLoader,
         onOpenSettings = navigateToSettings,
         onOpenFollowList = {
-            viewModel.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
+            viewModel.updateFollowUsersInfo(repository = context.followRepository) // TODO: not proper place to call?
             navigateToFollowList()
         }
     )
