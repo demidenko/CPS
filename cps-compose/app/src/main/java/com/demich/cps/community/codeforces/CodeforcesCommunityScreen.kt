@@ -1,5 +1,6 @@
 package com.demich.cps.community.codeforces
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import com.demich.cps.utils.newEntriesCountersBy
 import com.demich.cps.utils.stateOfNull
 import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.isRunning
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -214,6 +216,15 @@ private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
             }
         }
     }
+}
+
+private fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
+    val flow = when (tab) {
+        MAIN -> flowOfMainBlogEntries(context)
+        LOST -> flowOfLostBlogEntries(context)
+        else -> return null
+    }
+    return flow.map { it?.map { it.id } ?: [] }
 }
 
 private fun NewEntryTypeCounters.toBadgeCounter(
