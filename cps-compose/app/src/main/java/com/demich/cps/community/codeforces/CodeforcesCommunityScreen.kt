@@ -50,19 +50,21 @@ enum class CodeforcesTab {
 
 @Composable
 fun CodeforcesCommunityScreen(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     renderAllPages: Boolean
 ) {
     val newEntriesState = rememberNewEntriesState()
     Column {
         CodeforcesPagerHeader(
-            backgroundLoader = controller,
-            pagerState = controller.pagerState,
+            backgroundLoader = backgroundLoader,
+            pagerState = pagerState,
             newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxWidth()
         )
         CodeforcesPager(
-            controller = controller,
+            backgroundLoader = backgroundLoader,
+            pagerState = pagerState,
             renderAllPages = renderAllPages,
             newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxSize()
@@ -103,12 +105,12 @@ private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(tab: Codeforc
 
 @Composable
 private fun CodeforcesPager(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     renderAllPages: Boolean,
     newEntriesState: NewEntriesState,
     modifier: Modifier = Modifier
 ) {
-    val pagerState = controller.pagerState
     ProvideSystemTimeEachMinute {
         HorizontalPager(
             beyondViewportPageCount = if (renderAllPages) pagerState.tabs.size - 1 else 0,
@@ -117,10 +119,10 @@ private fun CodeforcesPager(
             modifier = modifier
         ) { index ->
             when (pagerState.tabs[index]) {
-                MAIN -> CodeforcesCommunityMainPage(controller, pagerState, newEntriesState)
-                TOP -> CodeforcesCommunityTopPage(controller, pagerState, newEntriesState)
-                RECENT -> CodeforcesCommunityRecentPage(controller, pagerState)
-                LOST -> CodeforcesCommunityLostPage(controller, pagerState, newEntriesState)
+                MAIN -> CodeforcesCommunityMainPage(backgroundLoader, pagerState, newEntriesState)
+                TOP -> CodeforcesCommunityTopPage(backgroundLoader, pagerState, newEntriesState)
+                RECENT -> CodeforcesCommunityRecentPage(backgroundLoader, pagerState)
+                LOST -> CodeforcesCommunityLostPage(backgroundLoader, pagerState, newEntriesState)
             }
         }
     }
