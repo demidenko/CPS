@@ -1,16 +1,13 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.features.codeforces.follow.database.updateFailedBlogEntries
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.fetchstate.toFetchResultFlow
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
-import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.platforms.utils.codeforces.CodeforcesBlogEntriesPageParser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesCommentsPageParser
 import com.demich.cps.platforms.utils.codeforces.getRecentFeed
@@ -54,16 +51,16 @@ class CodeforcesCommunityViewModel: ViewModel() {
     }
 
     private val mainBlogEntries = dataLoader { it.getMainBlogEntries() }
-    fun flowOfMainBlogEntries(context: Context) = mainBlogEntries.flowOfData(context)
+    fun flowOfMainBlogEntries(provider: suspend () -> CodeforcesPageContentProvider) = mainBlogEntries.flowOfData(provider)
 
     private val topBlogEntries = dataLoader { it.getTopBlogEntries() }
-    fun flowOfTopBlogEntries(context: Context) = topBlogEntries.flowOfData(context)
+    fun flowOfTopBlogEntries(provider: suspend () -> CodeforcesPageContentProvider) = topBlogEntries.flowOfData(provider)
 
     private val topComments = dataLoader { it.getTopComments() }
-    fun flowOfTopComments(context: Context) = topComments.flowOfData(context)
+    fun flowOfTopComments(provider: suspend () -> CodeforcesPageContentProvider) = topComments.flowOfData(provider)
 
     private val recentActions = dataLoader { it.getRecentFeed() }
-    fun flowOfRecent(context: Context) = recentActions.flowOfData(context)
+    fun flowOfRecent(provider: suspend () -> CodeforcesPageContentProvider) = recentActions.flowOfData(provider)
 
     private fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {
         when (tab) {
@@ -99,9 +96,6 @@ class CodeforcesCommunityViewModel: ViewModel() {
         }
     }
 }
-
-private suspend fun defaultProvider(context: Context): CodeforcesPageContentProvider =
-    CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale())
 
 private class CodeforcesDataLoader<T>(
     val scope: CoroutineScope,
@@ -142,9 +136,6 @@ private class CodeforcesDataLoader<T>(
         }
     }
 }
-
-private fun <T> CodeforcesDataLoader<T>.flowOfData(context: Context): StateFlow<T> =
-    flowOfData(provider = { defaultProvider(context)} )
 
 private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)

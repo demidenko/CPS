@@ -142,6 +142,7 @@ private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<Load
 private fun CodeforcesCommunityBackgroundLoader.touchFlows(
     pagerState: CodeforcesCommunityPagerState
 ) {
+    // TODO: provider factory calls on each instead of one
     pagerState.visitedTabs.forEach { tab ->
         when (tab) {
             MAIN -> flowOfMainBlogEntries()
@@ -174,14 +175,14 @@ private fun CodeforcesCommunityBackgroundLoader(
         viewModel.reload(tabs = tabs, provider = ::provider)
 
     override fun flowOfMainBlogEntries() =
-        viewModel.flowOfMainBlogEntries(context = context)
+        viewModel.flowOfMainBlogEntries(provider = ::provider)
 
     override fun flowOfTopBlogEntries() =
-        viewModel.flowOfTopBlogEntries(context = context)
+        viewModel.flowOfTopBlogEntries(provider = ::provider)
 
     override fun flowOfTopComments() =
-        viewModel.flowOfTopComments(context = context)
+        viewModel.flowOfTopComments(provider = ::provider)
 
     override fun flowOfRecent() =
-        viewModel.flowOfRecent(context = context)
+        viewModel.flowOfRecent(provider = ::provider)
 }
