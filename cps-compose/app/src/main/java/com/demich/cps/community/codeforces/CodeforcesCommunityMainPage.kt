@@ -11,30 +11,36 @@ import com.demich.cps.utils.context
 
 @Composable
 fun CodeforcesCommunityMainPage(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
-    CodeforcesReloadablePage(backgroundLoader = controller, tab = MAIN) {
-        CodeforcesCommunityMainList(controller, newEntriesState)
+    CodeforcesReloadablePage(backgroundLoader = backgroundLoader, tab = MAIN) {
+        CodeforcesCommunityMainList(
+            backgroundLoader = backgroundLoader,
+            pagerState = pagerState,
+            newEntriesState = newEntriesState
+        )
     }
 }
 
 @Composable
 private fun CodeforcesCommunityMainList(
-    controller: CodeforcesCommunityController,
+    backgroundLoader: CodeforcesCommunityBackgroundLoader,
+    pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
     val context = context
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
-        isListVisible = { controller.pagerState.isTabVisible(tab = MAIN) },
+        isListVisible = { pagerState.isTabVisible(tab = MAIN) },
         listState = listState,
         newEntriesState = newEntriesState,
         showNewEntries = true
     )
 
-    val blogEntries by controller.flowOfMainBlogEntries(context).collectAsState()
+    val blogEntries by backgroundLoader.flowOfMainBlogEntries(context).collectAsState()
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,
