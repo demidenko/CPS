@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
-import com.demich.cps.community.codeforces.CodeforcesCommunityController
 import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
 import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
@@ -66,16 +65,9 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         lostEnabled = specs.lostEnabled
     )
 
-    val controller = remember(pagerState, backgroundLoader) {
-        CodeforcesCommunityController(
-            backgroundLoader = backgroundLoader,
-            pagerState = pagerState
-        )
-    }
-
     val context = context
-    SideEffect(controller) {
-        controller.touchFlows(context = context, pagerState = pagerState)
+    SideEffect(backgroundLoader, pagerState) {
+        backgroundLoader.touchFlows(context = context, pagerState = pagerState)
     }
 
     screenTitle = remember(pagerState) {
@@ -88,7 +80,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
         followEnabled = specs.followEnabled,
         onOpenSettings = onOpenSettings,
         onOpenFollowList = {
-            controller.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
+            backgroundLoader.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
             onOpenFollowList()
         }
     )
@@ -101,7 +93,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
 
     bottomBar = communityBottomBarBuilder(
         pagerState = pagerState,
-        backgroundLoader = controller
+        backgroundLoader = backgroundLoader
     )
 }
 
