@@ -66,7 +66,7 @@ private fun CPSContent() {
     val navBuilder: NavGraphBuilder.() -> Unit = {
         navigator.navEntry<Screen.Profiles> {
             NavContentProfilesScreen(
-                onExpandProfile = { platform ->
+                navigateToProfileScreen = { platform ->
                     navigator.navigateTo(Screen.ProfileExpanded(platform))
                 }
             )
@@ -74,7 +74,7 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.ProfileExpanded> {
             NavContentProfilesExpandedScreen(
-                onOpenSettings = {
+                navigateToSettings = {
                     val platform = screen.platform
                     navigator.navigateTo(Screen.ProfileSettings(platform))
                 },
@@ -90,8 +90,8 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.Community> {
             NavContentCommunityScreen(
-                onOpenSettings = { navigator.navigateTo(Screen.CommunitySettings) },
-                onOpenFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
+                navigateToSettings = { navigator.navigateTo(Screen.CommunitySettings) },
+                navigateToFollowList = { navigator.navigateTo(Screen.CommunityFollowList) }
             )
         }
 
@@ -101,7 +101,7 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.CommunityFollowList> {
             NavContentCommunityFollowListScreen(
-                onShowBlogScreen = { id ->
+                navigateToBlogScreen = { id ->
                     navigator.navigateTo(Screen.CommunityCodeforcesBlog(blogId = id))
                 }
             )
@@ -113,7 +113,7 @@ private fun CPSContent() {
 
         navigator.navEntry<Screen.Contests> {
             NavContentContestsScreen(
-                onOpenSettings = { navigator.navigateTo(Screen.ContestsSettings) }
+                navigateToSettings = { navigator.navigateTo(Screen.ContestsSettings) }
             )
         }
 

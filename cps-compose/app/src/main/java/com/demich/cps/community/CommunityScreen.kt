@@ -33,8 +33,8 @@ import com.demich.cps.utils.rememberRunBlocking
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
-    onOpenSettings: () -> Unit,
-    onOpenFollowList: () -> Unit
+    navigateToSettings: () -> Unit,
+    navigateToFollowList: () -> Unit
 ) {
     val context = context
 
@@ -50,10 +50,10 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     NavContentCommunityScreen(
         specs = specs,
         backgroundLoader = backgroundLoader,
-        onOpenSettings = onOpenSettings,
+        onOpenSettings = navigateToSettings,
         onOpenFollowList = {
             viewModel.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
-            onOpenFollowList()
+            navigateToFollowList()
         }
     )
 }

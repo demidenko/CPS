@@ -85,7 +85,7 @@ private fun ProfilesScreen(
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
-    onExpandProfile: (Platform) -> Unit
+    navigateToProfileScreen: (Platform) -> Unit
 ) {
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
     val profiles by profilesOrderState()
@@ -107,7 +107,7 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
 
     ProfilesScreen(
         profiles = profiles,
-        onExpandProfile = onExpandProfile,
+        onExpandProfile = navigateToProfileScreen,
         reorderEnabled = reorderEnabled
     )
 

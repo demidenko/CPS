@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedScreen(
-    onOpenSettings: () -> Unit,
+    navigateToSettings: () -> Unit,
     navigateBack: () -> Unit
 ) {
     val platform = screen.platform
@@ -42,7 +42,7 @@ fun CPSNavigator.ScreenScope<Screen.ProfileExpanded>.NavContentProfilesExpandedS
     menu = profileExpandedMenuBuilder(
         manager = manager,
         onShowDeleteDialog = { showDeleteDialog = true },
-        onOpenSettings = onOpenSettings
+        onOpenSettings = navigateToSettings
     )
 
     ProfileExpandedContent(

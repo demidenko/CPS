@@ -93,7 +93,7 @@ import kotlin.time.Instant
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
-    onOpenSettings: () -> Unit
+    navigateToSettings: () -> Unit
 ) {
     val context = context
     val contestsViewModel = contestsViewModel()
@@ -112,7 +112,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     }
 
     menu = contestsMenuBuilder(
-        onOpenSettings = onOpenSettings
+        onOpenSettings = navigateToSettings
     )
 
     val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }

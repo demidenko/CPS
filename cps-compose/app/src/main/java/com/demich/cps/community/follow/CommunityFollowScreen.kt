@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFollowListScreen(
-    onShowBlogScreen: (Long) -> Unit
+    navigateToBlogScreen: (Long) -> Unit
 ) {
     val context = context
     val repository = remember { context.followRepository }
@@ -44,7 +44,7 @@ fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFoll
 
     CommunityFollowScreen(
         repository = repository,
-        onShowBlogScreen = onShowBlogScreen
+        onShowBlogScreen = navigateToBlogScreen
     )
 
     bottomBar = communityFollowListBottomBarBuilder(repository = repository)
