@@ -19,7 +19,6 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
 import com.demich.cps.community.settings.settingsCommunity
-import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
@@ -50,17 +49,18 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     val followRepository = remember { context.followRepository }
     NavContentCommunityScreen(
         specs = specs,
-        followRepository = followRepository,
         backgroundLoader = backgroundLoader,
         onOpenSettings = onOpenSettings,
-        onOpenFollowList = onOpenFollowList
+        onOpenFollowList = {
+            viewModel.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
+            onOpenFollowList()
+        }
     )
 }
 
 @Composable
 private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     specs: CodeforcesCommunityScreenSpecs,
-    followRepository: CodeforcesFollowRepository,
     backgroundLoader: CodeforcesCommunityBackgroundLoader,
     onOpenSettings: () -> Unit,
     onOpenFollowList: () -> Unit
@@ -83,10 +83,7 @@ private fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen
     menu = communityMenuBuilder(
         followEnabled = specs.followEnabled,
         onOpenSettings = onOpenSettings,
-        onOpenFollowList = {
-            backgroundLoader.updateFollowUsersInfo(repository = followRepository) // TODO: not proper place to call?
-            onOpenFollowList()
-        }
+        onOpenFollowList = onOpenFollowList
     )
 
     CodeforcesCommunityScreen(
@@ -182,7 +179,4 @@ private fun CodeforcesCommunityBackgroundLoader(
 
     override fun flowOfRecent() =
         viewModel.flowOfRecent(context = context)
-
-    override fun updateFollowUsersInfo(repository: CodeforcesFollowRepository) =
-        viewModel.updateFollowUsersInfo(repository = repository)
 }

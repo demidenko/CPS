@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRecentFeed
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebComment
@@ -18,8 +17,6 @@ interface CodeforcesCommunityBackgroundLoader {
     fun flowOfTopBlogEntries(): StateFlow<List<CodeforcesWebBlogEntry>?>
     fun flowOfTopComments(): StateFlow<List<CodeforcesWebComment>?>
     fun flowOfRecent(): StateFlow<CodeforcesRecentFeed?>
-
-    fun updateFollowUsersInfo(repository: CodeforcesFollowRepository)
 }
 
 fun CodeforcesCommunityBackgroundLoader.reload(tab: CodeforcesTab) {
