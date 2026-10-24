@@ -13,6 +13,7 @@ import com.demich.cps.community.codeforces.CodeforcesBlogEntries
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesState
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.addNewUser
+import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
@@ -30,9 +31,7 @@ fun CodeforcesBlogEntriesFollowAddable(
     scrollBarEnabled: Boolean = false,
     label: (@Composable (CodeforcesWebBlogEntry) -> Unit)? = null
 ) {
-    val context = context
-
-    var showAddToFollowDialogFor: CodeforcesWebBlogEntry? by remember { mutableStateOf(null) }
+    var showAddToFollowDialogFor: CodeforcesHandle? by remember { mutableStateOf(null) }
 
     CodeforcesBlogEntries(
         blogEntries = blogEntries,
@@ -40,19 +39,20 @@ fun CodeforcesBlogEntriesFollowAddable(
         modifier = modifier,
         lazyListState = lazyListState,
         scrollBarEnabled = scrollBarEnabled,
-        onLongClick = withVibration { showAddToFollowDialogFor = it },
+        onLongClick = withVibration { showAddToFollowDialogFor = it.author },
         label = label
     )
 
-    showAddToFollowDialogFor?.let { blogEntry ->
+    showAddToFollowDialogFor?.let { user ->
+        val context = context
         val scope = backgroundCoroutineScope
-        BlogEntryDialog(
-            blogEntry = blogEntry,
+        UserBlogDialog(
+            user = user,
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
                 scope.launch {
                     context.settingsCommunity.codeforcesFollowEnabled.setValue(true)
-                    context.followRepository.addNewUser(blogEntry.author.handle)
+                    context.followRepository.addNewUser(user.handle)
                 }
             }
         )
@@ -60,8 +60,8 @@ fun CodeforcesBlogEntriesFollowAddable(
 }
 
 @Composable
-private fun BlogEntryDialog(
-    blogEntry: CodeforcesWebBlogEntry,
+private fun UserBlogDialog(
+    user: CodeforcesHandle,
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit
 ) {
@@ -75,7 +75,7 @@ private fun BlogEntryDialog(
         title = {
             Text(text = buildAnnotatedString {
                 append("Add ")
-                append(blogEntry.author.toHandleSpan())
+                append(user.toHandleSpan())
                 append(" to follow list?")
             })
         },
