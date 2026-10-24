@@ -96,6 +96,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     navigateToSettings: () -> Unit
 ) {
     val context = context
+    val scope = backgroundCoroutineScope
+
     val contestsViewModel = contestsViewModel()
     val contestsWork = remember { ContestsWorker.getWork(context) }
 
@@ -125,7 +127,12 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
         isReloading = { loadingStatus == LOADING },
-        onReload = onReload
+        onReloadRequest = onReload,
+        onDeleteRequest = { contest ->
+            scope.launch {
+                ContestsInfoDataStore(context).ignoredContests.add(contest.compositeId, getSystemTime())
+            }
+        }
     )
 
     bottomBar = contestsBottomBarBuilder(
@@ -147,7 +154,8 @@ private fun ContestsScreen(
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
     isReloading: () -> Boolean,
-    onReload: () -> Unit
+    onReloadRequest: () -> Unit,
+    onDeleteRequest: (Contest) -> Unit
 ) {
     val context = context
     val contestsFlow = remember { flowOfContests(context) }
@@ -164,7 +172,8 @@ private fun ContestsScreen(
             filterState = filterState,
             anyPlatformEnabled = anyPlatformEnabled,
             isReloading = isReloading,
-            onReload = onReload,
+            onReloadRequest = onReloadRequest,
+            onDeleteRequest = onDeleteRequest
         )
     }
 }
@@ -176,7 +185,8 @@ private fun ContestsScreen(
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
     isReloading: () -> Boolean,
-    onReload: () -> Unit
+    onReloadRequest: () -> Unit,
+    onDeleteRequest: (Contest) -> Unit
 ) {
     Column {
         CodeforcesMonitor(modifier = Modifier.fillMaxWidth())
@@ -186,7 +196,8 @@ private fun ContestsScreen(
                 viewState = viewState,
                 filterState = filterState,
                 isReloading = isReloading,
-                onReload = onReload,
+                onReloadRequest = onReloadRequest,
+                onDeleteRequest = onDeleteRequest,
                 modifier = Modifier.weight(1f, false)
             )
             FilterTextField(
@@ -213,12 +224,13 @@ private fun ContestsReloadablePager(
     viewState: ContestsListViewState,
     filterState: FilterState,
     isReloading: () -> Boolean,
-    onReload: () -> Unit,
+    onReloadRequest: () -> Unit,
+    onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
     CPSSwipeRefreshBox(
         isRefreshing = isReloading,
-        onRefresh = onReload,
+        onRefresh = onReloadRequest,
         modifier = modifier
     ) {
         Column {
@@ -230,6 +242,7 @@ private fun ContestsReloadablePager(
                 sortedContests = sortedContests,
                 viewState = viewState,
                 filterState = filterState,
+                onDeleteRequest = onDeleteRequest,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -242,6 +255,7 @@ private fun ContestsPager(
     sortedContests: SortedContests?,
     viewState: ContestsListViewState,
     filterState: FilterState,
+    onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -251,6 +265,7 @@ private fun ContestsPager(
             contests = sortedContests?.sublist(page),
             viewState = viewState,
             filterState = filterState,
+            onDeleteRequest = onDeleteRequest,
             modifier = modifier
         )
     }
@@ -276,11 +291,9 @@ private fun ContestsPage(
     contests: List<Contest>?,
     viewState: ContestsListViewState,
     filterState: FilterState,
+    onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = context
-    val scope = backgroundCoroutineScope
-
     val filtered: List<Contest>? by remember(contests, filterState) {
         derivedStateOf {
             contests?.filterBy(filterState)
@@ -291,12 +304,7 @@ private fun ContestsPage(
         contests = filtered,
         viewState = viewState,
         modifier = modifier,
-        onDeleteRequest = { contest ->
-            scope.launch {
-                ContestsInfoDataStore(context)
-                    .ignoredContests.add(contest.compositeId, getSystemTime())
-            }
-        }
+        onDeleteRequest = onDeleteRequest
     )
 }
 
