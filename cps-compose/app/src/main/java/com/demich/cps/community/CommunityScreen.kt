@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewModelScope
 import com.demich.cps.community.codeforces.CodeforcesCommunityBackgroundLoader
 import com.demich.cps.community.codeforces.CodeforcesCommunityBottomBar
 import com.demich.cps.community.codeforces.CodeforcesCommunityPagerState
@@ -23,7 +24,6 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
-import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
@@ -32,6 +32,9 @@ import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberRunBlocking
+import kotlinx.coroutines.CoroutineStart.LAZY
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
@@ -141,7 +144,6 @@ private fun CodeforcesCommunityBackgroundLoader.loadingStatusState(): State<Load
 private fun CodeforcesCommunityBackgroundLoader.touchFlows(
     pagerState: CodeforcesCommunityPagerState
 ) {
-    // TODO: provider factory calls on each instead of one
     pagerState.visitedTabs.forEach { tab ->
         when (tab) {
             MAIN -> flowOfMainBlogEntries()
@@ -161,8 +163,13 @@ private fun CodeforcesCommunityBackgroundLoader(
     viewModel: CodeforcesCommunityViewModel,
     context: Context
 ): CodeforcesCommunityBackgroundLoader = object : CodeforcesCommunityBackgroundLoader {
-    val locale = context.settingsCommunity.codeforcesLocale
-    suspend fun provider(): CodeforcesPageContentProvider = CodeforcesClient(locale = locale())
+    private val provider = viewModel.viewModelScope.async(
+        context = Dispatchers.Default,
+        start = LAZY,
+        block = {
+            CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale())
+        }
+    )
 
     override fun flowOfLoadingStatus() =
         viewModel.flowOfLoadingStatus()
@@ -171,17 +178,17 @@ private fun CodeforcesCommunityBackgroundLoader(
         viewModel.flowOfLoadingStatus(tab = tab)
 
     override fun reload(tabs: List<CodeforcesTab>) =
-        viewModel.reload(tabs = tabs, provider = ::provider)
+        viewModel.reload(tabs = tabs, provider = provider::await)
 
     override fun flowOfMainBlogEntries() =
-        viewModel.flowOfMainBlogEntries(provider = ::provider)
+        viewModel.flowOfMainBlogEntries(provider = provider::await)
 
     override fun flowOfTopBlogEntries() =
-        viewModel.flowOfTopBlogEntries(provider = ::provider)
+        viewModel.flowOfTopBlogEntries(provider = provider::await)
 
     override fun flowOfTopComments() =
-        viewModel.flowOfTopComments(provider = ::provider)
+        viewModel.flowOfTopComments(provider = provider::await)
 
     override fun flowOfRecent() =
-        viewModel.flowOfRecent(provider = ::provider)
+        viewModel.flowOfRecent(provider = provider::await)
 }

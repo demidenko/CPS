@@ -19,7 +19,6 @@ import com.demich.cps.utils.plus
 import com.demich.cps.utils.sharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -76,12 +75,7 @@ class CodeforcesCommunityViewModel: ViewModel() {
     }
 
     fun reload(tabs: List<CodeforcesTab>, provider: suspend () -> CodeforcesPageContentProvider) {
-        val provider = viewModelScope.async(
-            context = Dispatchers.Default,
-            start = LAZY,
-            block = { provider() }
-        )
-        tabs.forEach { reload(tab = it, provider = provider::await) }
+        tabs.forEach { reload(tab = it, provider = provider) }
     }
 
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>
