@@ -140,8 +140,8 @@ private class CodeforcesDataLoader<T>(
 private fun <T> ViewModel.dataLoader(init: T, getData: suspend (CodeforcesPageContentProvider) -> T) =
     CodeforcesDataLoader(scope = viewModelScope, init = init, getData = getData)
 
-private fun <T> ViewModel.dataLoader(getData: suspend (CodeforcesPageContentProvider) -> T) =
-    CodeforcesDataLoader(scope = viewModelScope, init = null, getData = getData)
+private fun <T: Any> ViewModel.dataLoader(getData: suspend (CodeforcesPageContentProvider) -> T) =
+    dataLoader(init = null, getData = getData)
 
 
 private suspend fun CodeforcesPageContentProvider.getMainBlogEntries() =
