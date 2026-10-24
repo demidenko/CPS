@@ -1,6 +1,5 @@
 package com.demich.cps.community
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
@@ -25,6 +24,7 @@ import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
+import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.clients.codeforces.CodeforcesClient
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
@@ -46,7 +46,10 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
 
     val viewModel = codeforcesCommunityViewModel()
     val backgroundLoader = remember(viewModel) {
-        CodeforcesCommunityBackgroundLoader(viewModel, context)
+        CodeforcesCommunityBackgroundLoader(
+            viewModel = viewModel,
+            provider = { CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale()) }
+        )
     }
 
     // TODO: collectUntilFirst make bottombar glitch
@@ -162,14 +165,12 @@ private fun CodeforcesCommunityBackgroundLoader.touchFlows(
 
 private fun CodeforcesCommunityBackgroundLoader(
     viewModel: CodeforcesCommunityViewModel,
-    context: Context
+    provider: suspend () -> CodeforcesPageContentProvider
 ): CodeforcesCommunityBackgroundLoader = object : CodeforcesCommunityBackgroundLoader {
-    private val provider = viewModel.viewModelScope.async(
+    private val deferred = viewModel.viewModelScope.async(
         context = Dispatchers.Default,
         start = LAZY,
-        block = {
-            CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale())
-        }
+        block = { provider() }
     )
 
     override fun flowOfLoadingStatus() =
@@ -179,17 +180,17 @@ private fun CodeforcesCommunityBackgroundLoader(
         viewModel.flowOfLoadingStatus(tab = tab)
 
     override fun reload(tab: CodeforcesTab) =
-        viewModel.reload(tab = tab, provider = provider::await)
+        viewModel.reload(tab = tab, provider = deferred::await)
 
     override fun flowOfMainBlogEntries() =
-        viewModel.flowOfMainBlogEntries(provider = provider::await)
+        viewModel.flowOfMainBlogEntries(provider = deferred::await)
 
     override fun flowOfTopBlogEntries() =
-        viewModel.flowOfTopBlogEntries(provider = provider::await)
+        viewModel.flowOfTopBlogEntries(provider = deferred::await)
 
     override fun flowOfTopComments() =
-        viewModel.flowOfTopComments(provider = provider::await)
+        viewModel.flowOfTopComments(provider = deferred::await)
 
     override fun flowOfRecent() =
-        viewModel.flowOfRecent(provider = provider::await)
+        viewModel.flowOfRecent(provider = deferred::await)
 }
