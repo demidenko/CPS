@@ -15,6 +15,7 @@ import com.demich.cps.community.codeforces.CodeforcesCommunityScreen
 import com.demich.cps.community.codeforces.CodeforcesCommunityViewModel
 import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
+import com.demich.cps.community.codeforces.reload
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
 import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
@@ -177,8 +178,8 @@ private fun CodeforcesCommunityBackgroundLoader(
     override fun flowOfLoadingStatus(tab: CodeforcesTab) =
         viewModel.flowOfLoadingStatus(tab = tab)
 
-    override fun reload(tabs: List<CodeforcesTab>) =
-        viewModel.reload(tabs = tabs, provider = provider::await)
+    override fun reload(tab: CodeforcesTab) =
+        viewModel.reload(tab = tab, provider = provider::await)
 
     override fun flowOfMainBlogEntries() =
         viewModel.flowOfMainBlogEntries(provider = provider::await)

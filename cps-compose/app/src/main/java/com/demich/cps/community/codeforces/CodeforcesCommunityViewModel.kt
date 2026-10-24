@@ -61,7 +61,7 @@ class CodeforcesCommunityViewModel: ViewModel() {
     private val recentActions = dataLoader { it.getRecentFeed() }
     fun flowOfRecent(provider: suspend () -> CodeforcesPageContentProvider) = recentActions.flowOfData(provider)
 
-    private fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {
+    fun reload(tab: CodeforcesTab, provider: suspend () -> CodeforcesPageContentProvider) {
         when (tab) {
             MAIN -> mainBlogEntries.launchLoadIfActive(provider)
             TOP -> {
@@ -72,10 +72,6 @@ class CodeforcesCommunityViewModel: ViewModel() {
             RECENT -> recentActions.launchLoadIfActive(provider)
             else -> return
         }
-    }
-
-    fun reload(tabs: List<CodeforcesTab>, provider: suspend () -> CodeforcesPageContentProvider) {
-        tabs.forEach { reload(tab = it, provider = provider) }
     }
 
     val flowOfFollowUpdateLoadingStatus: StateFlow<LoadingStatus>

@@ -11,7 +11,7 @@ interface CodeforcesCommunityBackgroundLoader {
     fun flowOfLoadingStatus(): Flow<LoadingStatus>
     fun flowOfLoadingStatus(tab: CodeforcesTab): Flow<LoadingStatus>
 
-    fun reload(tabs: List<CodeforcesTab>)
+    fun reload(tab: CodeforcesTab)
 
     fun flowOfMainBlogEntries(): StateFlow<List<CodeforcesWebBlogEntry>?>
     fun flowOfTopBlogEntries(): StateFlow<List<CodeforcesWebBlogEntry>?>
@@ -19,6 +19,6 @@ interface CodeforcesCommunityBackgroundLoader {
     fun flowOfRecent(): StateFlow<CodeforcesRecentFeed?>
 }
 
-fun CodeforcesCommunityBackgroundLoader.reload(tab: CodeforcesTab) {
-    reload(tabs = listOf(tab))
+fun CodeforcesCommunityBackgroundLoader.reload(tabs: Collection<CodeforcesTab>) {
+    tabs.forEach { reload(tab = it) }
 }
