@@ -1,6 +1,5 @@
 package com.demich.cps.contests
 
-import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -158,7 +157,13 @@ private fun ContestsScreen(
     onDeleteRequest: (Contest) -> Unit
 ) {
     val context = context
-    val contestsFlow = remember { flowOfContests(context) }
+    val contestsFlow = remember {
+        flowOfContests(
+            repository = context.contestsRepository,
+            infoStorage = ContestsInfoDataStore(context),
+            monitorStorage = CodeforcesMonitorDataStore(context)
+        )
+    }
 
     val (
         contestsState: State<SortedContests?>,
@@ -539,13 +544,6 @@ private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
     fromSnapshot {
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
     }
-
-private fun flowOfContests(context: Context): Flow<List<Contest>> =
-    flowOfContests(
-        repository = context.contestsRepository,
-        infoStorage = ContestsInfoDataStore(context),
-        monitorStorage = CodeforcesMonitorDataStore(context)
-    )
 
 private fun flowOfContests(
     repository: ContestsRepository,
