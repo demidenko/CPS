@@ -52,7 +52,7 @@ suspend fun CodeforcesApi.getUsersCatchingFilterFound(
 ): Map<String, CodeforcesUser> =
     buildMap {
         getUsersCatching(handles = handles, checkHistoricHandles = checkHistoricHandles)
-            .forEach { (handle, result) ->
+            .forEach { [handle, result] ->
                 if (result is FetchResult.Success) {
                     result.value?.let { put(key = handle, value = it) }
                 }

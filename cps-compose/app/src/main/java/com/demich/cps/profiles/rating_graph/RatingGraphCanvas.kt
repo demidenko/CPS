@@ -146,7 +146,7 @@ private fun RatingGraphCanvas(
                 )
 
                 //rating points
-                pointsWithColors.forEach { (point, ratingColor) ->
+                pointsWithColors.forEach { [point, ratingColor] ->
                     drawPoint(
                         center = point.toCanvasPoint(),
                         color = getColor(ratingColor),

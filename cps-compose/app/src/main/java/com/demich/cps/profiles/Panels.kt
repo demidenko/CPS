@@ -306,7 +306,7 @@ fun SmallProfilePanelTypeArchive(
         additionalTitle = {
             Text(
                 text = buildAnnotatedString {
-                    infoArgs.forEachIndexed { index, (key, value) ->
+                    infoArgs.forEachIndexed { index, [key, value] ->
                         if (index > 0) append("  ")
                         append(text = "${key}: ", color = cpsColors.contentAdditional)
                         append(value)

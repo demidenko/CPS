@@ -50,7 +50,7 @@ class ProjectEulerRecentProblemsWorker(
         ): Instant? {
             val currentTime = getSystemTime()
             return parser.parseProblems()
-                .mapNotNull { (id, date) -> date.takeIf { it > currentTime } }
+                .mapNotNull { [id, date] -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also {
                     context.workerStorage.problemPublishTime.setValue(it)

@@ -38,14 +38,14 @@ inline fun <T> rememberRunBlocking(crossinline block: suspend () -> T): T =
 @Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> collectAsState(crossinline block: () -> Flow<T>): State<T> =
-    rememberWithFirst(block = block).let { (flow, value) ->
+    rememberWithFirst(block = block).let { [flow, value] ->
         flow.collectAsState(initial = value)
     }
 
 @Deprecated(level = WARNING, message = message)
 @Composable
 inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): State<T> =
-    rememberWithFirst(block = block).let { (flow, value) ->
+    rememberWithFirst(block = block).let { [flow, value] ->
         flow.collectAsStateWithLifecycle(initialValue = value)
     }
 
@@ -54,7 +54,7 @@ inline fun <T> collectAsStateWithLifecycle(crossinline block: () -> Flow<T>): St
 inline fun <T> collectItemAsState(
     crossinline block: () -> DataStoreValue<T>
 ): State<T> =
-    rememberRunBlocking { block().run { asFlow() to invoke() } }.let { (flow, value) ->
+    rememberRunBlocking { block().run { asFlow() to invoke() } }.let { [flow, value] ->
         flow.collectAsState(initial = value)
     }
 

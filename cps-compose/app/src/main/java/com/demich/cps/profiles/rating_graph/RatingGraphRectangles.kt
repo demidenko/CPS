@@ -42,7 +42,7 @@ internal class RatingGraphRectangles(
         var prevX: Instant = Instant.DISTANT_PAST
         upperBounds.forEachRangeEqualBy(selector = { it.first.x }) { l, r ->
             var prevY: Int = Int.MIN_VALUE
-            upperBounds.subList(l, r).forEach { (point, ratingColor) ->
+            upperBounds.subList(l, r).forEach { [point, ratingColor] ->
                 add(Triple(GraphPoint(prevX, prevY), point, ratingColor))
                 prevY = point.y
             }

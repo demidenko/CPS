@@ -45,7 +45,7 @@ fun Project.configureKotlin() {
             freeCompilerArgs.add("-Xcontext-sensitive-resolution")
             freeCompilerArgs.add("-Xreturn-value-checker=full")
             freeCompilerArgs.add("-Xcollection-literals")
-            freeCompilerArgs.add("-Xname-based-destructuring=only-syntax")
+            freeCompilerArgs.add("-Xname-based-destructuring=name-mismatch")
         }
     }
 }

@@ -71,7 +71,7 @@ internal fun <T> ApiAccessSettingsItem(
     if (showDialog) {
         val fieldsState = suspendAsState {
             val init = item()
-            fields.map { (title, prop) ->
+            fields.map { [title, prop] ->
                 Field(title = title, initValue = init?.let { prop.get(it) } ?: "")
             }
         }

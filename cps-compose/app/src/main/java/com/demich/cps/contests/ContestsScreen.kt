@@ -165,10 +165,10 @@ private fun ContestsScreen(
         )
     }
 
-    val (
+    val [
         contestsState: State<SortedContests?>,
         currentTimeState: State<Instant>
-    ) = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
+    ] = produceSortedContestsWithTime(flow = contestsFlow, clock = Clock.System)
 
     ProvideCurrentTime(currentTimeState) {
         ContestsScreen(
@@ -534,7 +534,7 @@ private fun loadingErrorsMessageState(): State<String?> {
                         e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
                     },
                     valueTransform = { it.first }
-                ).entries.joinToString(separator = "; ") { (msg, list) -> "${list.distinct()}: $msg" }
+                ).entries.joinToString(separator = "; ") { [msg, list] -> "${list.distinct()}: $msg" }
             }
         }
     }

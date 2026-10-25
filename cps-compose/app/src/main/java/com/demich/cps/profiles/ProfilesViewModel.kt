@@ -81,10 +81,10 @@ class ProfilesViewModel: ViewModel() {
         context: Context
     ) {
         progressBarsViewModel.doJob(id = clistImportId, coroutineScope = viewModelScope) {
-            val supported = cListUserInfo.accounts.mapNotNull { (resource, userData) ->
+            val supported = cListUserInfo.accounts.mapNotNull { [resource, userData] ->
                 getManager(resource, userData.first, userData.second)
             }
-            supported.map { (platform, userId) ->
+            supported.map { [platform, userId] ->
                 suspend {
                     replaceProfile(
                         manager = profileManagerOf(platform),

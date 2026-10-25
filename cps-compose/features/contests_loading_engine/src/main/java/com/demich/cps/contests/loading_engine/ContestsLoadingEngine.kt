@@ -31,7 +31,7 @@ suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectTo(
     if (isEmpty()) return
 
     coroutineScope {
-        forEach { (platform, flow) ->
+        forEach { [platform, flow] ->
             launch {
                 flow.firstOrNull { it.result.isSuccess }
                     ?.result
@@ -56,7 +56,7 @@ fun contestsFetchFlows(
         cacheScope = cacheScope
     )
 
-    return setup.mapValues { (platform, priorities) ->
+    return setup.mapValues { [platform, priorities] ->
         priorities.toFetchFlow(
             platform = platform,
             memoizer = memoizer
@@ -134,7 +134,7 @@ private class ContestsFetchMemoizer(
     }
 
     private suspend fun ContestsMultiplatformFetcher.fetchAllPlatforms(): Map<ContestPlatform, List<Contest>> {
-        val platforms = setup.mapNotNull { (platform, sources) ->
+        val platforms = setup.mapNotNull { [platform, sources] ->
             if (fetchSource in sources) platform else null
         }
         return fetchContests(

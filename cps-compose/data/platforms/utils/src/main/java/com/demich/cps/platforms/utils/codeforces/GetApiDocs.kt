@@ -32,7 +32,7 @@ private fun extractMethods(page: String): List<CodeforcesApiHelpMethod> {
         "${h3.size} of h3 / ${tables.size} of tables"
     }
 
-    return h3.zip(tables).map { (h3, table) ->
+    return h3.zip(tables).map { [h3, table] ->
         val name = h3.text()
 
         val parameters = table.select("tbody > tr").map { tr ->

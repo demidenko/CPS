@@ -97,7 +97,7 @@ private suspend inline fun getContestUpsolvingSuggestions(
     toRemoveAsSolved: (List<CodeforcesProblem>) -> Unit,
     onNewSuggestion: (CodeforcesProblem) -> Unit
 ) {
-    val (contestSubmissions, acceptedStats) = awaitPair(
+    val [contestSubmissions, acceptedStats] = awaitPair(
         blockFirst = {
             api.getContestSubmissions(contestId = contestId, handle = handle)
         },
@@ -139,7 +139,7 @@ private inline fun makeContestUpsolvingSuggestions(
 
     val contestSuggestedIndices = contestSuggested.mapToSet { it.index }
 
-    acceptedStats.forEach { (problem, solvers) ->
+    acceptedStats.forEach { [problem, solvers] ->
         if (solvers >= rank && problem.index !in solvedIndices) {
             if (problem.index !in contestSuggestedIndices) onNewSuggestion(problem)
         }

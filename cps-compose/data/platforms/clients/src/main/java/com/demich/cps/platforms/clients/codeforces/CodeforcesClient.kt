@@ -284,7 +284,7 @@ private fun apiSig(
             }
         }
         sortWith(compareBy({ it.first }, { it.second }))
-    }.joinToString(separator = "&") { (param, value) -> "${param}=${value}" }
+    }.joinToString(separator = "&") { [param, value] -> "${param}=${value}" }
 
     val str = "$rand/$method?$sortedParams#$secret"
 

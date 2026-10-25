@@ -82,7 +82,7 @@ private fun rememberTitleCharsState(
     ) {
         snapshotFlow { text() }
             .collect { cur ->
-                val (prev, prevIds) = value
+                val [prev, prevIds] = value
                 val prefix = cur.commonPrefixLengthWith(prev)
                 val ids = MutableList(cur.length) { if (it < prefix) prevIds[it] else Uuid.random() }
                 subsetIndices(

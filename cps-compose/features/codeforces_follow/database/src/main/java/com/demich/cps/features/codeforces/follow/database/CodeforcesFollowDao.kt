@@ -88,7 +88,7 @@ internal abstract class CodeforcesFollowDao {
 
     @Transaction
     open suspend fun updateUserProfiles(results: Map<String, ProfileResult<CodeforcesUserInfo>>) {
-        results.forEach { (handle, result) ->
+        results.forEach { [handle, result] ->
             when (result) {
                 is ProfileResult.Success -> setUserInfo(handle, result.userInfo)
                 is ProfileResult.NotFound -> remove(handle = handle)
