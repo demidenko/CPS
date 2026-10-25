@@ -62,7 +62,7 @@ fun <U: UserInfo> ProfilePanel(
 ) {
     val context = context
     val profilesViewModel = profilesViewModel()
-    val (result, manager) = profileResultWithManager
+    val (profileResult, manager) = profileResultWithManager
 
     val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
 
@@ -109,7 +109,7 @@ fun <U: UserInfo> ProfilePanel(
             }
         }
     ) {
-        manager.PanelContent(result)
+        manager.PanelContent(profileResult)
 
         if (mode != null) {
             PanelUIButtons(
