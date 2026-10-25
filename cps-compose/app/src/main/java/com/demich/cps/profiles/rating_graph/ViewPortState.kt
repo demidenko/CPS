@@ -149,7 +149,7 @@ internal inline fun toCanvasRect(
     topRight: GraphPoint,
     block: (Rect) -> Unit
 ) {
-    val (width, height) = scope.size
+    val [width, height] = scope.size
 
     val left = floor(bottomLeft.x.toCanvasX().coerceAtLeast(0f))
     val right = ceil(topRight.x.toCanvasX().coerceAtMost(width))
