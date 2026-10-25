@@ -33,7 +33,7 @@ internal class RatingGraphRectangles(
     }
 
     fun getRatingColor(point: GraphPoint): RatingColor =
-        upperBounds.first { (r, _) -> point.x < r.x && point.y < r.y }.second
+        upperBounds.first { (val r = first) -> point.x < r.x && point.y < r.y }.second
 
     inline fun forEachUpperBound(block: (GraphPoint, RatingColor) -> Unit) =
         upperBounds.asReversed().forEach { block(it.first, it.second) }

@@ -530,7 +530,7 @@ private fun loadingErrorsMessageState(): State<String?> {
             if (errors.isEmpty()) null
             else {
                 errors.groupBy(
-                    keySelector = { (_, e) ->
+                    keySelector = { (val e = second) ->
                         e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
                     },
                     valueTransform = { it.first }

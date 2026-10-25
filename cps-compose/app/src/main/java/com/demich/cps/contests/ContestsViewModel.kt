@@ -50,7 +50,7 @@ class ContestsViewModel: ViewModel() {
         var track = FetchTrack(loadingStatus = LOADING, errors = [])
         return onStart {
             fetchResults.set(platform, track)
-        }.onEach { (_, source, result) ->
+        }.onEach { (val source = fetchSource, val result) ->
             result.onFailure { error ->
                 track = track.run { copy(errors = errors + Pair(source, error)) }
                 fetchResults.set(platform, track)
