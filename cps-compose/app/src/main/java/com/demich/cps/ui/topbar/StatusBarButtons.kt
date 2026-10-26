@@ -171,6 +171,7 @@ private fun StatusBarPlatformsPopup(
     }
 }
 
+// TODO: there is CombinedRatingColorSpecs public class
 private data class Specs(
     val enabled: Boolean,
     val disabledPlatforms: Set<Platform>,
