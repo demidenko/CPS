@@ -20,8 +20,6 @@ import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
-import com.demich.datastore_itemized.flowOf
-import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -132,16 +130,7 @@ private class EnabledRankGetter(
 }
 
 private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
-    context.settingsUI.flowOf {
-        if (coloredStatusBar.value) {
-            CombinedRatingColorSpecs(
-                disabledPlatforms = statusBarDisabledPlatforms.value,
-                rankSelector = statusBarRankSelector.value
-            )
-        } else {
-            null
-        }
-    }.flatMapLatest { specs ->
+    context.settingsUI.combinedColorSpecs.asFlow().flatMapLatest { specs ->
         if (specs == null) {
             flowOf(RankGetter { null })
         } else {

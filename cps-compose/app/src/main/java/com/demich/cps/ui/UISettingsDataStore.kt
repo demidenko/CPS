@@ -45,6 +45,18 @@ val UISettingsDataStore.bottomNavBarSpecs get() = combine {
     )
 }
 
+val UISettingsDataStore.combinedColorSpecs
+    get() = combine {
+        if (coloredStatusBar.value) {
+            CombinedRatingColorSpecs(
+                disabledPlatforms = statusBarDisabledPlatforms.value,
+                rankSelector = statusBarRankSelector.value
+            )
+        } else {
+            null
+        }
+    }
+
 data class CPSUISpecs(
     val devModeEnabled: Boolean,
     val darkLightMode: DarkLightMode,
