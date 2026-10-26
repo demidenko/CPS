@@ -76,3 +76,6 @@ internal fun darkCPSColors(usePlatformRatingColors: Boolean) = CPSColors(
     materialInitColors = ::darkColors,
     ratingColors = cpsDarkThemeRatingColors(usePlatformRatingColors)
 )
+
+val CPSColors.topBarBackground: Color
+    get() = background
