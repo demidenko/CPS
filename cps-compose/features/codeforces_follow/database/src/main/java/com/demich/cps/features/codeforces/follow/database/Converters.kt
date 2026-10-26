@@ -1,13 +1,13 @@
 package com.demich.cps.features.codeforces.follow.database
 
-import androidx.room.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import com.demich.cps.features.room.RoomJsonConverter
 import com.demich.cps.profiles.userinfo.CodeforcesUserInfo
 import kotlinx.serialization.SerializationException
 
 
 internal class IntCollectionAsBytesConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun intsToString(ints: Collection<Int>): String {
         return buildString {
             ints.forEach { num ->
@@ -29,20 +29,20 @@ internal class IntCollectionAsBytesConverter {
         }
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun decodeIntList(s: String): List<Int> =
         buildList(capacity = s.intCollectionSize()) { extractInts(s) }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun decodeIntSet(s: String): Set<Int> =
         buildSet(capacity = s.intCollectionSize()) { extractInts(s) }
 }
 
 internal class CodeforcesUserInfoConverter: RoomJsonConverter<CodeforcesUserInfo?>() {
-    @TypeConverter
+    @ColumnTypeConverter
     override fun encode(value: CodeforcesUserInfo?) = encodeToString(value)
 
-    @TypeConverter
+    @ColumnTypeConverter
     override fun decode(str: String): CodeforcesUserInfo? {
         return try {
             decodeFromString(str)

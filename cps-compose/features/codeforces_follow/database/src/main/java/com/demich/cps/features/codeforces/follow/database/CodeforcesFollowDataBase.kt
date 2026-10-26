@@ -1,12 +1,12 @@
 package com.demich.cps.features.codeforces.follow.database
 
 import android.content.Context
-import androidx.room.AutoMigration
-import androidx.room.Database
-import androidx.room.RenameColumn
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.room.migration.AutoMigrationSpec
+import androidx.room3.AutoMigration
+import androidx.room3.ColumnTypeConverters
+import androidx.room3.Database
+import androidx.room3.RenameColumn
+import androidx.room3.RoomDatabase
+import androidx.room3.migration.AutoMigrationSpec
 import com.demich.cps.features.room.instanceDelegate
 
 @Database(
@@ -17,7 +17,7 @@ import com.demich.cps.features.room.instanceDelegate
         AutoMigration(from = 2, to = 3, spec = CodeforcesFollowDataBase.BlogEntriesIdsRenameMigration::class)
     ]
 )
-@TypeConverters(
+@ColumnTypeConverters(
     IntCollectionAsBytesConverter::class,
     CodeforcesUserInfoConverter::class
 )

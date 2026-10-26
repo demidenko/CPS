@@ -1,6 +1,6 @@
 package com.demich.cps.contests.database
 
-import androidx.room.Entity
+import androidx.room3.Entity
 import kotlin.time.Duration
 import kotlin.time.Instant
 

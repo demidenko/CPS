@@ -1,13 +1,13 @@
 package com.demich.cps.features.room
 
-import androidx.room.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import kotlin.time.Instant
 
 
 class InstantSecondsConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun instantToSeconds(time: Instant): Long = time.epochSeconds
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun secondsToInstant(seconds: Long): Instant = Instant.fromEpochSeconds(seconds)
 }

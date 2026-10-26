@@ -1,13 +1,13 @@
 package com.demich.cps.features.room
 
-import androidx.room.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class DurationSecondsConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun durationToSeconds(duration: Duration): Long = duration.inWholeSeconds
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun secondsToDuration(seconds: Long): Duration = seconds.seconds
 }

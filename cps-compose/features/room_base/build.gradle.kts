@@ -24,5 +24,5 @@ android {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
 
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room3.runtime)
 }

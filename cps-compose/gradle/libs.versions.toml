@@ -21,7 +21,7 @@ navigation-compose = "2.10.2" # https://developer.android.com/jetpack/androidx/r
 lifecycle = "2.11.0"  # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
 room = "2.8.5" # https://developer.android.com/jetpack/androidx/releases/room
-# room3 = TODO # https://developer.android.com/jetpack/androidx/releases/room3
+room3 = "3.0.3" # https://developer.android.com/jetpack/androidx/releases/room3
 
 datastore = "1.2.1" # https://developer.android.com/jetpack/androidx/releases/datastore
 
@@ -68,6 +68,9 @@ androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-ru
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
 
+androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room3"}
+androidx-room3-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room3"}
+
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
@@ -91,3 +94,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+room3 = { id = "androidx.room3", version.ref = "room3" }

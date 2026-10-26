@@ -1,14 +1,15 @@
 package com.demich.cps.contests.database
 
 import android.content.Context
-import androidx.room.AutoMigration
-import androidx.room.Database
-import androidx.room.RenameColumn
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.room.migration.AutoMigrationSpec
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room3.AutoMigration
+import androidx.room3.ColumnTypeConverters
+import androidx.room3.Database
+import androidx.room3.RenameColumn
+import androidx.room3.RoomDatabase
+import androidx.room3.migration.AutoMigrationSpec
+import androidx.room3.migration.Migration
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.execSQL
 import com.demich.cps.features.room.DurationSecondsConverter
 import com.demich.cps.features.room.InstantSecondsConverter
 import com.demich.cps.features.room.instanceDelegate
@@ -22,7 +23,7 @@ import com.demich.cps.features.room.instanceDelegate
         AutoMigration(from = 2, to = 3)
     ]
 )
-@TypeConverters(
+@ColumnTypeConverters(
     InstantSecondsConverter::class,
     DurationSecondsConverter::class
 )
@@ -39,7 +40,7 @@ internal val Context.contestsDatabase by instanceDelegate<ContestsDatabase>(
 )
 
 private val migration_3_4_AddEndTimeColumn get() = object : Migration(3, 4) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE contests_list ADD COLUMN endTime INTEGER NOT NULL DEFAULT 0")
+    override suspend fun migrate(connection: SQLiteConnection) {
+        connection.execSQL("ALTER TABLE contests_list ADD COLUMN endTime INTEGER NOT NULL DEFAULT 0")
     }
 }
