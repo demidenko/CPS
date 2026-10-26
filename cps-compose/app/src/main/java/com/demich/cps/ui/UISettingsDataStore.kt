@@ -58,3 +58,8 @@ data class CPSUISpecs(
 data class CPSBottomNavBarSpecs(
     val layoutType: NavigationLayoutType
 )
+
+data class CombinedRatingColorSpecs(
+    val disabledPlatforms: Set<Platform>,
+    val rankSelector: UISettingsDataStore.StatusBarRankSelector
+)
