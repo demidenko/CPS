@@ -28,6 +28,7 @@ import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.ratedProfilesColorState
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.theme.topBarBackground
 import com.demich.cps.ui.topbar.CPSTopBar
 import com.demich.cps.utils.backgroundColor
 import com.demich.cps.utils.collectUntilFirst
@@ -170,7 +171,7 @@ class CPSNavigator(
     fun TopBarWithStatusBar(modifier: Modifier = Modifier) {
         val statusBarColor by ratedProfilesColorState(
             navigator = this,
-            disabledColor = cpsColors.background
+            disabledColor = cpsColors.topBarBackground
         )
 
         Box(

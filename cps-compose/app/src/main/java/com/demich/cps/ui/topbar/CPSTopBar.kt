@@ -35,6 +35,7 @@ import com.demich.cps.ui.PermissionStatus
 import com.demich.cps.ui.dialogs.CPSAboutDialog
 import com.demich.cps.ui.rememberNotificationsPermissionsState
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.theme.topBarBackground
 import com.demich.cps.utils.context
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -49,7 +50,7 @@ fun CPSTopBar(
     var showAbout by rememberSaveable { mutableStateOf(false) }
 
     TopAppBar(
-        backgroundColor = cpsColors.background,
+        backgroundColor = cpsColors.topBarBackground,
         elevation = 0.dp,
         contentPadding = PaddingValues(start = 10.dp),
         modifier = Modifier.height(CPSDefaults.topBarHeight)
@@ -68,7 +69,7 @@ fun CPSTopBar(
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 UIPanel(
-                    modifier = Modifier.fillMaxWidth().background(cpsColors.background),
+                    modifier = Modifier.fillMaxWidth().background(cpsColors.topBarBackground),
                     onClosePanel = { showUIPanel = false }
                 )
             }

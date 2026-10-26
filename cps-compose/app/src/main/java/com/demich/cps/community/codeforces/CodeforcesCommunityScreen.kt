@@ -30,6 +30,7 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformLogoPainter
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.ui.theme.topBarBackground
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.LoadingStatus.PENDING
 import com.demich.cps.utils.NewEntryTypeCounters
@@ -140,10 +141,10 @@ private fun CodeforcesPagerHeader(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .height(CPSDefaults.tabsRowHeight)
+            .background(cpsColors.topBarBackground)
     ) {
         Box(
             modifier = Modifier
-                .background(cpsColors.background)
                 .padding(vertical = 10.dp)
                 .padding(start = 6.dp, end = 10.dp)
         ) {
@@ -168,9 +169,11 @@ private fun CodeforcesPagerHeader(
                     backgroundLoader = backgroundLoader,
                     pagerState = pagerState,
                     newEntriesState = newEntriesState,
-                    modifier = Modifier.clickableNoRipple {
-                        animationScope.launch { pagerState.scrollTo(title) }
-                    }
+                    modifier = Modifier
+                        .background(cpsColors.topBarBackground)
+                        .clickableNoRipple {
+                            animationScope.launch { pagerState.scrollTo(title) }
+                        }
                 )
             }
         }
