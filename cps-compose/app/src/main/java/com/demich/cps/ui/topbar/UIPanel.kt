@@ -1,6 +1,5 @@
 package com.demich.cps.ui.topbar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.ui.Modifier
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.settingsUI
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.uiSpecs
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithNull
@@ -25,7 +23,7 @@ internal fun UIPanel(
     modifier: Modifier = Modifier,
     onClosePanel: () -> Unit
 ) {
-    Row(modifier = modifier.background(cpsColors.background)) {
+    Row(modifier = modifier) {
         CPSIconButton(
             icon = CPSIcons.Close,
             onClick = onClosePanel

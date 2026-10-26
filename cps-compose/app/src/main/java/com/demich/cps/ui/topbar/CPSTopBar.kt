@@ -3,6 +3,7 @@ package com.demich.cps.ui.topbar
 import android.content.Context
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -66,7 +67,10 @@ fun CPSTopBar(
                 exit = shrinkHorizontally(shrinkTowards = Alignment.Start),
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                UIPanel(modifier = Modifier.fillMaxWidth()) { showUIPanel = false }
+                UIPanel(
+                    modifier = Modifier.fillMaxWidth().background(cpsColors.background),
+                    onClosePanel = { showUIPanel = false }
+                )
             }
         }
 
