@@ -18,10 +18,6 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
         private val Context.settingsUI_dataStore by dataStoreWrapper("settings_ui")
     }
 
-    enum class StatusBarRankSelector {
-        Min, Max
-    }
-
     val devModeEnabled = itemBoolean(name = "develop_enabled", defaultValue = false)
 
     val darkLightMode = itemEnum<DarkLightMode>(name = "dark_light_mode", defaultValue = SYSTEM)
@@ -30,7 +26,7 @@ class UISettingsDataStore(context: Context): ItemizedDataStore(context.settingsU
 
     val coloredStatusBar = itemBoolean(name = "use_status_bar", defaultValue = true)
     val statusBarDisabledPlatforms = itemEnumSet<Platform>(name = "status_bar_disabled_platforms")
-    val statusBarRankSelector = itemEnum<StatusBarRankSelector>(name = "status_bar_rank_selector", defaultValue = Max)
+    val statusBarRankSelector = itemEnum<CombinedRatingColorSpecs.RankSelector>(name = "status_bar_rank_selector", defaultValue = Max)
 
     val navigationLayoutType = itemEnum<NavigationLayoutType>(name = "navigation_bar_layout", defaultValue = start)
 }
@@ -61,5 +57,9 @@ data class CPSBottomNavBarSpecs(
 
 data class CombinedRatingColorSpecs(
     val disabledPlatforms: Set<Platform>,
-    val rankSelector: UISettingsDataStore.StatusBarRankSelector
-)
+    val rankSelector: RankSelector
+) {
+    enum class RankSelector {
+        Min, Max
+    }
+}

@@ -25,6 +25,7 @@ import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.CombinedRatingColorSpecs
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.UISettingsDataStore
 import com.demich.cps.ui.settingsUI
@@ -88,11 +89,11 @@ internal fun StatusBarButtons(
 private fun StatusBarButtons(
     modifier: Modifier = Modifier,
     coloredStatusBar: Boolean,
-    rankSelector: UISettingsDataStore.StatusBarRankSelector,
+    rankSelector: CombinedRatingColorSpecs.RankSelector,
     platforms: List<Platform>,
     disabledPlatforms: Set<Platform>,
     onSetEnabled: (Boolean) -> Unit,
-    onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
+    onSetRankSelector: (CombinedRatingColorSpecs.RankSelector) -> Unit,
     onCheckedChange: (Platform, Boolean) -> Unit
 ) {
     var showPopup by rememberSaveable { mutableStateOf(false) }
@@ -132,8 +133,8 @@ private fun StatusBarButtons(
 @Composable
 private fun StatusBarPlatformsPopup(
     expanded: Boolean,
-    rankSelector: UISettingsDataStore.StatusBarRankSelector,
-    onSetRankSelector: (UISettingsDataStore.StatusBarRankSelector) -> Unit,
+    rankSelector: CombinedRatingColorSpecs.RankSelector,
+    onSetRankSelector: (CombinedRatingColorSpecs.RankSelector) -> Unit,
     disabledPlatforms: Set<Platform>,
     onCheckedChange: (Platform, Boolean) -> Unit,
     platforms: List<Platform>,
@@ -154,7 +155,7 @@ private fun StatusBarPlatformsPopup(
             }
         }
         TextButtonsSelectRow(
-            values = UISettingsDataStore.StatusBarRankSelector.entries,
+            values = CombinedRatingColorSpecs.RankSelector.entries,
             selectedValue = rankSelector,
             text = { value ->
                 when (value) {
@@ -173,7 +174,7 @@ private fun StatusBarPlatformsPopup(
 private data class Specs(
     val enabled: Boolean,
     val disabledPlatforms: Set<Platform>,
-    val selector: UISettingsDataStore.StatusBarRankSelector
+    val selector: CombinedRatingColorSpecs.RankSelector
 )
 
 private val UISettingsDataStore.combinedColorSpecs
