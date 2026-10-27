@@ -6,6 +6,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +41,6 @@ import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.VotedRating
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.codeforcesHtmlContentToAnnotatedString
 import com.demich.cps.utils.formatTimeAgo
 import kotlin.math.roundToInt
@@ -101,7 +101,10 @@ private fun Comment(
     commentHtml: String,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         if (blogEntryTitle != null) {
             BlogEntryTitleWithArrow(
                 title = blogEntryTitle,
@@ -119,7 +122,6 @@ private fun Comment(
             commentHtml = commentHtml,
             fontSize = 14.sp,
             modifier = Modifier
-                .padding(top = 2.dp)
                 .padding(horizontal = 8.dp)
                 .fillMaxWidth()
         )
@@ -134,33 +136,31 @@ private fun CommentInfo(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        IncludeFontPadding {
-            Row(
-                modifier = Modifier.align(Alignment.TopStart)
-            ) {
-                IconSp(
-                    imageVector = CPSIcons.CommentSingle,
-                    size = 13.sp,
-                    color = cpsColors.contentAdditional,
-                    modifier = Modifier
-                        .padding(start = 2.dp, end = 2.dp)
-                        .alignBy { (it.measuredHeight * 0.75f).roundToInt() }
-                )
-                Text(
-                    text = authorHandle,
-                    fontSize = 13.sp,
-                    modifier = Modifier
-                        .alignByBaseline()
-                )
-                Text(
-                    text = timeAgo,
-                    color = cpsColors.contentAdditional,
-                    fontSize = 11.sp,
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .alignByBaseline()
-                )
-            }
+        Row(
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
+            IconSp(
+                imageVector = CPSIcons.CommentSingle,
+                size = 13.sp,
+                color = cpsColors.contentAdditional,
+                modifier = Modifier
+                    .padding(start = 2.dp, end = 2.dp)
+                    .alignBy { (it.measuredHeight * 0.75f).roundToInt() }
+            )
+            Text(
+                text = authorHandle,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .alignByBaseline()
+            )
+            Text(
+                text = timeAgo,
+                color = cpsColors.contentAdditional,
+                fontSize = 11.sp,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .alignByBaseline()
+            )
         }
         VotedRating(
             rating = rating,
