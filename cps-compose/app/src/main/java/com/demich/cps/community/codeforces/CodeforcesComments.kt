@@ -69,7 +69,7 @@ fun CodeforcesComments(
                 .clickable {
                     uriHandler.openUri(CodeforcesUrls.comment(blogEntryId = comment.blogEntryId, commentId = comment.id))
                 }
-                .padding(start = 3.dp, end = 5.dp, bottom = 3.dp)
+                .padding(start = 3.dp, end = 5.dp, top = 2.dp, bottom = 3.dp)
                 .animateContentSize()
         )
         Divider()
