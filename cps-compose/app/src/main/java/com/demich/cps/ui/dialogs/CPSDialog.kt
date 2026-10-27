@@ -78,12 +78,14 @@ fun CPSDialog(
         horizontalAlignment = Alignment.CenterHorizontally,
         onDismissRequest = onDismissRequest,
         content = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = 6.dp)
-            )
-            content()
+            IncludeFontPadding {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                content()
+            }
         }
     )
 }

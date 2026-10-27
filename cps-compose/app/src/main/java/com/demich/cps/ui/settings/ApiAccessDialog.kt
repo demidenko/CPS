@@ -36,6 +36,7 @@ import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.dialogs.CPSDialogCancelAcceptButtons
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.suspendAsState
 import com.demich.datastore_itemized.DataStoreValue
@@ -109,34 +110,36 @@ private fun <T: Any> ApiDialog(
         onDismissRequest = onDismissRequest,
         dismissOnClickOutside = false
     ) {
-        ApiAccessEditorHeader(
-            modifier = Modifier.fillMaxWidth(),
-            title = title,
-            onHelp = onHelp
-        )
+        IncludeFontPadding {
+            ApiAccessEditorHeader(
+                modifier = Modifier.fillMaxWidth(),
+                title = title,
+                onHelp = onHelp
+            )
 
-        val strings = rememberSaveable {
-            fields.map { it.initValue }.toMutableStateList()
-        }
+            val strings = rememberSaveable {
+                fields.map { it.initValue }.toMutableStateList()
+            }
 
-        fields.forEachIndexed { index, field ->
-            ApiAccessFieldTextField(
-                input = strings[index],
-                onChangeInput = { strings[index] = it },
-                title = field.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
+            fields.forEachIndexed { index, field ->
+                ApiAccessFieldTextField(
+                    input = strings[index],
+                    onChangeInput = { strings[index] = it },
+                    title = field.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+            }
+
+            ApiAccessControls(
+                modifier = Modifier.padding(top = 8.dp),
+                currentValue = { decode(strings) },
+                checkBlock = checkBlock,
+                onSave = onSave,
+                onCancelRequest = onDismissRequest
             )
         }
-
-        ApiAccessControls(
-            modifier = Modifier.padding(top = 8.dp),
-            currentValue = { decode(strings) },
-            checkBlock = checkBlock,
-            onSave = onSave,
-            onCancelRequest = onDismissRequest
-        )
     }
 }
 

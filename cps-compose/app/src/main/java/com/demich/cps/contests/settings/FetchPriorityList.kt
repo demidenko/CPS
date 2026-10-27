@@ -27,6 +27,7 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
@@ -68,25 +69,27 @@ private fun ColumnScope.DialogContent(
         item.asFlow().map { it.getValue(platform) }
     }.collectAsState(initial = null)
 
-    Text(text = "$platform fetch priority list = ")
+    IncludeFontPadding {
+        Text(text = "$platform fetch priority list = ")
 
-    state.onNotNull { priorityList ->
-        val scope = backgroundCoroutineScope
-        PriorityList(
-            modifier = Modifier.padding(vertical = 4.dp),
-            priorityList = priorityList,
-            availableOptions = availableOptions,
-            onListChange = { newList ->
-                scope.launch {
-                    item.edit {
-                        set(key = platform.toContestPlatform(), value = newList)
+        state.onNotNull { priorityList ->
+            val scope = backgroundCoroutineScope
+            PriorityList(
+                modifier = Modifier.padding(vertical = 4.dp),
+                priorityList = priorityList,
+                availableOptions = availableOptions,
+                onListChange = { newList ->
+                    scope.launch {
+                        item.edit {
+                            set(key = platform.toContestPlatform(), value = newList)
+                        }
                     }
                 }
-            }
-        )
-    }
+            )
+        }
 
-    Note()
+        Note()
+    }
 }
 
 @Composable

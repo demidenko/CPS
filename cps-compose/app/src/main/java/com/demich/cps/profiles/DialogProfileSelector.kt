@@ -70,6 +70,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.FetchValue
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.append
 import com.demich.cps.utils.context
@@ -97,23 +98,25 @@ fun <U: UserInfo> DialogProfileSelector(
     onResult: (ProfileResult<U>) -> Unit
 ) {
     CPSDialog(onDismissRequest = onDismissRequest) {
-        ProfileHeader(
-            text = "getUser(${manager.platform.name}):",
-            color = cpsColors.contentAdditional
-        ) {
-            Icon(imageVector = CPSIcons.Profile, contentDescription = null)
-        }
-
-        DialogContent(
-            manager = manager,
-            initial = initial,
-            onDismissRequest = onDismissRequest,
-            onResult = onResult,
-            charValidator = when (manager) {
-                is ProfileSuggestionsProvider -> manager::isValidForSearch
-                else -> manager::isValidForUserId
+        IncludeFontPadding {
+            ProfileHeader(
+                text = "getUser(${manager.platform.name}):",
+                color = cpsColors.contentAdditional
+            ) {
+                Icon(imageVector = CPSIcons.Profile, contentDescription = null)
             }
-        )
+
+            DialogContent(
+                manager = manager,
+                initial = initial,
+                onDismissRequest = onDismissRequest,
+                onResult = onResult,
+                charValidator = when (manager) {
+                    is ProfileSuggestionsProvider -> manager::isValidForSearch
+                    else -> manager::isValidForUserId
+                }
+            )
+        }
     }
 }
 

@@ -17,6 +17,7 @@ import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.LocalDevModeEnabled
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
@@ -65,21 +66,23 @@ private fun DialogContent(
     onDevModeChange: (Boolean) -> Unit
 ) {
     ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
-        Text("   Competitive")
-        Text("   Programming")
-        Text("&& Solving")
-        Text("{")
-        Text("   version = ${cpsVersion(devModeEnabled)}")
-        if (showDevModeLine) {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("   dev_mode = $devModeEnabled", Modifier.weight(1f))
-                CPSCheckBox(checked = devModeEnabled, onCheckedChange = onDevModeChange)
+        IncludeFontPadding {
+            Text("   Competitive")
+            Text("   Programming")
+            Text("&& Solving")
+            Text("{")
+            Text("   version = ${cpsVersion(devModeEnabled)}")
+            if (showDevModeLine) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("   dev_mode = $devModeEnabled", Modifier.weight(1f))
+                    CPSCheckBox(checked = devModeEnabled, onCheckedChange = onDevModeChange)
+                }
             }
+            Text("}")
         }
-        Text("}")
     }
 }
 

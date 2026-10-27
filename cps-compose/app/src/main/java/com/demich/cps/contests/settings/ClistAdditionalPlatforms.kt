@@ -33,6 +33,7 @@ import com.demich.cps.ui.dialogs.CPSDialog
 import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
+import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectAsStateWithNull
@@ -94,33 +95,35 @@ private fun ColumnScope.DialogContent(
 ) {
     var searchFilter by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.weight(1f, fill = false),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ListTitle(text = "selected:")
-        ClistResourcesList(
-            resources = filter(selected, searchFilter),
-            modifier = Modifier
-                .padding(bottom = 3.dp)
-                .heightIn(max = 200.dp),
-            onItemClick = onUnselectResource
-        )
-
-        ListTitle(text = "available:")
-        LoadingContentBox(
-            fetchState = fetchState,
-            failedText = { it.niceMessage ?: "Failed to get resources" },
-            onRetry = onFetchRetry,
-            modifier = Modifier
-                .padding(bottom = 5.dp)
-                .fillMaxWidth()
-        ) { resources ->
-            val unselected = resources - selected.toSet()
+    IncludeFontPadding {
+        Column(
+            modifier = Modifier.weight(1f, fill = false),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ListTitle(text = "selected:")
             ClistResourcesList(
-                resources = filter(unselected, searchFilter),
-                onItemClick = onSelectResource
+                resources = filter(selected, searchFilter),
+                modifier = Modifier
+                    .padding(bottom = 3.dp)
+                    .heightIn(max = 200.dp),
+                onItemClick = onUnselectResource
             )
+
+            ListTitle(text = "available:")
+            LoadingContentBox(
+                fetchState = fetchState,
+                failedText = { it.niceMessage ?: "Failed to get resources" },
+                onRetry = onFetchRetry,
+                modifier = Modifier
+                    .padding(bottom = 5.dp)
+                    .fillMaxWidth()
+            ) { resources ->
+                val unselected = resources - selected.toSet()
+                ClistResourcesList(
+                    resources = filter(unselected, searchFilter),
+                    onItemClick = onSelectResource
+                )
+            }
         }
     }
 
