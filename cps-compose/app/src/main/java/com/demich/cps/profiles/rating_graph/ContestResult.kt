@@ -26,7 +26,7 @@ import com.demich.cps.profiles.ratingDiff
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.formatFullDateTime
-import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.ui.theme.CPSThemePreview
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.contextLocalTimeZone
@@ -152,7 +152,7 @@ private fun ContestResultTest(
 @Preview(showBackground = true)
 @Composable
 private fun ContestResults() {
-    CPSTheme {
+    CPSThemePreview {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
             modifier = Modifier.padding(5.dp)

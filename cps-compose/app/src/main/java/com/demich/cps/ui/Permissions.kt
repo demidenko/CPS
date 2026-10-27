@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.ui.theme.CPSThemePreview
 import com.demich.cps.ui.theme.cpsColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -143,7 +143,7 @@ private fun PermissionPanel(
 @Preview
 @Composable
 private fun PreviewPermissionPanel() {
-    CPSTheme {
+    CPSThemePreview {
         PermissionPanel(
             message = "Please grand permission for full functionality",
             onClick = { }

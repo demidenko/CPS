@@ -31,7 +31,7 @@ import com.demich.cps.platforms.api.codeforces.models.title
 import com.demich.cps.ui.AttentionIcon
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
-import com.demich.cps.ui.theme.CPSTheme
+import com.demich.cps.ui.theme.CPSThemePreview
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.formatTimerShort
@@ -324,7 +324,7 @@ private fun Rank(
 @Preview(showBackground = true)
 @Composable
 private fun TestProblemColumns() {
-    CPSTheme {
+    CPSThemePreview {
         Row(modifier = Modifier.fillMaxWidth()) {
             ProblemColumn(
                 problemName = "A",

@@ -97,4 +97,16 @@ fun CPSTheme(content: @Composable () -> Unit) {
     }
 }
 
+@Composable
+fun CPSThemePreview(content: @Composable () -> Unit) {
+    CPSTheme(
+        specs = CPSUISpecs(
+            devModeEnabled = false,
+            darkLightMode = DARK,
+            usePlatformColors = false
+        ),
+        content = content
+    )
+}
+
 val LocalDevModeEnabled = compositionLocalOf { false }
