@@ -1,6 +1,7 @@
 package com.demich.cps.community.codeforces
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -102,7 +103,10 @@ internal fun RecentBlogEntry(
     isLowRated: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         BlogEntryTitleWithArrow(
             title = title,
             titleColor = if (isLowRated) cpsColors.contentAdditional else cpsColors.content,
@@ -114,9 +118,7 @@ internal fun RecentBlogEntry(
             commentators = commentators,
             fontSize = 13.sp,
             iconSize = 12.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 2.dp)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
