@@ -20,7 +20,7 @@ fun BlogEntryTitleWithArrow(
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 16.sp,
     singleLine: Boolean,
-    titleColor: Color = cpsColors.content
+    titleColor: Color = Color.Unspecified
 ) {
     IncludeFontPadding {
         Row(
