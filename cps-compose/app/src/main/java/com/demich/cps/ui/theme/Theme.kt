@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.demich.cps.ui.CPSUISpecs
 import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.uiSpecs
 import com.demich.cps.utils.collectAsStateWithNull
@@ -43,24 +44,28 @@ private fun setSystemBarsStyle(context: Context, isDarkMode: Boolean) {
 }
 
 @Composable
-private fun ProvideCPSColors(content: @Composable () -> Unit) {
-    val context = context
-    val specsState = remember { context.settingsUI.uiSpecs }.collectAsStateWithNull()
-    specsState.onNotNull { specs ->
-        val isDarkMode = specs.darkLightMode.isDarkMode()
-        setSystemBarsStyle(context, isDarkMode)
-        val colors = if (isDarkMode) darkCPSColors(specs.usePlatformColors) else lightCPSColors(specs.usePlatformColors)
-        CompositionLocalProvider(
-            LocalCPSColors provides colors,
-            LocalDevModeEnabled provides specs.devModeEnabled,
-            content = content
-        )
-    }
+private fun CPSProviders(
+    specs: CPSUISpecs,
+    content: @Composable () -> Unit
+) {
+    val isDarkMode = specs.darkLightMode.isDarkMode()
+    setSystemBarsStyle(context, isDarkMode)
+
+    val colors = if (isDarkMode) darkCPSColors(specs.usePlatformColors) else lightCPSColors(specs.usePlatformColors)
+
+    CompositionLocalProvider(
+        LocalCPSColors provides colors,
+        LocalDevModeEnabled provides specs.devModeEnabled,
+        content = content
+    )
 }
 
 @Composable
-fun CPSTheme(content: @Composable () -> Unit) {
-    ProvideCPSColors {
+private fun CPSTheme(
+    specs: CPSUISpecs,
+    content: @Composable () -> Unit
+) {
+    CPSProviders(specs = specs) {
         MaterialTheme(
             colors = cpsColors.materialColors(),
             typography = Typography(
@@ -77,6 +82,18 @@ fun CPSTheme(content: @Composable () -> Unit) {
                 content = content
             )
         }
+    }
+}
+
+@Composable
+fun CPSTheme(content: @Composable () -> Unit) {
+    val context = context
+    val specsState = remember { context.settingsUI.uiSpecs }.collectAsStateWithNull()
+    specsState.onNotNull { specs ->
+        CPSTheme(
+            specs = specs,
+            content = content
+        )
     }
 }
 
