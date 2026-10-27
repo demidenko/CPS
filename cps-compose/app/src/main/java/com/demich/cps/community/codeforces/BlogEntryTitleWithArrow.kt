@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 
 @Composable
 fun BlogEntryTitleWithArrow(
@@ -22,27 +21,25 @@ fun BlogEntryTitleWithArrow(
     singleLine: Boolean,
     titleColor: Color = Color.Unspecified
 ) {
-    IncludeFontPadding {
-        Row(
-            modifier = modifier
-        ) {
-            IconSp(
-                imageVector = CPSIcons.ArrowRight,
-                size = fontSize,
-                color = cpsColors.contentAdditional,
-                modifier = Modifier.alignBy {
-                    it.measuredHeight * 5 / 6
-                }
-            )
-            Text(
-                text = title,
-                fontSize = fontSize,
-                color = titleColor,
-                fontWeight = FontWeight.Medium,
-                maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-                overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
-                modifier = Modifier.alignByBaseline()
-            )
-        }
+    Row(
+        modifier = modifier
+    ) {
+        IconSp(
+            imageVector = CPSIcons.ArrowRight,
+            size = fontSize,
+            color = cpsColors.contentAdditional,
+            modifier = Modifier.alignBy {
+                it.measuredHeight * 5 / 6
+            }
+        )
+        Text(
+            text = title,
+            fontSize = fontSize,
+            color = titleColor,
+            fontWeight = FontWeight.Medium,
+            maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+            overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+            modifier = Modifier.alignByBaseline()
+        )
     }
 }

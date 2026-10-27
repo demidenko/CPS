@@ -63,7 +63,7 @@ internal fun CodeforcesRecentBlogEntries(
 }
 
 internal fun Modifier.recentBlogEntryPaddings() =
-    padding(start = 3.dp, end = 3.dp, bottom = 2.dp, top = 1.dp)
+    padding(start = 3.dp, end = 3.dp, bottom = 2.dp, top = 3.dp)
 
 @Immutable
 internal data class CodeforcesRecentCommentsOfBlogEntry(
