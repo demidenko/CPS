@@ -33,7 +33,6 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSThemePreview
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.formatTimerShort
 import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.springIntLow
@@ -224,17 +223,16 @@ private fun ProblemColumn(
     contestType: CodeforcesContestType,
     modifier: Modifier = Modifier
 ) {
-    IncludeFontPadding {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = problemName)
-            ProblemResultCell(
-                problemResult = problemResult,
-                contestType = contestType
-            )
-        }
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(text = problemName)
+        ProblemResultCell(
+            problemResult = problemResult,
+            contestType = contestType
+        )
     }
 }
 
