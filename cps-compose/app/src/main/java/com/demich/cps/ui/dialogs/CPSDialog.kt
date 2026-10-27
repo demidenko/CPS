@@ -48,20 +48,18 @@ fun CPSDialog(
 //            usePlatformDefaultWidth = false, //affects height!!!
         )
     ) {
-        IncludeFontPadding {
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                backgroundColor = cpsColors.backgroundAdditional,
-                modifier = Modifier
-                    .imePadding()
-                    .padding(vertical = 12.dp)
-            ) {
-                Column(
-                    modifier = modifier.padding(all = 18.dp),
-                    horizontalAlignment = horizontalAlignment,
-                    content = content
-                )
-            }
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            backgroundColor = cpsColors.backgroundAdditional,
+            modifier = Modifier
+                .imePadding()
+                .padding(vertical = 12.dp)
+        ) {
+            Column(
+                modifier = modifier.padding(all = 18.dp),
+                horizontalAlignment = horizontalAlignment,
+                content = content
+            )
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -368,9 +369,14 @@ private fun WorkerDialog(
         onDismissRequest = onDismissRequest
     ) {
         ProvideTextStyle(value = CPSDefaults.MonospaceTextStyle) {
-            Text(text = work.name, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 5.dp))
+            Text(text = work.name, fontWeight = FontWeight.SemiBold)
 
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(5.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 when (val state = workInfo.stateOrCancelled) {
                     ENQUEUED -> {
                         workInfo?.nextScheduleTime?.let { nextTime ->
