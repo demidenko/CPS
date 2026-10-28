@@ -1,5 +1,6 @@
 package com.demich.cps.ui.bottombar
 
+import androidx.compose.animation.animateBounds
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Indication
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import com.demich.cps.navigation.Screen
@@ -161,22 +163,24 @@ private fun BottomBarNavigationItems(
     onSelect: (Screen.RootScreen) -> Unit,
     onLongPress: () -> Unit
 ) {
-    BottomBarNavigationItems(
-        modifier = modifier.clipToBounds(),
-        navigationLayoutType = layoutType
-    ) {
-        val selectedRootScreen = selectedRootScreen()
-        rootScreens.forEach { screen ->
-            CPSBottomNavigationItem(
-                icon = screen.bottomBarIcon,
-                isSelected = screen == selectedRootScreen,
-                onClick = {
-                    if (screen != selectedRootScreen) onSelect(screen)
-                },
-                onLongPress = onLongPress,
-                indication = indication,
-                modifier = Modifier.fillMaxHeight()
-            )
+    LookaheadScope {
+        BottomBarNavigationItems(
+            modifier = modifier.clipToBounds(),
+            navigationLayoutType = layoutType
+        ) {
+            val selectedRootScreen = selectedRootScreen()
+            rootScreens.forEach { screen ->
+                CPSBottomNavigationItem(
+                    icon = screen.bottomBarIcon,
+                    isSelected = screen == selectedRootScreen,
+                    onClick = {
+                        if (screen != selectedRootScreen) onSelect(screen)
+                    },
+                    onLongPress = onLongPress,
+                    indication = indication,
+                    modifier = Modifier.fillMaxHeight().animateBounds(lookaheadScope = this)
+                )
+            }
         }
     }
 }
