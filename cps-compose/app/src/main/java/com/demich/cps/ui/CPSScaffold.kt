@@ -149,9 +149,9 @@ private fun BottomBarAndNavBar(
         if (enabled) {
             specsState.onNotNull { specs ->
                 CPSBottomBar(
-                    selectedRootScreen = selectedRootScreen,
+                    selectedRootScreen = selectedRootScreen(),
                     onNavigateToScreen = onNavigateToScreen,
-                    additionalContent = additionalBottomBar,
+                    additionalContent = additionalBottomBar(),
                     settingsEnabled = bottomBarSettingsEnabled,
                     onEnableSettings = onEnableBottomBarSettings,
                     onDisableSettings = onDisableBottomBarSettings,

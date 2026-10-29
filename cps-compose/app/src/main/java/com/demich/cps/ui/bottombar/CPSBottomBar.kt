@@ -42,9 +42,9 @@ typealias AdditionalBottomBarBuilder = @Composable RowScope.() -> Unit
 
 @Composable
 fun CPSBottomBar(
-    selectedRootScreen: () -> Screen.RootScreen?,
+    selectedRootScreen: Screen.RootScreen?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
-    additionalContent: () -> AdditionalBottomBarBuilder,
+    additionalContent: AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
     onDisableSettings: () -> Unit,
@@ -87,9 +87,9 @@ fun CPSBottomBar(
 
 @Composable
 private fun BottomBarRow(
-    selectedRootScreen: () -> Screen.RootScreen?,
+    selectedRootScreen: Screen.RootScreen?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
-    additionalContent: () -> AdditionalBottomBarBuilder,
+    additionalContent: AdditionalBottomBarBuilder,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
     specs: CPSBottomNavBarSpecs,
@@ -101,7 +101,7 @@ private fun BottomBarRow(
     ) {
         BottomBarBodyAdditional(
             modifier = Modifier.weight(1f),
-            content = additionalContent()
+            content = additionalContent
         )
         BottomBarVerticalDivider()
         BottomBarBodyMain(
@@ -117,7 +117,7 @@ private fun BottomBarRow(
 
 @Composable
 private fun BottomBarBodyMain(
-    selectedRootScreen: () -> Screen.RootScreen?,
+    selectedRootScreen: Screen.RootScreen?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
     settingsEnabled: Boolean,
     onEnableSettings: () -> Unit,
@@ -137,7 +137,7 @@ private fun BottomBarBodyMain(
     BottomBarNavigationItems(
         modifier = modifier,
         rootScreens = rootScreens,
-        selectedRootScreen = if (settingsEnabled) null else selectedRootScreen(),
+        selectedRootScreen = if (settingsEnabled) null else selectedRootScreen,
         indication = if (settingsEnabled) null else ripple(bounded = false, radius = 48.dp),
         layoutType = specs.layoutType,
         onSelect = onNavigateToScreen,
