@@ -1,8 +1,6 @@
 package com.demich.cps.ui.bottombar
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -22,22 +20,12 @@ import com.demich.cps.ui.theme.cpsColors
 internal fun CPSBottomNavigationItem(
     icon: ImageVector,
     isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    indication: Indication?,
-    onLongPress: (() -> Unit)? = null,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier
 ) {
     val fraction by animateFloatAsState(targetValue = if (isSelected) 1f else 0f)
 
     Box(
-        modifier = modifier
-            .minimumInteractiveComponentSize()
-            .combinedClickable(
-                indication = indication,
-                interactionSource = null,
-                onClick = onClick,
-                onLongClick = onLongPress
-            )
+        modifier = modifier.minimumInteractiveComponentSize()
     ) {
         Icon(
             imageVector = icon,

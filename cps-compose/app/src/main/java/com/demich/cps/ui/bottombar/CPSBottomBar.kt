@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -172,12 +173,15 @@ private fun BottomBarNavigationItems(
                 CPSBottomNavigationItem(
                     icon = screen.bottomBarIcon,
                     isSelected = screen == selectedRootScreen,
-                    onClick = {
-                        if (screen != selectedRootScreen) onSelect(screen)
-                    },
-                    onLongPress = onLongPress,
-                    indication = indication,
-                    modifier = Modifier.fillMaxHeight().animateBounds(lookaheadScope = this)
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .combinedClickable(
+                            indication = indication,
+                            interactionSource = null,
+                            onClick = { if (screen != selectedRootScreen) onSelect(screen) },
+                            onLongClick = onLongPress
+                        )
+                        .animateBounds(lookaheadScope = this)
                 )
             }
         }
