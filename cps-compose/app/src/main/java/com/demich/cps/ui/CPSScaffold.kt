@@ -138,16 +138,16 @@ private fun BottomBarAndNavBar(
 
     val enabled = bottomBarEnabled()
 
-    Box(
-        modifier = modifier
-            .backgroundColor {
-                if (enabled) backgroundColor
-                else Color.Unspecified
-            }
-            .navigationBarsPadding()
-    ) {
-        if (enabled) {
-            specsState.onNotNull { specs ->
+    specsState.onNotNull { specs ->
+        Box(
+            modifier = modifier
+                .backgroundColor {
+                    if (enabled) backgroundColor
+                    else Color.Unspecified
+                }
+                .navigationBarsPadding()
+        ) {
+            if (enabled) {
                 CPSBottomBar(
                     selectedRootScreen = selectedRootScreen(),
                     onNavigateToScreen = onNavigateToScreen,
