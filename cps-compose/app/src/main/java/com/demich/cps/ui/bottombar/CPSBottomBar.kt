@@ -104,7 +104,9 @@ private fun BottomBarRow(
             modifier = Modifier.weight(1f),
             content = additionalContent
         )
-        BottomBarVerticalDivider()
+        BottomBarVerticalDivider(
+            modifier = Modifier.fillMaxHeight(0.618f)
+        )
         BottomBarBodyMain(
             modifier = Modifier.weight(1f).fillMaxHeight(),
             selectedRootScreen = selectedRootScreen,
@@ -201,10 +203,11 @@ private fun BottomBarBodyAdditional(
 }
 
 @Composable
-private fun BottomBarVerticalDivider() {
+private fun BottomBarVerticalDivider(
+    modifier: Modifier = Modifier
+) { // TODO: material3 VerticalDivider
     Box(
-        Modifier
-            .fillMaxHeight(0.6f)
+        modifier = modifier
             .width(1.dp)
             .background(cpsColors.divider)
     )
