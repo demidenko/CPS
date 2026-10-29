@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -63,6 +64,7 @@ fun CodeforcesCommunityScreen(
             newEntriesState = newEntriesState,
             modifier = Modifier.fillMaxWidth()
         )
+        Divider()
         CodeforcesPager(
             backgroundLoader = backgroundLoader,
             pagerState = pagerState,
