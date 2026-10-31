@@ -14,9 +14,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
-import kotlin.math.max
 
-internal fun Modifier.drawScrollBar(
+fun Modifier.drawScrollBar(
     state: LazyListState,
     color: () -> Color,
     scrollBarWidth: Dp,
@@ -34,7 +33,7 @@ internal fun Modifier.drawScrollBar(
     }
 }
 
-internal fun Modifier.drawScrollBar(
+fun Modifier.drawScrollBar(
     state: LazyListState,
     activeColor: Color,
     inactiveColor: Color,
@@ -59,6 +58,25 @@ internal fun Modifier.drawScrollBar(
     )
 }
 
+private inline fun LazyListLayoutInfo.calculateBarSize(
+    minBarSize: Float,
+    block: (offset: Float, size: Float) -> Unit
+) {
+    calculateSizes { windowSize, totalSize, windowOffset ->
+        val rawSize = windowSize / totalSize * windowSize
+        val size: Float
+        val offset: Float
+        if (rawSize < minBarSize) {
+            size = minBarSize
+            offset = windowOffset / (totalSize - windowSize) * (windowSize - size)
+        } else {
+            size = rawSize
+            offset = windowOffset / totalSize * windowSize
+        }
+        block(offset, size)
+    }
+}
+
 private inline fun LazyListLayoutInfo.calculateSizes(
     block: (windowSize: Int, totalSize: Float, windowOffset: Float) -> Unit
 ) {
@@ -72,18 +90,5 @@ private inline fun LazyListLayoutInfo.calculateSizes(
             val windowOffset: Float = visibleItems.first().run { index * itemAvgSize - offset }
             block(windowSize, totalSize, windowOffset)
         }
-    }
-}
-
-private inline fun LazyListLayoutInfo.calculateBarSize(
-    minBarSize: Float,
-    block: (offset: Float, size: Float) -> Unit
-) {
-    calculateSizes { windowSize, totalSize, windowOffset ->
-        val rawSize = windowSize / totalSize * windowSize
-        val size = max(rawSize, minBarSize)
-        val offset = if (size == rawSize) windowOffset / totalSize * windowSize
-            else windowOffset / (totalSize - windowSize) * (windowSize - size)
-        block(offset, size)
     }
 }
