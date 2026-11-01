@@ -42,7 +42,9 @@ internal fun BottomBarSettings(
     Column(modifier = modifier) {
         CloseRow(onCloseRequest)
         Divider()
-        LayoutSelectRow()
+        LayoutSelectRow(
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -61,7 +63,9 @@ private fun CloseRow(
 }
 
 @Composable
-private fun LayoutSelectRow() {
+private fun LayoutSelectRow(
+    modifier: Modifier = Modifier
+) {
     val context = context
     val scope = backgroundCoroutineScope
     val layoutTypeState = remember { context.settingsUI.navigationLayoutType }.collectAsStateWithNull()
@@ -69,7 +73,7 @@ private fun LayoutSelectRow() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
     ) {
         Text(
             text = "layout: ",
