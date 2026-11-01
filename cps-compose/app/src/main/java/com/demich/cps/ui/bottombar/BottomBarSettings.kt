@@ -16,34 +16,32 @@ import androidx.compose.material.Divider
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.ButtonsSelectRow
+import com.demich.cps.ui.CPSBottomNavBarSpecs
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.settingsUI
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.collectAsStateWithNull
-import com.demich.cps.utils.context
-import com.demich.cps.utils.onNotNull
-import com.demich.datastore_itemized.setValueIn
 
 @Composable
-internal fun BottomBarSettings(
+fun BottomBarSettings(
     modifier: Modifier = Modifier,
+    specs: CPSBottomNavBarSpecs,
+    onChangeLayout: (NavigationLayoutType) -> Unit,
     onCloseRequest: () -> Unit
 ) {
     Column(modifier = modifier) {
         CloseRow(onCloseRequest)
         Divider()
         LayoutSelectRow(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            specs = specs,
+            onChangeLayout = onChangeLayout
         )
     }
 }
@@ -64,12 +62,10 @@ private fun CloseRow(
 
 @Composable
 private fun LayoutSelectRow(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    specs: CPSBottomNavBarSpecs,
+    onChangeLayout: (NavigationLayoutType) -> Unit,
 ) {
-    val context = context
-    val scope = backgroundCoroutineScope
-    val layoutTypeState = remember { context.settingsUI.navigationLayoutType }.collectAsStateWithNull()
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End,
@@ -81,19 +77,14 @@ private fun LayoutSelectRow(
             color = cpsColors.contentAdditional,
             style = CPSDefaults.MonospaceTextStyle
         )
-        layoutTypeState.onNotNull { layoutType ->
-            ButtonsSelectRow(
-                values = NavigationLayoutType.entries,
-                selectedValue = layoutType,
-                onSelect = {
-                    context.settingsUI.navigationLayoutType.setValueIn(scope, it)
-                }
-            ) {
-                DemoRow(it, Modifier.widthIn(max = 56.dp))
-            }
+        ButtonsSelectRow(
+            values = NavigationLayoutType.entries,
+            selectedValue = specs.layoutType,
+            onSelect = onChangeLayout
+        ) {
+            DemoRow(it, Modifier.widthIn(max = 56.dp))
         }
     }
-
 }
 
 @Composable

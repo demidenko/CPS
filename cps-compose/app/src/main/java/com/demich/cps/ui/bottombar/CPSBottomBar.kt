@@ -51,6 +51,7 @@ fun CPSBottomBar(
     onDisableSettings: () -> Unit,
     backgroundColor: () -> Color,
     specs: CPSBottomNavBarSpecs,
+    onChangeLayout: (NavigationLayoutType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -63,6 +64,8 @@ fun CPSBottomBar(
                 .fillMaxWidth()
         ) {
             BottomBarSettings(
+                specs = specs,
+                onChangeLayout = onChangeLayout,
                 onCloseRequest = onDisableSettings,
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp))
