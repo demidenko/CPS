@@ -54,30 +54,39 @@ fun CPSScaffold(
     ) {
         NavBarShelf(
             modifier = Modifier.fillMaxSize(),
-            selectedRootScreen = { navigator.currentScreen?.rootScreen },
+            state = {
+                if (navigator.isBottomBarEnabled) {
+                    CPSNavBarState(
+                        selectedRootScreen = navigator.currentScreen?.rootScreen,
+                        additionalContent = navigator.additionalBottomBar
+                    )
+                } else {
+                    null
+                }
+            },
             onNavigateToScreen = navigator::navigateTo,
-            bottomBarEnabled = navigator::isBottomBarEnabled,
             content = {
                 TopBarsAndContent(
                     topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
                     content = content,
                     modifier = Modifier.fillMaxSize()
                 )
-            },
-            additionalBottomBar = { navigator.additionalBottomBar }
+            }
         )
     }
 }
 
+private data class CPSNavBarState(
+    val selectedRootScreen: Screen.RootScreen?,
+    val additionalContent: AdditionalBottomBarBuilder
+)
 
 @Composable
 private fun NavBarShelf(
     modifier: Modifier = Modifier,
-    selectedRootScreen: () -> Screen.RootScreen?,
+    state: () -> CPSNavBarState?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
-    bottomBarEnabled: () -> Boolean,
     content: @Composable () -> Unit,
-    additionalBottomBar: () -> AdditionalBottomBarBuilder
 ) {
     var settingsEnabled by rememberSaveable { mutableStateOf(false) }
 
@@ -99,13 +108,11 @@ private fun NavBarShelf(
         }
 
         BottomBarAndNavBar(
-            selectedRootScreen = selectedRootScreen,
+            state = state,
             onNavigateToScreen = onNavigateToScreen,
-            bottomBarEnabled = bottomBarEnabled,
             bottomBarSettingsEnabled = settingsEnabled,
             onDisableBottomBarSettings = { settingsEnabled = false },
             onEnableBottomBarSettings = { settingsEnabled = true }.withVibration(),
-            additionalBottomBar = additionalBottomBar,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -125,13 +132,11 @@ private fun bottomBarBackgroundColorState(enabled: Boolean) =
 @Composable
 private fun BottomBarAndNavBar(
     modifier: Modifier = Modifier,
-    selectedRootScreen: () -> Screen.RootScreen?,
+    state: () -> CPSNavBarState?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
-    bottomBarEnabled: () -> Boolean,
     bottomBarSettingsEnabled: Boolean,
     onDisableBottomBarSettings: () -> Unit,
-    onEnableBottomBarSettings: () -> Unit,
-    additionalBottomBar: () -> AdditionalBottomBarBuilder
+    onEnableBottomBarSettings: () -> Unit
 ) {
     val context = context
     val scope = backgroundCoroutineScope
@@ -140,22 +145,22 @@ private fun BottomBarAndNavBar(
 
     val backgroundColor by bottomBarBackgroundColorState(bottomBarSettingsEnabled)
 
-    val enabled = bottomBarEnabled()
+    val state = state()
 
     specsState.onNotNull { specs ->
         Box(
             modifier = modifier
                 .backgroundColor {
-                    if (enabled) backgroundColor
+                    if (state != null) backgroundColor
                     else Color.Unspecified
                 }
                 .navigationBarsPadding()
         ) {
-            if (enabled) {
+            if (state != null) {
                 CPSBottomBar(
-                    selectedRootScreen = selectedRootScreen(),
+                    selectedRootScreen = state.selectedRootScreen,
                     onNavigateToScreen = onNavigateToScreen,
-                    additionalContent = additionalBottomBar(),
+                    additionalContent = state.additionalContent,
                     settingsEnabled = bottomBarSettingsEnabled,
                     onEnableSettings = onEnableBottomBarSettings,
                     onDisableSettings = onDisableBottomBarSettings,
