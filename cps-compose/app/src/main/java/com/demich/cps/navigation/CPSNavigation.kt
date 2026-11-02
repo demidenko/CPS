@@ -82,9 +82,6 @@ class CPSNavigator(
     fun flowOfCurrentScreen(): Flow<Screen> =
         navController.currentScreenFlow()
 
-    val isBottomBarEnabled: Boolean
-        get() = currentScreen !is Screen.NoBottomBarScreen
-
     fun navigateTo(screen: Screen) {
         val currentScreen = currentScreen ?: return
         if (screen.rootScreen != currentScreen.rootScreen) {
@@ -182,6 +179,15 @@ class CPSNavigator(
         get() = bottomBarBuilderState.value ?: {}
 }
 
+val CPSNavigator.navBarState: CPSNavBarState?
+    get() = when (val screen = currentScreen) {
+        is Screen.NoBottomBarScreen -> null
+        else -> CPSNavBarState(
+            selectedRootScreen = screen?.rootScreen,
+            additionalContent = additionalBottomBar
+        )
+    }
+
 context(builder: NavGraphBuilder)
 inline fun <reified T: Screen> CPSNavigator.navEntry(
     crossinline content: @Composable CPSNavigator.ScreenScope<T>.() -> Unit
@@ -198,6 +204,11 @@ inline fun <reified T: Screen> CPSNavigator.navEntry(
         }
     }
 }
+
+data class CPSNavBarState(
+    val selectedRootScreen: Screen.RootScreen?,
+    val additionalContent: AdditionalBottomBarBuilder
+)
 
 private class StartScreenDataStore(context: Context): ItemizedDataStore(context.dataStore) {
     companion object {

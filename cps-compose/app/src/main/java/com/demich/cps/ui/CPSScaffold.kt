@@ -23,9 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import com.demich.cps.navigation.CPSNavBarState
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
+import com.demich.cps.navigation.navBarState
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
@@ -55,16 +56,7 @@ fun CPSScaffold(
     ) {
         NavBarShelf(
             modifier = Modifier.fillMaxSize(),
-            state = {
-                if (navigator.isBottomBarEnabled) {
-                    CPSNavBarState(
-                        selectedRootScreen = navigator.currentScreen?.rootScreen,
-                        additionalContent = navigator.additionalBottomBar
-                    )
-                } else {
-                    null
-                }
-            },
+            state = navigator::navBarState,
             onNavigateToScreen = onNavigateToScreen,
             content = {
                 TopBarsAndContent(
@@ -76,11 +68,6 @@ fun CPSScaffold(
         )
     }
 }
-
-private data class CPSNavBarState(
-    val selectedRootScreen: Screen.RootScreen?,
-    val additionalContent: AdditionalBottomBarBuilder
-)
 
 @Composable
 private fun NavBarShelf(
