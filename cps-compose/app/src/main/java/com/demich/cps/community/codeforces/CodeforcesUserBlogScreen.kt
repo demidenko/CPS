@@ -11,8 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
+import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.community.follow.CodeforcesUserBlogPreview
-import com.demich.cps.community.follow.followRepository
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.features.codeforces.follow.database.blog
 import com.demich.cps.fetchstate.FetchResult
@@ -43,7 +43,6 @@ import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectAsStateWithLifecycle
-import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.flow.Flow
@@ -73,18 +72,17 @@ private fun CodeforcesUserBlogScreen(
     blogId: Long,
     filterState: FilterState
 ) {
-    val context = context
-    val repository = remember { context.followRepository }
+    val unitsFactory = LocalCommunityUnitsFactory.current
     val viewModel = viewModelScoped { BlogLoadingViewModel() }
 
     val uuidState = rememberUUIDState()
 
     val blogEntries by viewModel
-        .flowOfFetchBlogEntries(blogId = blogId, repository = repository, key = uuidState.value)
+        .flowOfFetchBlogEntries(blogId = blogId, repository = unitsFactory::followRepository, key = uuidState.value)
         .collectAsState()
 
     val userBlogInfo by collectAsStateWithLifecycle {
-        repository.flowOfUserBlogInfo(blogId = blogId)
+        unitsFactory.followRepository().flowOfUserBlogInfo(blogId = blogId)
     }
 
     CodeforcesUserBlogScreen(
@@ -179,9 +177,10 @@ private class BlogLoadingViewModel: ViewModel() {
 
     fun flowOfFetchBlogEntries(
         blogId: Long,
-        repository: CodeforcesFollowRepository,
+        repository: () -> CodeforcesFollowRepository,
         key: Any
     ) = blogEntriesLoader.executeFlow(key = Pair(blogId, key)) {
+            val repository = repository()
             val user = repository.blog(blogId = blogId).userProfile
             combine(
                 flow = flow {
