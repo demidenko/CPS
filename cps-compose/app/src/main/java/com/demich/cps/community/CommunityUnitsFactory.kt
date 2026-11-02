@@ -7,11 +7,15 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
+import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
+import com.demich.cps.workers.CodeforcesLostDataStore
 
 interface CommunityUnitsFactory {
     fun settingsStorage(): CommunitySettingsDataStore
 
     fun followRepository(): CodeforcesFollowRepository
+
+    fun lostStorage(): CodeforcesLostStorage
 }
 
 @JvmInline
@@ -19,6 +23,8 @@ private value class CommunityUnitsAndroidFactory(val context: Context): Communit
     override fun settingsStorage() = context.settingsCommunity
 
     override fun followRepository() = context.followRepository
+
+    override fun lostStorage() = CodeforcesLostDataStore(context)
 }
 
 val LocalCommunityUnitsFactory = compositionLocalWithComputedDefaultOf<CommunityUnitsFactory> {
