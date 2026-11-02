@@ -30,8 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.database.Contest
-import com.demich.cps.contests.database.ContestsRepository
-import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.list_items.ContestItem
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
@@ -160,11 +158,7 @@ private fun ContestsScreen(
 ) {
     val context = context
     val contestsFlow = remember {
-        flowOfContests(
-            repository = context.contestsRepository,
-            infoStorage = ContestsInfoDataStore(context),
-            monitorStorage = CodeforcesMonitorDataStore(context)
-        )
+        ContestsUnitsAndroidFactory(context).flowOfContests()
     }
 
     val [
@@ -531,14 +525,10 @@ private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
     }
 
-private fun flowOfContests(
-    repository: ContestsRepository,
-    infoStorage: ContestsInfoDataStore,
-    monitorStorage: CodeforcesMonitorDataStore
-): Flow<List<Contest>> =
+private fun ContestsUnitsFactory.flowOfContests(): Flow<List<Contest>> =
     combine(
-        repository.flowOfContests().distinctUntilChanged(),
-        flowOfHidden(infoStorage, monitorStorage)
+        repository().flowOfContests().distinctUntilChanged(),
+        flowOfHidden(infoStorage(), codeforcesMonitorStorage())
     ) { list, hidden ->
         if (hidden.isEmpty()) list
         else list.filter { contest -> contest.compositeId !in hidden }
