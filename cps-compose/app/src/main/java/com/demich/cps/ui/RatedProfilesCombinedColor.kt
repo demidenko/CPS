@@ -5,7 +5,9 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 
 @Composable
 fun ratedProfilesColorState(
@@ -35,11 +36,12 @@ fun ratedProfilesColorState(
     // TODO: upstream recomposition trigger on [rank] or [cpsColors] change
 
     val context = context
-    val rank by collectAsState {
-        combine(
-            flow = flowOfRankGetter(context),
-            flow2 = navigator.flowOfCurrentScreen().onStart<Screen?> { emit(null) } // deadlock without null
-        ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
+    val rankGetter by collectAsState { flowOfRankGetter(context) }
+
+    val rank: RatedRank? by remember(navigator) {
+        derivedStateOf {
+            rankGetter[navigator.currentScreen]
+        }
     }
 
     return colorState(
