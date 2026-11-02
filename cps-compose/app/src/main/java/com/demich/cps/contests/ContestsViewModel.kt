@@ -1,10 +1,9 @@
 package com.demich.cps.contests
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.demich.cps.contests.database.ContestPlatform
-import com.demich.cps.contests.database.contestsRepository
+import com.demich.cps.contests.database.ContestsRepository
 import com.demich.cps.contests.database.toContestPlatform
 import com.demich.cps.contests.fetching.ContestsFetchResult
 import com.demich.cps.contests.fetching.ContestsFetchSource
@@ -12,13 +11,11 @@ import com.demich.cps.contests.loading_engine.collectTo
 import com.demich.cps.contests.settings.ContestsFetchSettingsSnapshotDiff
 import com.demich.cps.contests.settings.differenceFrom
 import com.demich.cps.contests.settings.fetchSettingsSnapshot
-import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.combineLoadingStatus
 import com.demich.cps.utils.set
 import com.demich.cps.utils.sharedViewModel
 import com.demich.cps.utils.uniqueLaunch
-import com.demich.cps.workers.ContestsWorker
 import com.demich.kotlin_stdlib_boost.emptyEnumSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,28 +58,28 @@ class ContestsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectToRepository(context: Context) =
+    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectToRepository(repository: ContestsRepository) =
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
-        .collectTo(repository = context.contestsRepository)
+        .collectTo(repository = repository)
 
     private val reloadEnabledPlatformsMutex = Mutex()
-    fun reloadEnabledPlatforms(context: Context) {
+    fun reloadEnabledPlatforms(unitsFactory: ContestsUnitsFactory) {
         uniqueLaunch(mutex = reloadEnabledPlatformsMutex) {
-            ContestsWorker.getWork(context).enqueueInRepeatInterval()
+            unitsFactory.work().enqueueInRepeatInterval()
 
-            context.settingsContests.contestsFetchFlows()
-                .collectToRepository(context = context)
+            unitsFactory.settingsStorage().contestsFetchFlows()
+                .collectToRepository(repository = unitsFactory.repository())
         }
     }
 
     private val applyChangedSettingsMutex = Mutex()
-    fun applyChangedSettings(context: Context) {
+    fun applyChangedSettings(unitsFactory: ContestsUnitsFactory) {
         uniqueLaunch(mutex = applyChangedSettingsMutex) {
-            val infoDataStore = ContestsInfoDataStore(context)
+            val infoDataStore = unitsFactory.infoStorage()
             val snapshot = infoDataStore.settingsSnapshot() ?: return@uniqueLaunch
             infoDataStore.settingsSnapshot.setValue(null)
 
-            val settings = context.settingsContests
+            val settings = unitsFactory.settingsStorage()
             val diff = settings.fetchSettingsSnapshot().differenceFrom(snapshot)
 
             val fakeResults = diff.toRemove.map {
@@ -97,7 +94,7 @@ class ContestsViewModel: ViewModel() {
 
             settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload())
                 .plus(pairs = fakeResults)
-                .collectToRepository(context = context)
+                .collectToRepository(repository = unitsFactory.repository())
         }
     }
 }

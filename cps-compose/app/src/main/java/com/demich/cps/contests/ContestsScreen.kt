@@ -121,7 +121,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         flowOfLoadingStatus(viewModel = viewModel, work = unitsFactory.work())
     }.collectAsStateWithLifecycle(initialValue = null)
 
-    val onReload = { viewModel.reloadEnabledPlatforms(context) }
+    val onReload = { viewModel.reloadEnabledPlatforms(unitsFactory = unitsFactory) }
 
     ContestsScreen(
         viewState = viewState,
@@ -145,7 +145,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     )
 
     SideEffect(viewModel) {
-        viewModel.applyChangedSettings(context)
+        viewModel.applyChangedSettings(unitsFactory = unitsFactory)
     }
 }
 
