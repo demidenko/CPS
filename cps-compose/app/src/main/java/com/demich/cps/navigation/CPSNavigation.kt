@@ -39,7 +39,6 @@ import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.writeOnlyProperty
 import com.demich.datastore_itemized.ItemizedDataStore
 import com.demich.datastore_itemized.dataStoreWrapper
-import com.demich.datastore_itemized.setValueIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -162,7 +161,7 @@ class CPSNavigator(
                 .debounce(500.milliseconds)
                 .distinctUntilChangedBy { it.rootScreen }
                 .collect {
-                    startScreenItem.setValueIn(this, it.rootScreen)
+                    startScreenItem.setValue(it.rootScreen)
                 }
         }
     }
