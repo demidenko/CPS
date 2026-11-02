@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
@@ -12,8 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demich.cps.community.CommunityUnitsFactory
+import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.community.follow.CodeforcesBlogEntriesFollowAddable
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.platforms.codeforces.lost.CodeforcesLostBlogEntry
 import com.demich.cps.platforms.utils.codeforces.CodeforcesAdminTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesRatingColorTag
@@ -22,9 +22,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUserTag
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
 import com.demich.cps.platforms.utils.codeforces.toWebBlogEntry
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
-import com.demich.cps.workers.CodeforcesLostDataStore
 import com.demich.kotlin_stdlib_boost.mapToSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -36,7 +34,7 @@ fun CodeforcesCommunityLostPage(
     pagerState: CodeforcesCommunityPagerState,
     newEntriesState: NewEntriesState
 ) {
-    val context = context
+    val unitsFactory = LocalCommunityUnitsFactory.current
     val listState = rememberLazyListState()
 
     val codeforcesNewEntriesState = rememberCodeforcesNewEntriesState(
@@ -52,9 +50,8 @@ fun CodeforcesCommunityLostPage(
         }
     }.collectAsState(initial = null)
 
-    val blogEntries by remember {
-        backgroundLoader.flowOfLostBlogEntries(context)
-    }.collectAsStateWithLifecycle(initialValue = null)
+    val blogEntries by remember { unitsFactory.flowOfLostBlogEntries() }
+        .collectAsStateWithLifecycle(initialValue = null)
 
     CodeforcesBlogEntriesFollowAddable(
         blogEntries = blogEntries,
@@ -80,10 +77,10 @@ private fun TopLabel() {
     )
 }
 
-fun CodeforcesCommunityBackgroundLoader.flowOfLostBlogEntries(context: Context): Flow<List<CodeforcesWebBlogEntry>> =
+fun CommunityUnitsFactory.flowOfLostBlogEntries(): Flow<List<CodeforcesWebBlogEntry>> =
     combine(
-        flow = CodeforcesLostDataStore(context).flowOfLostEntries(),
-        flow2 = context.settingsCommunity.codeforcesLostMinRatingTag.asFlow()
+        flow = lostStorage().flowOfLostEntries(),
+        flow2 = settingsStorage().codeforcesLostMinRatingTag.asFlow()
     ) { list, minRatingTag ->
         list.sortedByDescending { it.timeStamp }.toWebBlogEntries(minRatingTag)
     }

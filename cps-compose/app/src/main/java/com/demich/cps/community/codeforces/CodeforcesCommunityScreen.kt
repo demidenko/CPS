@@ -1,6 +1,5 @@
 package com.demich.cps.community.codeforces
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.community.CommunityTab
 import com.demich.cps.community.CommunityTabRow
+import com.demich.cps.community.CommunityUnitsFactory
+import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.platformLogoPainter
@@ -208,9 +209,10 @@ private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
     tab: CodeforcesTab,
     newEntriesState: NewEntriesState
 ): State<NewEntryTypeCounters?> {
-    val context = context
+    val unitsFactory = LocalCommunityUnitsFactory.current
+
     val flowIds = remember(key1 = tab, key2 = this) {
-        flowOfEntryIds(tab = tab, context = context)
+        flowOfEntryIds(tab = tab, unitsFactory = unitsFactory)
     }
 
     if (flowIds == null) return stateOfNull()
@@ -226,10 +228,13 @@ private fun CodeforcesCommunityBackgroundLoader.newEntryCountersState(
     }
 }
 
-private fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(tab: CodeforcesTab, context: Context): Flow<List<Int>>? {
+private fun CodeforcesCommunityBackgroundLoader.flowOfEntryIds(
+    tab: CodeforcesTab,
+    unitsFactory: CommunityUnitsFactory
+): Flow<List<Int>>? {
     val flow = when (tab) {
         MAIN -> flowOfMainBlogEntries()
-        LOST -> flowOfLostBlogEntries(context)
+        LOST -> unitsFactory.flowOfLostBlogEntries()
         else -> return null
     }
     return flow.map { it?.map { it.id } ?: [] }

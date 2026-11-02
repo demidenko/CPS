@@ -7,7 +7,6 @@ import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CommunitySettingsDataStore
 import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
-import com.demich.cps.platforms.codeforces.lost.CodeforcesLostStorage
 import com.demich.cps.workers.CodeforcesLostDataStore
 
 interface CommunityUnitsFactory {
@@ -15,7 +14,7 @@ interface CommunityUnitsFactory {
 
     fun followRepository(): CodeforcesFollowRepository
 
-    fun lostStorage(): CodeforcesLostStorage
+    fun lostStorage(): CodeforcesLostDataStore
 }
 
 @JvmInline
