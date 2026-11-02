@@ -2,7 +2,7 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.demich.cps.contests.ContestsInfoDataStore
+import com.demich.cps.contests.ContestsUnitsAndroidFactory
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.navigation.CPSNavigator
@@ -17,7 +17,8 @@ import com.demich.cps.utils.context
 @Composable
 private fun ContestsSettingsScreen() {
     val context = context
-    val settingsStorage = remember { context.settingsContests }
+    val unitsFactory = remember { ContestsUnitsAndroidFactory(context) }
+    val settingsStorage = remember { unitsFactory.settingsStorage() }
 
     val devModeEnabled = LocalDevModeEnabled.current
 
@@ -29,14 +30,14 @@ private fun ContestsSettingsScreen() {
             AutoUpdateSettingsItem(item = settingsStorage.autoUpdateInterval)
 
             if (devModeEnabled) {
-                DeletedContestsSettingsItem(item = ContestsInfoDataStore(context).ignoredContests)
+                DeletedContestsSettingsItem(item = unitsFactory.infoStorage().ignoredContests)
             }
         }
     }
 
     LaunchedEffectOneTime {
         val snapshot = settingsStorage.fetchSettingsSnapshot()
-        ContestsInfoDataStore(context).settingsSnapshot.update {
+        unitsFactory.infoStorage().settingsSnapshot.update {
             // do not override
             it ?: snapshot
         }
