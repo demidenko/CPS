@@ -44,7 +44,8 @@ internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessM
 @Composable
 fun CPSScaffold(
     modifier: Modifier = Modifier,
-    navigator: CPSNavigator,
+    navigator: CPSNavigator, // TODO: remove this arg
+    onNavigateToScreen: (Screen.RootScreen) -> Unit,
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -64,7 +65,7 @@ fun CPSScaffold(
                     null
                 }
             },
-            onNavigateToScreen = navigator::navigateTo,
+            onNavigateToScreen = onNavigateToScreen,
             content = {
                 TopBarsAndContent(
                     topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },

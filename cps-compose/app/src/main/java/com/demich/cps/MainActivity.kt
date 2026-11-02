@@ -127,7 +127,8 @@ private fun CPSContent() {
     }
 
     CPSScaffold(
-        navigator = navigator
+        navigator = navigator,
+        onNavigateToScreen = navigator::navigateTo
     ) {
         navigator.NavHost(builder = navBuilder)
     }
