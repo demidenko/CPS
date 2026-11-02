@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 @Composable
 fun ratedProfilesColorState(
@@ -37,7 +38,7 @@ fun ratedProfilesColorState(
     val rank by collectAsState {
         combine(
             flow = flowOfRankGetter(context),
-            flow2 = navigator.flowOfCurrentScreen()
+            flow2 = navigator.flowOfCurrentScreen().onStart<Screen?> { emit(null) } // deadlock without null
         ) { rankGetter, currentScreen -> rankGetter[currentScreen] }
     }
 

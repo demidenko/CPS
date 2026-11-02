@@ -42,9 +42,6 @@ import com.demich.datastore_itemized.dataStoreWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -82,11 +79,8 @@ class CPSNavigator(
 ) {
     val currentScreen by currentScreenState
 
-    fun flowOfCurrentScreen(): Flow<Screen?> =
-        flow {
-            emit(null)
-            emitAll(navController.currentScreenFlow())
-        }
+    fun flowOfCurrentScreen(): Flow<Screen> =
+        navController.currentScreenFlow()
 
     val isBottomBarEnabled: Boolean
         get() = currentScreen !is Screen.NoBottomBarScreen
@@ -157,7 +151,6 @@ class CPSNavigator(
 
         LaunchedEffect(startScreenItem) {
             flowOfCurrentScreen()
-                .filterNotNull()
                 .debounce(500.milliseconds)
                 .distinctUntilChangedBy { it.rootScreen }
                 .collect {
