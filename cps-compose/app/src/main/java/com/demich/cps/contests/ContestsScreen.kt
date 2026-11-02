@@ -39,7 +39,6 @@ import com.demich.cps.contests.monitors.contestId
 import com.demich.cps.contests.monitors.flowOfContestData
 import com.demich.cps.contests.monitors.flowOfContestId
 import com.demich.cps.contests.settings.ContestsSettingsDataStore
-import com.demich.cps.contests.settings.settingsContests
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
@@ -78,7 +77,6 @@ import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.rememberRunBlocking
 import com.demich.cps.workers.CPSPeriodicWork
 import com.demich.cps.workers.CodeforcesMonitorWorker
-import com.demich.cps.workers.ContestsWorker
 import com.demich.cps.workers.isRunning
 import com.demich.cps.workers.state
 import com.demich.datastore_itemized.fromSnapshot
@@ -95,6 +93,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     navigateToSettings: () -> Unit
 ) {
     val context = context
+    val unitsFactory = remember { ContestsUnitsAndroidFactory(context) }
+
     val scope = backgroundCoroutineScope
 
     val viewModel = contestsViewModel()
@@ -115,10 +115,10 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onOpenSettings = navigateToSettings
     )
 
-    val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
+    val anyPlatformEnabled = rememberRunBlocking { unitsFactory.settingsStorage().anyPlatformEnabled() }
 
     val loadingStatus by remember {
-        flowOfLoadingStatus(viewModel = viewModel, work = ContestsWorker.getWork(context))
+        flowOfLoadingStatus(viewModel = viewModel, work = unitsFactory.work())
     }.collectAsStateWithLifecycle(initialValue = null)
 
     val onReload = { viewModel.reloadEnabledPlatforms(context) }
@@ -131,7 +131,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onReloadRequest = onReload,
         onDeleteRequest = { contest ->
             scope.launch {
-                ContestsInfoDataStore(context).ignoredContests.add(contest.compositeId, getSystemTime())
+                unitsFactory.infoStorage().ignoredContests.add(contest.compositeId, getSystemTime())
             }
         }
     )
