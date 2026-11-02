@@ -13,8 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
-import com.demich.cps.features.codeforces.follow.database.CodeforcesFollowRepository
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenStaticTitleState
@@ -30,37 +30,32 @@ import com.demich.cps.ui.dialogs.CPSDeleteDialog
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.CommunityFollowList>.NavContentCommunityFollowListScreen(
     navigateToBlogScreen: (Long) -> Unit
 ) {
-    val context = context
-    val repository = remember { context.followRepository }
-
     screenTitle = ScreenStaticTitleState("community", "codeforces", "follow", "list")
 
     CommunityFollowScreen(
-        repository = repository,
         onShowBlogScreen = navigateToBlogScreen
     )
 
-    bottomBar = communityFollowListBottomBarBuilder(repository = repository)
+    bottomBar = communityFollowListBottomBarBuilder()
 }
 
 @Composable
 private fun CommunityFollowScreen(
-    repository: CodeforcesFollowRepository,
     onShowBlogScreen: (Long) -> Unit
 ) {
+    val unitsFactory = LocalCommunityUnitsFactory.current
     val viewModel = codeforcesCommunityViewModel()
     val scope = backgroundCoroutineScope
 
     val loadingStatusState = viewModel.flowOfFollowUpdateLoadingStatus.collectAsState()
 
-    val userBlogs by remember { repository.flowOfUserBlogs() }
+    val userBlogs by remember { unitsFactory.followRepository().flowOfUserBlogs() }
         .collectAsStateWithLifecycle(initialValue = null)
 
     ProvideSystemTimeEachMinute {
@@ -69,7 +64,7 @@ private fun CommunityFollowScreen(
             isRefreshing = { loadingStatusState.value == LOADING },
             onOpenBlog = onShowBlogScreen,
             onDeleteUser = { blogId ->
-                scope.launch { repository.remove(blogId = blogId) }
+                scope.launch { unitsFactory.followRepository().remove(blogId = blogId) }
             },
             modifier = Modifier.fillMaxSize()
         )
@@ -139,11 +134,7 @@ private fun CodeforcesFollowList(
     }
 }
 
-private fun communityFollowListBottomBarBuilder(
-    repository: CodeforcesFollowRepository
-): AdditionalBottomBarBuilder = {
-    val scope = backgroundCoroutineScope
-
+private fun communityFollowListBottomBarBuilder(): AdditionalBottomBarBuilder = {
     var showChooseDialog by remember { mutableStateOf(false) }
 
     CPSIconButton(icon = CPSIcons.Add) {
@@ -151,12 +142,17 @@ private fun communityFollowListBottomBarBuilder(
     }
 
     if (showChooseDialog) {
+        val scope = backgroundCoroutineScope
+        val unitsFactory = LocalCommunityUnitsFactory.current
+
         DialogProfileSelector(
             manager = CodeforcesProfileManager(),
             initial = null,
             onDismissRequest = { showChooseDialog = false },
             onResult = {
-                scope.launch { repository.addNewUser(result = it) }
+                scope.launch {
+                    unitsFactory.followRepository().addNewUser(result = it)
+                }
             }
         )
     }
