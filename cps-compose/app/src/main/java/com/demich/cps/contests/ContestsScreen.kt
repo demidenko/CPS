@@ -97,8 +97,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     val context = context
     val scope = backgroundCoroutineScope
 
-    val contestsViewModel = contestsViewModel()
-    val contestsWork = remember { ContestsWorker.getWork(context) }
+    val viewModel = contestsViewModel()
 
     val viewState = rememberContestsListViewState()
     val filterState = rememberFilterState()
@@ -118,8 +117,11 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
 
     val anyPlatformEnabled = rememberRunBlocking { context.settingsContests.anyPlatformEnabled() }
 
-    val loadingStatus by combinedLoadingStatusState(viewModel = contestsViewModel, work = contestsWork)
-    val onReload = { contestsViewModel.reloadEnabledPlatforms(context) }
+    val loadingStatus by remember {
+        flowOfLoadingStatus(viewModel = viewModel, work = ContestsWorker.getWork(context))
+    }.collectAsStateWithLifecycle(initialValue = null)
+
+    val onReload = { viewModel.reloadEnabledPlatforms(context) }
 
     ContestsScreen(
         viewState = viewState,
@@ -142,8 +144,8 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onReloadClick = onReload
     )
 
-    SideEffect(contestsViewModel) {
-        contestsViewModel.applyChangedSettings(context)
+    SideEffect(viewModel) {
+        viewModel.applyChangedSettings(context)
     }
 }
 
@@ -433,22 +435,6 @@ private fun ContestsPageSwitchButton(
     )
 }
 
-
-@Composable
-private fun combinedLoadingStatusState(
-    viewModel: ContestsViewModel,
-    work: CPSPeriodicWork
-): State<LoadingStatus?> =
-    remember(viewModel, work) {
-        combine(
-            viewModel.flowOfLoadingStatus(),
-            work.flowOfWorkInfo()
-        ) { loadingStatus, workInfo ->
-            if (workInfo.isRunning) LOADING
-            else loadingStatus
-        }
-    }.collectAsStateWithLifecycle(initialValue = null)
-
 @Composable
 private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
     EmptyMessageBox(modifier = modifier) {
@@ -568,4 +554,16 @@ private fun flowOfHidden(
     ) { ignored, monitorContestId ->
         if (monitorContestId == null) ignored
         else ignored + Pair(codeforces, monitorContestId.toString())
+    }
+
+private fun flowOfLoadingStatus(
+    viewModel: ContestsViewModel,
+    work: CPSPeriodicWork
+): Flow<LoadingStatus> =
+    combine(
+        viewModel.flowOfLoadingStatus(),
+        work.flowOfWorkInfo()
+    ) { loadingStatus, workInfo ->
+        if (workInfo.isRunning) LOADING
+        else loadingStatus
     }
