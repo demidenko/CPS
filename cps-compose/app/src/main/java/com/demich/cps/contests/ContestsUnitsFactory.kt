@@ -1,6 +1,8 @@
 package com.demich.cps.contests
 
 import android.content.Context
+import androidx.compose.runtime.compositionLocalWithComputedDefaultOf
+import androidx.compose.ui.platform.LocalContext
 import com.demich.cps.contests.database.ContestsRepository
 import com.demich.cps.contests.database.contestsRepository
 import com.demich.cps.contests.monitors.CodeforcesMonitorDataStore
@@ -21,7 +23,8 @@ interface ContestsUnitsFactory {
     fun work(): CPSPeriodicWork
 }
 
-class ContestsUnitsAndroidFactory(val context: Context): ContestsUnitsFactory {
+@JvmInline
+private value class ContestsUnitsAndroidFactory(val context: Context): ContestsUnitsFactory {
     override fun repository() = context.contestsRepository
 
     override fun settingsStorage() = context.settingsContests
@@ -31,4 +34,8 @@ class ContestsUnitsAndroidFactory(val context: Context): ContestsUnitsFactory {
     override fun codeforcesMonitorStorage() = CodeforcesMonitorDataStore(context)
 
     override fun work() = ContestsWorker.getWork(context)
+}
+
+val LocalContestsUnitsFactory = compositionLocalWithComputedDefaultOf<ContestsUnitsFactory> {
+    ContestsUnitsAndroidFactory(context = LocalContext.currentValue)
 }

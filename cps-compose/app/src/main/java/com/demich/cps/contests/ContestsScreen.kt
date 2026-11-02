@@ -90,8 +90,7 @@ import kotlin.time.Instant
 fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
     navigateToSettings: () -> Unit
 ) {
-    val context = context
-    val unitsFactory = remember { ContestsUnitsAndroidFactory(context) }
+    val unitsFactory = LocalContestsUnitsFactory.current
 
     val scope = backgroundCoroutineScope
 
@@ -156,10 +155,8 @@ private fun ContestsScreen(
     onReloadRequest: () -> Unit,
     onDeleteRequest: (Contest) -> Unit
 ) {
-    val context = context
-    val contestsFlow = remember {
-        ContestsUnitsAndroidFactory(context).flowOfContests()
-    }
+    val unitsFactory = LocalContestsUnitsFactory.current
+    val contestsFlow = remember { unitsFactory.flowOfContests() }
 
     val [
         contestsState: State<SortedContests?>,

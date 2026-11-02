@@ -2,7 +2,7 @@ package com.demich.cps.contests.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.demich.cps.contests.ContestsUnitsAndroidFactory
+import com.demich.cps.contests.LocalContestsUnitsFactory
 import com.demich.cps.contests.database.Contest
 import com.demich.cps.contests.database.toGeneralPlatform
 import com.demich.cps.navigation.CPSNavigator
@@ -12,12 +12,10 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.ui.settings.SettingsColumn
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.utils.LaunchedEffectOneTime
-import com.demich.cps.utils.context
 
 @Composable
 private fun ContestsSettingsScreen() {
-    val context = context
-    val unitsFactory = remember { ContestsUnitsAndroidFactory(context) }
+    val unitsFactory = LocalContestsUnitsFactory.current
     val settingsStorage = remember { unitsFactory.settingsStorage() }
 
     val devModeEnabled = LocalDevModeEnabled.current
