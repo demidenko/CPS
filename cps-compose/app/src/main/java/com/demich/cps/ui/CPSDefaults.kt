@@ -1,6 +1,6 @@
 package com.demich.cps.ui
 
-import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.TextStyle
@@ -23,7 +23,7 @@ object CPSDefaults {
         )
 
     @Stable
-    fun <T> toggleAnimationSpec(): AnimationSpec<T> =
+    fun <T> toggleAnimationSpec(): FiniteAnimationSpec<T> =
         tween(durationMillis = 800)
 }
 
