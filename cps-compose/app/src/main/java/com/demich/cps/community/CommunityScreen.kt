@@ -16,10 +16,8 @@ import com.demich.cps.community.codeforces.CodeforcesTab
 import com.demich.cps.community.codeforces.codeforcesCommunityViewModel
 import com.demich.cps.community.codeforces.reload
 import com.demich.cps.community.codeforces.rememberCodeforcesCommunityPagerState
-import com.demich.cps.community.follow.followRepository
 import com.demich.cps.community.settings.CodeforcesCommunityScreenSpecs
 import com.demich.cps.community.settings.codeforcesScreenSpecs
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
@@ -31,7 +29,6 @@ import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.context
 import com.demich.cps.utils.rememberRunBlocking
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Dispatchers
@@ -42,25 +39,25 @@ fun CPSNavigator.ScreenScope<Screen.Community>.NavContentCommunityScreen(
     navigateToSettings: () -> Unit,
     navigateToFollowList: () -> Unit
 ) {
-    val context = context
+    val unitsFactory = LocalCommunityUnitsFactory.current
 
     val viewModel = codeforcesCommunityViewModel()
     val backgroundLoader = remember(viewModel) {
         CodeforcesCommunityBackgroundLoader(
             viewModel = viewModel,
-            provider = { CodeforcesClient(locale = context.settingsCommunity.codeforcesLocale()) }
+            provider = { CodeforcesClient(locale = unitsFactory.settingsStorage().codeforcesLocale()) }
         )
     }
 
     // TODO: collectUntilFirst make bottombar glitch
-    val specs = rememberRunBlocking { context.settingsCommunity.codeforcesScreenSpecs() }
+    val specs = rememberRunBlocking { unitsFactory.settingsStorage().codeforcesScreenSpecs() }
 
     NavContentCommunityScreen(
         specs = specs,
         backgroundLoader = backgroundLoader,
         onOpenSettings = navigateToSettings,
         onOpenFollowList = {
-            viewModel.updateFollowUsersInfo(repository = context.followRepository) // TODO: not proper place to call?
+            viewModel.updateFollowUsersInfo(repository = unitsFactory.followRepository()) // TODO: not proper place to call?
             navigateToFollowList()
         }
     )

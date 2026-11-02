@@ -9,9 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.buildAnnotatedString
+import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.community.codeforces.CodeforcesBlogEntries
 import com.demich.cps.community.codeforces.CodeforcesNewEntriesState
-import com.demich.cps.community.settings.settingsCommunity
 import com.demich.cps.features.codeforces.follow.database.addNewUser
 import com.demich.cps.platforms.utils.codeforces.CodeforcesHandle
 import com.demich.cps.platforms.utils.codeforces.CodeforcesWebBlogEntry
@@ -19,7 +19,6 @@ import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.dialogs.CPSYesNoDialog
 import com.demich.cps.ui.withVibration
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.context
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,15 +43,15 @@ fun CodeforcesBlogEntriesFollowAddable(
     )
 
     showAddToFollowDialogFor?.let { user ->
-        val context = context
+        val unitsFactory = LocalCommunityUnitsFactory.current
         val scope = backgroundCoroutineScope
         UserBlogDialog(
             user = user,
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
                 scope.launch {
-                    context.settingsCommunity.codeforcesFollowEnabled.setValue(true)
-                    context.followRepository.addNewUser(user.handle)
+                    unitsFactory.settingsStorage().codeforcesFollowEnabled.setValue(true)
+                    unitsFactory.followRepository().addNewUser(user.handle)
                 }
             }
         )
