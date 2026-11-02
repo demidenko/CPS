@@ -53,7 +53,7 @@ fun rememberCPSNavigator(): CPSNavigator {
     val navController: NavHostController = rememberNavController()
 
     val currentScreenState: State<Screen?> =
-        remember { navController.currentScreenFlow }
+        remember { navController.currentScreenFlow() }
             .collectAsState(initial = null)
 
     val titleState = remember { mutableStateOf<ScreenTitleState>(ScreenStaticTitleState()) }
@@ -69,8 +69,8 @@ fun rememberCPSNavigator(): CPSNavigator {
     )
 }
 
-private val NavController.currentScreenFlow: Flow<Screen>
-    get() = currentBackStackEntryFlow.map { it.getScreen() }
+private fun NavController.currentScreenFlow(): Flow<Screen> =
+    currentBackStackEntryFlow.map { it.getScreen() }
 
 @Stable
 class CPSNavigator(
@@ -85,7 +85,7 @@ class CPSNavigator(
     fun flowOfCurrentScreen(): Flow<Screen?> =
         flow {
             emit(null)
-            emitAll(navController.currentScreenFlow)
+            emitAll(navController.currentScreenFlow())
         }
 
     val isBottomBarEnabled: Boolean
