@@ -58,7 +58,7 @@ class ContestsViewModel: ViewModel() {
         }
     }
 
-    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.collectToRepository(repository: ContestsRepository) =
+    private suspend fun Map<ContestPlatform, Flow<ContestsFetchResult>>.trackAndCollectTo(repository: ContestsRepository) =
         mapValues { it.value.trackLoadingStatus(platform = it.key) }
         .collectTo(repository = repository)
 
@@ -68,7 +68,7 @@ class ContestsViewModel: ViewModel() {
             unitsFactory.work().enqueueInRepeatInterval()
 
             unitsFactory.settingsStorage().contestsFetchFlows()
-                .collectToRepository(repository = unitsFactory.repository())
+                .trackAndCollectTo(repository = unitsFactory.repository())
         }
     }
 
@@ -94,7 +94,7 @@ class ContestsViewModel: ViewModel() {
 
             settings.contestsFetchFlows(platforms = diff.contestPlatformsToReload())
                 .plus(pairs = fakeResults)
-                .collectToRepository(repository = unitsFactory.repository())
+                .trackAndCollectTo(repository = unitsFactory.repository())
         }
     }
 }
