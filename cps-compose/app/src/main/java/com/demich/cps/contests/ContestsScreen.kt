@@ -449,11 +449,11 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
     val context = context
+    val unitsFactory = LocalContestsUnitsFactory.current
     val uriHandler = LocalUriHandler.current
-    val storage = remember { CodeforcesMonitorDataStore(context) }
 
     val contestDataState = collectAsStateWithLifecycle {
-        storage.flowOfContestData()
+        unitsFactory.codeforcesMonitorStorage().flowOfContestData()
     }
 
     AnimatedVisibleByNotNull(
@@ -464,9 +464,8 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         val scope = backgroundCoroutineScope
 
         // TODO: merge with contestData
-        val requestFailed by remember {
-            storage.lastRequest.asFlow()
-        }.collectAsStateWithLifecycle(initialValue = null)
+        val requestFailed by remember { unitsFactory.codeforcesMonitorStorage().lastRequest }
+            .collectAsStateWithLifecycle(initial = null)
 
         CodeforcesMonitorWidget(
             contestData = contestData,
@@ -480,7 +479,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
                 scope.launch {
                     CodeforcesProfileManager().profileStorage(context)
                         .monitorCanceledContests.add(contestId, getSystemTime())
-                    storage.reset()
+                    unitsFactory.codeforcesMonitorStorage().reset()
                 }
             }
         )
@@ -489,7 +488,7 @@ private fun CodeforcesMonitor(modifier: Modifier = Modifier) {
         // TODO: check args instead of contestData?
         LaunchedEffect(Unit) {
             if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
-                val args = storage.args() ?: return@LaunchedEffect
+                val args = unitsFactory.codeforcesMonitorStorage().args() ?: return@LaunchedEffect
                 CodeforcesMonitorWorker.start(startArgs = args, context = context)
             }
         }
