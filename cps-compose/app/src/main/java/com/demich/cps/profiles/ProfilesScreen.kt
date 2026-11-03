@@ -1,5 +1,6 @@
 package com.demich.cps.profiles
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -87,8 +88,10 @@ private fun ProfilesScreen(
 fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
     navigateToProfileScreen: (Platform) -> Unit
 ) {
+    val context = context
+    val profiles by collectAsState { flowOfProfilesOrder(context) }
+
     var reorderEnabled by rememberSaveable { mutableStateOf(false) }
-    val profiles by profilesOrderState()
 
     screenTitle = ScreenStaticTitleState("profiles")
 
@@ -116,20 +119,6 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
-}
-
-@Composable
-private fun profilesOrderState() = with(context) {
-    collectAsState {
-        combine(
-            flow = ProfileManager.entries().flowOfEnabledProfiles(this),
-            flow2 = settingsProfiles.platformsOrder.asFlow()
-        ) { profiles, order ->
-            order.mapNotNull { platform ->
-                profiles.find { it.platform == platform }
-            }
-        }
-    }
 }
 
 private fun profilesBottomBarBuilder(
@@ -272,3 +261,13 @@ private fun CListImportDialog(
         }
     )
 }
+
+private fun flowOfProfilesOrder(context: Context) =
+    combine(
+        flow = ProfileManager.entries().flowOfEnabledProfiles(context),
+        flow2 = context.settingsProfiles.platformsOrder.asFlow()
+    ) { profiles, order ->
+        order.mapNotNull { platform ->
+            profiles.find { it.platform == platform }
+        }
+    }
