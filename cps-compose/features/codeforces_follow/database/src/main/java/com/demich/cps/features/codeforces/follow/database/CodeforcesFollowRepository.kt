@@ -42,33 +42,12 @@ abstract class CodeforcesFollowRepository(
 
     // TODO
     suspend fun getAndReloadBlogEntries(handle: String) = runCatching {
-        getApi(locale = getLocale()).getAndUpdateBlogEntries(handle = handle)
-    }
-
-    private suspend fun CodeforcesApi.getAndUpdateBlogEntries(
-        handle: String
-    ): List<CodeforcesBlogEntry> {
-        var handle = handle
-        val blogEntries = try {
-            getBlogEntriesRecoverHotFound(
+        getApi(locale = getLocale())
+            .getAndUpdateBlogEntries(
                 handle = handle,
-                onChangeUserInfo = {
-                    dao.updateUserProfile(handle = handle, result = ProfileResult(it))
-                    handle = it.handle
-                }
+                dao = dao,
+                onNewBlogEntry = ::notifyNewBlogEntry
             )
-        } catch (it: CodeforcesApiUserNotFoundException) {
-            dao.updateUserProfile(handle = handle, result = ProfileResult.NotFound(handle))
-            throw it
-        }
-
-        dao.updateBlogEntries(
-            handle = handle,
-            blogEntries = blogEntries,
-            onNewBlogEntries = { it.forEach(::notifyNewBlogEntry) }
-        )
-
-        return blogEntries
     }
 
     suspend fun addNewUser(result: ProfileResult<CodeforcesUserInfo>) {
@@ -112,6 +91,34 @@ suspend fun CodeforcesFollowRepository.updateFailedBlogEntries() {
 
 suspend fun CodeforcesFollowRepository.addNewUser(handle: String) =
     addNewUser(result = ProfileResult.Failed(handle))
+
+private suspend fun CodeforcesApi.getAndUpdateBlogEntries(
+    handle: String,
+    dao: CodeforcesFollowDao,
+    onNewBlogEntry: (CodeforcesBlogEntry) -> Unit
+): List<CodeforcesBlogEntry> {
+    var handle = handle
+    val blogEntries = try {
+        getBlogEntriesRecoverHotFound(
+            handle = handle,
+            onChangeUserInfo = {
+                dao.updateUserProfile(handle = handle, result = ProfileResult(it))
+                handle = it.handle
+            }
+        )
+    } catch (it: CodeforcesApiUserNotFoundException) {
+        dao.updateUserProfile(handle = handle, result = ProfileResult.NotFound(handle))
+        throw it
+    }
+
+    dao.updateBlogEntries(
+        handle = handle,
+        blogEntries = blogEntries,
+        onNewBlogEntries = { it.forEach(onNewBlogEntry) }
+    )
+
+    return blogEntries
+}
 
 private suspend inline fun CodeforcesApi.getBlogEntriesRecoverHotFound(
     handle: String,
