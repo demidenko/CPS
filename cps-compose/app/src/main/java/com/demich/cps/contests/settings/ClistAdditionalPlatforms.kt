@@ -40,9 +40,7 @@ import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.rememberUUIDState
-import com.demich.datastore_itemized.DataStoreItem
 import com.demich.datastore_itemized.edit
-import com.demich.kotlin_stdlib_boost.mapToSet
 import com.sebaslogen.resaca.viewModelScoped
 import kotlinx.coroutines.launch
 
@@ -173,23 +171,19 @@ private class CListResourcesLoadingViewModel: ViewModel() {
     fun flowOfFetchResources(settings: ContestsSettingsDataStore, key: Any) =
         loader.execute(key = key) {
             ClistClient(apiAccess = settings.clistApiAccess())
-                .getResourcesSyncWithSettings(
-                    item = settings.clistAdditionalResources
-                )
+                .getResourcesNotMain()
+                .sortedBy { it.name }
+                .also { list ->
+                    val res = list.associateBy { it.id }
+                    settings.clistAdditionalResources.update {
+                        it.mapNotNull { res[it.id] }
+                    }
+                }
         }
 }
 
-private suspend fun ClistApi.getResourcesSyncWithSettings(
-    item: DataStoreItem<List<ClistResource>>
-): List<ClistResource> {
-    val mainIds = contestPlatforms.mapToSet { it.clistResourceId }
+private suspend fun ClistApi.getResourcesNotMain(): List<ClistResource> {
+    val mainIds = contestPlatforms.mapNotNull { it.clistResourceId }.toSet()
     return getResources()
         .filter { it.id !in mainIds }
-        .sortedBy { it.name }
-        .also { list ->
-            val res = list.associateBy { it.id }
-            item.update {
-                it.mapNotNull { res[it.id] }
-            }
-        }
 }
