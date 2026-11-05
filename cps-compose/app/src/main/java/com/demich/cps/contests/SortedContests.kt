@@ -14,7 +14,6 @@ import com.demich.cps.utils.flowOfTruncatedCurrentTime
 import com.demich.cps.utils.truncateBySeconds
 import com.demich.kotlin_stdlib_boost.minOfNotNull
 import com.demich.kotlin_stdlib_boost.partitionIndex
-import com.sebaslogen.resaca.rememberScoped
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.adapters.ImmutableListAdapter
 import kotlinx.collections.immutable.toImmutableList
@@ -124,7 +123,7 @@ fun produceSortedContestsWithTime(
     flow: Flow<List<Contest>>,
     clock: Clock
 ): Pair<State<SortedContests?>, State<Instant>> {
-    val sorter = rememberScoped { SortedContestsState() }
+    val sorter = remember { SortedContestsState() }
 
     val currentTimeState = remember {
         val initTime = clock.now().truncateBySeconds()
