@@ -164,6 +164,6 @@ class CodeforcesMonitorNotifier(
             )
         }
 
-        notificationBuilder.buildAndPush(context = context)
+        notificationBuilder.buildAndPush()
     }
 }

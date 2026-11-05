@@ -25,7 +25,8 @@ class NotificationChannelSingleId internal constructor(
         return NotificationBuilder(
             builder = NotificationCompat.Builder(context, channelInfo.id),
             notificationId = notificationId,
-            notificationManager = notificationManager
+            notificationManager = notificationManager,
+            context = context
         )
     }
 
@@ -33,7 +34,7 @@ class NotificationChannelSingleId internal constructor(
         builder(context).apply { edit(block) }
 
     inline fun notify(context: Context, block: NotificationBuildScope.() -> Unit) =
-        builder(context, block).buildAndPush(context = context)
+        builder(context, block).buildAndPush()
 }
 
 fun NotificationChannelSingleId.getActiveNotification(context: Context): Notification? =

@@ -12,25 +12,24 @@ import androidx.core.app.NotificationManagerCompat
 class NotificationBuilder internal constructor(
     private val builder: NotificationCompat.Builder,
     val notificationId: Int,
-    private val notificationManager: NotificationManagerCompat
+    private val notificationManager: NotificationManagerCompat,
+    private val context: Context
 ) {
     val builderScope = NotificationBuildScope(
-        builder = builder
+        builder = builder,
+        context = context
     )
 
     inline fun edit(block: NotificationBuildScope.() -> Unit) = builderScope.block()
 
-    fun build(context: Context): Notification {
-        builderScope.finalize(context)
-        return builder.build()
-    }
+    fun build(): Notification = builder.build()
 
-    fun buildAndPush(context: Context) {
+    fun buildAndPush() {
         if (!notificationManager.areNotificationsEnabled()) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
                 return
         }
-        notificationManager.notify(notificationId, build(context = context))
+        notificationManager.notify(notificationId, build())
     }
 }

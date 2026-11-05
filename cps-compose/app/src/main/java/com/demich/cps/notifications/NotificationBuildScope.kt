@@ -12,7 +12,8 @@ import com.demich.cps.utils.writeOnlyProperty
 import kotlin.time.Instant
 
 class NotificationBuildScope(
-    private val builder: NotificationCompat.Builder
+    private val builder: NotificationCompat.Builder,
+    private val context: Context
 ) {
 
     var contentTitle: String by writeOnlyProperty {
@@ -35,7 +36,9 @@ class NotificationBuildScope(
         builder.setColor(it.toArgb())
     }
 
-    var colorResId: Int? = null
+    var colorResId: Int by writeOnlyProperty {
+        builder.setColor(context.getColor(it))
+    }
 
     // NOTE: If time is too old, android system may not show notification
     var time: Instant? by writeOnlyProperty {
@@ -47,7 +50,9 @@ class NotificationBuildScope(
         builder.setContentText(it).setStyle(NotificationCompat.BigTextStyle().bigText(it))
     }
 
-    var url: String? = null
+    var url: String by writeOnlyProperty {
+        builder.setContentIntent(makePendingIntentOpenUrl(url = it, context = context))
+    }
 
     var autoCancel: Boolean by writeOnlyProperty {
         builder.setAutoCancel(it)
@@ -71,10 +76,5 @@ class NotificationBuildScope(
 
     fun addExtras(key: String, value: Any?) {
         builder.addExtras(bundleOf(key to value))
-    }
-
-    fun finalize(context: Context) {
-        colorResId?.let { builder.setColor(context.getColor(it)) }
-        url?.let { builder.setContentIntent(makePendingIntentOpenUrl(url = it, context = context)) }
     }
 }
