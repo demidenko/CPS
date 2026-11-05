@@ -10,11 +10,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class NotificationBuilder internal constructor(
-    private val builder: NotificationCompat.Builder,
+    channelInfo: NotificationChannelInfo,
     val notificationId: Int,
     private val notificationManager: NotificationManagerCompat,
     private val context: Context
 ) {
+    private val builder = NotificationCompat.Builder(context, channelInfo.id)
+
     val builderScope = NotificationBuildScope(
         builder = builder,
         context = context

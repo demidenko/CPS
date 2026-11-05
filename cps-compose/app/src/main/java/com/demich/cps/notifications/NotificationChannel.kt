@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class NotificationChannelInfo internal constructor(
@@ -23,7 +22,7 @@ class NotificationChannelSingleId internal constructor(
             it.createAndroidNotificationChannel(channelInfo)
         }
         return NotificationBuilder(
-            builder = NotificationCompat.Builder(context, channelInfo.id),
+            channelInfo = channelInfo,
             notificationId = notificationId,
             notificationManager = notificationManager,
             context = context
