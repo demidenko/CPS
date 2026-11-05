@@ -209,7 +209,7 @@ suspend fun Context.enqueueEnabledWorkers() {
 internal suspend fun CoroutineWorker.setForeground(builder: NotificationBuilder) {
     setForeground(ForegroundInfo(
         builder.notificationId,
-        builder.build(),
+        builder.build(context = applicationContext),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
     ))
 }
