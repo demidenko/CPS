@@ -13,7 +13,7 @@ import kotlin.time.Instant
 
 class NotificationBuildScope(
     private val builder: NotificationCompat.Builder,
-    private val context: Context
+    private val context: Context // instead of builder.mContext
 ) {
 
     var contentTitle: String by writeOnlyProperty {
