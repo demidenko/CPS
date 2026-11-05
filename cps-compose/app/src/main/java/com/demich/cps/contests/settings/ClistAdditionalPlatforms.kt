@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import com.demich.cps.contests.ContestsUnitsFactory
+import com.demich.cps.contests.LocalContestsUnitsFactory
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
@@ -36,7 +38,6 @@ import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.collectAsStateWithNull
-import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.rememberUUIDState
 import com.demich.datastore_itemized.edit
@@ -47,15 +48,13 @@ import kotlinx.coroutines.launch
 internal fun ClistAdditionalResourcesDialog(
     onDismissRequest: () -> Unit
 ) {
-    val context = context
-    val settings = remember { context.settingsContests }
-    val item = remember { settings.clistAdditionalResources }
+    val unitsFactory = LocalContestsUnitsFactory.current
 
     val viewModel = viewModelScoped { CListResourcesLoadingViewModel() }
     val uuidState = rememberUUIDState()
 
     val fetchState by viewModel
-        .flowOfFetchResources(settings = settings, key = uuidState.value)
+        .flowOfFetchResources(unitsFactory = unitsFactory, key = uuidState.value)
         .collectAsState()
 
     val scope = backgroundCoroutineScope
@@ -64,6 +63,7 @@ internal fun ClistAdditionalResourcesDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest
     ) {
+        val item = remember { unitsFactory.settingsStorage().clistAdditionalResources }
         val state = item.collectAsStateWithNull()
 
         state.onNotNull { selected ->
@@ -167,15 +167,15 @@ private fun ClistResourcesList(
 private class CListResourcesLoadingViewModel: ViewModel() {
     private val loader = backgroundDataLoader<List<ClistResource>>()
 
-    fun flowOfFetchResources(settings: ContestsSettingsDataStore, key: Any) =
+    fun flowOfFetchResources(unitsFactory: ContestsUnitsFactory, key: Any) =
         loader.execute(key = key) {
-            ClistClient(apiAccess = settings.clistApiAccess())
+            ClistClient(apiAccess = unitsFactory.settingsStorage().clistApiAccess())
                 .getResources()
                 .filterNotMain()
                 .sortedBy { it.name }
                 .also { list ->
                     val res = list.associateBy { it.id }
-                    settings.clistAdditionalResources.update {
+                    unitsFactory.settingsStorage().clistAdditionalResources.update {
                         it.mapNotNull { res[it.id] }
                     }
                 }
