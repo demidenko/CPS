@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.demich.cps.fetchstate.FetchState
-import com.demich.cps.platforms.api.clist.ClistApi
 import com.demich.cps.platforms.api.clist.ClistResource
 import com.demich.cps.platforms.clients.ClistClient
 import com.demich.cps.platforms.clients.niceMessage
@@ -171,7 +170,8 @@ private class CListResourcesLoadingViewModel: ViewModel() {
     fun flowOfFetchResources(settings: ContestsSettingsDataStore, key: Any) =
         loader.execute(key = key) {
             ClistClient(apiAccess = settings.clistApiAccess())
-                .getResourcesNotMain()
+                .getResources()
+                .filterNotMain()
                 .sortedBy { it.name }
                 .also { list ->
                     val res = list.associateBy { it.id }
@@ -182,8 +182,7 @@ private class CListResourcesLoadingViewModel: ViewModel() {
         }
 }
 
-private suspend fun ClistApi.getResourcesNotMain(): List<ClistResource> {
+private fun List<ClistResource>.filterNotMain(): List<ClistResource> {
     val mainIds = contestPlatforms.mapNotNull { it.clistResourceId }.toSet()
-    return getResources()
-        .filter { it.id !in mainIds }
+    return filter { it.id !in mainIds }
 }
