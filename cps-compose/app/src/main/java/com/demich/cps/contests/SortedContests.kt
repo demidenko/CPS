@@ -126,14 +126,14 @@ fun produceSortedContestsWithTime(
 ): Pair<State<SortedContests?>, State<Instant>> {
     val sorter = rememberScoped { SortedContestsState() }
 
-    val currentTimeState = remember(clock) {
+    val currentTimeState = remember {
         val initTime = clock.now().truncateBySeconds()
         mutableStateOf(initTime)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner, flow, sorter, currentTimeState) {
+    LaunchedEffect(lifecycleOwner, flow, clock) {
         lifecycleOwner.repeatOnLifecycle(state = STARTED) {
             combine(
                 flow = flow.distinctUntilChanged().map { it.toImmutableList() },
