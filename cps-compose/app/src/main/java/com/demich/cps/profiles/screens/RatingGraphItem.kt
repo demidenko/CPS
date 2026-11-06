@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
+import com.demich.cps.profiles.managers.getRatingHistory
 import com.demich.cps.profiles.rating_graph.RatingGraph
 import com.demich.cps.utils.backgroundDataLoader
 import com.demich.cps.utils.rememberUUIDState
@@ -39,6 +40,6 @@ private class RatingLoadingViewModel: ViewModel() {
 
     fun flowOfFetchRatingHistory(manager: RatedProfileManager<*>, userId: String, key: Any) =
         loader.execute(key = Triple(manager.platform, userId, key)) {
-            manager.getRatingChangeHistory(userId)
+            manager.getRatingHistory(userId)
         }
 }

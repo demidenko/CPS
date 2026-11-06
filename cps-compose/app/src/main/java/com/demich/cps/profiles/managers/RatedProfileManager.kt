@@ -46,11 +46,11 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
     abstract val rankedRatingColors: Array<RatingColor>
 
-    protected abstract suspend fun getRatingChanges(userId: String): List<RatingChange>
-    suspend fun getRatingChangeHistory(userId: String): List<RatingChange> =
-        getRatingChanges(userId).sortedBy { it.date }
-
+    abstract suspend fun getRatingChanges(userId: String): List<RatingChange>
 }
+
+suspend fun RatedProfileManager<*>.getRatingHistory(userId: String): List<RatingChange> =
+    getRatingChanges(userId).sortedBy { it.date }
 
 interface RatingRevolutionsProvider {
     fun ratingUpperBoundRevolutions(): List<RatingBoundsArchived>
