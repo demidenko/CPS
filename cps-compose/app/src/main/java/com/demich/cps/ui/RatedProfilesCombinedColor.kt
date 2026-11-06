@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
+import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.RatingColor
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
@@ -40,7 +41,7 @@ fun ratedProfilesColorState(
 
     val rank: RatedRank? by remember(navigator) {
         derivedStateOf {
-            rankGetter[navigator.currentScreen]
+            rankGetter[navigator.currentScreen?.platformOrNull()]
         }
     }
 
@@ -71,6 +72,11 @@ private fun colorState(
     )
 }
 
+private fun Screen.platformOrNull(): Platform? =
+    when (this) {
+        is Screen.ProfileScreen -> platform
+        else -> null
+    }
 
 @Immutable
 private data class RatedRank(
@@ -110,7 +116,7 @@ private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
     combine(ProfileManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
 
 private fun interface RankGetter {
-    operator fun get(screen: Screen?): RatedRank?
+    operator fun get(platform: Platform?): RatedRank?
 }
 
 private class EnabledRankGetter(
@@ -125,10 +131,10 @@ private class EnabledRankGetter(
             }
         }
 
-    override operator fun get(screen: Screen?): RatedRank? =
-        when (screen) {
-            is Screen.ProfileScreen -> validRanks.find { it.manager.platform == screen.platform }
-            else -> rank
+    override operator fun get(platform: Platform?): RatedRank? =
+        when (platform) {
+            null -> rank
+            else -> validRanks.find { it.manager.platform == platform }
         }
 }
 
