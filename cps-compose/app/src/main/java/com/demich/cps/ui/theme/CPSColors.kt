@@ -78,4 +78,4 @@ internal fun darkCPSColors(usePlatformRatingColors: Boolean) = CPSColors(
 )
 
 val CPSColors.topBarBackground: Color
-    get() = background
+    get() = backgroundNavigation
