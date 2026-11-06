@@ -9,7 +9,7 @@ import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.getRatingHistory
 import com.demich.cps.profiles.rating_graph.RatingGraph
-import com.demich.cps.utils.backgroundDataLoader
+import com.demich.cps.utils.backgroundFetchStateHost
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
 
@@ -36,10 +36,10 @@ internal fun RatingGraphItem(
 
 private class RatingLoadingViewModel: ViewModel() {
 
-    private val loader = backgroundDataLoader<List<RatingChange>>()
+    private val host = backgroundFetchStateHost<List<RatingChange>>()
 
     fun flowOfFetchRatingHistory(manager: RatedProfileManager<*>, userId: String, key: Any) =
-        loader.execute(key = Triple(manager.platform, userId, key)) {
+        host.execute(key = Triple(manager.platform, userId, key)) {
             manager.getRatingHistory(userId)
         }
 }

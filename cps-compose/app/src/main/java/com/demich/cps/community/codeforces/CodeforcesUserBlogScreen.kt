@@ -41,7 +41,7 @@ import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.utils.ProvideSystemTimeEachMinute
-import com.demich.cps.utils.backgroundDataLoader
+import com.demich.cps.utils.backgroundFetchStateHost
 import com.demich.cps.utils.collectAsStateWithLifecycle
 import com.demich.cps.utils.rememberUUIDState
 import com.sebaslogen.resaca.viewModelScoped
@@ -173,13 +173,13 @@ private fun List<CodeforcesWebBlogEntry>.filterBy(state: FilterState) =
 
 private class BlogLoadingViewModel: ViewModel() {
 
-    private val blogEntriesLoader = backgroundDataLoader<List<CodeforcesWebBlogEntry>>()
+    private val host = backgroundFetchStateHost<List<CodeforcesWebBlogEntry>>()
 
     fun flowOfFetchBlogEntries(
         blogId: Long,
         repository: () -> CodeforcesFollowRepository,
         key: Any
-    ) = blogEntriesLoader.executeFlow(key = Pair(blogId, key)) {
+    ) = host.executeFlow(key = Pair(blogId, key)) {
             val repository = repository()
             val user = repository.blog(blogId = blogId).userProfile
             combine(

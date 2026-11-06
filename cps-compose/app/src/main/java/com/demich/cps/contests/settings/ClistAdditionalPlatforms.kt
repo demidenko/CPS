@@ -36,7 +36,7 @@ import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
-import com.demich.cps.utils.backgroundDataLoader
+import com.demich.cps.utils.backgroundFetchStateHost
 import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.onNotNull
 import com.demich.cps.utils.rememberUUIDState
@@ -165,10 +165,10 @@ private fun ClistResourcesList(
 }
 
 private class CListResourcesLoadingViewModel: ViewModel() {
-    private val loader = backgroundDataLoader<List<ClistResource>>()
+    private val host = backgroundFetchStateHost<List<ClistResource>>()
 
     fun flowOfFetchResources(unitsFactory: ContestsUnitsFactory, key: Any) =
-        loader.execute(key = key) {
+        host.execute(key = key) {
             ClistClient(apiAccess = unitsFactory.settingsStorage().clistApiAccess())
                 .getResources()
                 .filterNotMain()

@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class BackgroundDataLoader<T>(private val scope: CoroutineScope) {
+class BackgroundFetchStateHost<T>(private val scope: CoroutineScope) {
     private var currentKey: Any? = null
     private var job: Job? = null
     private val mutex = Mutex()
@@ -52,4 +52,4 @@ class BackgroundDataLoader<T>(private val scope: CoroutineScope) {
         executeFlow(key = key, flow = block.asFlow())
 }
 
-fun <T> ViewModel.backgroundDataLoader() = BackgroundDataLoader<T>(scope = viewModelScope)
+fun <T> ViewModel.backgroundFetchStateHost() = BackgroundFetchStateHost<T>(scope = viewModelScope)
