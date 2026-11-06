@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
+class BackgroundDataLoader<T>(private val scope: CoroutineScope) {
     private var currentKey: Any? = null
     private var job: Job? = null
     private val mutex = Mutex()
@@ -25,23 +25,20 @@ class BackgroundDataLoader<T> (private val scope: CoroutineScope) {
     val flowOfFetchState: StateFlow<FetchState<T>>
         field = MutableStateFlow(value = Loading)
 
-    private fun launchCollect(flow: Flow<T>, key: Any): Job =
-        scope.launch(Dispatchers.Default) {
-            flow.toFetchFlow()
-                .collect {
-                    mutex.withLock {
-                        if (currentKey == key) flowOfFetchState.value = it
-                    }
-                }
-        }
-
-    private fun executeFlow(key: Any, flow: Flow<T>): StateFlow<FetchState<T>>  {
-        scope.launch(Dispatchers.Default) {
+    private fun executeFlow(key: Any, flow: Flow<T>): StateFlow<FetchState<T>> {
+        scope.launch {
             mutex.withLock {
                 if (currentKey != key) {
                     currentKey = key
                     job?.cancel()
-                    job = launchCollect(flow = flow, key = key)
+                    job = scope.launch(Dispatchers.Default) {
+                        flow.toFetchFlow()
+                            .collect {
+                                mutex.withLock {
+                                    if (currentKey == key) flowOfFetchState.value = it
+                                }
+                            }
+                    }
                 }
             }
         }
