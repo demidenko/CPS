@@ -16,7 +16,6 @@ import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
-import com.demich.cps.profiles.managers.colorTagFor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -87,17 +86,18 @@ private data class RatedRank(
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
     val rating = profile?.userInfoOrNull()?.rating ?: return null
-    val colorTag = colorTagFor(rating)
+    val bounds = ratingsUpperBounds
+    val colorTag = bounds.colorTagFor(rating)
     val rank = when (colorTag) {
         RED -> Double.POSITIVE_INFINITY
         else -> {
             val rankedRatingColors = rankedArray(platform = platform) ?: return null
             val i = rankedRatingColors.indexOfFirst { colorTag == it }
             val j = rankedRatingColors.indexOfLast { colorTag == it }
-            val pos = ratingsUpperBounds.indexOfFirst { it.colorTag == colorTag }
+            val pos = bounds.indexOfFirst { it.colorTag == colorTag }
             check(i != -1 && j >= i && pos != -1)
-            val lower = if (pos > 0) ratingsUpperBounds[pos-1].upperBound else 0
-            val upper = ratingsUpperBounds[pos].upperBound
+            val lower = if (pos > 0) bounds[pos-1].upperBound else 0
+            val upper = bounds[pos].upperBound
             val blockLength = (upper - lower).toDouble() / (j - i + 1)
             i + (rating - lower) / blockLength
         }
