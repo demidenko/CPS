@@ -29,9 +29,11 @@ class CodeforcesBlogEntriesPageParser:
     private fun Element.extractBlogEntry(): CodeforcesWebBlogEntry {
         val id: Int
         val title: String
-        expectFirst(evaluatorDivTitle).expectFirst("a").let {
-            title = it.text()
-            id = it.href.extractBlogEntryIdFromBlogEntryHref()
+        expectFirst(evaluatorDivTitle).let { divTitle ->
+            title = divTitle.text()
+            divTitle.expectFirst("a").let {
+                id = it.href.extractBlogEntryIdFromBlogEntryHref()
+            }
         }
 
         val author: CodeforcesHandle
