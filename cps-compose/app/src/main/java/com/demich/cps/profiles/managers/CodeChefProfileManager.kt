@@ -108,8 +108,6 @@ class CodeChefProfileManager :
             else -> null
         }
 
-    override val rankedRatingColors = RatingColorTag.rankedCodeChef
-
     private fun getRatingStarNumber(rating: Int): Int {
         return ratingsUpperBounds.partitionIndex { rating >= it.upperBound } + 1
     }

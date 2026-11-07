@@ -68,8 +68,6 @@ class AtCoderProfileManager :
         )
     }
 
-    override val rankedRatingColors = RatingColorTag.rankedAtCoder
-
     override fun platformColor(colorTag: RatingColorTag): Color? =
         when (colorTag) {
             GRAY -> Color(0xFF808080)

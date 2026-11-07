@@ -94,8 +94,6 @@ class CodeforcesProfileManager :
         RatingBounds(ratingUpperBounds())
     }
 
-    override val rankedRatingColors = RatingColorTag.rankedCodeforces
-
     override fun platformColor(colorTag: RatingColorTag): Color? =
         when (colorTag) {
             GRAY -> Color(0xFF808080)

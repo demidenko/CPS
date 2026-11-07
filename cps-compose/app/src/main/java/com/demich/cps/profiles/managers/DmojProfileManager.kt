@@ -65,8 +65,6 @@ class DmojProfileManager :
         )
     }
 
-    override val rankedRatingColors = RatingColorTag.rankedDmoj
-
     override fun platformColor(colorTag: RatingColorTag): Color? =
         when (colorTag) {
             GRAY -> Color(0xFF999999)
