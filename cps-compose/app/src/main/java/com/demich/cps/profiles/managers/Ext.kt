@@ -16,9 +16,7 @@ import com.demich.cps.ui.theme.CPSRatingColors
 import com.demich.cps.ui.theme.cpsColors
 
 fun RatedProfileManager<*>.colorTagFor(rating: Int): RatingColorTag =
-    ratingsUpperBounds
-        .firstOrNull { rating < it.upperBound }
-        ?.colorTag ?: RED
+    ratingsUpperBounds.colorTagFor(rating = rating)
 
 context(manager: RatedProfileManager<*>)
 fun CPSRatingColors.colorFor(colorTag: RatingColorTag): Color =

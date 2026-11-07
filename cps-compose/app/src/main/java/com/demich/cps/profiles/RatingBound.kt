@@ -27,6 +27,11 @@ class RatingBounds(
     override val size get() = bounds.size
 
     override fun get(index: Int) = bounds[index]
+
+    fun colorTagFor(rating: Int): RatingColorTag =
+        bounds
+            .firstOrNull { rating < it.upperBound }
+            ?.colorTag ?: RED
 }
 
 class RatingBoundsArchived(
