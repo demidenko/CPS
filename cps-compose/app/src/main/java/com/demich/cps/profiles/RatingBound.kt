@@ -36,3 +36,9 @@ class RatingBoundsArchived(
 
 infix fun RatingBounds.until(endTime: Instant) =
     RatingBoundsArchived(bounds = this, endTime = endTime)
+
+interface RatingBoundsHistory {
+    val current: RatingBounds
+
+    fun archived(): List<RatingBoundsArchived>
+}
