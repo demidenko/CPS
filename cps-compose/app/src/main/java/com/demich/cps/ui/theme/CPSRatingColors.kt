@@ -4,15 +4,15 @@ import androidx.compose.ui.graphics.Color
 import com.demich.cps.profiles.RatingColorTag
 
 interface CPSRatingColors {
-    fun ratingColor(ratingColor: RatingColorTag): Color
+    fun ratingColor(colorTag: RatingColorTag): Color
 
     val usePlatformRatingColors: Boolean
 }
 
 fun cpsLightThemeRatingColors(usePlatformRatingColors: Boolean): CPSRatingColors =
     object : CPSRatingColors {
-        override fun ratingColor(ratingColor: RatingColorTag) =
-            when (ratingColor) {
+        override fun ratingColor(colorTag: RatingColorTag) =
+            when (colorTag) {
                 GRAY -> Color(0xFF808080)
                 BROWN -> Color(0xFF804000)
                 GREEN -> Color(0xFF008000)
@@ -29,8 +29,8 @@ fun cpsLightThemeRatingColors(usePlatformRatingColors: Boolean): CPSRatingColors
 
 fun cpsDarkThemeRatingColors(usePlatformRatingColors: Boolean): CPSRatingColors =
     object : CPSRatingColors {
-        override fun ratingColor(ratingColor: RatingColorTag) =
-            when (ratingColor) {
+        override fun ratingColor(colorTag: RatingColorTag) =
+            when (colorTag) {
                 GRAY -> Color(0xFF888888)
                 BROWN -> Color(0xFF80461B)
                 GREEN -> Color(0xFF009600)

@@ -46,7 +46,7 @@ internal fun ContestResult(
         contestTitle = ratingChange.contestTitle,
         date = ratingChange.date,
         rank = ratingChange.rank,
-        ratingColor = manager.colorFor(ratingColor = rectangles.getRatingColor(ratingChange.toGraphPoint())),
+        ratingColor = manager.colorFor(colorTag = rectangles.getRatingColor(ratingChange.toGraphPoint())),
         modifier = modifier
     )
 }
@@ -133,7 +133,7 @@ private fun RatingChange(
 private fun ContestResultTest(
     change: Int?,
     longTitle: Boolean = false,
-    ratingColor: RatingColorTag = ORANGE
+    colorTag: RatingColorTag = ORANGE
 ) {
     val rating = 2150
     ContestResult(
@@ -142,7 +142,7 @@ private fun ContestResultTest(
         contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
         date = Instant.fromEpochSeconds(1e9.toLong()),
         rank = 345,
-        ratingColor = cpsColors.ratingColor(ratingColor = ratingColor),
+        ratingColor = cpsColors.ratingColor(colorTag = colorTag),
         modifier = Modifier
             .background(cpsColors.backgroundAdditional)
             .padding(all = 3.dp)

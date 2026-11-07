@@ -18,21 +18,21 @@ import com.demich.cps.ui.theme.cpsColors
 fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColorTag =
     ratingsUpperBounds
         .firstOrNull { rating < it.upperBound }
-        ?.ratingColor ?: RED
+        ?.colorTag ?: RED
 
 context(manager: RatedProfileManager<*>)
-fun CPSRatingColors.colorFor(ratingColor: RatingColorTag): Color =
-    if (usePlatformRatingColors) manager.platformColorOrThrow(ratingColor)
-    else ratingColor(ratingColor)
+fun CPSRatingColors.colorFor(colorTag: RatingColorTag): Color =
+    if (usePlatformRatingColors) manager.platformColorOrThrow(colorTag)
+    else ratingColor(colorTag)
 
 context(manager: RatedProfileManager<*>)
 fun CPSRatingColors.colorFor(rating: Int): Color =
-    colorFor(ratingColor = manager.ratingColorFor(rating))
+    colorFor(colorTag = manager.ratingColorFor(rating))
 
 @Composable
 @ReadOnlyComposable
-fun RatedProfileManager<*>.colorFor(ratingColor: RatingColorTag): Color =
-    cpsColors.colorFor(ratingColor = ratingColor)
+fun RatedProfileManager<*>.colorFor(colorTag: RatingColorTag): Color =
+    cpsColors.colorFor(colorTag = colorTag)
 
 fun RatedProfileManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
     if (rating == null) AnnotatedString(text = text)

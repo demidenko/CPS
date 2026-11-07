@@ -15,7 +15,7 @@ internal class RatingGraphRectangles(
     private val upperBounds: List<Pair<GraphPoint, RatingColorTag>> = buildList {
         fun addBounds(x: Instant, bounds: RatingBounds) {
             bounds.forEach {
-                add(GraphPoint(x = x, y = it.upperBound) to it.ratingColor)
+                add(GraphPoint(x = x, y = it.upperBound) to it.colorTag)
             }
             add(GraphPoint(x = x, y = Int.MAX_VALUE) to RatingColorTag.RED)
         }

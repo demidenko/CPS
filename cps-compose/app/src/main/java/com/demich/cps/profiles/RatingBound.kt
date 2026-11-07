@@ -3,12 +3,12 @@ package com.demich.cps.profiles
 import kotlin.time.Instant
 
 data class RatingBound(
-    val ratingColor: RatingColorTag,
+    val colorTag: RatingColorTag,
     val upperBound: Int
 )
 
 infix fun RatingColorTag.until(rating: Int): RatingBound =
-    RatingBound(ratingColor = this, upperBound = rating)
+    RatingBound(colorTag = this, upperBound = rating)
 
 class RatingBounds(
     source: Collection<RatingBound>
@@ -16,8 +16,8 @@ class RatingBounds(
     private val bounds = source.sortedBy { it.upperBound }
         .also {
             for (i in 1 until it.size) {
-                check(it[i-1].ratingColor < it[i].ratingColor) {
-                    "colors must be strictly increasing but: ${it.joinToString { it.ratingColor.name }}"
+                check(it[i-1].colorTag < it[i].colorTag) {
+                    "colors must be strictly increasing but: ${it.joinToString { it.colorTag.name }}"
                 }
             }
         }
