@@ -16,7 +16,7 @@ import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
-import com.demich.cps.profiles.managers.ratingColorFor
+import com.demich.cps.profiles.managers.colorTagFor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
@@ -87,7 +87,7 @@ private data class RatedRank(
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
     val rating = profile?.userInfoOrNull()?.rating ?: return null
-    val colorTag = ratingColorFor(rating)
+    val colorTag = colorTagFor(rating)
     val rank = when (colorTag) {
         RED -> Double.POSITIVE_INFINITY
         else -> {
