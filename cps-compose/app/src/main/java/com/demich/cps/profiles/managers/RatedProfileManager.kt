@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingBoundsArchived
 import com.demich.cps.profiles.RatingChange
-import com.demich.cps.profiles.RatingColor
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.SmallRatedProfilePanel
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
@@ -20,7 +20,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
 
     abstract val ratingsUpperBounds: RatingBounds
 
-    abstract fun platformColor(ratingColor: RatingColor): Color?
+    abstract fun platformColor(ratingColor: RatingColorTag): Color?
 
     open fun makeRatedSpan(text: String, rating: Int, cpsColors: CPSColors): AnnotatedString =
         AnnotatedString(
@@ -44,7 +44,7 @@ abstract class RatedProfileManager<U: RatedUserInfo>: ProfileManager<U>() {
     override fun PanelContent(profileResult: ProfileResult<U>) =
         SmallRatedProfilePanel(profileResult)
 
-    abstract val rankedRatingColors: Array<RatingColor>
+    abstract val rankedRatingColors: Array<RatingColorTag>
 
     abstract suspend fun getRatingChanges(userId: String): List<RatingChange>
 }
@@ -56,8 +56,8 @@ interface RatingRevolutionsProvider {
     fun ratingUpperBoundRevolutions(): List<RatingBoundsArchived>
 }
 
-fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColor): Color =
+fun RatedProfileManager<*>.platformColorOrThrow(ratingColor: RatingColorTag): Color =
     platformColor(ratingColor = ratingColor) ?: throw IllegalArgumentException("platform $platform does not support rating color $ratingColor")
 
-fun RatedProfileManager<*>.availableRatingColors(): List<RatingColor> =
-    RatingColor.entries.filter { platformColor(it) != null }
+fun RatedProfileManager<*>.availableRatingColors(): List<RatingColorTag> =
+    RatingColorTag.entries.filter { platformColor(it) != null }

@@ -3,11 +3,11 @@ package com.demich.cps.profiles
 import kotlin.time.Instant
 
 data class RatingBound(
-    val ratingColor: RatingColor,
+    val ratingColor: RatingColorTag,
     val upperBound: Int
 )
 
-infix fun RatingColor.until(rating: Int): RatingBound =
+infix fun RatingColorTag.until(rating: Int): RatingBound =
     RatingBound(ratingColor = this, upperBound = rating)
 
 class RatingBounds(

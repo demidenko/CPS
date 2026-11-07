@@ -13,7 +13,7 @@ import com.demich.cps.platforms.clients.DmojClient
 import com.demich.cps.platforms.clients.isPageNotFound
 import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
-import com.demich.cps.profiles.RatingColor
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.screens.DmojUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
@@ -57,17 +57,17 @@ class DmojProfileManager :
 
     override val ratingsUpperBounds by lazy {
         RatingBounds(
-            RatingColor.GRAY until 1000,
-            RatingColor.GREEN until 1300,
-            RatingColor.BLUE until 1600,
-            RatingColor.VIOLET until 1900,
-            RatingColor.ORANGE until 2400
+            RatingColorTag.GRAY until 1000,
+            RatingColorTag.GREEN until 1300,
+            RatingColorTag.BLUE until 1600,
+            RatingColorTag.VIOLET until 1900,
+            RatingColorTag.ORANGE until 2400
         )
     }
 
-    override val rankedRatingColors = RatingColor.rankedDmoj
+    override val rankedRatingColors = RatingColorTag.rankedDmoj
 
-    override fun platformColor(ratingColor: RatingColor): Color? =
+    override fun platformColor(ratingColor: RatingColorTag): Color? =
         when (ratingColor) {
             GRAY -> Color(0xFF999999)
             GREEN -> Color(0xff00a900)

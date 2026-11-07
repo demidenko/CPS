@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
 import com.demich.cps.platforms.Platform
-import com.demich.cps.profiles.RatingColor
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
@@ -81,7 +81,7 @@ private fun Screen.platformOrNull(): Platform? =
 @Immutable
 private data class RatedRank(
     val rank: Double,
-    val ratingColor: RatingColor,
+    val ratingColor: RatingColorTag,
     val manager: RatedProfileManager<*>
 )
 

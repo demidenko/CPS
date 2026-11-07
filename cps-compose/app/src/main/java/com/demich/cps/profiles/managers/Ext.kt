@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.utils.toProfileResult
-import com.demich.cps.profiles.RatingColor
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.UserInfo
@@ -15,13 +15,13 @@ import com.demich.cps.ui.theme.CPSColors
 import com.demich.cps.ui.theme.CPSRatingColors
 import com.demich.cps.ui.theme.cpsColors
 
-fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColor =
+fun RatedProfileManager<*>.ratingColorFor(rating: Int): RatingColorTag =
     ratingsUpperBounds
         .firstOrNull { rating < it.upperBound }
         ?.ratingColor ?: RED
 
 context(manager: RatedProfileManager<*>)
-fun CPSRatingColors.colorFor(ratingColor: RatingColor): Color =
+fun CPSRatingColors.colorFor(ratingColor: RatingColorTag): Color =
     if (usePlatformRatingColors) manager.platformColorOrThrow(ratingColor)
     else ratingColor(ratingColor)
 
@@ -31,7 +31,7 @@ fun CPSRatingColors.colorFor(rating: Int): Color =
 
 @Composable
 @ReadOnlyComposable
-fun RatedProfileManager<*>.colorFor(ratingColor: RatingColor): Color =
+fun RatedProfileManager<*>.colorFor(ratingColor: RatingColorTag): Color =
     cpsColors.colorFor(ratingColor = ratingColor)
 
 fun RatedProfileManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =

@@ -1,6 +1,6 @@
 package com.demich.cps.profiles
 
-enum class RatingColor {
+enum class RatingColorTag {
     GRAY,
     BROWN,
     GREEN,

@@ -31,7 +31,7 @@ import com.demich.cps.platforms.utils.codeforces.getHandleSuggestions
 import com.demich.cps.platforms.utils.codeforces.toUserInfo
 import com.demich.cps.profiles.RatingBounds
 import com.demich.cps.profiles.RatingChange
-import com.demich.cps.profiles.RatingColor
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.screens.CodeforcesUserInfoExpandedContent
 import com.demich.cps.profiles.toRatingChange
 import com.demich.cps.profiles.until
@@ -94,9 +94,9 @@ class CodeforcesProfileManager :
         RatingBounds(ratingUpperBounds())
     }
 
-    override val rankedRatingColors = RatingColor.rankedCodeforces
+    override val rankedRatingColors = RatingColorTag.rankedCodeforces
 
-    override fun platformColor(ratingColor: RatingColor): Color? =
+    override fun platformColor(ratingColor: RatingColorTag): Color? =
         when (ratingColor) {
             GRAY -> Color(0xFF808080)
             GREEN -> Color(0xFF008000)
@@ -165,42 +165,42 @@ class CodeforcesProfileManager :
     override fun ratingUpperBoundRevolutions() = [
         //https://codeforces.com/blog/entry/59228
         RatingBounds(
-            RatingColor.GRAY until 1200,
-            RatingColor.GREEN until 1400,
-            RatingColor.CYAN until 1600,
-            RatingColor.BLUE until 1900,
-            RatingColor.VIOLET until 2200,
-            RatingColor.ORANGE until 2400
+            RatingColorTag.GRAY until 1200,
+            RatingColorTag.GREEN until 1400,
+            RatingColorTag.CYAN until 1600,
+            RatingColorTag.BLUE until 1900,
+            RatingColorTag.VIOLET until 2200,
+            RatingColorTag.ORANGE until 2400
         ) until Instant.fromEpochSeconds(1525364996L),
         //https://codeforces.com/blog/entry/20638
         RatingBounds(
-            RatingColor.GRAY until 1200,
-            RatingColor.GREEN until 1500,
-            RatingColor.BLUE until 1700,
-            RatingColor.VIOLET until 1900,
-            RatingColor.ORANGE until 2200
+            RatingColorTag.GRAY until 1200,
+            RatingColorTag.GREEN until 1500,
+            RatingColorTag.BLUE until 1700,
+            RatingColorTag.VIOLET until 1900,
+            RatingColorTag.ORANGE until 2200
         ) until Instant.fromEpochSeconds(1443721088L),
         //https://codeforces.com/blog/entry/3064
         RatingBounds(
-            RatingColor.GRAY until 1200,
-            RatingColor.GREEN until 1500,
-            RatingColor.BLUE until 1650,
-            RatingColor.VIOLET until 1800,
-            RatingColor.ORANGE until 2000
+            RatingColorTag.GRAY until 1200,
+            RatingColorTag.GREEN until 1500,
+            RatingColorTag.BLUE until 1650,
+            RatingColorTag.VIOLET until 1800,
+            RatingColorTag.ORANGE until 2000
         ) until Instant.fromEpochSeconds(1320620562L),
         //https://codeforces.com/blog/entry/1383
         RatingBounds(
-            RatingColor.GRAY until 1200,
-            RatingColor.GREEN until 1500,
-            RatingColor.BLUE until 1650,
-            RatingColor.YELLOW until 2000
+            RatingColorTag.GRAY until 1200,
+            RatingColorTag.GREEN until 1500,
+            RatingColorTag.BLUE until 1650,
+            RatingColorTag.YELLOW until 2000
         ) until Instant.fromEpochSeconds(1298914585L)
         //https://codeforces.com/blog/entry/126
     ]
 
 }
 
-private fun CodeforcesRatingColorTag.toRatingColor(): RatingColor =
+private fun CodeforcesRatingColorTag.toRatingColor(): RatingColorTag =
     when (this) {
         GRAY -> GRAY
         GREEN -> GREEN
