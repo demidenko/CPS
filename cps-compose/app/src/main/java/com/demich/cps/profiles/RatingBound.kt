@@ -40,5 +40,5 @@ infix fun RatingBounds.until(endTime: Instant) =
 interface RatingBoundsHistory {
     val current: RatingBounds
 
-    fun archived(): List<RatingBoundsArchived>
+    val archived: List<RatingBoundsArchived>
 }

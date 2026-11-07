@@ -2,15 +2,14 @@ package com.demich.cps.profiles.rating_graph
 
 import androidx.compose.runtime.Immutable
 import com.demich.cps.profiles.RatingBounds
+import com.demich.cps.profiles.RatingBoundsHistory
 import com.demich.cps.profiles.RatingColor
-import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.RatingRevolutionsProvider
 import com.demich.cps.utils.forEachRangeEqualBy
 import kotlin.time.Instant
 
 @Immutable
 internal class RatingGraphRectangles(
-    manager: RatedProfileManager<*>
+    history: RatingBoundsHistory
 ) {
     //point is upperBound (endTime, ratingUpperBound)
     private val upperBounds: List<Pair<GraphPoint, RatingColor>> = buildList {
@@ -20,14 +19,14 @@ internal class RatingGraphRectangles(
             }
             add(GraphPoint(x = x, y = Int.MAX_VALUE) to RatingColor.RED)
         }
-        if (manager is RatingRevolutionsProvider) {
-            manager.ratingUpperBoundRevolutions()
-                .sortedBy { it.endTime }
-                .forEach {
-                    addBounds(x = it.endTime, bounds = it.bounds)
-                }
-        }
-        addBounds(x = Instant.DISTANT_FUTURE, bounds = manager.ratingsUpperBounds)
+
+        history.archived
+            .sortedBy { it.endTime }
+            .forEach {
+                addBounds(x = it.endTime, bounds = it.bounds)
+            }
+
+        addBounds(x = Instant.DISTANT_FUTURE, bounds = history.current)
     }.apply {
         check(isSortedWith(compareBy({ it.first.x }, { it.first.y })))
     }

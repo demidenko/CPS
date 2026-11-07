@@ -26,8 +26,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.platforms.clients.niceMessage
+import com.demich.cps.profiles.RatingBoundsHistory
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.managers.RatedProfileManager
+import com.demich.cps.profiles.managers.RatingRevolutionsProvider
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
@@ -96,7 +98,9 @@ private fun RatingGraphWithHeader(
     require(ratingChanges.isNotEmpty())
 
     val viewPortState = rememberViewPortState(inflateHorizontal = 10.dp)
-    val rectangles = remember(manager) { RatingGraphRectangles(manager) }
+    val rectangles = remember(manager) {
+        RatingGraphRectangles(manager.ratingBoundsHistory())
+    }
 
     // TODO: carefully change to provide current time
     val currentTime = remember { getSystemTime() }
@@ -280,3 +284,11 @@ private fun makeValidFilters(ratingChanges: List<RatingChange>, currentTime: Ins
         if (isNotEmpty()) add(index = 0, ALL)
     }
 
+private fun RatedProfileManager<*>.ratingBoundsHistory(): RatingBoundsHistory =
+    object : RatingBoundsHistory {
+        override val current = ratingsUpperBounds
+
+        override val archived =
+            if (this@ratingBoundsHistory is RatingRevolutionsProvider) ratingUpperBoundRevolutions()
+            else emptyList()
+    }
