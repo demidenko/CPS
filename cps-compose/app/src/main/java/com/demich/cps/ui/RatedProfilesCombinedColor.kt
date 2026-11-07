@@ -91,6 +91,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
     val rank = when (colorTag) {
         RED -> Double.POSITIVE_INFINITY
         else -> {
+            val rankedRatingColors = rankedArray(platform = platform)
             val i = rankedRatingColors.indexOfFirst { colorTag == it }
             val j = rankedRatingColors.indexOfLast { colorTag == it }
             val pos = ratingsUpperBounds.indexOfFirst { it.colorTag == colorTag }
@@ -150,4 +151,14 @@ private fun flowOfRankGetter(context: Context): Flow<RankGetter> =
                 )
             }
         }
+    }
+
+private fun rankedArray(platform: Platform): Array<RatingColorTag> =
+    when (platform) {
+        //TODO atcoder::orange == cf::red
+        codeforces -> arrayOf(GRAY, GRAY, GREEN, CYAN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
+        atcoder -> arrayOf(GRAY, BROWN, GREEN, CYAN, BLUE, YELLOW, YELLOW, ORANGE, ORANGE, RED)
+        codechef -> arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, YELLOW, YELLOW, ORANGE, RED)
+        dmoj -> arrayOf(GRAY, GRAY, GREEN, GREEN, BLUE, VIOLET, VIOLET, ORANGE, ORANGE, RED)
+        else -> error("bruh")
     }
