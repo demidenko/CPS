@@ -146,10 +146,10 @@ private fun RatingGraphCanvas(
                 )
 
                 //rating points
-                pointsWithColors.forEach { [point, ratingColor] ->
+                pointsWithColors.forEach { [point, colorTag] ->
                     drawPoint(
                         center = point.toCanvasPoint(),
-                        color = getColor(ratingColor),
+                        color = getColor(colorTag),
                         borderColor = lineColor,
                         radius = circleRadius,
                         borderWidth = circleBorderWidth,
@@ -199,13 +199,13 @@ private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
     getColor: (RatingColorTag) -> Color
 ) {
-    rectangles.forEachRect { bottomLeft, topRight, ratingColor ->
+    rectangles.forEachRect { bottomLeft, topRight, colorTag ->
         toCanvasRect(
             bottomLeft = bottomLeft,
             topRight = topRight
         ) { rect ->
             drawRect(
-                color = getColor(ratingColor),
+                color = getColor(colorTag),
                 topLeft = rect.topLeft,
                 size = rect.size
             )
