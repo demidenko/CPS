@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
@@ -131,9 +132,11 @@ private fun RatingGraphWithHeader(
 
     val animationScope = rememberCoroutineScope()
 
+    val cpsColors = cpsColors
+    val ratingColor = { colorTag: RatingColorTag -> context(manager) { cpsColors.colorFor(colorTag = colorTag) } }
+
     Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
-            manager = manager,
             header = selectedIndex?.let {
                 val ratingChange = ratingChanges.getProperly(it)
                 RatingChangeHeader(ratingChange = ratingChange, colorTag = rectangles.getRatingColor(ratingChange.toGraphPoint()))
@@ -148,16 +151,17 @@ private fun RatingGraphWithHeader(
                     filterType = header.filterType
                 }
             },
+            ratingColor = ratingColor,
             shape = shape
         )
 
         RatingGraphCanvas(
             ratingChanges = ratingChanges,
-            manager = manager,
             rectangles = rectangles,
             viewPortState = viewPortState,
             markVerticals = markVerticals,
             selectedIndex = selectedIndex,
+            ratingColor = ratingColor,
             modifier = Modifier
                 .height(graphHeight)
                 .clip(shape)
@@ -241,16 +245,16 @@ private data class FilterHeader(
 
 @Composable
 private fun RatingGraphHeader(
-    manager: RatedProfileManager<*>,
     header: Header,
     onHeaderChange: (Header) -> Unit,
+    ratingColor: (RatingColorTag) -> Color,
     shape: Shape
 ) {
     when (header) {
         is RatingChangeHeader -> {
             ContestResult(
                 ratingChange = header.ratingChange,
-                ratingColor = manager.colorFor(colorTag = header.colorTag),
+                ratingColor = ratingColor(header.colorTag),
                 modifier = Modifier
                     .padding(bottom = 3.dp)
                     .background(cpsColors.backgroundAdditional, shape)

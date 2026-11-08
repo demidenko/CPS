@@ -24,35 +24,30 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColorTag
-import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.geom.RectProjector
 import com.demich.cps.ui.geom.toOffset
-import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.spawnDpState
 import kotlin.time.Instant
 
 @Composable
 internal fun RatingGraphCanvas(
     ratingChanges: List<RatingChange>,
-    manager: RatedProfileManager<*>,
     rectangles: RatingGraphRectangles,
     viewPortState: ViewPortState,
     markVerticals: List<Instant>,
     selectedIndex: Int?,
+    ratingColor: (RatingColorTag) -> Color,
     modifier: Modifier = Modifier
 ) {
     val ratingPoints = remember(ratingChanges) {
         ratingChanges.map { it.toGraphPoint() }.sortedBy { it.x }
     }
 
-    val cpsColors = cpsColors
-
     RatingGraphCanvas(
         ratingPoints = ratingPoints,
         selectedIndex = selectedIndex,
         markVerticals = markVerticals,
-        getColor = { context(manager) { cpsColors.colorFor(colorTag = it) } },
+        ratingColor = ratingColor,
         viewPortState = viewPortState,
         rectangles = rectangles,
         lineColor = Color.Black,
@@ -65,7 +60,7 @@ private fun RatingGraphCanvas(
     ratingPoints: List<GraphPoint>,
     selectedIndex: Int?,
     markVerticals: List<Instant>,
-    getColor: (RatingColorTag) -> Color,
+    ratingColor: (RatingColorTag) -> Color,
     viewPortState: ViewPortState,
     rectangles: RatingGraphRectangles,
     lineColor: Color,
@@ -110,7 +105,7 @@ private fun RatingGraphCanvas(
             //rating filled areas
             drawRatingBackground(
                 rectangles = rectangles,
-                getColor = getColor
+                ratingColor = ratingColor
             )
 
             //time dashes
@@ -149,7 +144,7 @@ private fun RatingGraphCanvas(
                 pointsWithColors.forEach { [point, colorTag] ->
                     drawPoint(
                         center = point.toCanvasPoint(),
-                        color = getColor(colorTag),
+                        color = ratingColor(colorTag),
                         borderColor = lineColor,
                         radius = circleRadius,
                         borderWidth = circleBorderWidth,
@@ -197,7 +192,7 @@ private fun DrawScope.drawPoint(
 context(projector: RectProjector)
 private inline fun DrawScope.drawRatingBackground(
     rectangles: RatingGraphRectangles,
-    getColor: (RatingColorTag) -> Color
+    ratingColor: (RatingColorTag) -> Color
 ) {
     rectangles.forEachRect { bottomLeft, topRight, colorTag ->
         toCanvasRect(
@@ -205,7 +200,7 @@ private inline fun DrawScope.drawRatingBackground(
             topRight = topRight
         ) { rect ->
             drawRect(
-                color = getColor(colorTag),
+                color = ratingColor(colorTag),
                 topLeft = rect.topLeft,
                 size = rect.size
             )
