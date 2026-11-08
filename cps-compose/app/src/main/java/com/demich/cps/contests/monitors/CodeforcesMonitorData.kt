@@ -40,7 +40,7 @@ data class CodeforcesMonitorData(
         data class Points(val points: Double, val isFinal: Boolean): ProblemResult
 
         companion object {
-            const val failedSystemTestSymbol = "⨯" //alternatives: × ✖
+            const val failedSystemTestSymbol = "×" // variants: × ⨯ ✖
         }
     }
 }
