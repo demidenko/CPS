@@ -28,8 +28,10 @@ import com.demich.cps.fetchstate.FetchState
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.profiles.RatingBoundsHistory
 import com.demich.cps.profiles.RatingChange
+import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.RatingRevolutionsProvider
+import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.ui.LoadingContentBox
 import com.demich.cps.ui.TextButtonsSelectRow
 import com.demich.cps.ui.geom.RectProjector
@@ -132,8 +134,10 @@ private fun RatingGraphWithHeader(
     Column(modifier = Modifier.background(cpsColors.background)) {
         RatingGraphHeader(
             manager = manager,
-            header = selectedIndex?.let { RatingChangeHeader(ratingChanges.getProperly(it), rectangles) }
-                ?: FilterHeader(filterType, ratingChanges, currentTime),
+            header = selectedIndex?.let {
+                val ratingChange = ratingChanges.getProperly(it)
+                RatingChangeHeader(ratingChange = ratingChange, colorTag = rectangles.getRatingColor(ratingChange.toGraphPoint()))
+            } ?: FilterHeader(filterType, ratingChanges, currentTime),
             onHeaderChange = { header ->
                 if (header is FilterHeader) {
                     animationScope.launch {
@@ -224,9 +228,9 @@ private fun RatingGraphBounds.addRatingBorder(border: Int) =
 
 private sealed interface Header
 
-private class RatingChangeHeader(
+private data class RatingChangeHeader(
     val ratingChange: RatingChange,
-    val rectangles: RatingGraphRectangles
+    val colorTag: RatingColorTag
 ): Header
 
 private data class FilterHeader(
@@ -246,8 +250,7 @@ private fun RatingGraphHeader(
         is RatingChangeHeader -> {
             ContestResult(
                 ratingChange = header.ratingChange,
-                manager = manager,
-                rectangles = header.rectangles,
+                ratingColor = manager.colorFor(colorTag = header.colorTag),
                 modifier = Modifier
                     .padding(bottom = 3.dp)
                     .background(cpsColors.backgroundAdditional, shape)

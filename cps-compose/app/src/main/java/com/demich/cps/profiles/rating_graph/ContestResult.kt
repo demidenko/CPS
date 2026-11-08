@@ -20,8 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.profiles.RatingChange
 import com.demich.cps.profiles.RatingColorTag
-import com.demich.cps.profiles.managers.RatedProfileManager
-import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.ratingDiff
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.IconSp
@@ -36,8 +34,7 @@ import kotlin.time.Instant
 @Composable
 internal fun ContestResult(
     ratingChange: RatingChange,
-    manager: RatedProfileManager<*>,
-    rectangles: RatingGraphRectangles,
+    ratingColor: Color,
     modifier: Modifier = Modifier
 ) {
     ContestResult(
@@ -46,7 +43,7 @@ internal fun ContestResult(
         contestTitle = ratingChange.contestTitle,
         date = ratingChange.date,
         rank = ratingChange.rank,
-        ratingColor = manager.colorFor(colorTag = rectangles.getRatingColor(ratingChange.toGraphPoint())),
+        ratingColor = ratingColor,
         modifier = modifier
     )
 }
