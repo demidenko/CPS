@@ -27,11 +27,6 @@ context(manager: RatedProfileManager<*>)
 fun CPSRatingColors.colorFor(rating: Int): Color =
     colorFor(colorTag = manager.colorTagFor(rating))
 
-@Composable
-@ReadOnlyComposable
-fun RatedProfileManager<*>.colorFor(colorTag: RatingColorTag): Color =
-    cpsColors.colorFor(colorTag = colorTag)
-
 fun RatedProfileManager<*>.makeOKSpan(text: String, rating: Int?, cpsColors: CPSColors): AnnotatedString =
     if (rating == null) AnnotatedString(text = text)
     else makeRatedSpan(text, rating, cpsColors)

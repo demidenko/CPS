@@ -19,6 +19,7 @@ import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
+import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.animateToggleColorAsState
 import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.context
@@ -44,8 +45,10 @@ fun ratedProfilesColorState(
         }
     }
 
+    val cpsColors = cpsColors
+
     return colorState(
-        enabledColor = rank?.run { manager.colorFor(colorTag) },
+        enabledColor = rank?.run { context(manager) { cpsColors.colorFor(colorTag = colorTag) } },
         disabledColor = disabledColor
     )
 }
