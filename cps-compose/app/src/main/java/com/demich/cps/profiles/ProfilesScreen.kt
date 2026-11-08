@@ -70,19 +70,24 @@ private fun ProfilesScreen(
             items = profiles,
             key = { it.platform },
             onEmptyMessage = { Text(text = "Profiles are not defined") }
-        ) { profileResultWithManager ->
+        ) {
             ProfilePanel(
-                profileResultWithManager = profileResultWithManager,
-                onReloadRequest = { viewModel.reload(profileResultWithManager.manager, context) },
-                onExpandRequest = { onExpandProfile(profileResultWithManager.platform) },
+                manager = it.manager,
+                onReloadRequest = { viewModel.reload(it.manager, context) },
+                onExpandRequest = { onExpandProfile(it.manager.platform) },
                 visibleOrder = profilePlatforms,
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .animateItem()
+                    .animateItem(),
+                content = { PanelContent(it) }
             )
         }
     }
 }
+
+@Composable
+private fun <U: UserInfo> PanelContent(it: ProfileResultWithManager<U>) =
+    it.manager.PanelContent(it.profileResult)
 
 @Composable
 fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(

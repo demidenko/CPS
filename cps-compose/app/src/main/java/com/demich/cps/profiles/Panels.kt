@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
-import com.demich.cps.profiles.managers.ProfileResultWithManager
+import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.managers.makeHandleSpan
@@ -54,15 +54,15 @@ import kotlin.time.Instant
 
 @Composable
 fun <U: UserInfo> ProfilePanel(
-    profileResultWithManager: ProfileResultWithManager<U>,
     modifier: Modifier = Modifier,
+    manager: ProfileManager<U>,
     visibleOrder: List<Platform>? = null,
     onReloadRequest: () -> Unit,
-    onExpandRequest: () -> Unit
+    onExpandRequest: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     val context = context
     val profilesViewModel = profilesViewModel()
-    val (profileResult, manager) = profileResultWithManager
 
     val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
 
@@ -109,7 +109,7 @@ fun <U: UserInfo> ProfilePanel(
             }
         }
     ) {
-        manager.PanelContent(profileResult)
+        content()
 
         if (mode != null) {
             PanelUIButtons(
