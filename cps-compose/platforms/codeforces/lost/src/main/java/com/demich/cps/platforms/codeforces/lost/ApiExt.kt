@@ -25,6 +25,7 @@ internal fun CodeforcesApi.withBlogEntriesCache(
             origin.getRecentActions(maxCount = maxCount).apply {
                 forEach {
                     it.blogEntry?.let { blogEntry ->
+                        // TODO: multiple writes
                         getOrPut(id = blogEntry.id) { blogEntry }
                     }
                 }
