@@ -120,14 +120,14 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
     )
 
     bottomBar = profilesBottomBarBuilder(
-        profiles = profiles,
+        enabledPlatforms = profiles.map { it.platform },
         reorderEnabled = reorderEnabled,
         onReorderDone = { reorderEnabled = false }
     )
 }
 
 private fun profilesBottomBarBuilder(
-    profiles: List<ProfileResultWithManager<*>>,
+    enabledPlatforms: List<Platform>,
     reorderEnabled: Boolean,
     onReorderDone: () -> Unit
 ): AdditionalBottomBarBuilder = {
@@ -137,8 +137,8 @@ private fun profilesBottomBarBuilder(
             onClick = onReorderDone
         )
     } else {
-        AddProfileButton(availableProfiles = profiles)
-        ReloadProfilesButton(anyPlatformEnabled = profiles.isNotEmpty())
+        AddProfileButton(enabledPlatforms = enabledPlatforms)
+        ReloadProfilesButton(anyPlatformEnabled = enabledPlatforms.isNotEmpty())
     }
 }
 
@@ -178,7 +178,7 @@ private fun AddProfileMenuItem(platform: Platform, onSelect: () -> Unit) {
 
 @Composable
 private fun AddProfileButton(
-    availableProfiles: List<ProfileResultWithManager<*>>
+    enabledPlatforms: List<Platform>
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var selectedPlatform: Platform? by remember { mutableStateOf(null) }
@@ -198,10 +198,9 @@ private fun AddProfileButton(
             onDismissRequest = { showMenu = false },
             modifier = Modifier.background(cpsColors.backgroundAdditional)
         ) {
-            val platforms: List<Platform> = remember(availableProfiles) {
+            val platforms: List<Platform> = remember(enabledPlatforms) {
                 val all = profilePlatforms
-                val available = availableProfiles.map { it.platform }
-                all - available + Platform.clist
+                all - enabledPlatforms + Platform.clist
             }
 
             platforms.forEach { platform ->
