@@ -149,6 +149,7 @@ private suspend fun CodeforcesLostStorage.updateFresh(
 
     if (suspects.size > 1) {
         api.runCatching { getRecentActions() }
+            .unwrapCancellation()
     }
 
     suspects.upgradeToFresh(
@@ -280,7 +281,7 @@ private suspend fun CodeforcesPageContentProvider.getRecentCatching(): Result<Li
         extractFrom(::getGroupsPage)
     }.recoverCatching {
         extractFrom(::getRecentActionsPage)
-    }
+    }.unwrapCancellation()
 }
 
 private fun isNotFresh(blogEntryId: Int, hint: CodeforcesLostHint?) =
@@ -318,3 +319,6 @@ private suspend inline fun DelayedTransactionsLostStorage.use(block: DelayedTran
         pushChanges()
     }
 }
+
+private fun <T> Result<T>.unwrapCancellation(): Result<T> =
+    onFailure { if (it is kotlin.coroutines.cancellation.CancellationException) throw it }
