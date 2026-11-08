@@ -12,14 +12,14 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 open class DataStoreSnapshot internal constructor(
-    protected open val preferences: Preferences
+    private val preferences: Preferences
 ) {
     operator fun <T> get(item: DataStoreValue<T>): T =
         item.reader.restore(preferences)
 }
 
 class DataStoreEditScope internal constructor(
-    override val preferences: MutablePreferences
+    private val preferences: MutablePreferences
 ): DataStoreSnapshot(preferences) {
     operator fun <T> set(item: DataStoreItem<T>, value: T) =
         item.saver.save(preferences, value)
