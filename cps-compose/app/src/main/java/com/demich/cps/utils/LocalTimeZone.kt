@@ -9,7 +9,7 @@ import kotlinx.datetime.TimeZone
 
 
 val LocalTimeZone = staticCompositionLocalOf<TimeZone> {
-    throw IllegalAccessException("timezone not provided")
+    getSystemTimeZone()
 }
 
 @Composable
