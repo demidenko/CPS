@@ -167,11 +167,14 @@ private fun UserOnlineInfo(
     modifier: Modifier = Modifier,
     time: Instant
 ) {
-    UserOnlineInfo(
-        modifier = modifier,
-        text = "online: " + time.formatTimeAgo(),
-        showWarning = contextLocalTimeZone { time.yearsUntil(localCurrentTime, timeZone = contextOf<TimeZone>()) > 0 }
-    )
+    contextLocalTimeZone {
+        val currentTime = localCurrentTime
+        UserOnlineInfo(
+            modifier = modifier,
+            text = "online: " + time.formatTimeAgo(until = currentTime),
+            showWarning = time.yearsUntil(currentTime, timeZone = contextOf<TimeZone>()) > 0
+        )
+    }
 }
 
 @Composable

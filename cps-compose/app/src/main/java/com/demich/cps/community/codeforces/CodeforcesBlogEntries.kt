@@ -35,6 +35,7 @@ import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.formatTimeAgo
+import com.demich.cps.utils.localCurrentTime
 import com.demich.cps.utils.plusIf
 
 
@@ -108,9 +109,11 @@ private fun BlogEntryInfo(
         authorHandle = blogEntry.author.toHandleSpan(),
         rating = blogEntry.rating,
         commentsCount = blogEntry.commentsCount,
-        creationTime = when (showType) {
-            TIME_AGO -> blogEntry.creationTime.formatTimeAgo()
-            DATE -> contextLocalTimeZone { blogEntry.creationTime.formatFullDate() }
+        creationTime = contextLocalTimeZone {
+            when (showType) {
+                TIME_AGO -> blogEntry.creationTime.formatTimeAgo(until = localCurrentTime)
+                DATE -> blogEntry.creationTime.formatFullDate()
+            }
         },
         markNew = markNew,
         label = label,

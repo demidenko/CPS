@@ -52,6 +52,10 @@ fun Instant.formatRoundedTime(until: Instant): String {
     return (until - this).formatRoundedTime()
 }
 
+context(timeZone: TimeZone)
+fun Instant.formatTimeAgo(until: Instant): String =
+    formatRoundedTime(until) + " ago"
+
 fun Duration.formatTimerShort(): String =
     if (this < 48.hours) formatHHMMSS() else formatRoundedTime()
 
