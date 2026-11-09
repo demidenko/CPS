@@ -13,7 +13,6 @@ import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -55,16 +54,13 @@ fun ProfilePanel(
     modifier: Modifier = Modifier,
     platform: Platform,
     visibleOrder: List<Platform>? = null,
+    loadingStatus: LoadingStatus,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val context = context
     val profilesViewModel = profilesViewModel()
-
-    val loadingStatus by remember(platform) {
-        profilesViewModel.flowOfLoadingStatus(platform)
-    }.collectAsState(initial = null)
 
     val mode: PanelMode? =
         if (visibleOrder != null) {

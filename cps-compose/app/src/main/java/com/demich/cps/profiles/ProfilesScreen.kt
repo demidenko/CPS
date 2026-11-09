@@ -57,6 +57,8 @@ private fun ProfilesScreen(
     val context = context
     val viewModel = profilesViewModel()
 
+    val loadingStatuses by viewModel.flowOfLoadingStatuses.collectAsState()
+
     val profilePlatforms = if (reorderEnabled) profiles.map { it.platform } else null
 
     LazyColumn(
@@ -73,6 +75,7 @@ private fun ProfilesScreen(
         ) {
             ProfilePanel(
                 platform = it.platform,
+                loadingStatus = loadingStatuses[it.platform] ?: PENDING,
                 onReloadRequest = { viewModel.reload(it.manager, context) },
                 onExpandRequest = { onExpandProfile(it.platform) },
                 visibleOrder = profilePlatforms,

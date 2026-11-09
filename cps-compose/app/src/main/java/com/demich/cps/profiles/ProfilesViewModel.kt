@@ -27,6 +27,7 @@ import com.demich.cps.utils.toLoadingStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
@@ -37,6 +38,9 @@ fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 
 class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<Platform, LoadingStatus>())
+
+    val flowOfLoadingStatuses: StateFlow<Map<Platform, LoadingStatus>>
+        get() = loadingStatuses
 
     fun flowOfLoadingStatus(platform: Platform): Flow<LoadingStatus> =
         loadingStatuses.map { it[platform] ?: PENDING }
