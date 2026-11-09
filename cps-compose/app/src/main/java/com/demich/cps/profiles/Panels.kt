@@ -25,7 +25,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
@@ -39,6 +38,7 @@ import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.append
+import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.ifThen
@@ -59,9 +59,6 @@ fun ProfilePanel(
     onExpandRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val context = context
-    val profilesViewModel = profilesViewModel()
-
     val mode: PanelMode? =
         if (visibleOrder != null) {
             PanelMode.Reorder(
@@ -101,6 +98,8 @@ fun ProfilePanel(
         content()
 
         if (mode != null) {
+            val context = context
+            val scope = backgroundCoroutineScope
             PanelUIButtons(
                 mode = mode,
                 modifier = Modifier.align(Alignment.CenterEnd),
@@ -109,7 +108,7 @@ fun ProfilePanel(
                 onSwap = { i, j ->
                     val visibleOrder = requireNotNull(visibleOrder) // TODO
                     context.settingsProfiles.platformsOrder.setValueIn(
-                        scope = profilesViewModel.viewModelScope,
+                        scope = scope,
                         value = visibleOrder.toMutableList().apply { swap(i, j) }
                     )
                 }
