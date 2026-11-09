@@ -59,7 +59,7 @@ fun ProfilePanel(
     onExpandRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val mode: PanelMode? =
+    val mode: PanelMode =
         if (visibleOrder != null) {
             PanelMode.Reorder(
                 index = visibleOrder.indexOf(platform),
@@ -67,7 +67,6 @@ fun ProfilePanel(
             )
         } else {
             when (loadingStatus) {
-                null -> null
                 LOADING -> PanelMode.Reloading
                 PENDING, FAILED -> PanelMode.Pending(
                     isFailed = loadingStatus == FAILED,
@@ -97,23 +96,21 @@ fun ProfilePanel(
     ) {
         content()
 
-        if (mode != null) {
-            val context = context
-            val scope = backgroundCoroutineScope
-            PanelUIButtons(
-                mode = mode,
-                modifier = Modifier.align(Alignment.CenterEnd),
-                onReloadRequest = onReloadRequest,
-                onExpandRequest = onExpandRequest,
-                onSwap = { i, j ->
-                    val visibleOrder = requireNotNull(visibleOrder) // TODO
-                    context.settingsProfiles.platformsOrder.setValueIn(
-                        scope = scope,
-                        value = visibleOrder.toMutableList().apply { swap(i, j) }
-                    )
-                }
-            )
-        }
+        val context = context
+        val scope = backgroundCoroutineScope
+        PanelUIButtons(
+            mode = mode,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            onReloadRequest = onReloadRequest,
+            onExpandRequest = onExpandRequest,
+            onSwap = { i, j ->
+                val visibleOrder = requireNotNull(visibleOrder) // TODO
+                context.settingsProfiles.platformsOrder.setValueIn(
+                    scope = scope,
+                    value = visibleOrder.toMutableList().apply { swap(i, j) }
+                )
+            }
+        )
     }
 }
 
