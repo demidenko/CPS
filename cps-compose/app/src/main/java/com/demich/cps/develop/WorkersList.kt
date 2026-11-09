@@ -93,7 +93,6 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.Instant
 
 @Composable
 fun WorkersList(modifier: Modifier = Modifier) {
@@ -213,7 +212,7 @@ private fun WorkerItem(
         name = work.name,
         workState = workInfo.stateOrCancelled,
         progressInfo = { workInfo?.takeIf { it.isRunning }?.getProgressInfo() },
-        lastExecTime = lastExecutionEvent?.start,
+        lastExecutedAgo = lastExecutionEvent?.let { localCurrentTime - it.start },
         lastResult = lastExecutionEvent?.resultType,
         lastDuration = lastExecutionEvent?.duration,
         modifier = modifier
@@ -245,7 +244,7 @@ private fun WorkerItem(
     name: String,
     workState: WorkInfo.State,
     progressInfo: () -> ProgressBarInfo?,
-    lastExecTime: Instant?,
+    lastExecutedAgo: Duration?,
     lastResult: CPSWorker.ResultType?,
     lastDuration: Duration?
 ) {
@@ -264,9 +263,7 @@ private fun WorkerItem(
             }
 
             Text(
-                text = lastExecTime?.let {
-                    (localCurrentTime - it).formatDropSeconds() + " ago"
-                } ?: "never"
+                text = lastExecutedAgo?.let { it.formatDropSeconds() + " ago" } ?: "never"
             )
 
             if (lastDuration != null) {
