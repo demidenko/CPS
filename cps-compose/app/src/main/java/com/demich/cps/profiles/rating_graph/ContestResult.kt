@@ -29,7 +29,9 @@ import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 import com.demich.cps.utils.contextLocalTimeZone
 import com.demich.cps.utils.toSignedString
-import kotlin.time.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 internal fun ContestResult(
@@ -41,7 +43,7 @@ internal fun ContestResult(
         rating = ratingChange.rating,
         change = ratingChange.run { if (oldRating == null) null else ratingDiff() },
         contestTitle = ratingChange.contestTitle,
-        date = ratingChange.date,
+        date = contextLocalTimeZone { ratingChange.date.toLocalDateTime(timeZone = contextOf<TimeZone>()) },
         rank = ratingChange.rank,
         ratingColor = ratingColor,
         modifier = modifier
@@ -53,7 +55,7 @@ private fun ContestResult(
     rating: Int,
     change: Int?,
     contestTitle: String,
-    date: Instant,
+    date: LocalDateTime,
     rank: Int,
     ratingColor: Color,
     modifier: Modifier = Modifier,
@@ -78,7 +80,7 @@ private fun ContestResult(
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
             Text(
-                text = contextLocalTimeZone { date.formatFullDateTime() + "  rank: $rank" },
+                text = date.formatFullDateTime() + "  rank: $rank",
                 fontSize = subTitleFontSize,
                 color = cpsColors.contentAdditional
             )
@@ -137,7 +139,7 @@ private fun ContestResultTest(
         rating = rating,
         change = change,
         contestTitle = "Contest " + "very long ".repeat(if (longTitle) 10 else 0) + "title",
-        date = Instant.fromEpochSeconds(1e9.toLong()),
+        date = LocalDateTime(year = 2000, month = 3, day = 4, hour = 18, minute = 0),
         rank = 345,
         ratingColor = cpsColors.ratingColor(colorTag = colorTag),
         modifier = Modifier
