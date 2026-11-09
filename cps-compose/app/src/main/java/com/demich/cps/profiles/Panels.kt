@@ -11,6 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,7 +46,6 @@ import com.demich.cps.utils.ifThen
 import com.demich.datastore_itemized.setValueIn
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -62,14 +62,8 @@ fun ProfilePanel(
     val context = context
     val profilesViewModel = profilesViewModel()
 
-    val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
-
-    val loadingStatus by remember(platform, lastClickState) {
+    val loadingStatus by remember(platform) {
         profilesViewModel.flowOfLoadingStatus(platform)
-            .onEach {
-                // TODO
-                if (it == LOADING) lastClickState.value = Instant.DISTANT_PAST
-            }
     }.collectAsState(initial = null)
 
     val mode: PanelMode? =
@@ -84,7 +78,7 @@ fun ProfilePanel(
                 LOADING -> PanelMode.Reloading
                 PENDING, FAILED -> PanelMode.Pending(
                     isFailed = loadingStatus == FAILED,
-                    lastClick = lastClickState.value
+                    lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
                 )
             }
         }
@@ -93,11 +87,12 @@ fun ProfilePanel(
         .fillMaxWidth()
         .minimumInteractiveComponentSize()
         .ifThen(mode is PanelMode.Pending) {
-            pointerInput(lastClickState, onExpandRequest) {
+            require(mode is PanelMode.Pending)
+            pointerInput(mode, onExpandRequest) {
                 detectTapGestures(
                     onPress = {
                         if (tryAwaitRelease()) {
-                            lastClickState.value = getSystemTime()
+                            mode.lastClickState.value = getSystemTime()
                         }
                     },
                     onDoubleTap = {
@@ -159,7 +154,7 @@ private fun PanelUIButtons(
         is PanelMode.Pending -> {
             val loadingStatus: LoadingStatus = if (mode.isFailed) FAILED else PENDING
             Row(modifier = modifier) {
-                val uiAlpha by hidingState(mode.lastClick)
+                val uiAlpha by hidingState(mode.lastClickState.value)
                 if (uiAlpha > 0f) {
                     CPSIconButton(
                         icon = CPSIcons.Expand,
@@ -212,7 +207,7 @@ private sealed interface PanelMode {
 
     data class Pending(
         val isFailed: Boolean,
-        val lastClick: Instant
+        val lastClickState: MutableState<Instant> // TODO: weird
     ): PanelMode
 
     data class Reorder(
