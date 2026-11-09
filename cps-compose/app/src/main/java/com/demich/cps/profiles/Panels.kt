@@ -27,13 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.demich.cps.platforms.Platform
-import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
 import com.demich.cps.profiles.managers.makeHandleSpan
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
-import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.profiles.userinfo.ratingToString
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
@@ -53,9 +51,9 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Composable
-fun <U: UserInfo> ProfilePanel(
+fun ProfilePanel(
     modifier: Modifier = Modifier,
-    manager: ProfileManager<U>,
+    platform: Platform,
     visibleOrder: List<Platform>? = null,
     onReloadRequest: () -> Unit,
     onExpandRequest: () -> Unit,
@@ -66,8 +64,8 @@ fun <U: UserInfo> ProfilePanel(
 
     val lastClickState = remember { mutableStateOf(Instant.DISTANT_PAST) }
 
-    val loadingStatus by remember(manager, lastClickState) {
-        profilesViewModel.flowOfLoadingStatus(manager)
+    val loadingStatus by remember(platform, lastClickState) {
+        profilesViewModel.flowOfLoadingStatus(platform)
             .onEach {
                 // TODO
                 if (it == LOADING) lastClickState.value = Instant.DISTANT_PAST
@@ -77,7 +75,7 @@ fun <U: UserInfo> ProfilePanel(
     val mode: PanelMode? =
         if (visibleOrder != null) {
             PanelMode.Reorder(
-                index = visibleOrder.indexOf(manager.platform),
+                index = visibleOrder.indexOf(platform),
                 count = visibleOrder.size
             )
         } else {

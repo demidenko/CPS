@@ -38,8 +38,8 @@ fun profilesViewModel(): ProfilesViewModel = sharedViewModel()
 class ProfilesViewModel: ViewModel() {
     private val loadingStatuses = MutableStateFlow(emptyMap<Platform, LoadingStatus>())
 
-    fun flowOfLoadingStatus(manager: ProfileManager<*>): Flow<LoadingStatus> =
-        loadingStatuses.map { it[manager.platform] ?: PENDING }
+    fun flowOfLoadingStatus(platform: Platform): Flow<LoadingStatus> =
+        loadingStatuses.map { it[platform] ?: PENDING }
 
     fun flowOfLoadingStatus(): Flow<LoadingStatus> =
         loadingStatuses.map { it.values.combine() }

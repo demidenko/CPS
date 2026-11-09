@@ -72,9 +72,9 @@ private fun ProfilesScreen(
             onEmptyMessage = { Text(text = "Profiles are not defined") }
         ) {
             ProfilePanel(
-                manager = it.manager,
+                platform = it.platform,
                 onReloadRequest = { viewModel.reload(it.manager, context) },
-                onExpandRequest = { onExpandProfile(it.manager.platform) },
+                onExpandRequest = { onExpandProfile(it.platform) },
                 visibleOrder = profilePlatforms,
                 modifier = Modifier
                     .padding(start = 10.dp)
