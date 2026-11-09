@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -91,7 +91,7 @@ fun ProfilePanel(
 
     Box(modifier = modifier
         .fillMaxWidth()
-        .heightIn(min = 48.dp)
+        .minimumInteractiveComponentSize()
         .ifThen(mode is PanelMode.Pending) {
             pointerInput(lastClickState, onExpandRequest) {
                 detectTapGestures(
