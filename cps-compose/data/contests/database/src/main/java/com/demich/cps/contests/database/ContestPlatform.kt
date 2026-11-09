@@ -33,6 +33,7 @@ fun Contest.generalPlatformOrNull(): Platform? =
             "topcoder.com" -> topcoder
             "leetcode.com" -> leetcode
             "luogu.com.cn" -> luogu
+            "acmp.ru" -> acmp
             else -> null
         }
     }
