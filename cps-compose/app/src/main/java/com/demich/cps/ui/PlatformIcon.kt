@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import com.demich.cps.R
@@ -17,7 +18,7 @@ fun PlatformIcon(
     color: Color
 ) {
     IconSp(
-        painter = platformLogoPainter(platform),
+        painter = platformLogoPainter(platform) ?: rememberVectorPainter(CPSIcons.Close), // TODO fallback icon
         size = size,
         modifier = modifier,
         color = color
@@ -25,8 +26,12 @@ fun PlatformIcon(
 }
 
 @Composable
-fun platformLogoPainter(platform: Platform): Painter =
-    painterResource(platformLogoResIdOrThrow(platform))
+fun platformLogoPainter(platform: Platform): Painter? =
+    platformLogoResId(platform)?.let { painterResource(it) }
+
+@Composable
+fun platformLogoPainterOrThrow(platform: Platform): Painter =
+    requireNotNull(platformLogoPainter(platform)) { "platform $platform has no logo" }
 
 
 fun platformLogoResId(platform: Platform): Int? =
@@ -44,4 +49,4 @@ fun platformLogoResId(platform: Platform): Int? =
     }
 
 fun platformLogoResIdOrThrow(platform: Platform): Int =
-    platformLogoResId(platform) ?: throw IllegalArgumentException()
+    requireNotNull(platformLogoResId(platform)) { "platform $platform has no logo" }

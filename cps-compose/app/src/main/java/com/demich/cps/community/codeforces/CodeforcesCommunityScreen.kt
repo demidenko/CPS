@@ -30,7 +30,7 @@ import com.demich.cps.community.CommunityUnitsFactory
 import com.demich.cps.community.LocalCommunityUnitsFactory
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSSwipeRefreshBox
-import com.demich.cps.ui.platformLogoPainter
+import com.demich.cps.ui.platformLogoPainterOrThrow
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.ui.theme.topBarBackground
 import com.demich.cps.utils.LoadingStatus
@@ -152,7 +152,7 @@ private fun CodeforcesPagerHeader(
                 .padding(start = 6.dp, end = 10.dp)
         ) {
             Icon(
-                painter = platformLogoPainter(platform = codeforces),
+                painter = platformLogoPainterOrThrow(platform = codeforces),
                 contentDescription = null,
                 tint = cpsColors.content,
                 modifier = Modifier

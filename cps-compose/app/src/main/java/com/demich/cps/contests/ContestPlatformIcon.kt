@@ -20,10 +20,7 @@ fun ContestPlatformIcon(
     color: Color
 ) {
     IconSp(
-        painter = when (platform) {
-            null -> rememberVectorPainter(CPSIcons.Contest)
-            else -> platformLogoPainter(platform)
-        },
+        painter = platform?.let { platformLogoPainter(it) } ?: rememberVectorPainter(CPSIcons.Contest),
         size = size,
         modifier = modifier,
         color = color

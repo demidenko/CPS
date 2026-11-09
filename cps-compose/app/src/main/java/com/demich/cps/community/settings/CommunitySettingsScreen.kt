@@ -21,7 +21,7 @@ import com.demich.cps.platforms.utils.codeforces.CodeforcesUnratedTag
 import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.platformLogoPainter
+import com.demich.cps.ui.platformLogoPainterOrThrow
 import com.demich.cps.ui.settings.Item
 import com.demich.cps.ui.settings.MultiSelectEnum
 import com.demich.cps.ui.settings.Select
@@ -71,7 +71,7 @@ private fun CommunitySettingsScreen() {
     ) {
         SettingsSectionHeader(
             title = "codeforces",
-            painter = platformLogoPainter(platform = codeforces)
+            painter = platformLogoPainterOrThrow(platform = codeforces)
         ) {
             DefaultTabSettingsItem()
             FollowSettingsItem()
