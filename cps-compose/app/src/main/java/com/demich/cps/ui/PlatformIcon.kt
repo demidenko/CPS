@@ -29,8 +29,7 @@ fun platformLogoPainter(platform: Platform): Painter =
     painterResource(platformLogoResIdOrThrow(platform))
 
 
-// TODO: return nullable instead of throw
-fun platformLogoResIdOrThrow(platform: Platform): Int =
+fun platformLogoResId(platform: Platform): Int? =
     when (platform) {
         codeforces -> R.drawable.logo_codeforces
         atcoder -> R.drawable.logo_atcoder
@@ -43,3 +42,6 @@ fun platformLogoResIdOrThrow(platform: Platform): Int =
         luogu -> R.drawable.logo_luogu
         acmp, timus -> throw IllegalArgumentException()
     }
+
+fun platformLogoResIdOrThrow(platform: Platform): Int =
+    platformLogoResId(platform) ?: throw IllegalArgumentException()
