@@ -10,14 +10,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-val LocalCurrentBackgroundCoroutineScope = staticCompositionLocalOf<CoroutineScope> {
+val LocalBackgroundCoroutineScope = staticCompositionLocalOf<CoroutineScope> {
     throw IllegalStateException("no background coroutine scope")
 }
 
 val backgroundCoroutineScope: CoroutineScope
     @Composable
     @ReadOnlyComposable
-    inline get() = LocalCurrentBackgroundCoroutineScope.current
+    inline get() = LocalBackgroundCoroutineScope.current
 
 class BackgroundJobsViewModel: ViewModel(
     viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -27,7 +27,7 @@ class BackgroundJobsViewModel: ViewModel(
 fun ProvideBackgroundCoroutineScope(content: @Composable () -> Unit) {
     val viewModel = sharedViewModel<BackgroundJobsViewModel>()
     CompositionLocalProvider(
-        LocalCurrentBackgroundCoroutineScope provides viewModel.viewModelScope,
+        LocalBackgroundCoroutineScope provides viewModel.viewModelScope,
         content = content
     )
 }
