@@ -85,7 +85,7 @@ fun CodeforcesReloadablePage(
 ) {
     val loadingStatus by backgroundLoader.loadingStatusState(tab = tab)
     CPSSwipeRefreshBox(
-        isRefreshing = { loadingStatus == LOADING },
+        isRefreshing = loadingStatus == LOADING,
         onRefresh = { backgroundLoader.reload(tab = tab) },
         content = content
     )

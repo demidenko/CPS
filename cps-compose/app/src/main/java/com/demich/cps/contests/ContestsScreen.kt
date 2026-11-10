@@ -227,7 +227,7 @@ private fun ContestsReloadablePager(
     modifier: Modifier = Modifier
 ) {
     CPSSwipeRefreshBox(
-        isRefreshing = isReloading,
+        isRefreshing = isReloading(),
         onRefresh = onReloadRequest,
         modifier = modifier
     ) {

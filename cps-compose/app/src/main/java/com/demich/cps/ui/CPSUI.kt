@@ -349,14 +349,14 @@ fun CPSCountBadge(count: Int) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-inline fun CPSSwipeRefreshBox(
-    isRefreshing: () -> Boolean,
-    noinline onRefresh: () -> Unit,
+fun CPSSwipeRefreshBox(
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     val state = rememberPullRefreshState(
-        refreshing = isRefreshing(),
+        refreshing = isRefreshing,
         onRefresh = onRefresh
     )
     Box(
@@ -366,7 +366,7 @@ inline fun CPSSwipeRefreshBox(
     ) {
         content()
         PullRefreshIndicator(
-            refreshing = isRefreshing(),
+            refreshing = isRefreshing,
             state = state,
             modifier = Modifier.align(Alignment.TopCenter)
         )
