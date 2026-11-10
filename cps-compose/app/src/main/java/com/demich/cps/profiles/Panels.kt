@@ -144,7 +144,6 @@ private fun PanelUIButtons(
             )
         }
         is PanelMode.Pending -> {
-            val loadingStatus: LoadingStatus = if (mode.isFailed) FAILED else PENDING
             Row(modifier = modifier) {
                 val uiAlpha by hidingState(mode.lastClickState.value)
                 if (uiAlpha > 0f) {
@@ -154,10 +153,10 @@ private fun PanelUIButtons(
                         onClick = onExpandRequest
                     )
                 }
-                if (loadingStatus != PENDING || uiAlpha > 0f) {
+                if (mode.isFailed || uiAlpha > 0f) {
                     CPSReloadingButton(
-                        loadingStatus = loadingStatus,
-                        modifier = Modifier.alpha(if (loadingStatus == PENDING) uiAlpha else 1f),
+                        loadingStatus = if (mode.isFailed) FAILED else PENDING,
+                        modifier = Modifier.alpha(if (mode.isFailed) 1f else uiAlpha),
                         onClick = onReloadRequest
                     )
                 }
