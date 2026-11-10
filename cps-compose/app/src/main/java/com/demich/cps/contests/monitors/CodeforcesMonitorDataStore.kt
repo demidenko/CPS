@@ -167,3 +167,20 @@ fun CodeforcesMonitorDataStore.flowOfContestId(): Flow<Int?> =
     flowOf {
         contestInfoChecked()?.id
     }
+
+fun CodeforcesMonitorDataStore.flowOfFullData(): Flow<CodeforcesMonitorFullData?> =
+    flowOf {
+        args.value?.let { args ->
+            CodeforcesMonitorFullData(
+                args = args,
+                monitorData = contestData(),
+                lastRequest = lastRequest.value
+            )
+        }
+    }
+
+data class CodeforcesMonitorFullData(
+    val args: CodeforcesMonitorArgs,
+    val monitorData: CodeforcesMonitorData?,
+    val lastRequest: Boolean?,
+)
