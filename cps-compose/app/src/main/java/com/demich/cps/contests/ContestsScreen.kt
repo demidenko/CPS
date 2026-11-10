@@ -38,14 +38,10 @@ import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
 import com.demich.cps.platforms.clients.niceMessage
 import com.demich.cps.ui.AnimatedVisibleByNotNull
-import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
-import com.demich.cps.ui.CPSReloadingButton
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.EmptyMessageBox
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
-import com.demich.cps.ui.filter.FilterIconButton
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.filterByTokensAsSubsequence
@@ -122,13 +118,15 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         }
     )
 
-    bottomBar = contestsBottomBarBuilder(
-        viewState = viewState,
-        filterState = filterState,
-        anyPlatformEnabled = anyPlatformEnabled,
-        loadingStatus = { loadingStatus },
-        onReloadClick = onReload
-    )
+    bottomBar = {
+        ContestsBottomBar(
+            viewState = viewState,
+            filterState = filterState,
+            anyPlatformEnabled = anyPlatformEnabled,
+            loadingStatus = loadingStatus,
+            onReloadClick = onReload
+        )
+    }
 
     SideEffect(viewModel) {
         viewModel.applyChangedSettings(unitsFactory = unitsFactory)
@@ -367,51 +365,6 @@ private fun contestsMenuBuilder(
         title = "Settings",
         icon = CPSIcons.Settings,
         onClick = onOpenSettings
-    )
-}
-
-private fun contestsBottomBarBuilder(
-    viewState: ContestsListViewState,
-    filterState: FilterState,
-    anyPlatformEnabled: Boolean,
-    loadingStatus: () -> LoadingStatus?,
-    onReloadClick: () -> Unit
-): AdditionalBottomBarBuilder = {
-    if (anyPlatformEnabled) {
-        FilterIconButton(filterState = filterState)
-    }
-
-    if (anyPlatformEnabled) {
-        ContestsPageSwitchButton(
-            contestsPage = viewState.contestsPage,
-            onClick = {
-                viewState.contestsPage = it
-            }
-        )
-    }
-
-    CPSReloadingButton(
-        loadingStatus = loadingStatus(),
-        enabled = anyPlatformEnabled,
-        onClick = onReloadClick
-    )
-}
-
-@Composable
-private fun ContestsPageSwitchButton(
-    contestsPage: ContestsListViewState.ContestsPage,
-    onClick: (ContestsListViewState.ContestsPage) -> Unit
-) {
-    CPSIconButton(
-        icon = CPSIcons.Swap,
-        onClick = {
-            onClick(
-                when (contestsPage) {
-                    Finished -> RunningOrUpcoming
-                    RunningOrUpcoming -> Finished
-                }
-            )
-        }
     )
 }
 
