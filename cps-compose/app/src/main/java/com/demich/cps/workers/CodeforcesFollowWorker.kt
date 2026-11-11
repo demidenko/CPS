@@ -39,12 +39,12 @@ class CodeforcesFollowWorker(
     }
 
     override suspend fun runWork() {
-        val repository = context.followRepository
+        val repository = applicationContext.followRepository
 
         // update userInfo to keep fresh lastOnlineTime
         val profiles = repository.updateProfiles()
 
-        val lastOnlineItem = CodeforcesFollowWorkerStorage(context).usersLastOnlineTime
+        val lastOnlineItem = CodeforcesFollowWorkerStorage(applicationContext).usersLastOnlineTime
 
         val skipper = SkippingHeuristic(
             profiles = profiles,

@@ -52,7 +52,7 @@ class CodeforcesMonitorLauncherWorker(
     override suspend fun runWork() {
         //TODO: restart failed monitor
 
-        val storage = CodeforcesProfileManager().profileStorage(context)
+        val storage = CodeforcesProfileManager().profileStorage(applicationContext)
 
         with(storage) {
             val handle: String
@@ -73,7 +73,7 @@ class CodeforcesMonitorLauncherWorker(
                         CodeforcesMonitorWorker.start(
                             contestId = submission.contestId,
                             handle = handle,
-                            context = context
+                            context = applicationContext
                         )
                     }
                 }

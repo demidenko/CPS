@@ -68,17 +68,17 @@ class CodeforcesLostRecentWorker(
     }
 
     override suspend fun runWork() {
-        val lostStorage: CodeforcesLostStorage = CodeforcesLostDataStore(context)
+        val lostStorage: CodeforcesLostStorage = CodeforcesLostDataStore(applicationContext)
 
         val client = CodeforcesClient(
-            locale = context.settingsCommunity.codeforcesLocale()
+            locale = applicationContext.settingsCommunity.codeforcesLocale()
         )
 
         val currentTime = workerStartTime
         lostStorage.updateEntries(
             api = client,
             pageContentProvider = client,
-            hintStorage = context.workerStorage.asHintStorage(),
+            hintStorage = applicationContext.workerStorage.asHintStorage(),
             freshAfter = currentTime - 24.hours,
             staleUntil = currentTime - 7.days,
             trustColorTags = isCFMagicSafeMonth()

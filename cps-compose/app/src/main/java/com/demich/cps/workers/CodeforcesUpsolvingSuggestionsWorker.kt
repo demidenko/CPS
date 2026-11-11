@@ -46,7 +46,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
     }
 
     override suspend fun runWork() {
-        val storage = CodeforcesProfileManager().profileStorage(context)
+        val storage = CodeforcesProfileManager().profileStorage(applicationContext)
 
         val handle = storage.profile()
             ?.userInfoOrNull()
@@ -81,7 +81,7 @@ class CodeforcesUpsolvingSuggestionsWorker(
                         }
                     ) { problem ->
                         suggestedItem.add(problem, ratingChange.ratingUpdateTime)
-                        notifyProblemForUpsolve(problem, context)
+                        notifyProblemForUpsolve(problem, applicationContext)
                     }
                 }
         }

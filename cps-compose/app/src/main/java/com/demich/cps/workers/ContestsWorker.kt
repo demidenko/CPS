@@ -34,8 +34,8 @@ class ContestsWorker(
     override suspend fun runWork() {
         // usual reload
         coroutineScope {
-            context.settingsContests.contestsFetchFlows().collectTo(
-                repository = context.contestsRepository
+            applicationContext.settingsContests.contestsFetchFlows().collectTo(
+                repository = applicationContext.contestsRepository
             )
         }
     }

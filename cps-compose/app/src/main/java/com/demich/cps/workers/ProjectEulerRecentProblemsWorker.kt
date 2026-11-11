@@ -67,10 +67,10 @@ class ProjectEulerRecentProblemsWorker(
     private suspend fun scanProblems() {
         ProjectEulerParser().parseRecentProblems(ProjectEulerClient().getRecentPage()).scanNewsFeed(
             newsFeed = project_euler_problems,
-            storage = NewsFeedStorage(context)
+            storage = NewsFeedStorage(applicationContext)
         ) { post ->
             val problemId = post.id.toInt()
-            notificationChannels.project_euler.problems(problemId).notify(context) {
+            notificationChannels.project_euler.problems(problemId).notify(applicationContext) {
                 subText = "Project Euler • New problem published!"
                 contentTitle = "Problem $problemId"
                 bigContent = post.name
@@ -89,11 +89,11 @@ class ProjectEulerRecentProblemsWorker(
     }
 
     private suspend fun getPublishTimeHint(): Instant? {
-        context.workerStorage.problemPublishTime().let {
+        applicationContext.workerStorage.problemPublishTime().let {
             if (it != null && it > workerStartTime) return it
         }
         val rssParser = ProjectEulerRssParser(rssPage = ProjectEulerClient().getRSSPage())
-        return extractAndSaveHint(parser = rssParser, context = context)
+        return extractAndSaveHint(parser = rssParser, context = applicationContext)
     }
 }
 

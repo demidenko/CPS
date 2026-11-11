@@ -52,7 +52,7 @@ class NewsWorker(
 
     override suspend fun runWork() {
         joinAllWithProgress {
-            context.settingsCommunity.enabledNewsFeeds().let { enabled ->
+            applicationContext.settingsCommunity.enabledNewsFeeds().let { enabled ->
                 if (atcoder_news in enabled) add(::atcoderNews)
                 if (project_euler_news in enabled) add(::projectEulerNews)
             }
@@ -62,9 +62,9 @@ class NewsWorker(
     private suspend fun atcoderNews() {
         AtCoderNewsParser().parseNews(source = AtCoderClient().getMainPage()).scanNewsFeed(
             newsFeed = atcoder_news,
-            storage = NewsFeedStorage(context)
+            storage = NewsFeedStorage(applicationContext)
         ) { post ->
-            notificationChannels.atcoder.news(post.id).notify(context) {
+            notificationChannels.atcoder.news(post.id).notify(applicationContext) {
                 subText = "atcoder news"
                 bigContent = post.title.trim() //TODO: title + content html
                 smallIcon = R.drawable.ic_community
@@ -81,9 +81,9 @@ class NewsWorker(
 
         rssParser.parseNews().scanNewsFeed(
             newsFeed = project_euler_news,
-            storage = NewsFeedStorage(context)
+            storage = NewsFeedStorage(applicationContext)
         ) { post ->
-            notificationChannels.project_euler.news(post.id.toInt()).notify(context) {
+            notificationChannels.project_euler.news(post.id.toInt()).notify(applicationContext) {
                 subText = "Project Euler news"
                 contentTitle = post.title
                 //TODO: still <p> .. </p>
@@ -96,8 +96,8 @@ class NewsWorker(
             }
         }
 
-        if (ProjectEulerRecentProblemsWorker.getWork(context).isEnabled()) {
-            ProjectEulerRecentProblemsWorker.extractAndSaveHint(parser = rssParser, context = context)
+        if (ProjectEulerRecentProblemsWorker.getWork(applicationContext).isEnabled()) {
+            ProjectEulerRecentProblemsWorker.extractAndSaveHint(parser = rssParser, context = applicationContext)
         }
     }
 }
