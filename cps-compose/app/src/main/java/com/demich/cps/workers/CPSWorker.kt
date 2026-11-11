@@ -31,8 +31,6 @@ abstract class CPSWorker(
     val parameters: WorkerParameters
 ): CoroutineWorker(work.context, parameters) {
 
-    protected val context get() = work.context
-
     private val timeHolder = TimeHolder(clock = Clock.System)
     protected val workerStartTime by timeHolder
 
