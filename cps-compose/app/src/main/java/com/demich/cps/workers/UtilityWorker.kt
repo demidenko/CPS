@@ -34,13 +34,13 @@ class UtilityWorker(
     }
 
     private suspend fun removeOldIgnoredContests() {
-        ContestsInfoDataStore(context).edit {
+        ContestsInfoDataStore(applicationContext).edit {
             ignoredContests.removeOlderThan(workerStartTime - 30.days)
         }
     }
 
     private suspend fun removeOldCodeforcesNewEntries() {
-        with(CodeforcesNewEntriesDataStore(context)) {
+        with(CodeforcesNewEntriesDataStore(applicationContext)) {
             commonNewEntries.removeOlderThan(days = 30)
         }
     }

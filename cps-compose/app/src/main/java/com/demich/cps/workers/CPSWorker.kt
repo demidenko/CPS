@@ -43,7 +43,7 @@ abstract class CPSWorker(
         }
 
         val event = ExecutionEvent(start = workerStartTime)
-        val workersInfo = CPSWorkersDataStore(context)
+        val workersInfo = CPSWorkersDataStore(applicationContext)
         workersInfo.add(work.name, event)
 
         val resultCatching = runWorkCatching()
@@ -58,7 +58,7 @@ abstract class CPSWorker(
 
         resultCatching.onFailure {
             if (result.toType() == FAILURE) {
-                if (UISettingsDataStore(context).devModeEnabled()) {
+                if (UISettingsDataStore(applicationContext).devModeEnabled()) {
                     notificationFailure(work = work, throwable = it)
                 }
             }
