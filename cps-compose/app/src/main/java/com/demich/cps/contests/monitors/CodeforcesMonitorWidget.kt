@@ -37,7 +37,7 @@ import kotlin.time.Duration
 
 @Composable
 fun CodeforcesMonitorWidget(
-    contestData: CodeforcesMonitorData,
+    monitorData: CodeforcesMonitorData,
     requestFailed: Boolean,
     modifier: Modifier
 ) {
@@ -46,19 +46,19 @@ fun CodeforcesMonitorWidget(
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Header(
-            contestTitle = contestData.contestInfo.name,
-            contestPhase = contestData.contestPhase,
+            contestTitle = monitorData.contestInfo.name,
+            contestPhase = monitorData.contestPhase,
             modifier = Modifier.fillMaxWidth()
         )
         Footer(
-            contestantRank = contestData.contestantRank,
-            contestPhase = contestData.contestPhase,
+            contestantRank = monitorData.contestantRank,
+            contestPhase = monitorData.contestPhase,
             requestFailed = requestFailed,
             modifier = Modifier.fillMaxWidth()
         )
         StandingsRow(
-            problems = contestData.problems,
-            contestType = contestData.contestInfo.type,
+            problems = monitorData.problems,
+            contestType = monitorData.contestInfo.type,
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
                 .background(color = cpsColors.backgroundAdditional)

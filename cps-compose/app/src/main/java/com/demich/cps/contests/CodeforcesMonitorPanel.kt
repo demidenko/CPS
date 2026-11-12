@@ -51,7 +51,7 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
             enter = enterInColumn(),
             exit = exitInColumn()
         ) { data ->
-            (val contestData = monitorData, val args) = data
+            (val monitorData, val args, val failureMsg) = data
             Widget(
                 onOpenInBrowser = {
                     uriHandler.openUri(CodeforcesUrls.contest(args.contestId))
@@ -66,17 +66,17 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
                 }
             ) {
                 Column {
-                    if (contestData != null) {
+                    if (monitorData != null) {
                         CodeforcesMonitorWidget(
-                            contestData = contestData,
-                            requestFailed = data.failureMsg != null,
+                            monitorData = monitorData,
+                            requestFailed = failureMsg != null,
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else {
                         // TODO
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text("monitor no data")
-                            data.failureMsg?.let { msg ->
+                            failureMsg?.let { msg ->
                                 Text(text = msg, fontSize = 14.sp)
                             }
                         }
