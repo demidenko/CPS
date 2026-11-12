@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
+fun CodeforcesMonitorWidget(modifier: Modifier = Modifier) {
     val context = context
     val scope = backgroundCoroutineScope
     val unitsFactory = LocalContestsUnitsFactory.current

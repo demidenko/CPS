@@ -174,7 +174,7 @@ private fun ContestsScreen(
     onDeleteRequest: (Contest) -> Unit
 ) {
     Column {
-        CodeforcesMonitorPanel(modifier = Modifier.fillMaxWidth())
+        CodeforcesMonitorWidget(modifier = Modifier.fillMaxWidth())
         if (anyPlatformEnabled) {
             ContestsReloadablePager(
                 sortedContests = sortedContests,
