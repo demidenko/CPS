@@ -1,5 +1,7 @@
 package com.demich.cps.contests
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -39,16 +41,18 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
 
     state.onNotNull { panelState ->
         AnimatedVisibleOfNotNull(
+            modifier = modifier,
             value = panelState.data,
             enter = enterInColumn(),
             exit = exitInColumn()
         ) { data ->
-            data.monitorData?.let { contestData ->
+            val contestData = data.monitorData
+            if (contestData != null) {
                 val scope = backgroundCoroutineScope
                 CodeforcesMonitorWidget(
                     contestData = contestData,
                     requestFailed = data.lastRequest ?: false,
-                    modifier = modifier,
+                    modifier = Modifier.fillMaxWidth(),
                     onOpenInBrowser = {
                         uriHandler.openUri(CodeforcesUrls.contest(contestData.contestId))
                     },
@@ -61,9 +65,12 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
                         }
                     }
                 )
+            } else {
+                // TODO
+                Text("monitor error")
             }
 
-            // TODO: else show info/error
+            // TODO: show worker status (failed)
 
             // restart failed monitor
             LaunchedEffect(data.args) {
