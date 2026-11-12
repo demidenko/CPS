@@ -26,7 +26,7 @@ class CodeforcesMonitorDataStore(context: Context): ItemizedDataStore(context.cf
 
     val args = jsonCPS.itemNullable<CodeforcesMonitorArgs>(name = "args")
 
-    val lastRequest = jsonCPS.itemNullable<Boolean>(name = "last_request")
+    val lastRequestFailureMsg = jsonCPS.itemNullable<String>(name = "last_request_failure_msg")
 
     internal val contestInfo = jsonCPS.itemNullable<CodeforcesContest>(name = "contest_info")
 
@@ -174,7 +174,7 @@ fun CodeforcesMonitorDataStore.flowOfFullData(): Flow<CodeforcesMonitorFullData?
             CodeforcesMonitorFullData(
                 args = args,
                 monitorData = contestData(),
-                lastRequest = lastRequest.value
+                failureMsg = lastRequestFailureMsg.value
             )
         }
     }
@@ -182,5 +182,5 @@ fun CodeforcesMonitorDataStore.flowOfFullData(): Flow<CodeforcesMonitorFullData?
 data class CodeforcesMonitorFullData(
     val args: CodeforcesMonitorArgs,
     val monitorData: CodeforcesMonitorData?,
-    val lastRequest: Boolean?,
+    val failureMsg: String?,
 )

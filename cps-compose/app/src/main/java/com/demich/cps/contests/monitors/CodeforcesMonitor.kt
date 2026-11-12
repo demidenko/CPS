@@ -83,11 +83,13 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     notifiedSubmissionsIds.value += newResultSubmissions.map { it.id }
                     submissionsInfo.value = problemResults.makeMapWith(submissions)
                 }
-            }.onFailure { lastRequest.setValue(false) }
+            }.onFailure {
+                lastRequestFailureMsg.setValue(it.toMonitorMsg())
+            }
         }
 
         ratingChangeWaiter.getDelay(contest = contestInfo()).let { duration ->
-            if (lastRequest() == false) duration.coerceAtMost(10.seconds)
+            if (lastRequestFailureMsg() != null) duration.coerceAtMost(10.seconds)
             else duration
         }
     }
@@ -126,7 +128,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             participantTypes = [CONTESTANT, OUT_OF_COMPETITION]
         )
     }.onFailure { e ->
-        monitor.lastRequest.setValue(false)
+        monitor.lastRequestFailureMsg.setValue(e.toMonitorMsg())
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
             monitor.contestInfo.update { it?.copy(phase = BEFORE) }
         }
@@ -136,7 +138,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
     }.onSuccess { standings ->
         val standings = standings.toStandingsData()
         monitor.edit {
-            lastRequest.value = true
+            lastRequestFailureMsg.value = null
             saveStandings(standings = standings)
         }
     }
@@ -302,3 +304,7 @@ private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<C
         it.value.distinct()
             .filter { !it.isFailedPretests() } // do not save useless
     }
+
+// TODO
+private fun Throwable.toMonitorMsg(): String =
+    this.toString()
