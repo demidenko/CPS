@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,15 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.demich.cps.contests.contestItemPaddings
 import com.demich.cps.contests.list_items.ContestItemFooter
 import com.demich.cps.contests.list_items.ContestItemHeader
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestPhase
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContestType
 import com.demich.cps.platforms.api.codeforces.models.title
 import com.demich.cps.ui.AttentionIcon
-import com.demich.cps.ui.CPSIcons
-import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.ui.theme.CPSThemePreview
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.formatTimerShort
@@ -41,34 +37,6 @@ import kotlin.time.Duration
 
 @Composable
 fun CodeforcesMonitorWidget(
-    contestData: CodeforcesMonitorData,
-    requestFailed: Boolean,
-    modifier: Modifier = Modifier,
-    onOpenInBrowser: () -> Unit,
-    onStop: () -> Unit
-) {
-    ContentWithCPSDropdownMenu(
-        content = {
-            Column {
-                CodeforcesMonitor(
-                    contestData = contestData,
-                    requestFailed = requestFailed,
-                    modifier = modifier
-                        .contestItemPaddings()
-                )
-                Divider()
-            }
-        }
-    ) {
-        CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
-        CPSDropdownMenuItem(title = "Stop monitor", icon = CPSIcons.Close, onClick = onStop)
-    }
-}
-
-
-
-@Composable
-private fun CodeforcesMonitor(
     contestData: CodeforcesMonitorData,
     requestFailed: Boolean,
     modifier: Modifier

@@ -2,6 +2,7 @@ package com.demich.cps.contests
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,11 +13,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.monitors.CodeforcesMonitorFullData
 import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
-import com.demich.cps.contests.monitors.contestId
 import com.demich.cps.contests.monitors.flowOfFullData
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
 import com.demich.cps.ui.AnimatedVisibleOfNotNull
+import com.demich.cps.ui.CPSIcons
+import com.demich.cps.ui.ContentWithCPSDropdownMenu
 import com.demich.cps.utils.add
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
@@ -32,6 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
     val context = context
+    val scope = backgroundCoroutineScope
     val unitsFactory = LocalContestsUnitsFactory.current
     val uriHandler = LocalUriHandler.current
 
@@ -48,41 +51,46 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
             enter = enterInColumn(),
             exit = exitInColumn()
         ) { data ->
-            val contestData = data.monitorData
-            if (contestData != null) {
-                val scope = backgroundCoroutineScope
-                CodeforcesMonitorWidget(
-                    contestData = contestData,
-                    requestFailed = data.failureMsg != null,
-                    modifier = Modifier.fillMaxWidth(),
-                    onOpenInBrowser = {
-                        uriHandler.openUri(CodeforcesUrls.contest(contestData.contestId))
-                    },
-                    onStop = {
-                        val contestId = contestData.contestId
-                        scope.launch {
-                            CodeforcesProfileManager().profileStorage(context)
-                                .monitorCanceledContests.add(contestId, getSystemTime())
-                            unitsFactory.codeforcesMonitorStorage().reset()
+            (val contestData = monitorData, val args) = data
+            Widget(
+                onOpenInBrowser = {
+                    uriHandler.openUri(CodeforcesUrls.contest(args.contestId))
+                },
+                onStop = {
+                    val contestId = args.contestId
+                    scope.launch {
+                        CodeforcesProfileManager().profileStorage(context)
+                            .monitorCanceledContests.add(contestId, getSystemTime())
+                        unitsFactory.codeforcesMonitorStorage().reset()
+                    }
+                }
+            ) {
+                Column {
+                    if (contestData != null) {
+                        CodeforcesMonitorWidget(
+                            contestData = contestData,
+                            requestFailed = data.failureMsg != null,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        // TODO
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text("monitor no data")
+                            data.failureMsg?.let { msg ->
+                                Text(text = msg, fontSize = 14.sp)
+                            }
                         }
                     }
-                )
-            } else {
-                // TODO
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("monitor no data")
-                    data.failureMsg?.let { msg ->
-                        Text(text = msg, fontSize = 14.sp)
-                    }
+                    Divider()
                 }
             }
 
             // TODO: show worker status (failed)
 
             // restart failed monitor
-            LaunchedEffect(data.args) {
+            LaunchedEffect(args) {
                 if (CodeforcesMonitorWorker.getWork(context).state() == FAILED) {
-                    CodeforcesMonitorWorker.start(startArgs = data.args, context = context)
+                    CodeforcesMonitorWorker.start(startArgs = args, context = context)
                 }
             }
         }
@@ -92,3 +100,19 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
 private data class PanelState(
     val data: CodeforcesMonitorFullData?
 )
+
+@Composable
+private fun Widget(
+    modifier: Modifier = Modifier,
+    onOpenInBrowser: () -> Unit,
+    onStop: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    ContentWithCPSDropdownMenu(
+        modifier = modifier,
+        content = content
+    ) {
+        CPSDropdownMenuItem(title = "Open in browser", icon = CPSIcons.OpenInBrowser, onClick = onOpenInBrowser)
+        CPSDropdownMenuItem(title = "Stop monitor", icon = CPSIcons.Close, onClick = onStop)
+    }
+}
