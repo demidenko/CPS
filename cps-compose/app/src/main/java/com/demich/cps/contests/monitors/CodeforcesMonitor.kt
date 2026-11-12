@@ -5,6 +5,7 @@ import com.demich.cps.fetchstate.fetchResultOf
 import com.demich.cps.platforms.api.codeforces.CodeforcesApi
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotFoundException
 import com.demich.cps.platforms.api.codeforces.CodeforcesApiContestNotStartedException
+import com.demich.cps.platforms.api.codeforces.CodeforcesApiException
 import com.demich.cps.platforms.api.codeforces.CodeforcesPageContentProvider
 import com.demich.cps.platforms.api.codeforces.getContestStandings
 import com.demich.cps.platforms.api.codeforces.models.CodeforcesContest
@@ -307,4 +308,7 @@ private fun List<CodeforcesMonitorProblemResult>.makeMapWith(submissions: List<C
 
 // TODO
 private fun Throwable.toMonitorMsg(): String =
-    this.toString()
+    when (this) {
+        is CodeforcesApiException -> comment
+        else -> this.toString()
+    }
