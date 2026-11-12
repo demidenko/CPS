@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.demich.cps.contests.monitors.CodeforcesMonitorFullData
-import com.demich.cps.contests.monitors.CodeforcesMonitorWidget
+import com.demich.cps.contests.monitors.CodeforcesMonitorPanel
 import com.demich.cps.contests.monitors.flowOfFullData
 import com.demich.cps.platforms.api.codeforces.CodeforcesUrls
 import com.demich.cps.profiles.managers.CodeforcesProfileManager
@@ -67,7 +67,7 @@ fun CodeforcesMonitorPanel(modifier: Modifier = Modifier) {
             ) {
                 Column {
                     if (monitorData != null) {
-                        CodeforcesMonitorWidget(
+                        CodeforcesMonitorPanel(
                             monitorData = monitorData,
                             requestFailed = failureMsg != null,
                             modifier = Modifier.fillMaxWidth()

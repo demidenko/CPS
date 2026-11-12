@@ -36,7 +36,7 @@ import kotlin.time.Duration
 
 
 @Composable
-fun CodeforcesMonitorWidget(
+fun CodeforcesMonitorPanel(
     monitorData: CodeforcesMonitorData,
     requestFailed: Boolean,
     modifier: Modifier
