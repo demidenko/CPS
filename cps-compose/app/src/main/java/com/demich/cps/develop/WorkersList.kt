@@ -210,7 +210,7 @@ private fun WorkerItem(
 
     WorkerItem(
         name = work.name,
-        workState = workInfo.stateOrCancelled,
+        workState = workInfo?.state,
         progressInfo = { workInfo?.takeIf { it.isRunning }?.getProgressInfo() },
         lastExecutedAgo = lastExecutionEvent?.let { localCurrentTime - it.start },
         lastResult = lastExecutionEvent?.resultType,
@@ -231,7 +231,7 @@ private fun CodeforcesMonitorWorkItem(
     WorkerItem(
         modifier = modifier,
         name = work.name,
-        workState = workInfo.stateOrCancelled,
+        workState = workInfo?.state,
         progressInfo = { null }
     ) {
         Text(text = "contestId = ${monitorArgs?.contestId}")
@@ -242,7 +242,7 @@ private fun CodeforcesMonitorWorkItem(
 private fun WorkerItem(
     modifier: Modifier = Modifier,
     name: String,
-    workState: WorkInfo.State,
+    workState: WorkInfo.State?,
     progressInfo: () -> ProgressBarInfo?,
     lastExecutedAgo: Duration?,
     lastResult: CPSWorker.ResultType?,
@@ -277,7 +277,7 @@ private fun WorkerItem(
 private fun WorkerItem(
     modifier: Modifier = Modifier,
     name: String,
-    workState: WorkInfo.State,
+    workState: WorkInfo.State?,
     progressInfo: () -> ProgressBarInfo?,
     additional: @Composable () -> Unit
 ) {
@@ -308,12 +308,14 @@ private fun WorkerItem(
                 .padding(horizontal = 8.dp)
                 .width(IntrinsicSize.Min)
         ) {
-            Text(
-                text = workState.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = cpsColors.colorFor(workState)
-            )
+            workState?.let {
+                Text(
+                    text = it.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = cpsColors.colorFor(it)
+                )
+            }
             AnimatedVisibleByNotNull(
                 value = progressInfo,
                 enter = enterInColumn(),
