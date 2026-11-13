@@ -42,11 +42,11 @@ import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSSwipeRefreshBox
 import com.demich.cps.ui.EmptyMessageBox
+import com.demich.cps.ui.WithDivider
 import com.demich.cps.ui.filter.FilterState
 import com.demich.cps.ui.filter.FilterTextField
 import com.demich.cps.ui.filter.filterByTokensAsSubsequence
 import com.demich.cps.ui.filter.rememberFilterState
-import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
@@ -306,7 +306,7 @@ private fun ContestsColumn(
         items = contests,
         key = { it.compositeId }
     ) { contest ->
-        ItemWithDivider(
+        WithDivider(
             modifier = Modifier
                 .animateItem(placementSpec = spring())
                 .animateContentSize(spring())

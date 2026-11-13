@@ -30,8 +30,8 @@ import com.demich.cps.platforms.utils.clistResourceId
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.ListTitle
 import com.demich.cps.ui.LoadingContentBox
+import com.demich.cps.ui.WithDivider
 import com.demich.cps.ui.dialogs.CPSDialog
-import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnWithScrollBar
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.IncludeFontPadding
@@ -151,7 +151,7 @@ private fun ClistResourcesList(
 ) {
     LazyColumnWithScrollBar(modifier = modifier) {
         items(items = resources, key = { it.id }) { resource ->
-            ItemWithDivider(modifier = Modifier.animateItem()) {
+            WithDivider(modifier = Modifier.animateItem()) {
                 Text(
                     text = resource.name,
                     modifier = Modifier

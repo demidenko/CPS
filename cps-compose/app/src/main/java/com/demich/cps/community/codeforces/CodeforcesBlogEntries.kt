@@ -28,8 +28,8 @@ import com.demich.cps.profiles.managers.toHandleSpan
 import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.VotedRating
+import com.demich.cps.ui.WithDivider
 import com.demich.cps.ui.formatFullDate
-import com.demich.cps.ui.lazylist.ItemWithDivider
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.lazylist.visibleItemsInfo
 import com.demich.cps.ui.theme.cpsColors
@@ -62,7 +62,7 @@ fun CodeforcesBlogEntries(
         key = { it.id },
         contentType = { CodeforcesBlogEntryContentType }
     ) { blogEntry ->
-        ItemWithDivider(modifier = Modifier.animateItem()) {
+        WithDivider(modifier = Modifier.animateItem()) {
             BlogEntryInfo(
                 blogEntry = blogEntry,
                 markNew = newEntriesState.isNew(blogEntry.id),
