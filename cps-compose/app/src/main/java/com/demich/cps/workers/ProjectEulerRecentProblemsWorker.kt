@@ -69,7 +69,7 @@ class ProjectEulerRecentProblemsWorker(
             newsFeed = project_euler_problems,
             storage = NewsFeedStorage(applicationContext)
         ) { post ->
-            val problemId = post.id.toInt()
+            val problemId = post.id
             notificationChannels.project_euler.problems(problemId).notify(applicationContext) {
                 subText = "Project Euler • New problem published!"
                 contentTitle = "Problem $problemId"
