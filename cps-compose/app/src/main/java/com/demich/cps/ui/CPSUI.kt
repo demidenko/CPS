@@ -3,6 +3,7 @@ package com.demich.cps.ui
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Badge
@@ -11,6 +12,7 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -408,5 +410,16 @@ fun VotedRating(
             fontSize = fontSize,
             modifier = modifier
         )
+    }
+}
+
+@Composable
+inline fun WithDivider(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = modifier) {
+        content()
+        Divider()
     }
 }
