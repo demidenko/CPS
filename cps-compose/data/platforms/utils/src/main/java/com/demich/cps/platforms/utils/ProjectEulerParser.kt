@@ -91,12 +91,12 @@ class ProjectEulerRssParser(
             }
         }
 
-    fun parseProblems(): Sequence<Pair<Int, Instant>> =
+    fun parseProblems(): Sequence<ProjectEulerRecentProblem> =
         rssItems.asSequence().mapNotNull { item ->
             item.guidOrNull(prefix = "problem_id_") { id ->
                 // <description>Release date: Sun, 28 Jun 2026 04:00:00 +0000</description>
                 val date = item.description().text().removePrefix("Release date: ").parseDate()
-                id.toInt() to date
+                ProjectEulerRecentProblem(name = "", id = id, date = date)
             }
         }
 }
