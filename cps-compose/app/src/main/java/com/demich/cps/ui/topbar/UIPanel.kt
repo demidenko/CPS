@@ -15,7 +15,7 @@ import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 
 
 @Composable
@@ -54,7 +54,7 @@ private fun Buttons(
                 icon = CPSIcons.Colors,
                 onState = specs.usePlatformColors,
                 onClick = {
-                    settingsUI.usePlatformColors.setValueIn(scope, !specs.usePlatformColors)
+                    settingsUI.usePlatformColors.saveIn(scope, !specs.usePlatformColors)
                 }
             )
             StatusBarButtons()
@@ -62,7 +62,7 @@ private fun Buttons(
                 mode = specs.darkLightMode,
                 isSystemInDarkMode = isSystemInDarkTheme(),
                 onModeChanged = { mode ->
-                    settingsUI.darkLightMode.setValueIn(scope, mode)
+                    settingsUI.darkLightMode.saveIn(scope, mode)
                 }
             )
         }

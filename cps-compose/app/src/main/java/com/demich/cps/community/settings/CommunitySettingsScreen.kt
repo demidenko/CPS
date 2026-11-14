@@ -46,7 +46,7 @@ import com.demich.cps.workers.CodeforcesLostRecentWorker
 import com.demich.cps.workers.NewsWorker
 import com.demich.cps.workers.ProjectEulerRecentProblemsWorker
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 
 
 @Composable
@@ -183,7 +183,7 @@ private fun RuEnabledSettingsItem() {
         title = "Russian content",
         checked = locale?.let { it == RU },
         onCheckedChange = { checked ->
-            item.setValueIn(
+            item.saveIn(
                 scope = scope,
                 value = if (checked) RU else EN
             )

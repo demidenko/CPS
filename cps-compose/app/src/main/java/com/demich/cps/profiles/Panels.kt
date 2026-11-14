@@ -42,7 +42,7 @@ import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.context
 import com.demich.cps.utils.getSystemTime
 import com.demich.cps.utils.ifThen
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 import com.demich.kotlin_stdlib_boost.swap
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -105,7 +105,7 @@ fun ProfilePanel(
             onExpandRequest = onExpandRequest,
             onSwap = { i, j ->
                 val visibleOrder = requireNotNull(visibleOrder) // TODO
-                context.settingsProfiles.platformsOrder.setValueIn(
+                context.settingsProfiles.platformsOrder.saveIn(
                     scope = scope,
                     value = visibleOrder.toMutableList().apply { swap(i, j) }
                 )

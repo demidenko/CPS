@@ -30,7 +30,7 @@ import com.demich.cps.ui.settings.Subtitle
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.collectItemAsState
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -52,17 +52,17 @@ internal fun DateConstraintsSettingsItem() {
                 DurationRow(
                     title = "Max duration = ",
                     duration = dateConstraints.maxDuration,
-                    onDurationChange = { storage.contestMaxDuration.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxDuration.saveIn(scope, it) }
                 )
                 DurationRow(
                     title = "Max start - now = ",
                     duration = dateConstraints.nowToStartTimeMaxDuration,
-                    onDurationChange = { storage.contestMaxNowToStart.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxNowToStart.saveIn(scope, it) }
                 )
                 DurationRow(
                     title = "Max now - end = ",
                     duration = dateConstraints.endTimeToNowMaxDuration,
-                    onDurationChange = { storage.contestMaxEndToNow.setValueIn(scope, it) }
+                    onDurationChange = { storage.contestMaxEndToNow.saveIn(scope, it) }
                 )
             }
         }

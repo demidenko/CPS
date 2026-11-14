@@ -3,7 +3,7 @@ package com.demich.datastore_itemized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun <T> DataStoreItem<T>.setValueIn(
+fun <T> DataStoreItem<T>.saveIn(
     scope: CoroutineScope,
     value: T
 ) {

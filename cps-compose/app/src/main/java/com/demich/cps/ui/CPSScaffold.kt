@@ -37,7 +37,7 @@ import com.demich.cps.utils.collectAsStateWithNull
 import com.demich.cps.utils.context
 import com.demich.cps.utils.ifThen
 import com.demich.cps.utils.onNotNull
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 
 @Stable
 internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessMediumLow)
@@ -155,7 +155,7 @@ private fun BottomBarAndNavBar(
                     backgroundColor = { backgroundColor },
                     specs = specs,
                     onChangeLayout = {
-                        context.settingsUI.navigationLayoutType.setValueIn(scope, it)
+                        context.settingsUI.navigationLayoutType.saveIn(scope, it)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

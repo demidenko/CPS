@@ -36,7 +36,7 @@ import com.demich.cps.utils.context
 import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.combine
 import com.demich.datastore_itemized.edit
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 import com.demich.datastore_itemized.value
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -70,8 +70,8 @@ internal fun StatusBarButtons(
                     rankSelector = specs.selector,
                     platforms = platforms,
                     disabledPlatforms = specs.disabledPlatforms,
-                    onSetEnabled = { settingsUI.coloredStatusBar.setValueIn(scope, it) },
-                    onSetRankSelector = { settingsUI.statusBarRankSelector.setValueIn(scope, it) },
+                    onSetEnabled = { settingsUI.coloredStatusBar.saveIn(scope, it) },
+                    onSetRankSelector = { settingsUI.statusBarRankSelector.saveIn(scope, it) },
                     onCheckedChange = { platform, checked ->
                         scope.launch {
                             settingsUI.statusBarDisabledPlatforms.edit {

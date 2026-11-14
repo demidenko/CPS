@@ -21,7 +21,7 @@ import com.demich.cps.utils.IncludeFontPadding
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
 import com.demich.cps.utils.context
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +38,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
     val onClick = remember {
         patternClickListener(pattern = "._.._...", clock = Clock.System) {
             showDevModeLine = true
-            context.settingsUI.devModeEnabled.setValueIn(scope, true)
+            context.settingsUI.devModeEnabled.saveIn(scope, true)
         }
     }
 
@@ -53,7 +53,7 @@ fun CPSAboutDialog(onDismissRequest: () -> Unit) {
             devModeEnabled = devModeEnabled,
             showDevModeLine = showDevModeLine,
             onDevModeChange = { checked ->
-                context.settingsUI.devModeEnabled.setValueIn(scope, checked)
+                context.settingsUI.devModeEnabled.saveIn(scope, checked)
             }
         )
     }

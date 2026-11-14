@@ -20,7 +20,7 @@ import com.demich.cps.utils.collectItemAsState
 import com.demich.cps.utils.collectUntilFirst
 import com.demich.cps.utils.onNotNull
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,7 +56,7 @@ fun <T> Select(
             optionTitle = optionTitle,
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
-                item.setValueIn(scope, it)
+                item.saveIn(scope, it)
             }
         )
     }

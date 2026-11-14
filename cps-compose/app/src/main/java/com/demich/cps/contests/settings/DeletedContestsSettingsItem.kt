@@ -16,7 +16,7 @@ import com.demich.cps.utils.TimedCollection
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.emptyTimedCollection
 import com.demich.datastore_itemized.DataStoreItem
-import com.demich.datastore_itemized.setValueIn
+import com.demich.datastore_itemized.saveIn
 
 @Composable
 context(scope: SettingsContainerScope)
@@ -39,7 +39,7 @@ internal fun DeletedContestsSettingsItem(
             title = { Text("Reset ignored?") },
             onDismissRequest = { showDialog = false },
             onConfirmRequest = {
-                item.setValueIn(scope, emptyTimedCollection())
+                item.saveIn(scope, emptyTimedCollection())
             }
         )
     }
