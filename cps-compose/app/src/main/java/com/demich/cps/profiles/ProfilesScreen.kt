@@ -31,6 +31,7 @@ import com.demich.cps.profiles.managers.flowOfEnabledProfiles
 import com.demich.cps.profiles.managers.platform
 import com.demich.cps.profiles.managers.profileManagerOf
 import com.demich.cps.profiles.managers.profilePlatforms
+import com.demich.cps.profiles.managers.sortByPlatformsOrder
 import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.CPSDefaults
@@ -276,7 +277,5 @@ private fun flowOfProfilesOrder(context: Context) =
         flow = ProfileManager.entries().flowOfEnabledProfiles(context),
         flow2 = context.settingsProfiles.platformsOrder.asFlow()
     ) { profiles, order ->
-        order.mapNotNull { platform ->
-            profiles.find { it.platform == platform }
-        }
+        profiles.sortByPlatformsOrder(order) { it.platform }
     }

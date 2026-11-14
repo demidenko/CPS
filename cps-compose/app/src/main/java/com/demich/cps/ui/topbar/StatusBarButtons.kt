@@ -20,6 +20,7 @@ import com.demich.cps.platforms.Platform
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.flowOfEnabledProfiles
 import com.demich.cps.profiles.managers.platform
+import com.demich.cps.profiles.managers.sortByPlatformsOrder
 import com.demich.cps.profiles.settingsProfiles
 import com.demich.cps.ui.CPSCheckBox
 import com.demich.cps.ui.CPSDefaults
@@ -54,7 +55,7 @@ internal fun StatusBarButtons(
         ProfileManager.ratedEntries().flowOfEnabledProfiles(context)
             .map { it.map { it.platform } }
             .combine(context.settingsProfiles.platformsOrder.asFlow()) { platforms, order ->
-                platforms.sortedBy { order.indexOf(it) }
+                platforms.sortByPlatformsOrder(order) { it }
             }
     }.collectAsState(initial = null)
 
