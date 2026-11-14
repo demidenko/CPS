@@ -30,7 +30,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.demich.cps.ui.CPSCheckBoxTitled
 import com.demich.cps.ui.CPSRadioButtonTitled
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.IncludeFontPadding
 
 
 @Composable
@@ -76,14 +75,12 @@ fun CPSDialog(
         horizontalAlignment = Alignment.CenterHorizontally,
         onDismissRequest = onDismissRequest,
         content = {
-            IncludeFontPadding {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
-                content()
-            }
+            Text(
+                text = title,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+            content()
         }
     )
 }
