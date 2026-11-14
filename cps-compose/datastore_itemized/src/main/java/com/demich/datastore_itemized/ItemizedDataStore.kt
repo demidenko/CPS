@@ -140,9 +140,4 @@ abstract class ItemizedDataStore(wrapper: DataStoreWrapper) {
         noinline defaultValue: () -> Map<K, V> = ::emptyMap
     ): DataStoreItem<Map<K, V>> = item(name, defaultValue)
 
-
-    protected fun <T> DataStoreItem<T>.mapGetter(transform: (T) -> T): DataStoreItem<T> =
-        dataStoreItem(saver = object : PreferencesSaver<T> by saver {
-            override fun restore(prefs: Preferences): T = transform(saver.restore(prefs))
-        })
 }
