@@ -37,7 +37,7 @@ abstract class RatedProfileStorage<U: RatedUserInfo>(
         }
 
         //save
-        lastRatingChange.setValue(ratingChange.short())
+        lastRatingChange.save(ratingChange.short())
 
         if (prev == null) return //TODO: consider cases
 

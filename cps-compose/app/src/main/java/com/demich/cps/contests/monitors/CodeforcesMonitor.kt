@@ -85,7 +85,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                     submissionsInfo.value = problemResults.makeMapWith(submissions)
                 }
             }.onFailure {
-                lastRequestFailureMsg.setValue(it.toMonitorMsg())
+                lastRequestFailureMsg.save(it.toMonitorMsg())
             }
         }
 
@@ -103,7 +103,7 @@ suspend fun CodeforcesMonitorDataStore.launchIn(
                 pageContentProvider = pageContentProvider
             )
             .collect {
-                sysTestPercentage.setValue(it)
+                sysTestPercentage.save(it)
             }
     }
 
@@ -129,7 +129,7 @@ private suspend inline fun CodeforcesApi.updateStandingsData(
             participantTypes = [CONTESTANT, OUT_OF_COMPETITION]
         )
     }.onFailure { e ->
-        monitor.lastRequestFailureMsg.setValue(e.toMonitorMsg())
+        monitor.lastRequestFailureMsg.save(e.toMonitorMsg())
         if (e is CodeforcesApiContestNotStartedException && e.contestId == contestId) {
             monitor.contestInfo.update { it?.copy(phase = BEFORE) }
         }

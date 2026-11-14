@@ -91,7 +91,7 @@ fun <T> SelectSubtitled(
             onDismissRequest = { showChangeDialog = false },
             onSelectOption = {
                 scope.launch {
-                    item.setValue(it)
+                    item.save(it)
                     onOptionSaved(it)
                 }
             }
@@ -152,7 +152,7 @@ fun <T: Enum<T>> MultiSelectEnum(
                 onDismissRequest = { showChangeDialog = false },
                 onSaveSelected = {
                     scope.launch {
-                        item.setValue(it)
+                        item.save(it)
                         onNewSelected(it - selected)
                     }
                 }

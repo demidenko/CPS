@@ -53,7 +53,7 @@ class ProjectEulerRecentProblemsWorker(
                 .mapNotNull { (val date) -> date.takeIf { it > currentTime } }
                 .minOrNull()
                 ?.also {
-                    context.workerStorage.problemPublishTime.setValue(it)
+                    context.workerStorage.problemPublishTime.save(it)
                 }
         }
     }

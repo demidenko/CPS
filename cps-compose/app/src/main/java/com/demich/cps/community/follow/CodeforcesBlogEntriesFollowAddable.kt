@@ -50,7 +50,7 @@ fun CodeforcesBlogEntriesFollowAddable(
             onDismissRequest = { showAddToFollowDialogFor = null },
             onConfirmRequest = {
                 scope.launch {
-                    unitsFactory.settingsStorage().codeforcesFollowEnabled.setValue(true)
+                    unitsFactory.settingsStorage().codeforcesFollowEnabled.save(true)
                     unitsFactory.followRepository().addNewUser(user.handle)
                 }
             }

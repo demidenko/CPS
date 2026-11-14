@@ -151,7 +151,7 @@ class CPSNavigator(
                 .debounce(500.milliseconds)
                 .distinctUntilChangedBy { it.rootScreen }
                 .collect {
-                    startScreenItem.setValue(it.rootScreen)
+                    startScreenItem.save(it.rootScreen)
                 }
         }
     }

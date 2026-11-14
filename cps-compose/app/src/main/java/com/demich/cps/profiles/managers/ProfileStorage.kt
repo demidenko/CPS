@@ -34,7 +34,7 @@ abstract class ProfileStorage<U: UserInfo>(
         reset: Boolean = true
     ) {
         if (!reset) {
-            profileItem.setValue(profileResult)
+            profileItem.save(profileResult)
         } else {
             edit {
                 val oldUserId = profileItem.value?.userId
@@ -47,7 +47,7 @@ abstract class ProfileStorage<U: UserInfo>(
     }
 
     suspend fun deleteProfile() {
-        profileItem.setValue(null)
+        profileItem.save(null)
     }
 }
 

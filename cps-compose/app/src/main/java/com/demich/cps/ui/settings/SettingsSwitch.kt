@@ -54,7 +54,7 @@ private inline fun SwitchByItem(
             description = description
         ) {
             scope.launch {
-                item.setValue(it)
+                item.save(it)
                 onCheckedChange(it)
             }
         }

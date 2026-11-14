@@ -77,7 +77,7 @@ class ContestsViewModel: ViewModel() {
         uniqueLaunch(mutex = applyChangedSettingsMutex) {
             val infoDataStore = unitsFactory.infoStorage()
             val snapshot = infoDataStore.settingsSnapshot() ?: return@uniqueLaunch
-            infoDataStore.settingsSnapshot.setValue(null)
+            infoDataStore.settingsSnapshot.save(null)
 
             val settings = unitsFactory.settingsStorage()
             val diff = settings.fetchSettingsSnapshot().differenceFrom(snapshot)

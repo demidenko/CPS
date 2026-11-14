@@ -8,7 +8,7 @@ fun <T> DataStoreItem<T>.setValueIn(
     value: T
 ) {
     scope.launch {
-        setValue(value = value)
+        save(value = value)
     }
 }
 

@@ -14,7 +14,7 @@ internal constructor(
     internal val saver: PreferencesSaver<T>
 ): DataStoreValue<T>(dataStore = dataStore, reader = saver) {
 
-    suspend fun setValue(value: T) {
+    suspend fun save(value: T) {
         dataStore.edit { prefs ->
             saver.save(prefs, value)
         }
