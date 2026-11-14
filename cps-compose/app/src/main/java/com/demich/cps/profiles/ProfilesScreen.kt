@@ -242,7 +242,7 @@ internal fun <U: UserInfo> ChangeSavedProfileDialog(
         manager = manager,
         initial = initial,
         onDismissRequest = onDismissRequest,
-        onResult = { scope.launch { manager.profileStorage(context).setProfile(it) } }
+        onResult = { scope.launch { manager.profileStorage(context).saveProfile(it) } }
     )
 }
 

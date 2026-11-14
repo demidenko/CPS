@@ -29,7 +29,7 @@ abstract class ProfileStorage<U: UserInfo>(
     val profile: DataStoreValue<ProfileResult<U>?>
         get() = profileItem
 
-    suspend fun setProfile(
+    suspend fun saveProfile(
         profileResult: ProfileResult<U>,
         reset: Boolean = true
     ) {

@@ -86,7 +86,7 @@ private suspend fun CodeforcesProfileManager.checkContribution(context: Context)
 
     if (newContribution == userInfo.contribution) return
 
-    storage.setProfile(ProfileResult(userInfo.copy(contribution = newContribution)), reset = false)
+    storage.saveProfile(ProfileResult(userInfo.copy(contribution = newContribution)), reset = false)
 
     val oldContribution = getNotifiedCodeforcesContribution(context) ?: userInfo.contribution
 

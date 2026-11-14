@@ -64,7 +64,7 @@ class ProfilesViewModel: ViewModel() {
                 if (it is FetchResult) {
                     val profileResult = it.toProfileResult(userId)
                     if (profileResult !is ProfileResult.Failed) {
-                        storage.setProfile(profileResult, reset = false)
+                        storage.saveProfile(profileResult, reset = false)
                     }
                 }
                 setLoadingStatus(manager, it.toLoadingStatus())
@@ -118,7 +118,7 @@ class ProfilesViewModel: ViewModel() {
             fetchFlowOf { manager.getUserInfo(userId) }.collect {
                 when (it) {
                     is FetchResult -> {
-                        storage.setProfile(it.toProfileResult(userId))
+                        storage.saveProfile(it.toProfileResult(userId))
                         // PENDING even on Failure
                         setLoadingStatus(manager, PENDING)
                     }

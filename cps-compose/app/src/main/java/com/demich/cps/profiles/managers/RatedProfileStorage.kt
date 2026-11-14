@@ -48,12 +48,12 @@ abstract class RatedProfileStorage<U: RatedUserInfo>(
         if (newProfile is ProfileResult.Failed) {
             if (profile is ProfileResult.Success) {
                 val newUserInfo = profile.userInfo.copyRating(rating = ratingChange.rating)
-                setProfile(ProfileResult(newUserInfo), reset = false)
+                saveProfile(ProfileResult(newUserInfo), reset = false)
             } else {
                 // TODO ??????????
             }
         } else {
-            setProfile(newProfile, reset = false)
+            saveProfile(newProfile, reset = false)
         }
 
         notifyRatingChange(
