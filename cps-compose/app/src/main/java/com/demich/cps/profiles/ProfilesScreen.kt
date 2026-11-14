@@ -37,7 +37,6 @@ import com.demich.cps.ui.CPSDefaults
 import com.demich.cps.ui.CPSIconButton
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSReloadingButton
-import com.demich.cps.ui.bottombar.AdditionalBottomBarBuilder
 import com.demich.cps.ui.bottomprogressbar.progressBarsViewModel
 import com.demich.cps.ui.lazylist.itemsNotEmpty
 import com.demich.cps.ui.theme.cpsColors
@@ -122,18 +121,21 @@ fun CPSNavigator.ScreenScope<Screen.Profiles>.NavContentProfilesScreen(
         reorderEnabled = reorderEnabled
     )
 
-    bottomBar = profilesBottomBarBuilder(
-        enabledPlatforms = profiles.map { it.platform },
-        reorderEnabled = reorderEnabled,
-        onReorderDone = { reorderEnabled = false }
-    )
+    bottomBar = {
+        ProfilesBottomBar(
+            enabledPlatforms = profiles.map { it.platform },
+            reorderEnabled = reorderEnabled,
+            onReorderDone = { reorderEnabled = false }
+        )
+    }
 }
 
-private fun profilesBottomBarBuilder(
+@Composable
+private fun ProfilesBottomBar(
     enabledPlatforms: List<Platform>,
     reorderEnabled: Boolean,
     onReorderDone: () -> Unit
-): AdditionalBottomBarBuilder = {
+) {
     if (reorderEnabled) {
         CPSIconButton(
             icon = CPSIcons.ReorderDone,
