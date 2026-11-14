@@ -70,6 +70,15 @@ val profilePlatforms: List<Platform> =
 fun profileManagerOf(platform: Platform) =
     ProfileManager.entries().first { it.platform == platform }
 
+fun <T> Collection<T>.sortByPlatformsOrder(order: List<Platform>, block: (T) -> Platform): List<T> =
+    sortedBy {
+        val platform = block(it)
+        val index = order.indexOf(platform)
+        // missing should be in the end
+        if (index == -1) order.size + platform.ordinal
+        else index
+    }
+
 interface ProfileSuggestionsProvider {
     suspend fun getSuggestions(str: String): List<UserSuggestion>
 
