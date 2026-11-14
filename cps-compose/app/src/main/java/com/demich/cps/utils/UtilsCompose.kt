@@ -18,7 +18,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -46,9 +45,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -278,13 +275,4 @@ fun rememberUUIDState(): ResetableUUIDState {
 
     @SuppressLint("UnrememberedMutableState")
     return ResetableUUIDState(state = uuidState)
-}
-
-//TODO: remove it (use default includeFontPadding = false)
-@Composable
-fun IncludeFontPadding(content: @Composable () -> Unit) {
-    ProvideTextStyle(
-        value = TextStyle(platformStyle = PlatformTextStyle(includeFontPadding = true)),
-        content = content
-    )
 }
