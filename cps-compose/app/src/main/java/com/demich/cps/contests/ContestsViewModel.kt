@@ -31,14 +31,14 @@ fun contestsViewModel(): ContestsViewModel = sharedViewModel()
 
 class ContestsViewModel: ViewModel() {
 
-    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-        fetchResults.map { it.values.combineLoadingStatus { it.loadingStatus } }
-
-    fun flowOfLoadingErrors(): Flow<List<Pair<ContestsFetchSource?, Throwable>>> =
+    fun flowOfLoadingState(): Flow<ContestsLoadingState> =
         fetchResults.map {
-            it.values.flatMap {
-                if (it.loadingStatus == FAILED) it.errors else []
-            }
+            ContestsLoadingState(
+                loadingStatus = it.values.combineLoadingStatus { it.loadingStatus },
+                errors = it.values.flatMap {
+                    if (it.loadingStatus == FAILED) it.errors else []
+                }
+            )
         }
 
     private val fetchResults = MutableStateFlow(emptyMap<ContestPlatform, FetchTrack>())
@@ -98,6 +98,11 @@ class ContestsViewModel: ViewModel() {
         }
     }
 }
+
+data class ContestsLoadingState(
+    val loadingStatus: LoadingStatus,
+    val errors: List<Pair<ContestsFetchSource?, Throwable>>
+)
 
 private fun ContestsFetchSettingsSnapshotDiff.contestPlatformsToReload(): Set<ContestPlatform> =
     emptyEnumSet<ContestPlatform>().apply {

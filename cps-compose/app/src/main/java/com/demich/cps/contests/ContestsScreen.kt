@@ -37,7 +37,7 @@ import com.demich.cps.navigation.Screen
 import com.demich.cps.navigation.ScreenTitleState
 import com.demich.cps.navigation.cpsScreenTitleOf
 import com.demich.cps.platforms.clients.niceMessage
-import com.demich.cps.ui.AnimatedVisibleByNotNull
+import com.demich.cps.ui.AnimatedVisibleOfNotNull
 import com.demich.cps.ui.CPSIcons
 import com.demich.cps.ui.CPSMenuBuilder
 import com.demich.cps.ui.CPSSwipeRefreshBox
@@ -50,12 +50,10 @@ import com.demich.cps.ui.filter.rememberFilterState
 import com.demich.cps.ui.lazylist.LazyColumnOfData
 import com.demich.cps.ui.theme.LocalDevModeEnabled
 import com.demich.cps.ui.theme.cpsColors
-import com.demich.cps.utils.LoadingStatus
 import com.demich.cps.utils.ProvideCurrentTime
 import com.demich.cps.utils.add
 import com.demich.cps.utils.backgroundCoroutineScope
 import com.demich.cps.utils.clickableNoRipple
-import com.demich.cps.utils.collectAsState
 import com.demich.cps.utils.enterInColumn
 import com.demich.cps.utils.exitInColumn
 import com.demich.cps.utils.getSystemTime
@@ -97,19 +95,19 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
         onOpenSettings = navigateToSettings
     )
 
-    val anyPlatformEnabled = rememberRunBlocking { unitsFactory.settingsStorage().anyPlatformEnabled() }
-
-    val loadingStatus by remember {
-        flowOfLoadingStatus(viewModel = viewModel, work = unitsFactory.work())
+    val loadingState by remember {
+        flowOfLoadingState(viewModel = viewModel, work = unitsFactory.work())
     }.collectAsStateWithLifecycle(initialValue = null)
 
     val onReload = { viewModel.reloadEnabledPlatforms(unitsFactory = unitsFactory) }
 
+    val anyPlatformEnabled = rememberRunBlocking { unitsFactory.settingsStorage().anyPlatformEnabled() }
+
     ContestsScreen(
+        loadingState = { loadingState },
         viewState = viewState,
         filterState = filterState,
         anyPlatformEnabled = anyPlatformEnabled,
-        isReloading = { loadingStatus == LOADING },
         onReloadRequest = onReload,
         onDeleteRequest = { contest ->
             scope.launch {
@@ -123,7 +121,7 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
             viewState = viewState,
             filterState = filterState,
             anyPlatformEnabled = anyPlatformEnabled,
-            loadingStatus = loadingStatus,
+            loadingStatus = loadingState?.loadingStatus,
             onReloadClick = onReload
         )
     }
@@ -135,10 +133,10 @@ fun CPSNavigator.ScreenScope<Screen.Contests>.NavContentContestsScreen(
 
 @Composable
 private fun ContestsScreen(
+    loadingState: () -> ContestsLoadingState?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
-    isReloading: () -> Boolean,
     onReloadRequest: () -> Unit,
     onDeleteRequest: (Contest) -> Unit
 ) {
@@ -153,10 +151,10 @@ private fun ContestsScreen(
     ProvideCurrentTime(currentTimeState) {
         ContestsScreen(
             sortedContests = contestsState.value,
+            loadingState = loadingState(),
             viewState = viewState,
             filterState = filterState,
             anyPlatformEnabled = anyPlatformEnabled,
-            isReloading = isReloading,
             onReloadRequest = onReloadRequest,
             onDeleteRequest = onDeleteRequest
         )
@@ -166,10 +164,10 @@ private fun ContestsScreen(
 @Composable
 private fun ContestsScreen(
     sortedContests: SortedContests?,
+    loadingState: ContestsLoadingState?,
     viewState: ContestsListViewState,
     filterState: FilterState,
     anyPlatformEnabled: Boolean,
-    isReloading: () -> Boolean,
     onReloadRequest: () -> Unit,
     onDeleteRequest: (Contest) -> Unit
 ) {
@@ -178,9 +176,9 @@ private fun ContestsScreen(
         if (anyPlatformEnabled) {
             ContestsReloadablePager(
                 sortedContests = sortedContests,
+                loadingState = loadingState,
                 viewState = viewState,
                 filterState = filterState,
-                isReloading = isReloading,
                 onReloadRequest = onReloadRequest,
                 onDeleteRequest = onDeleteRequest,
                 modifier = Modifier.weight(1f, false)
@@ -206,31 +204,34 @@ private fun ContestsScreen(
 @Composable
 private fun ContestsReloadablePager(
     sortedContests: SortedContests?,
+    loadingState: ContestsLoadingState?,
     viewState: ContestsListViewState,
     filterState: FilterState,
-    isReloading: () -> Boolean,
     onReloadRequest: () -> Unit,
     onDeleteRequest: (Contest) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    CPSSwipeRefreshBox(
-        isRefreshing = isReloading(),
-        onRefresh = onReloadRequest,
-        modifier = modifier
-    ) {
-        Column {
-            LoadingError(
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            ContestsPager(
-                sortedContests = sortedContests,
-                viewState = viewState,
-                filterState = filterState,
-                onDeleteRequest = onDeleteRequest,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+    if (loadingState != null) {
+        CPSSwipeRefreshBox(
+            isRefreshing = loadingState.loadingStatus == LOADING,
+            onRefresh = onReloadRequest,
+            modifier = modifier
+        ) {
+            Column {
+                LoadingErrors(
+                    loadingState = loadingState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                ContestsPager(
+                    sortedContests = sortedContests,
+                    viewState = viewState,
+                    filterState = filterState,
+                    onDeleteRequest = onDeleteRequest,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -334,12 +335,27 @@ internal fun Modifier.contestItemPaddings() =
     )
 
 @Composable
-private fun LoadingError(
+private fun LoadingErrors(
+    loadingState: ContestsLoadingState,
     modifier: Modifier = Modifier
 ) {
-    val messageState = loadingErrorsMessageState()
-    AnimatedVisibleByNotNull(
-        value = messageState::value,
+    val exposeAll = LocalDevModeEnabled.current
+    val errors = loadingState.errors
+
+    val message = remember(errors, exposeAll) {
+        if (errors.isEmpty()) null
+        else {
+            errors.groupBy(
+                keySelector = { (val e = second) ->
+                    e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
+                },
+                valueTransform = { it.first }
+            ).entries.joinToString(separator = "; ") { [msg, list] -> "${list.distinct()}: $msg" }
+        }
+    }
+
+    AnimatedVisibleOfNotNull(
+        value = message,
         enter = enterInColumn(),
         exit = exitInColumn(),
         modifier = modifier.fillMaxWidth()
@@ -387,27 +403,6 @@ private fun NoneEnabledMessage(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-private fun loadingErrorsMessageState(): State<String?> {
-    val viewModel = contestsViewModel()
-    val errors by collectAsState { viewModel.flowOfLoadingErrors() }
-
-    val exposeAll = LocalDevModeEnabled.current
-    return remember(exposeAll) {
-        derivedStateOf {
-            if (errors.isEmpty()) null
-            else {
-                errors.groupBy(
-                    keySelector = { (val e = second) ->
-                        e.niceMessage ?: if (exposeAll) "$e" else "Some error..."
-                    },
-                    valueTransform = { it.first }
-                ).entries.joinToString(separator = "; ") { [msg, list] -> "${list.distinct()}: $msg" }
-            }
-        }
-    }
-}
-
 private suspend fun ContestsSettingsDataStore.anyPlatformEnabled(): Boolean =
     fromSnapshot {
         enabledPlatforms.value.isNotEmpty() || clistAdditionalResources.value.isNotEmpty()
@@ -434,14 +429,14 @@ private fun flowOfHidden(
         else ignored + Pair(codeforces, monitorContestId.toString())
     }
 
-private fun flowOfLoadingStatus(
+private fun flowOfLoadingState(
     viewModel: ContestsViewModel,
     work: CPSPeriodicWork
-): Flow<LoadingStatus> =
+): Flow<ContestsLoadingState> =
     combine(
-        viewModel.flowOfLoadingStatus(),
+        viewModel.flowOfLoadingState(),
         work.flowOfWorkInfo()
-    ) { loadingStatus, workInfo ->
-        if (workInfo.isRunning) LOADING
-        else loadingStatus
+    ) { state, workInfo ->
+        if (workInfo.isRunning) state.copy(loadingStatus = LOADING)
+        else state
     }
