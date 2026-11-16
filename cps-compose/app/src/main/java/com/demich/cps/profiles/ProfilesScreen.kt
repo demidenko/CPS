@@ -144,24 +144,28 @@ private fun ProfilesBottomBar(
         )
     } else {
         AddProfileButton(enabledPlatforms = enabledPlatforms)
-        ReloadProfilesButton(anyPlatformEnabled = enabledPlatforms.isNotEmpty())
+        ReloadProfilesButton(enabledPlatforms = enabledPlatforms)
     }
 }
 
 @Composable
 private fun ReloadProfilesButton(
-    anyPlatformEnabled: Boolean
+    enabledPlatforms: List<Platform>
 ) {
     val context = context
     val viewModel = profilesViewModel()
 
-    val loadingStatus by remember { viewModel.flowOfLoadingStatus() }.collectAsState(initial = null)
+    val loadingStatus by remember(enabledPlatforms) {
+        viewModel.flowOfLoadingStatus(enabledPlatforms)
+    }.collectAsState(initial = null)
 
     CPSReloadingButton(
         loadingStatus = loadingStatus,
-        enabled = anyPlatformEnabled,
+        enabled = enabledPlatforms.isNotEmpty(),
         onClick = {
-            ProfileManager.entries().forEach { viewModel.reload(it, context) }
+            enabledPlatforms.forEach {
+                viewModel.reload(profileManagerOf(it), context)
+            }
         }
     )
 }

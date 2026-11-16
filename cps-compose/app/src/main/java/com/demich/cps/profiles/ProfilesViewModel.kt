@@ -19,7 +19,7 @@ import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.UserInfo
 import com.demich.cps.ui.bottomprogressbar.ProgressBarsViewModel
 import com.demich.cps.utils.LoadingStatus
-import com.demich.cps.utils.combine
+import com.demich.cps.utils.combineLoadingStatus
 import com.demich.cps.utils.joinAllWithProgress
 import com.demich.cps.utils.set
 import com.demich.cps.utils.sharedViewModel
@@ -45,8 +45,10 @@ class ProfilesViewModel: ViewModel() {
     fun flowOfLoadingStatus(platform: Platform): Flow<LoadingStatus> =
         loadingStatuses.map { it[platform] ?: PENDING }
 
-    fun flowOfLoadingStatus(): Flow<LoadingStatus> =
-        loadingStatuses.map { it.values.combine() }
+    fun flowOfLoadingStatus(platforms: Collection<Platform>): Flow<LoadingStatus> =
+        loadingStatuses.map { map ->
+            platforms.combineLoadingStatus { map[it] ?: PENDING }
+        }
 
     private fun setLoadingStatus(manager: ProfileManager<*>, loadingStatus: LoadingStatus) =
         loadingStatuses.set(
