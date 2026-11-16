@@ -30,6 +30,7 @@ fun <T> LazyColumnOfData(
     items: List<T>?,
     key: ((item: T) -> Any)? = null,
     contentType: (item: T) -> Any? = { null },
+    onEmpty: @Composable () -> Unit = { Text(text = "List is empty") },
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Box(modifier = modifier.ifThen(scrollUpButtonEnabled) { clipToBounds() }) {
@@ -41,7 +42,7 @@ fun <T> LazyColumnOfData(
             ) {
                 itemsNotEmpty(
                     items = items,
-                    onEmptyMessage = { Text(text = "List is empty") },
+                    onEmptyMessage = onEmpty,
                     key = key,
                     itemContent = itemContent,
                     contentType = contentType
