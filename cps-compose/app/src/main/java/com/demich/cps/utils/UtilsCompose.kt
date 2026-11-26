@@ -25,7 +25,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -203,7 +203,7 @@ fun animateToggleColorAsState(
         label = "color_fraction"
     )
     return remember(disabledColorState, enabledColorState, fractionState) {
-        derivedStateOf {
+        computedStateOf {
             lerp(
                 start = disabledColorState.value,
                 stop = enabledColorState.value,

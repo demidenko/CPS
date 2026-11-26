@@ -5,7 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -40,7 +40,7 @@ fun ratedProfilesColorState(
     val rankGetter by collectAsState { flowOfRankGetter(context) }
 
     val rank: RatedRank? by remember(navigator) {
-        derivedStateOf {
+        computedStateOf {
             rankGetter[navigator.currentScreen?.platformOrNull()]
         }
     }

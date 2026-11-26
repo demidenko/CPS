@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,7 +30,7 @@ fun LazyListScrollUpButton(
     val animationScope = rememberCoroutineScope()
 
     val visible by remember(listState) {
-        derivedStateOf {
+        computedStateOf {
             listState.lastScrolledBackward && listState.firstVisibleItemIndex > 0
         }
     }

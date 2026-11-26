@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -194,7 +194,7 @@ private fun Scrim(
         label = "scrim_alpha"
     )
 
-    val visible by remember { derivedStateOf { alpha > 0 } }
+    val visible by remember { computedStateOf { alpha > 0 } }
 
     if (visible) {
         Box(
