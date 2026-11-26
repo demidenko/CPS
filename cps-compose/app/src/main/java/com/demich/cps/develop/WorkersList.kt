@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Divider
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -21,10 +22,10 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -529,17 +530,21 @@ private fun CodeforcesMonitorDialog(onDismissRequest: () -> Unit, onStart: (Int)
     }.collectUntilFirst()
 
     initIdState.onNotNull { initContestId ->
-        var contestId: String by rememberSaveable { mutableStateOf(value = initContestId) }
+        val textFieldState = rememberTextFieldState(initialText = initContestId)
+        val contestId by remember {
+            computedStateOf {
+                textFieldState.text.toString().toIntOrNull()
+            }
+        }
 
         CPSYesNoDialog(
             onDismissRequest = onDismissRequest,
-            onConfirmRequest = { contestId.toIntOrNull()?.let(onStart) },
+            onConfirmRequest = { contestId?.let(onStart) },
             title = {
                 TextField(
-                    value = contestId,
-                    onValueChange = { contestId = it },
+                    state = textFieldState,
                     label = { Text("contestId") },
-                    isError = contestId.toIntOrNull() == null
+                    isError = contestId == null
                 )
             }
         )
