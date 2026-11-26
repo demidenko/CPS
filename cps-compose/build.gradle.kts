@@ -25,7 +25,11 @@ private val javaVersion = JavaVersion.toVersion(25)
 
 fun CommonExtension.baseAndroidConfig() {
     val apiLevel = 37
-    compileSdk { version = release(version = apiLevel) }
+    compileSdk {
+        version = release(version = apiLevel) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig.apply {
         minSdk = 26
