@@ -7,15 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -89,7 +89,7 @@ private fun ColumnScope.DialogContent(
     onSelectResource: (ClistResource) -> Unit,
     onUnselectResource: (ClistResource) -> Unit
 ) {
-    var searchFilter by remember { mutableStateOf("") }
+    val textFieldState = rememberTextFieldState(initialText = "")
 
     Column(
         modifier = Modifier.weight(1f, fill = false),
@@ -97,7 +97,7 @@ private fun ColumnScope.DialogContent(
     ) {
         ListTitle(text = "selected:")
         ClistResourcesList(
-            resources = filter(selected, searchFilter),
+            resources = filter(selected, textFieldState.text),
             modifier = Modifier
                 .padding(bottom = 3.dp)
                 .heightIn(max = 200.dp),
@@ -115,15 +115,14 @@ private fun ColumnScope.DialogContent(
         ) { resources ->
             val unselected = resources - selected.toSet()
             ClistResourcesList(
-                resources = filter(unselected, searchFilter),
+                resources = filter(unselected, textFieldState.text),
                 onItemClick = onSelectResource
             )
         }
     }
 
     OutlinedTextField(
-        value = searchFilter,
-        onValueChange = { searchFilter = it },
+        state = textFieldState,
         leadingIcon = {
             Icon(
                 imageVector = CPSIcons.Search,
@@ -131,12 +130,12 @@ private fun ColumnScope.DialogContent(
                 tint = cpsColors.content
             )
         },
-        singleLine = true,
+        lineLimits = TextFieldLineLimits.SingleLine,
         modifier = Modifier.fillMaxWidth()
     )
 }
 
-private fun filter(resources: List<ClistResource>, searchFilter: String) =
+private fun filter(resources: List<ClistResource>, searchFilter: CharSequence) =
     resources.filter { it.name.contains(searchFilter, ignoreCase = true) }
 
 
