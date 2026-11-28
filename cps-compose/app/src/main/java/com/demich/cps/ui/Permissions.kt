@@ -38,9 +38,7 @@ fun rememberNotificationsPermissionsState(): State<PermissionStatus> {
         }
     } else {
         return remember {
-            object : State<PermissionStatus> {
-                override val value: PermissionStatus get() = Granted
-            }
+            computedStateOf { PermissionStatus.Granted }
         }
     }
 }
