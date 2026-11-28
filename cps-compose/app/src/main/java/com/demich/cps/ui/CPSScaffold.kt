@@ -24,9 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import com.demich.cps.navigation.CPSNavBarState
-import com.demich.cps.navigation.CPSNavigator
 import com.demich.cps.navigation.Screen
-import com.demich.cps.navigation.navBarState
 import com.demich.cps.ui.bottombar.CPSBottomBar
 import com.demich.cps.ui.bottomprogressbar.CPSBottomProgressBarsColumn
 import com.demich.cps.ui.theme.cpsColors
@@ -45,8 +43,9 @@ internal fun <T> switchAnimationSpec() = spring<T>(stiffness = Spring.StiffnessM
 @Composable
 fun CPSScaffold(
     modifier: Modifier = Modifier,
-    navigator: CPSNavigator, // TODO: remove this arg
+    navBarState: () -> CPSNavBarState?,
     onNavigateToScreen: (Screen.RootScreen) -> Unit,
+    topBarContent: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -56,11 +55,11 @@ fun CPSScaffold(
     ) {
         NavBarShelf(
             modifier = Modifier.fillMaxSize(),
-            state = navigator::navBarState,
+            state = navBarState,
             onNavigateToScreen = onNavigateToScreen,
             content = {
                 TopBarsAndContent(
-                    topBars = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) },
+                    topBars = topBarContent,
                     content = content,
                     modifier = Modifier.fillMaxSize()
                 )

@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -20,6 +22,7 @@ import com.demich.cps.contests.NavContentContestsScreen
 import com.demich.cps.contests.settings.NavContentContestsSettingsScreen
 import com.demich.cps.develop.NavContentDevelopmentScreen
 import com.demich.cps.navigation.Screen
+import com.demich.cps.navigation.navBarState
 import com.demich.cps.navigation.navEntry
 import com.demich.cps.navigation.rememberCPSNavigator
 import com.demich.cps.profiles.NavContentProfilesExpandedScreen
@@ -127,8 +130,9 @@ private fun CPSContent() {
     }
 
     CPSScaffold(
-        navigator = navigator,
-        onNavigateToScreen = navigator::navigateTo
+        navBarState = navigator::navBarState,
+        onNavigateToScreen = navigator::navigateTo,
+        topBarContent = { navigator.TopBarWithStatusBar(modifier = Modifier.fillMaxWidth()) }
     ) {
         navigator.NavHost(builder = navBuilder)
     }
