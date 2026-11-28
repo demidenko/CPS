@@ -16,7 +16,6 @@ import com.demich.cps.profiles.RatingColorTag
 import com.demich.cps.profiles.managers.ProfileManager
 import com.demich.cps.profiles.managers.RatedProfileManager
 import com.demich.cps.profiles.managers.colorFor
-import com.demich.cps.profiles.userinfo.ProfileResult
 import com.demich.cps.profiles.userinfo.RatedUserInfo
 import com.demich.cps.profiles.userinfo.userInfoOrNull
 import com.demich.cps.ui.theme.cpsColors
@@ -87,10 +86,11 @@ private data class RatedRank(
     val manager: RatedProfileManager<*>
 )
 
-private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileResult<U>?): RatedRank? {
-    val rating = profile?.userInfoOrNull()?.rating ?: return null
+private fun RatedProfileManager<*>.getRank(rating: Int?): RatedRank? {
+    val rating = rating ?: return null
     val bounds = ratingsUpperBounds
     val colorTag = bounds.colorTagFor(rating)
+
     val rank = when (colorTag) {
         RED -> Double.POSITIVE_INFINITY
         else -> {
@@ -105,6 +105,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
             i + (rating - lower) / blockLength
         }
     }
+
     return RatedRank(
         rank = rank,
         colorTag = colorTag,
@@ -114,7 +115,7 @@ private fun <U: RatedUserInfo> RatedProfileManager<U>.getRank(profile: ProfileRe
 
 
 private fun <U: RatedUserInfo> RatedProfileManager<U>.flowOfRatedRank(context: Context): Flow<RatedRank?> =
-    profileStorage(context).profile.asFlow().map { getRank(it) }
+    profileStorage(context).profile.asFlow().map { getRank(rating = it?.userInfoOrNull()?.rating) }
 
 private fun flowOfValidRanks(context: Context): Flow<List<RatedRank>> =
     combine(ProfileManager.ratedEntries().map { it.flowOfRatedRank(context) }) { it.filterNotNull() }
