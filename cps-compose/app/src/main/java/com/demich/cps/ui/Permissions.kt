@@ -16,7 +16,6 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.computedStateOf
 import androidx.compose.runtime.remember
@@ -61,35 +60,6 @@ fun rememberNotificationsPermissionsState(): State<PermissionStatus> {
             object : State<PermissionStatus> {
                 override val value: PermissionStatus get() = Granted
             }
-        }
-    }
-}
-
-@Composable
-fun NotificationsPermissionPanel(
-    permissionRequired: Boolean,
-    modifier: Modifier = Modifier
-) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        if (permissionRequired) {
-            NotificationsPermissionPanel(modifier = modifier)
-        }
-    }
-}
-
-@Composable
-private fun NotificationsPermissionPanel(modifier: Modifier) {
-    val state = rememberNotificationsPermissionsState()
-    val status = state.value
-    if (status is PermissionStatus.NotGranted) {
-        PermissionPanel(
-            modifier = modifier,
-            message = message,
-            onClick = status.permissionRequest,
-        )
-
-        SideEffect(status) {
-            if (status.canForceRequest) status.permissionRequest()
         }
     }
 }
@@ -151,4 +121,4 @@ private fun PreviewPermissionPanel() {
     }
 }
 
-private const val message = "Some features you turned on use notifications for full functionality. Grant the permission for CPS to post notifications."
+private const val messageNotifications = "Some features you turned on use notifications for full functionality. Grant the permission for CPS to post notifications."

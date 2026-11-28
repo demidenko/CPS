@@ -2,7 +2,6 @@ package com.demich.cps.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.demich.cps.ui.CPSFontSize
 import com.demich.cps.ui.IconSp
-import com.demich.cps.ui.NotificationsPermissionPanel
 import com.demich.cps.ui.theme.cpsColors
 import com.demich.cps.utils.ProvideContentColor
 
@@ -43,18 +41,6 @@ inline fun SettingsColumn(
             content()
         }
         Spacer(modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Composable
-inline fun SettingsColumn(
-    requiredNotificationsPermission: Boolean,
-    modifier: Modifier = Modifier,
-    content: @Composable context(SettingsContainerScope) () -> Unit
-) {
-    Column(modifier = modifier) {
-        SettingsColumn(content = content, modifier = Modifier.weight(1f))
-        NotificationsPermissionPanel(permissionRequired = requiredNotificationsPermission)
     }
 }
 
